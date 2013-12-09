@@ -12,7 +12,7 @@ else:
 @app.route('/hello')
 def hello_world():
     return ('Hello World! I am the Keble Ball Ticketing System, '
-        'running in the {0} environment').format(app.config['ENVIRONMENT'])
+        'running in the {0} environment').format(getenv('KEBLE_BALL_ENV', 'DEVELOPMENT'))
 
 @app.route('/')
 def index():
