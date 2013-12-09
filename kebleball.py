@@ -1,11 +1,11 @@
-from flask import Flask
+from flask import Flask, request
 import os
 import json
 
 app = Flask(__name__)
 app.config.from_object('config.default')
 
-if os.getenv('KEBLE_BALL_ENV', 'DEVELOPMENT') == 'PRODUCTION':
+if request.environ.get('KEBLE_BALL_ENV') == 'PRODUCTION':
     app.config.from_object('config.production')
 else:
     app.config.from_object('config.development')
@@ -21,8 +21,8 @@ def index():
 
 @app.route('/environ')
 def dump_environ():
-    x = os.environ
-    return str(x)
+    x = request.environ
+    return x
 
 if __name__ == '__main__':
     app.run()
