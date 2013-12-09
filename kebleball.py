@@ -1,5 +1,5 @@
 from flask import Flask
-from os import getenv
+from os import getenv,environ
 
 app = Flask(__name__)
 app.config.from_object('config.default')
@@ -17,6 +17,10 @@ def hello_world():
 @app.route('/')
 def index():
     raise NotImplementedError
+
+@app.route('/environ')
+def environ():
+    return str(environ)
 
 if __name__ == '__main__':
     app.run()
