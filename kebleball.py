@@ -1,10 +1,11 @@
 from flask import Flask
-from os import getenv,environ
+import os
+import json
 
 app = Flask(__name__)
 app.config.from_object('config.default')
 
-if getenv('KEBLE_BALL_ENV', 'DEVELOPMENT') == 'PRODUCTION':
+if os.getenv('KEBLE_BALL_ENV', 'DEVELOPMENT') == 'PRODUCTION':
     app.config.from_object('config.production')
 else:
     app.config.from_object('config.development')
@@ -19,8 +20,9 @@ def index():
     raise NotImplementedError
 
 @app.route('/environ')
-def environ():
-    return str(environ)
+def dump_environ():
+    x = os.environ
+    return str(x)
 
 if __name__ == '__main__':
     app.run()
