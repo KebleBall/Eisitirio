@@ -1,6 +1,7 @@
 Flask==0.10.1
 Flask-SQLAlchemy==1.0
 Flask-WhooshAlchemy==0.55a
+Flask-Login==0.2.7
 Jinja2==2.7.1
 MarkupSafe==0.18
 SQLAlchemy==0.8.3
