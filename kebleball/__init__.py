@@ -30,7 +30,7 @@ def hello_world():
 
 @app.route('/')
 def router():
-    if current_user is not None:
+    if not current_user.is_anonymous():
         return redirect(url_for('dashboard.dashboardHome'))
     else:
         return redirect(url_for('front.home'))
@@ -50,6 +50,3 @@ def utility_processor():
     def get_all(query):
         return query.all()
     return dict(get_all=get_all)
-
-if __name__ == '__main__':
-    app.run()
