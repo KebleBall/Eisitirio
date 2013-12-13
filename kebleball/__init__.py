@@ -11,6 +11,7 @@ app.register_blueprint(ajax.ajax)
 app.register_blueprint(dashboard.dashboard)
 app.register_blueprint(front.front)
 app.register_blueprint(purchase.purchase)
+app.register_blueprint(resale.resale)
 
 login_manager.loginManager.init_app(app)
 

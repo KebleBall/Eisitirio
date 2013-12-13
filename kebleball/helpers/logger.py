@@ -36,13 +36,14 @@ class Logger():
                 datefmt='%Y-%m-%d %H:%M:%S'
             )
 
-        self.database = logging.getLogger('database')
         self.admin = logging.getLogger('admin')
         self.ajax = logging.getLogger('ajax')
         self.dashboard = logging.getLogger('dashboard')
+        self.database = logging.getLogger('database')
         self.front = logging.getLogger('front')
-        self.purchase = logging.getLogger('purchase')
         self.main = logging.getLogger('main')
+        self.purchase = logging.getLogger('purchase')
+        self.resale = logging.getLogger('purchase')
 
     def log(self, module, level, message):
         getattr(getattr(self, module), level)(message)
@@ -52,13 +53,14 @@ class Logger():
 
         if len(components) == 2:
             if components[1] in [
-                'database',
                 'admin',
                 'ajax',
                 'dashboard',
+                'database',
                 'front',
+                'main',
                 'purchase',
-                'main'
+                'resale',
             ]:
                 return lambda level, message: self.log(
                     components[1],

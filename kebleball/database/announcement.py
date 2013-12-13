@@ -7,6 +7,7 @@ Used to store announcements displayed on site and emailed
 
 from kebleball.database import db
 from kebleball.database.user import User
+import smtplib
 
 user_announce_link = db.Table('user_announce_link', db.Model.metadata,
                          db.Column('user_id',

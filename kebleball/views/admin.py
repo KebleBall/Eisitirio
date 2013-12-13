@@ -34,6 +34,12 @@ def announcements():
     # [todo] - Add announcements
     raise NotImplementedError('announcements')
 
+@admin.route('/admin/vouchers')
+@login_required
+def vouchers():
+    # [todo] - Add vouchers
+    raise NotImplementedError('vouchers')
+
 @admin.route('/admin/graphs/sales')
 @login_required
 def graphSales():

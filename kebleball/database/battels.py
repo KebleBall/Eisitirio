@@ -31,14 +31,14 @@ class Battels(db.Model):
     def __getattr__(self, name):
         if name == 'mt_pounds':
             mt = '{0:03d}'.format(self.mt)
-            return mt[:-2] + '.' + []
+            return mt[:-2] + '.' + mt[-2:]
         elif name == 'ht_pounds':
-            ht = '{0:03d}'.format(self.mt)
-            return mt[:-2] + '.' + []
+            ht = '{0:03d}'.format(self.ht)
+            return ht[:-2] + '.' + ht[-2:]
         else:
             raise AttributeError(
-                    "Battels instance has no attribute '{0}'".format(name)
-                )
+                "Battels instance has no attribute '{0}'".format(name)
+            )
 
     def charge(self, term, amount):
         if term not in ['ht', 'mt']:
