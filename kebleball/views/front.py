@@ -1,9 +1,17 @@
 from flask import Blueprint
 
+from kebleball.app import app
+from kebleball.helpers.logger import Logger
+
+logger = Logger(app)
+
+log = logger.log_front
+
 front = Blueprint('front', __name__)
 
 @front.route('/home')
 def home():
+    log('info', 'Attempted access to /home')
     # [todo] - Add homepage
     raise NotImplementedError('homepage')
 

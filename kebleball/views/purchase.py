@@ -1,6 +1,13 @@
 from flask import Blueprint
 from flask.ext.login import login_required
 
+from kebleball.app import app
+from kebleball.helpers.logger import Logger
+
+logger = Logger(app)
+
+log = logger.log_purchase
+
 purchase = Blueprint('purchase', __name__)
 
 @purchase.route('/purchase')

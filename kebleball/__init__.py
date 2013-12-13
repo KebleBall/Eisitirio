@@ -1,18 +1,10 @@
-from flask import Flask, url_for, redirect
+from flask import url_for, redirect
 
-app = Flask(__name__)
+from .app import app
 
 from flask.ext.login import current_user
-from os import getenv
 from .views import *
 from .helpers import *
-
-app.config.from_pyfile('config/default.py')
-
-if getenv('KEBLE_BALL_ENV', 'DEVELOPMENT') == 'PRODUCTION':
-    app.config.from_pyfile('config/production.py')
-else:
-    app.config.from_pyfile('config/development.py')
 
 app.register_blueprint(admin.admin)
 app.register_blueprint(ajax.ajax)

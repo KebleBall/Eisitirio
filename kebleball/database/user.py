@@ -4,8 +4,13 @@ user.py
 Contains User class
 """
 
-import bcrypt
 from kebleball.database import db
+from kebleball.database.battels import Battels
+from kebleball.app import app
+from flask.ext.bcrypt import Bcrypt
+import re
+
+bcrypt = Bcrypt(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,34 +24,47 @@ class User(db.Model):
     note = db.Column(db.Text)
     role = db.Column(db.Enum('User', 'Admin'))
 
-    college_id = db.Column(db.Integer,
-                           db.ForeignKey('college.id'))
-    college = db.relationship('College',
-                            backref=db.backref('users',
-                                               lazy='dynamic'
-                                               )
-                            )
+    college_id = db.Column(
+        db.Integer,
+        db.ForeignKey('college.id'),
+        nullable=True
+    )
+    college = db.relationship(
+        'College',
+        backref=db.backref(
+            'users',
+            lazy='dynamic'
+        )
+    )
 
-    affiliation_id = db.Column(db.Integer,
-                               db.ForeignKey('affiliation.id'))
-    affiliation = db.relationship('Affiliation',
-                            backref=db.backref('users',
-                                               lazy='dynamic'
-                                               )
-                            )
+    affiliation_id = db.Column(
+        db.Integer,
+        db.ForeignKey('affiliation.id')
+    )
+    affiliation = db.relationship(
+        'Affiliation',
+        backref=db.backref(
+            'users',
+            lazy='dynamic'
+        )
+    )
 
-    primary_tid = db.Column(db.Integer,
-                            db.ForeignKey('ticket.id'),
-                            nullable=True)
-    primary_ticket = db.relationship('Ticket',
-                            backref=db.backref('owner',
-                                               lazy='dynamic'
-                                               )
-                            )
+    battels_id = db.Column(
+        db.Integer,
+        db.ForeignKey('battels.id'),
+        nullable=True
+    )
+    battels = db.relationship(
+        'BattelsAuto',
+        backref=db.backref(
+            'user',
+            lazy='dynamic'
+        )
+    )
 
     def __init__(self, email, password, name, phone, college, affiliation):
         self.email = email
-        self.passhash = bcrypt.hashpw(password, bcrypt.gensalt())
+        self.passhash = bcrypt.generate_password_hash(password)
         self.name = name
         self.phone = phone
         self.emailkey = random_key(64)
@@ -65,14 +83,24 @@ class User(db.Model):
         else:
             self.affiliation_id = affiliation
 
+        battels = Battels.query().filter_by(Battels.email==email).first()
+
+        if battels is not None:
+            self.battels = battels
+        elif re.match('(.*?)@keble\.ox\.ac\.uk$',email) is not None:
+            self.battels = Battels(None, None, True)
+            db.session.add(self.battels)
+        else:
+            self.battels = None
+
     def __repr__(self):
         return "<User {id}: {name}>".format_map(vars(self))
 
     def checkPassword(self, candidate):
-        return bcrypt.hashpw(candidate, self.passhash) == self.passhash
+        return bcrypt.check_password_hash(self.passhash, candidate)
 
     def setPassword(self, password):
-        self.passhash = bcrypt.hashpw(password, bcrypt.gensalt())
+        self.passhash = bcrypt.generate_password_hash(password)
 
     def hasTickets(self):
         return len(self.tickets) > 0
@@ -94,6 +122,9 @@ class User(db.Model):
 
     def waitingFor(self):
         return sum([x.num for x in self.waiting])
+
+    def canPayByBattels(self):
+        return self.battels is not None
 
     def is_active(self):
         return True

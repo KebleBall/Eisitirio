@@ -9,7 +9,15 @@ from kebleball.database import db
 
 class Affiliation(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(50), unique=True)
+    name = db.Column(
+                db.Enum(
+                    'Student',
+                    'Graduand',
+                    'Staff',
+                    'Alumnus',
+                    'Other'
+                )
+            )
 
     def __init__(self, name):
         self.name = name
