@@ -42,6 +42,7 @@ def error404(e):
     )
     return render_template('404.html'), 404
 
+@app.errorhandler(Exception)
 @app.errorhandler(500)
 def error500(e):
     log(
