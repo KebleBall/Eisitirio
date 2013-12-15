@@ -13,28 +13,15 @@ from flask.ext.login import current_user, request
 
 class Logger():
     def __init__(self, app):
-        try:
-            logging.basicConfig(
-                filename=app.config['LOG_LOCATION'],
-                level=app.config['LOG_LEVEL'],
-                format=(
-                    "[%(name)s/%(levelname)s] "
-                    "%(asctime)s - "
-                    "%(message)s"
-                ),
-                datefmt='%Y-%m-%d %H:%M:%S'
-            )
-        except KeyError:
-            # If LOG_LOCATION is not set, we log to console
-            logging.basicConfig(
-                level=app.config['LOG_LEVEL'],
-                format=(
-                    "[%(name)s/%(levelname)s] "
-                    "%(asctime)s - "
-                    "%(message)s"
-                ),
-                datefmt='%Y-%m-%d %H:%M:%S'
-            )
+        logging.basicConfig(
+            level=app.config['LOG_LEVEL'],
+            format=(
+                "[%(name)s/%(levelname)s] "
+                "%(asctime)s - "
+                "%(message)s"
+            ),
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
 
         self.admin = logging.getLogger('admin')
         self.ajax = logging.getLogger('ajax')
