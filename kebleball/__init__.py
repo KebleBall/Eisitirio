@@ -1,4 +1,4 @@
-from flask import url_for, redirect, render_template, request
+from flask import url_for, redirect, render_template, request, abort
 
 from .app import app
 
@@ -29,7 +29,7 @@ def router():
 
 @app.route('/trigger_error')
 def trigger_error():
-    return json.dump({})
+    return abort(500)
 
 @app.errorhandler(404)
 def error404(e):
