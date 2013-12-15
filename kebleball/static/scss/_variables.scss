@@ -1,0 +1,30 @@
+$blue: #8ed0b7;
+$red: #f26772;
+$white: #f9f6f1;
+$black: #070707;
+$dark-grey: #222;
+$light-grey: #c6c6c6;
+
+$body-bg: url('images/background.jpg') $white;
+$body-font-color: $black;
+$body-font-family: Quicksand, sans-serif;
+$body-font-weight: lighter;
+$primary-color: $blue;
+$secondary-color: $light-grey;
+
+$header-font-family: Metshige, sans-serif;
+$header-font-weight: normal;
+$header-font-color: $black;
+$header-line-height: 1em;
+$header-top-margin: 0.3em;
+$header-bottom-margin: 0.2em;
+
+$h1-font-size: 2rem;
+$h2-font-size: 1.8rem;
+$h3-font-size: 1.6rem;
+$h4-font-size: 1.4rem;
+$h5-font-size: 1.2rem;
+$h6-font-size: 1rem;
+
+$anchor-font-color: $dark-grey;
+$anchor-font-color-hover: $light-grey;

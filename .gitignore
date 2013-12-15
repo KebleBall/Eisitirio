@@ -1,3 +1,4 @@
 *.pyc
 config/*
 .watsonrc
+*.sass-cache*
