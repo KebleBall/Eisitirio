@@ -13,40 +13,40 @@ from flask.ext.login import current_user, request
 
 class Logger():
     def __init__(self, app):
+        self.loggers = {}
+
         try:
-            logging.basicConfig(
-                filename=app.config['LOG_LOCATION'],
-                level=app.config['LOG_LEVEL'],
-                format=(
-                    "[%(name)s/%(levelname)s] "
-                    "%(asctime)s - "
-                    "%(message)s"
-                ),
-                datefmt='%Y-%m-%d %H:%M:%S'
-            )
+            handler = logging.FileHandler(app.config['LOG_LOCATION'])
         except KeyError:
             # If LOG_LOCATION is not set, we log to console
-            logging.basicConfig(
-                level=app.config['LOG_LEVEL'],
-                format=(
-                    "[%(name)s/%(levelname)s] "
-                    "%(asctime)s - "
-                    "%(message)s"
-                ),
-                datefmt='%Y-%m-%d %H:%M:%S'
-            )
+            handler = logging.StreamHandler()
 
-        self.admin = logging.getLogger('admin')
-        self.ajax = logging.getLogger('ajax')
-        self.dashboard = logging.getLogger('dashboard')
-        self.database = logging.getLogger('database')
-        self.front = logging.getLogger('front')
-        self.main = logging.getLogger('main')
-        self.purchase = logging.getLogger('purchase')
-        self.resale = logging.getLogger('purchase')
+        formatter = logging.Formatter(
+            fmt = (
+                "[%(name)s/%(levelname)s] "
+                "%(asctime)s - "
+                "%(message)s"
+            ),
+            datefmt = '%Y-%m-%d %H:%M:%S'
+        )
+
+        handler.setFormatter(formatter)
+
+        self.loggers['admin'] = logging.getLogger('admin')
+        self.loggers['ajax'] = logging.getLogger('ajax')
+        self.loggers['dashboard'] = logging.getLogger('dashboard')
+        self.loggers['database'] = logging.getLogger('database')
+        self.loggers['front'] = logging.getLogger('front')
+        self.loggers['main'] = logging.getLogger('main')
+        self.loggers['purchase'] = logging.getLogger('purchase')
+        self.loggers['resale'] = logging.getLogger('purchase')
+
+        for key in self.loggers.iterkeys():
+            self.loggers[key].setLevel(app.config['LOG_LEVEL'])
+            self.loggers[key].addHandler(handler)
 
     def log(self, module, level, message):
-        getattr(getattr(self, module), level)(message)
+        getattr(self.loggers[module], level)(message)
 
     def __getattr__(self, name):
         components = name.split('_')
