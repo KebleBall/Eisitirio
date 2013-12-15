@@ -20,9 +20,11 @@
                 {% endif %}
             </section>
             <section id="logo" class="large-6 large-centered columns">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" />
+                <a href="{{ url_for('router') }}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" />
+                </a>
                 <h2>Keble Ball</h2>
-                <h1>Romanov Russia</h1>
+                <h1 class="red">Romanov Russia</h1>
                 <h2>10th May 2014</h2>
             </section>
         </header>
@@ -46,7 +48,7 @@
                 <section id="flashes" class="row">
                     <ul class="large-12 columns">
                         {% for category, message in messages %}
-                            <li class="{{ category }}">{{ message }}</li>
+                            <li class="{{ category }}" title="Click to dismiss">{{ message }}</li>
                         {% endfor %}
                     </ul>
                 </section>
@@ -60,5 +62,7 @@
                 <p>&copy; 2013- Keble Ball. All rights reserved. <a href="http://www.google.com/recaptcha/mailhide/d?k=01VW2HusQat4KpnmQYJBSfhQ==&c=0pBadqH9ae41gTIaahTM78kkmPpv_-wELjktV6Zs-d0=" target="_blank">Webmaster</a></p>
             </section>
         </footer>
+        <script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/footer.js') }}"></script>
     </body>
 </html>

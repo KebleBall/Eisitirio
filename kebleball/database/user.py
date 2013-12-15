@@ -8,21 +8,23 @@ from kebleball.database import db
 from kebleball.database.battels import Battels
 from kebleball.app import app
 from flask.ext.bcrypt import Bcrypt
+
+from datetime import datetime
 import re
 
 bcrypt = Bcrypt(app)
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     passhash = db.Column(db.BINARY(60), nullable=False)
-    name = db.Column(db.String(120))
-    phone = db.Column(db.String(20))
-    emailkey = db.Column(db.String(64))
-    verified = db.Column(db.Boolean)
-    cookiekey = db.Column(db.String(64))
-    note = db.Column(db.Text)
-    role = db.Column(db.Enum('User', 'Admin'))
+    name = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    secretkey = db.Column(db.String(64), nullable=True)
+    secretkeyexpiry = db.Column(db.DateTime(), nullable=True)
+    verified = db.Column(db.Boolean, nullable=False)
+    note = db.Column(db.Text, nullable=True)
+    role = db.Column(db.Enum('User', 'Admin'), nullable=False)
 
     college_id = db.Column(
         db.Integer,
@@ -67,21 +69,20 @@ class User(db.Model):
         self.passhash = bcrypt.generate_password_hash(password)
         self.name = name
         self.phone = phone
-        self.emailkey = random_key(64)
+        self.secretkey = generate_key(64)
         self.verified = False
-        self.cookiekey = ''
         self.primary_tid = None
         self.role = 'User'
 
-        if isinstance(college, tickets.database.College):
-            self.college = college
-        else:
+        if isinstance(college, (int, long)):
             self.college_id = college
-
-        if isinstance(affiliation, tickets.database.Affiliation):
-            self.affiliation = affiliation
         else:
+            self.college = college
+
+        if isinstance(affiliation, (int, long)):
             self.affiliation_id = affiliation
+        else:
+            self.affiliation = affiliation
 
         battels = Battels.query().filter_by(Battels.email==email).first()
 
@@ -141,6 +142,15 @@ class User(db.Model):
     @staticmethod
     def get_by_id(id):
         user = User.query.filter(User.id==int(id)).first()
+
+        if not user:
+            return None
+
+        return user
+
+    @staticmethod
+    def get_by_email(email):
+        user = User.query.filter(User.email==email).first()
 
         if not user:
             return None

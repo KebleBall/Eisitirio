@@ -1,4 +1,4 @@
-from flask import url_for, redirect, render_template, request, abort
+from flask import url_for, redirect, render_template, request
 
 from .app import app
 
