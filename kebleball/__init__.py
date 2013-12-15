@@ -27,10 +27,6 @@ def router():
     else:
         return redirect(url_for('front.home'))
 
-@app.route('/trigger_error')
-def trigger_error():
-    return abort(500)
-
 @app.errorhandler(404)
 def error404(e):
     log(
