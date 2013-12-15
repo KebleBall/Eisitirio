@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}{% endblock %} - Keble Ball 2014</title>
+        <meta name="description" content="Keble Ball 2014 - Buy Tickets">
+        <meta name="keywords" content="Keble,Oxford,Ball,Tickets">
+        <meta name="author" content="Samuel Littley">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+        {% block javascripts %}{% endblock %}
+    </head>
+    <body>
+        <header class="row">
+            <section id="user" class="large-3 columns right">
+                {% if current_user.is_anonymous %}
+                    <p>You are not currently logged in. <a href="{{ url_for('front.login') }}">Log in.</a></p>
+                {% else %}
+                    <p>You are currently logged in as {{ current_user.name }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
+                {% endif %}
+            </section>
+            <section id="logo" class="large-6 large-centered columns">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" />
+                <h2>Keble Ball</h2>
+                <h1>Romanov Russia</h1>
+                <h2>10th May 2014</h2>
+            </section>
+        </header>
+        {% if not current_user.is_anonymous %}
+            <nav class="row">
+                <ul id="navigation-main">
+                    {% include 'blocks/dashboard-navigation.html' %}
+                    {% if current_user.isAdmin %}
+                        {% include 'blocks/admin-navigation.html' %}
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+        <section id="page-title" class="row">
+            <div class="large-12 columns">
+                <h2>{{ self.title() }}</h2>
+            </div>
+        </section>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <section id="flashes" class="row">
+                    <ul class="large-12 columns">
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+        {% endwith %}
+        <section id="main" class="row">
+            {% block content %}{% endblock %}
+        </section>
+        <footer class="row">
+            <section id="copyright" class="large-8 large-centered columns">
+                <p>&copy; 2013- Keble Ball. All rights reserved. <a href="http://www.google.com/recaptcha/mailhide/d?k=01VW2HusQat4KpnmQYJBSfhQ==&c=0pBadqH9ae41gTIaahTM78kkmPpv_-wELjktV6Zs-d0=" target="_blank">Webmaster</a></p>
+            </section>
+        </footer>
+    </body>
+</html>

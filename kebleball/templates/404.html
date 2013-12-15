@@ -1,0 +1,11 @@
+<!-- 404.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+    <section id="page-not-found" class="columns">
+        <p>The page you were looking for cannot be found. If you followed a link to get here, please contact the <a href="http://www.google.com/recaptcha/mailhide/d?k=01VW2HusQat4KpnmQYJBSfhQ==&c=0pBadqH9ae41gTIaahTM78kkmPpv_-wELjktV6Zs-d0=" target="_blank">webmaster</a>, giving details of what page you were trying to find, and which page you came from.</p>
+        <p>In the meantime, you may wish to go to the <a href="{{ url_for('router') }}">homepage</a>, and try to find what you need from there using the menus.</p>
+    </section>
+{% endblock %}

@@ -1,5 +1,5 @@
 from flask.ext.login import LoginManager
-from kebleball.database import User
+from kebleball.database.user import User
 
 loginManager = LoginManager()
 
