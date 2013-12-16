@@ -1,11 +1,8 @@
 from flask import Blueprint
 
 from kebleball.app import app
-from kebleball.helpers.logger import Logger
 
-logger = Logger(app)
-
-log = logger.log_ajax
+log = app.log_manager.log_ajax
 
 ajax = Blueprint('ajax', __name__)
 

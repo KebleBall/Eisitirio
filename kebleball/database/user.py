@@ -6,8 +6,11 @@ Contains User class
 
 from kebleball.database import db
 from kebleball.database.battels import Battels
+from kebleball.database.college import College
+from kebleball.database.affiliation import Affiliation
 from kebleball.app import app
 from flask.ext.bcrypt import Bcrypt
+from kebleball.helpers import generate_key
 
 from datetime import datetime
 import re
@@ -57,7 +60,7 @@ class User(db.Model):
         nullable=True
     )
     battels = db.relationship(
-        'BattelsAuto',
+        'Battels',
         backref=db.backref(
             'user',
             lazy='dynamic'
@@ -71,20 +74,19 @@ class User(db.Model):
         self.phone = phone
         self.secretkey = generate_key(64)
         self.verified = False
-        self.primary_tid = None
         self.role = 'User'
 
-        if isinstance(college, (int, long)):
-            self.college_id = college
-        else:
+        if isinstance(college, College):
             self.college = college
-
-        if isinstance(affiliation, (int, long)):
-            self.affiliation_id = affiliation
         else:
-            self.affiliation = affiliation
+            self.college_id = college
 
-        battels = Battels.query().filter_by(Battels.email==email).first()
+        if isinstance(affiliation, Affiliation):
+            self.affiliation = affiliation
+        else:
+            self.affiliation_id = affiliation
+
+        battels = Battels.query.filter(Battels.email==email).first()
 
         if battels is not None:
             self.battels = battels

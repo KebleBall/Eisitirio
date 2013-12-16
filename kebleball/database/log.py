@@ -6,6 +6,8 @@ Used to store log entries
 """
 
 from kebleball.database import db
+from kebleball.database.user import User
+from kebleball.database.ticket import Ticket
 from datetime import datetime
 
 class Log(db.Model):
@@ -19,11 +21,12 @@ class Log(db.Model):
         db.ForeignKey('user.id')
     )
     actor = db.relationship(
-        'User',
+        User,
         backref=db.backref(
             'actions',
             lazy='dynamic'
-        )
+        ),
+        foreign_keys=[actor_id]
     )
 
     user_id = db.Column(
@@ -31,11 +34,12 @@ class Log(db.Model):
         db.ForeignKey('user.id')
     )
     user = db.relationship(
-        'User',
+        User,
         backref=db.backref(
             'events',
             lazy='dynamic'
-        )
+        ),
+        foreign_keys=[user_id]
     )
 
     ticket_id = db.Column(
@@ -44,7 +48,7 @@ class Log(db.Model):
         nullable=True
     )
     ticket = db.relationship(
-        'Ticket',
+        Ticket,
         backref=db.backref(
             'events',
             lazy='dynamic'
@@ -56,20 +60,20 @@ class Log(db.Model):
         self.ip = ip
         self.message = message
 
-        if isinstance(actor, (int,long)):
-            self.actor_id = actor
-        else:
+        if isinstance(actor, User):
             self.actor = actor
-
-        if isinstance(user, (int,long)):
-            self.user_id = user
         else:
+            self.actor_id = actor
+
+        if isinstance(user, User):
             self.user = user
-
-        if isinstance(ticket, (int,long)):
-            self.ticket_id = ticket
         else:
+            self.user_id = user
+
+        if isinstance(ticket, Ticket):
             self.ticket = ticket
+        else:
+            self.ticket_id = ticket
 
     def __repr__(self):
         return '<Log {0}: {1}>'.format(

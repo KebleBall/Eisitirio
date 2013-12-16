@@ -6,9 +6,10 @@ Used to store data about discount vouchers
 """
 
 from kebleball.database import db
+from kebleball.database.user import User
 from datetime import datetime, timedelta
 
-class Ticket(db.Model):
+class Voucher(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     code = db.Column(db.String(30))
     expires = db.Column(db.DateTime(), nullable=True)
@@ -94,10 +95,10 @@ class Ticket(db.Model):
 
         if self.singleuse:
             self.used = True
-            if isinstance(user, (int,long)):
-                self.used_by_id = user
-            else:
+            if isinstance(user, User):
                 self.used_by = user
+            else:
+                self.used_by_id = user
 
         if self.appliesto == 'Ticket':
             tickets[0] = self.applyToTicket(tickets[0])

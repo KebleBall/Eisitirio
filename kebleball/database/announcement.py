@@ -5,20 +5,26 @@ Contains Announcement class
 Used to store announcements displayed on site and emailed
 """
 
+from kebleball.app import app
 from kebleball.database import db
 from kebleball.database.user import User
+from kebleball.database.college import College
+from kebleball.database.affiliation import Affiliation
 import smtplib
+from email.mime.text import MIMEText
 
-user_announce_link = db.Table('user_announce_link', db.Model.metadata,
-                         db.Column('user_id',
-                                   db.Integer,
-                                   db.ForeignKey('user.id')
-                                   ),
-                         db.Column('announcement_id',
-                                   db.Integer,
-                                   db.ForeignKey('announcement.id')
-                                   )
-                         )
+user_announce_link = db.Table(
+    'user_announce_link',
+    db.Model.metadata,
+    db.Column('user_id',
+        db.Integer,
+        db.ForeignKey('user.id')
+    ),
+    db.Column('announcement_id',
+        db.Integer,
+        db.ForeignKey('announcement.id')
+    )
+)
 
 class Announcement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,37 +41,46 @@ class Announcement(db.Model):
 
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     sender = db.relationship('User',
-                            backref=db.backref('announcements',
-                                               lazy='dynamic'
-                                               )
-                            )
+        backref=db.backref('announcements-sent',
+            lazy='dynamic'
+        )
+    )
 
-    college_id = db.Column(db.Integer,
-                           db.ForeignKey('college.id'),
-                           nullable=True)
-    college = db.relationship('Announcement',
-                            backref=db.backref('announcements',
-                                               lazy='dynamic'
-                                               )
-                            )
+    college_id = db.Column(
+        db.Integer,
+        db.ForeignKey('college.id'),
+        nullable=True
+    )
+    college = db.relationship(
+        'College',
+        backref=db.backref(
+            'announcements',
+            lazy='dynamic'
+        )
+    )
 
-    affiliation_id = db.Column(db.Integer,
-                               db.ForeignKey('affiliation.id'),
-                               nullable=True)
-    affiliation = db.relationship('Announcement',
-                            backref=db.backref('announcements',
-                                               lazy='dynamic'
-                                               )
-                            )
+    affiliation_id = db.Column(
+        db.Integer,
+        db.ForeignKey('affiliation.id'),
+        nullable=True
+    )
+    affiliation = db.relationship(
+        'Affiliation',
+        backref=db.backref(
+            'announcements-received',
+            lazy='dynamic'
+        )
+    )
 
     is_waiting = db.Column(db.Boolean, nullable=True)
     has_tickets = db.Column(db.Boolean, nullable=True)
     has_collected = db.Column(db.Boolean, nullable=True)
 
-    users = db.relationship('User',
-                       secondary=user_announce_link,
-                       backref='announcements'
-                       )
+    users = db.relationship(
+        'User',
+        secondary=user_announce_link,
+        backref='announcements'
+    )
 
 
     def __init__(self,
@@ -85,12 +100,12 @@ class Announcement(db.Model):
         self.has_collected = has_collected
         self.users = []
 
-        if isinstance(college, (tickets.database.College, type(None))):
+        if isinstance(college, (College, type(None))):
             self.college = college
         else:
             self.college_id = college
 
-        if isinstance(affiliation, (tickets.database.Affiliation, type(None))):
+        if isinstance(affiliation, (Affiliation, type(None))):
             self.affiliation = affiliation
         else:
             self.affiliation_id = affiliation
@@ -121,14 +136,11 @@ class Announcement(db.Model):
             msg['Subject'] = subject
             msg['From'] = self.sender.email
 
-            s = smtplib.SMTP('localhost')
-
             for user in self.users:
                 msg['To'] = user.email
-                s.sendmail(msg['From'], msg['To'], msg.as_string())
+                app.email_manager.sendMsg(msg)
                 self.sent_to_last = user.id
             self.email_sent = True
         finally:
             db.session.commit()
-            s.quit()
 

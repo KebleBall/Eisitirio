@@ -1,5 +1,5 @@
 """
-logger.py
+log_manager.py
 
 Contains Logger class
 Used to log events, both for users and for system errors
@@ -8,10 +8,10 @@ Used to log events, both for users and for system errors
 import logging
 from kebleball.database import db
 from kebleball.database.log import Log
-from flask import session
+from flask import session, current_app
 from flask.ext.login import current_user, request
 
-class Logger():
+class LogManager(object):
     def __init__(self, app):
         logging.basicConfig(
             level=app.config['LOG_LEVEL'],
@@ -27,10 +27,14 @@ class Logger():
         self.ajax = logging.getLogger('ajax')
         self.dashboard = logging.getLogger('dashboard')
         self.database = logging.getLogger('database')
+        self.email = logging.getLogger('email')
         self.front = logging.getLogger('front')
         self.main = logging.getLogger('main')
         self.purchase = logging.getLogger('purchase')
         self.resale = logging.getLogger('purchase')
+
+    def init_app(self, app):
+        app.logger = self
 
     def log(self, module, level, message):
         getattr(getattr(self, module), level)(message)
@@ -44,6 +48,7 @@ class Logger():
                 'ajax',
                 'dashboard',
                 'database',
+                'email',
                 'front',
                 'main',
                 'purchase',

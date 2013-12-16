@@ -6,6 +6,7 @@ Used to store data about users waiting for tickets
 """
 
 from kebleball.database import db
+from kebleball.database.user import User
 from datetime import datetime
 
 class Waiting(db.Model):
@@ -26,10 +27,10 @@ class Waiting(db.Model):
     )
 
     def __init__(self, user, waitingfor):
-        if isinstance(user, (int,long)):
-            self.user_id = user
-        else:
+        if isinstance(user, User):
             self.user = user
+        else:
+            self.user_id = user
 
         self.waitingfor = waitingfor
 

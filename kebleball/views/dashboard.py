@@ -2,11 +2,8 @@ from flask import Blueprint
 from flask.ext.login import login_required, fresh_login_required
 
 from kebleball.app import app
-from kebleball.helpers.logger import Logger
 
-logger = Logger(app)
-
-log = logger.log_dashboard
+log = app.log_manager.log_dashboard
 
 dashboard = Blueprint('dashboard', __name__)
 

@@ -6,6 +6,7 @@ Used to store data about tickets purchased
 """
 
 from kebleball.database import db
+from kebleball.database.user import User
 from datetime import datetime
 from kebleball.app import app
 from kebleball.helpers import generate_key
@@ -39,7 +40,8 @@ class Ticket(db.Model):
         backref=db.backref(
             'tickets',
             lazy='dynamic'
-        )
+        ),
+        foreign_keys=[owner_id]
     )
 
     resalekey = db.Column(db.String(32), nullable=True)
@@ -54,14 +56,15 @@ class Ticket(db.Model):
         backref=db.backref(
             'resales',
             lazy='dynamic'
-        )
+        ),
+        foreign_keys=[reselling_to_id]
     )
 
     def __init__(self, owner, price, name=None):
-        if isinstance(owner, (int,long)):
-            self.owner_id = owner
-        else:
+        if isinstance(owner, User):
             self.owner = owner
+        else:
+            self.owner_id = owner
 
         self.price = price
 
@@ -106,10 +109,10 @@ class Ticket(db.Model):
         self.expires = None
 
     def startResale(self, reselling_to):
-        if isinstance(reselling_to, (int,long)):
-            self.reselling_to_id = reselling_to
-        else:
+        if isinstance(reselling_to, User):
             self.reselling_to = reselling_to
+        else:
+            self.reselling_to_id = reselling_to
 
         self.resalekey = generate_key(32)
         self.resaleconfirmed = False

@@ -2,11 +2,8 @@ from flask import Blueprint
 from flask.ext.login import login_required
 
 from kebleball.app import app
-from kebleball.helpers.logger import Logger
 
-logger = Logger(app)
-
-log = logger.log_admin
+log = app.log_manager.log_admin
 
 admin = Blueprint('admin', __name__)
 
