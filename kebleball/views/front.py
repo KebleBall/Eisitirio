@@ -301,7 +301,13 @@ def resetPassword(userID, secretkey):
             user.secretkeyexpiry = datetime.utcnow() + timedelta(minutes=5)
             db.session.commit()
             flash(u'Passwords do not match, please try again', 'warning')
-            return render_template('front/resetPassword.html', user=user)
+            return redirect(
+                url_for(
+                    'front.resetPassword',
+                    userID=user.id,
+                    secretkey=user.secretkey
+                )
+            )
         else:
             user.setPassword(request.form['password'])
             user.secretkey = None
@@ -310,8 +316,7 @@ def resetPassword(userID, secretkey):
             flash(u'Your password has been reset, please log in.','success')
             return redirect(url_for('front.home'))
     else:
-        flash(u'Identity confirmed, please enter a new password','info')
-        return render_template('front/resetPassword.html', user=user)
+        return render_template('front/resetPassword.html')
 
 @front.route('/confirmemail/<int:userID>/<secretkey>')
 def confirmEmail(userID, secretkey):
