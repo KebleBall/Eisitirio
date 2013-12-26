@@ -65,13 +65,12 @@ class LogManager(object):
                 )
 
     def log_event(self, message, ticket=None, user=None):
-        if user == None and not current_user.is_anonymous():
-            user = current_user
-
         if 'actor_id' in session:
             actor = session['actor_id']
+        elif not current_user.is_anonymous():
+            actor = current_user
         else:
-            actor = user
+            actor = None
 
         entry = Log(
             request.remote_addr,

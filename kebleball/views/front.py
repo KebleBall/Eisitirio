@@ -12,6 +12,7 @@ from kebleball.database.affiliation import Affiliation
 from datetime import datetime, timedelta
 
 log = app.log_manager.log_front
+log_entry = app.log_manager.log_entry
 
 front = Blueprint('front', __name__)
 
@@ -29,10 +30,22 @@ def login():
     user = User.get_by_email(request.form['email'])
 
     if not user or not user.checkPassword(request.form['password']):
+        if user:
+            log_entry(
+                'Failed login attempt - invalid password',
+                None,
+                user
+            )
+
         flash(u'Could not complete log in. Invalid email or password.', 'error')
         return redirect(url_for('front.home'))
 
     if not user.verified:
+        log_entry(
+            'Failed login attempt - not verified',
+            None,
+            user
+        )
         flash(
             u'Could not complete log in. Email address is not confirmed.',
             'warning'
@@ -45,6 +58,12 @@ def login():
             'remember-me' in request.form and
             request.form['remember-me'] == 'yes'
         )
+    )
+
+    log_entry(
+        'Logged in',
+        None,
+        user
     )
 
     flash(u'Logged in successfully.', 'success')
@@ -155,6 +174,12 @@ def register():
     db.session.add(user)
     db.session.commit()
 
+    log_entry(
+        'Registered',
+        None,
+        user
+    )
+
     app.email_manager.sendTemplate(
         request.form['email'],
         "Confirm your Email Address",
@@ -193,12 +218,24 @@ def passwordReset():
         user = User.get_by_email(request.form['email'])
 
         if not user:
+            log_entry(
+                'Attempted password reset for {0}'.format(
+                    request.form['email']
+                )
+            )
+
             app.email_manager.sendTemplate(
                 request.form['email'],
                 "Attempted Account Access",
                 "passwordResetFail.email"
             )
         else:
+            log_entry(
+                'Started password reset',
+                None,
+                user
+            )
+
             user.secretkey = generate_key(64)
             user.secretkeyexpiry = (
                 datetime.utcnow() +
@@ -240,12 +277,24 @@ def emailConfirm():
         user = User.get_by_email(request.form['email'])
 
         if not user:
+            log_entry(
+                'Attempted email confirm for {0}'.format(
+                    request.form['email']
+                )
+            )
+
             app.email_manager.sendTemplate(
                 request.form['email'],
                 "Attempted Account Access",
                 "emailConfirmFail.email"
             )
         else:
+            log_entry(
+                'Requested email confirm',
+                None,
+                user
+            )
+
             user.secretkey = generate_key(64)
             user.secretkeyexpiry = None
 
@@ -309,6 +358,12 @@ def resetPassword(userID, secretkey):
                 )
             )
         else:
+            log_entry(
+                'Completed password reset',
+                None,
+                user
+            )
+
             user.setPassword(request.form['password'])
             user.secretkey = None
             user.secretkeyexpiry = None
@@ -323,6 +378,12 @@ def confirmEmail(userID, secretkey):
     user = User.get_by_id(userID)
 
     if user is not None and user.secretkey == secretkey:
+        log_entry(
+            'Confirmed email',
+            None,
+            user
+        )
+
         user.secretkey = None
         user.verified = True
         db.session.commit()
@@ -337,9 +398,34 @@ def destroyAccount(userID, secretkey):
     user = User.get_by_id(userID)
 
     if user is not None and user.secretkey == secretkey:
-        db.session.delete(user)
-        db.session.commit()
-        flash(u'The account has been deleted.','info')
+        if not user.is_verified():
+            log_entry(
+                'Deleted account with email address {0}'.format(
+                    user.email
+                )
+            )
+
+            for entry in user.events:
+                entry.message = (
+                    entry.message +
+                    " (destroyed user with email address {0})".format(
+                        self.email
+                    )
+                )
+                entry.user = None
+
+            db.session.delete(user)
+            db.session.commit()
+
+            flash(u'The account has been deleted.','info')
+        else:
+            log_entry(
+                'Attempted deletion of verified account',
+                None,
+                user
+            )
+
+            flash(u'Could not delete user account.','warning')
     else:
         flash(u'Could not delete user account. Check that you have used the correct link','warning')
 

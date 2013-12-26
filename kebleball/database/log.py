@@ -87,8 +87,10 @@ class Log(db.Model):
             self.actor.name,
             self.user.name,
             (
-                "" if self.ticket is None else ", in relation "
-                "to ticket {0}".format(
+                "" if self.ticket is None else (
+                    ", in relation "
+                    "to ticket {0}"
+                ).format(
                     self.ticket.id
                 )
             ),

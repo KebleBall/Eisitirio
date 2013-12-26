@@ -26,6 +26,7 @@ class User(db.Model):
     secretkey = db.Column(db.String(64), nullable=True)
     secretkeyexpiry = db.Column(db.DateTime(), nullable=True)
     verified = db.Column(db.Boolean, nullable=False)
+    deleted = db.Column(db.Boolean, nullable=False)
     note = db.Column(db.Text, nullable=True)
     role = db.Column(db.Enum('User', 'Admin'), nullable=False)
 
@@ -74,6 +75,7 @@ class User(db.Model):
         self.phone = phone
         self.secretkey = generate_key(64)
         self.verified = False
+        self.deleted = False
         self.role = 'User'
 
         if isinstance(college, College):
@@ -129,8 +131,14 @@ class User(db.Model):
     def canPayByBattels(self):
         return self.battels is not None
 
+    def is_verified(self):
+        return self.verified
+
+    def is_deleted(self):
+        return self.deleted
+
     def is_active(self):
-        return True
+        return is_verified() and not is_deleted()
 
     def is_authenticated(self):
         return True
@@ -158,3 +166,6 @@ class User(db.Model):
             return None
 
         return user
+
+    def delete(self):
+        raise NotImplementedError
