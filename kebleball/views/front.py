@@ -199,6 +199,14 @@ def passwordReset():
                 "passwordResetFail.email"
             )
         else:
+            user.secretkey = generate_key(64)
+            user.secretkeyexpiry = (
+                datetime.utcnow() +
+                timedelta(minutes=30)
+            )
+
+            db.session.commit()
+
             app.email_manager.sendTemplate(
                 request.form['email'],
                 "Confirm Password Reset",
@@ -224,7 +232,7 @@ def passwordReset():
 
         return redirect(url_for('front.home'))
     else:
-        return render_template('passwordReset.html')
+        return render_template('front/passwordReset.html')
 
 @front.route('/emailconfirm', methods=['GET','POST'])
 def emailConfirm():
@@ -238,6 +246,11 @@ def emailConfirm():
                 "emailConfirmFail.email"
             )
         else:
+            user.secretkey = generate_key(64)
+            user.secretkeyexpiry = None
+
+            db.session.commit()
+
             app.email_manager.sendTemplate(
                 request.form['email'],
                 "Confirm your Email Address",
@@ -269,7 +282,7 @@ def emailConfirm():
 
         return redirect(url_for('front.home'))
     else:
-        return render_template('emailConfirm.html')
+        return render_template('front/emailConfirm.html')
 
 @front.route('/resetpassword/<int:userID>/<secretkey>', methods=['GET', 'POST'])
 def resetPassword(userID, secretkey):

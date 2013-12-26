@@ -59,6 +59,20 @@ def error500(e):
 def utility_processor():
     def get_all(query):
         return query.all()
+
+    def get_ord(datetime):
+        daymod = int(datetime.strftime('%d')) % 10
+        if daymod == 1:
+            return 'st'
+        elif daymod == 2:
+            return 'nd'
+        elif daymod == 3:
+            return 'rd'
+        else:
+            return 'th'
+
     return dict(
-        get_all=get_all
+        get_all=get_all,
+        get_ord=get_ord,
+        template_config={key: app.config[key] for key in app.config['TEMPLATE_CONFIG_KEYS']}
     )
