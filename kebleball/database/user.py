@@ -168,4 +168,6 @@ class User(db.Model):
         return user
 
     def delete(self):
+        # [todo] - Implement user.delete
+
         raise NotImplementedError

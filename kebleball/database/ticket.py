@@ -151,3 +151,8 @@ class Ticket(db.Model):
             return True
         else:
             return False
+
+    def cancel(self):
+        # [todo] - Implement ticket.cancel
+
+        raise NotImplementedError
