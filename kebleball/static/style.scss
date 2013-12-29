@@ -7,6 +7,8 @@
 @import "scss/fonts/quicksand";
 @import "scss/fonts/metshige";
 
+@import "scss/simple-slider";
+
 .blue {
     color: $blue;
 }
@@ -31,30 +33,37 @@ a {
     text-align: center;
 }
 
+.message-box {
+    display: block;
+    border: 3px solid;
+    padding: 0.5em;
+    margin: 0.5em;
+    &.error {
+        background-color: #f3afbf;
+        border: 3px solid #f31323;
+    }
+    &.warning {
+        background-color: #f3cf9f;
+        border: 3px solid #f38323;
+    }
+    &.success {
+        background-color: #83ef9f;
+        border: 3px solid #338323;
+    }
+    &.info {
+        background-color: #b3dfef;
+        border: 3px solid #1313f3;
+    }
+    p:last-child {
+        margin-bottom: 0;
+    }
+}
+
 #flashes {
     ul {
         margin: 0;
     }
     li {
-        display: block;
-        border: 3px solid;
-        padding: 0.5em;
-        margin: 0.5em;
-        &.error {
-            background-color: #f3afbf;
-            border: 3px solid #f31323;
-        }
-        &.warning {
-            background-color: #f3cf9f;
-            border: 3px solid #f38323;
-        }
-        &.success {
-            background-color: #83ef9f;
-            border: 3px solid #338323;
-        }
-        &.info {
-            background-color: #b3dfef;
-            border: 3px solid #1313f3;
-        }
+        @extend .message-box;
     }
 }

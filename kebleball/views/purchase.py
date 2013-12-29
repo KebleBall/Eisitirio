@@ -1,10 +1,11 @@
-from flask import Blueprint, request
-from flask.ext.login import login_required, fresh_login_required
+from flask import Blueprint, request, render_template
+from flask.ext.login import login_required, fresh_login_required, current_user
 
 from kebleball.app import app
+from kebleball.helpers.purchase import canBuy, canWait
 
 log = app.log_manager.log_purchase
-log_entry = app.log_manager.log_entry
+log_event = app.log_manager.log_event
 
 purchase = Blueprint('purchase', __name__)
 
@@ -14,7 +15,11 @@ def purchaseHome(methods=['GET','POST']):
     if request.method == 'POST':
         pass
     else:
-        return render_template('purchase/purchaseHome.html')
+        return render_template(
+            'purchase/purchaseHome.html',
+            canBuy=canBuy(current_user),
+            canWait=canWait(current_user)
+        )
 
 @purchase.route('/purchase/change-method')
 @login_required

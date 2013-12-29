@@ -1334,33 +1334,45 @@ th.hide-for-touch { display: table-cell !important; }
 
 @font-face { font-family: 'Metshige'; src: url("fonts/metshige/metshige-webfont.eot"); src: url("fonts/metshige/metshige-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/metshige/metshige-webfont.woff") format("woff"), url("fonts/metshige/metshige-webfont.ttf") format("truetype"), url("fonts/metshige/metshige-webfont.svg#metshigenormal") format("svg"); font-weight: normal; font-style: normal; }
 
-/* line 10, style.scss */
+/* line 2, scss/_simple-slider.scss */
+.slider > .dragger { background: #8ed0b7; background: -webkit-linear-gradient(top, #8ed0b7, #49af88); background: -moz-linear-gradient(top, #8ed0b7, #49af88); background: linear-gradient(top, #8ed0b7, #49af88); -webkit-box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2); -moz-box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2); box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2); -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px; border: 1px solid #2b6750; width: 16px; height: 16px; }
+/* line 20, scss/_simple-slider.scss */
+.slider > .dragger:hover { background: #49af88; background: -webkit-linear-gradient(top, #49af88, #2b6750); background: -moz-linear-gradient(top, #49af88, #2b6750); background: linear-gradient(top, #49af88, #2b6750); }
+/* line 28, scss/_simple-slider.scss */
+.slider > .track, .slider > .highlight-track { background: #ccc; -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; height: 8px; }
+/* line 41, scss/_simple-slider.scss */
+.slider > .highlight-track { background-color: #f26772; }
+
+/* line 12, style.scss */
 .blue { color: #8ed0b7; }
 
-/* line 14, style.scss */
+/* line 16, style.scss */
 .red { color: #f26772; }
 
-/* line 18, style.scss */
+/* line 20, style.scss */
 a { font-weight: bold; }
 
-/* line 22, style.scss */
+/* line 24, style.scss */
 #logo { text-align: center; }
 
-/* line 26, style.scss */
+/* line 28, style.scss */
 #user { text-align: right; }
 
-/* line 30, style.scss */
+/* line 32, style.scss */
 #copyright { text-align: center; }
 
-/* line 35, style.scss */
+/* line 36, style.scss */
+.message-box, #flashes li { display: block; border: 3px solid; padding: 0.5em; margin: 0.5em; }
+/* line 41, style.scss */
+.message-box.error, #flashes li.error { background-color: #f3afbf; border: 3px solid #f31323; }
+/* line 45, style.scss */
+.message-box.warning, #flashes li.warning { background-color: #f3cf9f; border: 3px solid #f38323; }
+/* line 49, style.scss */
+.message-box.success, #flashes li.success { background-color: #83ef9f; border: 3px solid #338323; }
+/* line 53, style.scss */
+.message-box.info, #flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
+/* line 57, style.scss */
+.message-box p:last-child, #flashes li p:last-child { margin-bottom: 0; }
+
+/* line 63, style.scss */
 #flashes ul { margin: 0; }
-/* line 38, style.scss */
-#flashes li { display: block; border: 3px solid; padding: 0.5em; margin: 0.5em; }
-/* line 43, style.scss */
-#flashes li.error { background-color: #f3afbf; border: 3px solid #f31323; }
-/* line 47, style.scss */
-#flashes li.warning { background-color: #f3cf9f; border: 3px solid #f38323; }
-/* line 51, style.scss */
-#flashes li.success { background-color: #83ef9f; border: 3px solid #338323; }
-/* line 55, style.scss */
-#flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
