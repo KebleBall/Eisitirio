@@ -8,7 +8,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width" />
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
-        {% block javascripts %}{% endblock %}
     </head>
     <body>
         <header class="row">
@@ -59,10 +58,11 @@
         </section>
         <footer class="row">
             <section id="copyright" class="large-8 large-centered columns">
-                <p>&copy; 2013- Keble Ball. All rights reserved. <a href="http://www.google.com/recaptcha/mailhide/d?k=01VW2HusQat4KpnmQYJBSfhQ==&c=0pBadqH9ae41gTIaahTM78kkmPpv_-wELjktV6Zs-d0=" target="_blank">Webmaster</a></p>
+                <p>&copy; 2013- Keble Ball. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
             </section>
         </footer>
         <script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"></script>
         <script src="{{ url_for('static', filename='js/footer.js') }}"></script>
+        {% block javascripts %}{% endblock %}
     </body>
 </html>

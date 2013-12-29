@@ -4,71 +4,84 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    <h2>Your Tickets</h2>
-    {% if current_user.tickets %}
-        <table id="ticketsTable">
-            <thead>
-                <tr>
-                    <th>Ticket Number</th>
-                    <th>Name on Ticket</th>
-                    <th>Ticket Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ticket in current_user.tickets %}
-                    <tr id="ticket-{{ ticket.id }}">
-                        <td>#{{ '%05d' % ticket.id }}</td>
-                        <td>{{ ticket.name | default 'Not Set' }} (<a onclick="changeTicketName({{ ticket.id }})">Change</a>)</td>
-                        <td>
-                            {% if ticket.cancelled -%}
-                                Cancelled.
-                            {% elif ticket.collected -%}
-                                Collected.
-                            {% elif ticket.paid -%}
-                                {% if ticket.payment_method == 'Free' -%}
-                                    Free Ticket.
-                                {% else -%}
-                                    Paid for by {{ ticket.payment_method }}.
-                                {% endif %}
-                            {% else -%}
-                                Awaiting {{ ticket.payment_method }} payment.
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if not ticket.cancelled %}
-                                {% if not ticket.paid %}
-                                    <a href="{{ url_for('purchase.changeMethod') }}" class="button small">Change Payment Method</a>
-                                    {% if ticket.payment_method == 'Card' %}
-                                        <a href="{{ url_for('purchase.cardConfirm') }}">Complete card payment</a>
-                                    {% elif ticket.payment_method == 'Battels' %}
-                                        <a href="{{ url_for('purchase.battelsConfirm') }}">Confirm battels payment</a>
-                                    {% else %}
-                                        <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}">Contact treasurer</a>
-                                    {% endif %}
-                                {% endif %}
-                                <a href="{{ url_for('purchase.resell') }}" class="button small">Resell</a>
-                                <a href="{{ url_for('purchase.cancel') }}" class="button small">Cancel</a>
-                            {% endif %}
-                        </td>
+    <section id="dashboard" class="columns">
+        <h3>Your Tickets</h3>
+        {% if get_all(current_user.tickets) %}
+            <table id="ticketsTable">
+                <thead>
+                    <tr>
+                        <th>Ticket Number</th>
+                        <th>Name on Ticket</th>
+                        <th>Ticket Status</th>
+                        <th>Actions</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>You have no tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchaseHome') }}">buy some</a>?</p>
-    {% endif %}
+                </thead>
+                <tbody>
+                    {% for ticket in current_user.tickets %}
+                        <tr id="ticket-{{ ticket.id }}">
+                            <td>#{{ '%05d' % ticket.id }}</td>
+                            <td>{{ ticket.name | default('Not Set') }} (<a onclick="changeTicketName({{ ticket.id }})">Change</a>)</td>
+                            <td>
+                                {% if ticket.cancelled -%}
+                                    Cancelled.
+                                {% elif ticket.collected -%}
+                                    Collected.
+                                {% elif ticket.paid -%}
+                                    {% if ticket.payment_method == 'Free' -%}
+                                        Free Ticket.
+                                    {% else -%}
+                                        Paid for by {{ ticket.payment_method }}.
+                                    {% endif %}
+                                {% else -%}
+                                    Awaiting {{ ticket.payment_method }} payment.
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not ticket.cancelled %}
+                                    {% if not ticket.paid %}
+                                        <a href="{{ url_for('purchase.changeMethod') }}" class="button small">Change Payment Method</a>
+                                        {% if ticket.payment_method == 'Card' %}
+                                            <a href="{{ url_for('purchase.cardConfirm') }}">Complete card payment</a>
+                                        {% elif ticket.payment_method == 'Battels' %}
+                                            <a href="{{ url_for('purchase.battelsConfirm') }}">Confirm battels payment</a>
+                                        {% else %}
+                                            <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}">Contact treasurer</a>
+                                        {% endif %}
+                                    {% endif %}
+                                    <a href="{{ url_for('purchase.resell') }}" class="button small">Resell</a>
+                                    <a href="{{ url_for('purchase.cancel') }}" class="button small">Cancel</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You have no tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchaseHome') }}">buy some</a>?</p>
+        {% endif %}
 
-    <h2>Announcements</h2>
-    {% if user.announcements %}
-        {% for announcement in user.announcements %}
+        <h3>Announcements</h3>
+        {% for announcement in current_user.announcements %}
             <article class="announcement">
                 <h3>{{ announcement.subject }}</h3>
-                {{ announcement.message | trim 250 False '...' | markdown }}
+                {{ announcement.message | trim(250, False, '...') | markdown }}
                 <a href="{{ url_for('dashboard.announcement', announcementID=announcement.id) }}" class="read-more">Read More</a>
             </article>
+        {% else %}
+            <p>The Keble Ball committee has not posted any announcements yet. Watch this space and check your email for important information about the Ball</p>
         {% endfor %}
-    {% else %}
-        <p>The Keble Ball committee has not posted any announcements yet. Watch this space and check your email for important information about the Ball</p>
-    {% endif %}
+
+        <h3>Referrals</h3>
+        {% if get_all(current_user.referrals) %}
+            <p>The following tickets have been marked as being referred by you. Once you have referred {{ template_config['TICKET_REFERRALS'] - (get_all(current_user.referrals)|count % template_config['TICKET_REFERRALS']) }} more tickets you will earn {% if get_all(current_user.referrals)|count > template_config['TICKET_REFERRALS'] %}another{% else %}a{% endif %} free ticket.</p>
+            <ul id="referralsList">
+                {% for ticket in current_user.referrals %}
+                    <li>#{{ '%05d' % ticket.id }}, owned by {{ ticket.owner.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You haven't referred any tickets yet</p>
+            <p>For every {{ template_config['TICKET_REFERRALS'] }} tickets that are referred by you, you will receive a voucher for a free ticket. The person buying the ticket must enter your email address to ensure we know you referred them.</p>
+        {% endif %}
+    </section>
 {% endblock %}
