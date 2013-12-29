@@ -75,8 +75,8 @@ class Ticket(db.Model):
     )
 
     def __init__(self, owner, price, name=None):
-        if isinstance(owner, User):
-            self.owner = owner
+        if hasattr(owner, 'id'):
+            self.owner_id = owner.id
         else:
             self.owner_id = owner
 
@@ -123,14 +123,14 @@ class Ticket(db.Model):
         self.expires = None
 
     def setReferrer(self, referrer):
-        if isinstance(referrer, User):
-            self.referrer = referrer
+        if hasattr(referrer, 'id'):
+            self.referrer_id = referrer.id
         else:
             self.referrer_id = referrer
 
     def startResale(self, reselling_to):
-        if isinstance(reselling_to, User):
-            self.reselling_to = reselling_to
+        if hasattr(reselling_to, 'id'):
+            self.reselling_to_id = reselling_to.id
         else:
             self.reselling_to_id = reselling_to
 

@@ -27,8 +27,8 @@ class Waiting(db.Model):
     )
 
     def __init__(self, user, waitingfor):
-        if isinstance(user, User):
-            self.user = user
+        if hasattr(user, 'id'):
+            self.user_id = user.id
         else:
             self.user_id = user
 

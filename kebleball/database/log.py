@@ -18,7 +18,8 @@ class Log(db.Model):
 
     actor_id = db.Column(
         db.Integer(),
-        db.ForeignKey('user.id')
+        db.ForeignKey('user.id'),
+        nullable=True
     )
     actor = db.relationship(
         User,
@@ -55,23 +56,23 @@ class Log(db.Model):
         )
     )
 
-    def __init__(self, ip, message, actor, user, ticket=None):
+    def __init__(self, ip, action, actor, user, ticket=None):
         self.timestamp = datetime.utcnow()
         self.ip = ip
-        self.message = message
+        self.action = action
 
-        if isinstance(actor, User):
-            self.actor = actor
+        if hasattr(actor, 'id'):
+            self.actor_id = actor.id
         else:
             self.actor_id = actor
 
-        if isinstance(user, User):
-            self.user = user
+        if hasattr(user, 'id'):
+            self.user_id = user.id
         else:
             self.user_id = user
 
-        if isinstance(ticket, Ticket):
-            self.ticket = ticket
+        if hasattr(ticket, 'id'):
+            self.ticket_id = ticket.id
         else:
             self.ticket_id = ticket
 

@@ -15,4 +15,4 @@ class College(db.Model):
         self.name = name
 
     def __repr__(self):
-        return "<College {id}: {name}>".format_map(vars(self))
+        return "<College {0}: {1}>".format(self.id, self.name)

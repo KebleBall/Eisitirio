@@ -8,7 +8,6 @@ from kebleball.database import db
 from kebleball.database.battels import Battels
 from kebleball.database.college import College
 from kebleball.database.affiliation import Affiliation
-from kebleball.database.ticket import Ticket
 from kebleball.app import app
 from flask.ext.bcrypt import Bcrypt
 from kebleball.helpers import generate_key
@@ -79,13 +78,13 @@ class User(db.Model):
         self.deleted = False
         self.role = 'User'
 
-        if isinstance(college, College):
-            self.college = college
+        if hasattr(college, 'id'):
+            self.college_id = college.id
         else:
             self.college_id = college
 
-        if isinstance(affiliation, Affiliation):
-            self.affiliation = affiliation
+        if hasattr(affiliation, 'id'):
+            self.affiliation_id = affiliation.id
         else:
             self.affiliation_id = affiliation
 
@@ -100,7 +99,7 @@ class User(db.Model):
             self.battels = None
 
     def __repr__(self):
-        return "<User {id}: {name}>".format_map(vars(self))
+        return "<User {0}: {1}>".format(self.id, self.name)
 
     def checkPassword(self, candidate):
         return bcrypt.check_password_hash(self.passhash, candidate)
@@ -132,41 +131,13 @@ class User(db.Model):
     def canPayByBattels(self):
         return self.battels is not None
 
-    def canBuy(self):
-        if isinstance(app.config['TICKETS_ON_SALE'], datetime):
-            if app.config['TICKETS_ON_SALE'] > datetime.utcnow():
-                on_sale = 0
-            else:
-                on_sale = app.config['TICKETS_AVAILABLE']
-        else:
-            on_sale = app.config['TICKETS_AVAILABLE'] if app.config['TICKETS_ON_SALE'] else 0
-
-        return max(
-            min(
-                on_sale,
-                app.config['TICKETS_AVAILABLE'] - Ticket.count(),
-                app.config['MAX_TICKETS_PER_TRANSACTION'],
-                app.config['MAX_UNPAID_TICKETS'] - len(self.tickets.filter(Ticket.paid==False)),
-                app.config['MAX_TICKETS'] - len(self.tickets)
-            ),
-            0
+    def getsDiscount(self):
+        return (
+            self.college.name == 'Keble' and
+            self.affiliation.name == 'Student' and
+            app.config['KEBLE_DISCOUNT'] > 0 and
+            self.tickets.count() == 0
         )
-
-    def canWait(self):
-        can_wait_for = max(
-            app.config['MAX_TICKETS_WAITING'] - self.waitingFor(),
-            0
-        )
-
-        if isinstance(app.config['WAITING_OPEN'], datetime):
-            if app.config['WAITING_OPEN'] > datetime.utcnow():
-                return 0
-            else:
-                return can_wait_for
-        else:
-            return can_wait_for if app.config['WAITING_OPEN'] else 0
-
-        return
 
     def is_verified(self):
         return self.verified
@@ -175,7 +146,7 @@ class User(db.Model):
         return self.deleted
 
     def is_active(self):
-        return is_verified() and not is_deleted()
+        return self.is_verified() and not self.is_deleted()
 
     def is_authenticated(self):
         return True

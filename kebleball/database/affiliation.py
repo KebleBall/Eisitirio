@@ -15,4 +15,4 @@ class Affiliation(db.Model):
         self.name = name
 
     def __repr__(self):
-        return "<Affiliation {id}: {name}>".format_map(vars(self))
+        return "<Affiliation {0}: {1}>".format(self.id, self.name)

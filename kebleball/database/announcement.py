@@ -117,13 +117,13 @@ class Announcement(db.Model):
         self.has_collected = has_collected
         self.users = []
 
-        if isinstance(college, (College, type(None))):
-            self.college = college
+        if hasattr(college, 'id'):
+            self.college_id = college.id
         else:
             self.college_id = college
 
-        if isinstance(affiliation, (Affiliation, type(None))):
-            self.affiliation = affiliation
+        if hasattr(affiliation, 'id'):
+            self.affiliation_id = affiliation.id
         else:
             self.affiliation_id = affiliation
 
@@ -145,7 +145,7 @@ class Announcement(db.Model):
                 self.users.append(user)
 
     def __repr__(self):
-        return "<Announcement {id}: {subject}".format_map(vars(self))
+        return "<Announcement {0}: {1}>".format(self.id, self.subject)
 
     def sendEmails(self):
         try:

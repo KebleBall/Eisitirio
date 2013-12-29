@@ -95,8 +95,8 @@ class Voucher(db.Model):
 
         if self.singleuse:
             self.used = True
-            if isinstance(user, User):
-                self.used_by = user
+            if hasattr(user, 'id'):
+                self.used_by_id = user.id
             else:
                 self.used_by_id = user
 

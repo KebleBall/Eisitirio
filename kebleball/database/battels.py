@@ -26,7 +26,7 @@ class Battels(db.Model):
         self.manual = manual
 
     def __repr__(self):
-        return "<Battels {id}: {battelsid}>".format_map(vars(self))
+        return "<Battels {0}: {1}>".format(self.id, self.battelsid)
 
     def __getattr__(self, name):
         if name == 'mt_pounds':
