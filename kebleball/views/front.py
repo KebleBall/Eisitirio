@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
 from flask.ext.login import login_user, logout_user, login_required
 
@@ -12,7 +12,7 @@ from kebleball.database.affiliation import Affiliation
 from datetime import datetime, timedelta
 
 log = app.log_manager.log_front
-log_entry = app.log_manager.log_entry
+log_event = app.log_manager.log_event
 
 front = Blueprint('front', __name__)
 
@@ -31,7 +31,7 @@ def login():
 
     if not user or not user.checkPassword(request.form['password']):
         if user:
-            log_entry(
+            log_event(
                 'Failed login attempt - invalid password',
                 None,
                 user
@@ -41,7 +41,7 @@ def login():
         return redirect(url_for('front.home'))
 
     if not user.verified:
-        log_entry(
+        log_event(
             'Failed login attempt - not verified',
             None,
             user
@@ -60,7 +60,7 @@ def login():
         )
     )
 
-    log_entry(
+    log_event(
         'Logged in',
         None,
         user
@@ -174,7 +174,7 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    log_entry(
+    log_event(
         'Registered',
         None,
         user
@@ -218,7 +218,7 @@ def passwordReset():
         user = User.get_by_email(request.form['email'])
 
         if not user:
-            log_entry(
+            log_event(
                 'Attempted password reset for {0}'.format(
                     request.form['email']
                 )
@@ -230,7 +230,7 @@ def passwordReset():
                 "passwordResetFail.email"
             )
         else:
-            log_entry(
+            log_event(
                 'Started password reset',
                 None,
                 user
@@ -277,7 +277,7 @@ def emailConfirm():
         user = User.get_by_email(request.form['email'])
 
         if not user:
-            log_entry(
+            log_event(
                 'Attempted email confirm for {0}'.format(
                     request.form['email']
                 )
@@ -289,7 +289,7 @@ def emailConfirm():
                 "emailConfirmFail.email"
             )
         else:
-            log_entry(
+            log_event(
                 'Requested email confirm',
                 None,
                 user
@@ -358,7 +358,7 @@ def resetPassword(userID, secretkey):
                 )
             )
         else:
-            log_entry(
+            log_event(
                 'Completed password reset',
                 None,
                 user
@@ -378,7 +378,7 @@ def confirmEmail(userID, secretkey):
     user = User.get_by_id(userID)
 
     if user is not None and user.secretkey == secretkey:
-        log_entry(
+        log_event(
             'Confirmed email',
             None,
             user
@@ -399,7 +399,7 @@ def destroyAccount(userID, secretkey):
 
     if user is not None and user.secretkey == secretkey:
         if not user.is_verified():
-            log_entry(
+            log_event(
                 'Deleted account with email address {0}'.format(
                     user.email
                 )
@@ -419,7 +419,7 @@ def destroyAccount(userID, secretkey):
 
             flash(u'The account has been deleted.','info')
         else:
-            log_entry(
+            log_event(
                 'Attempted deletion of verified account',
                 None,
                 user
