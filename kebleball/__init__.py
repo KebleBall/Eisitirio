@@ -4,6 +4,7 @@ from .app import app
 from kebleball.helpers.log_manager import LogManager
 from kebleball.helpers.login_manager import loginManager
 from kebleball.helpers.email_manager import EmailManager
+from flask.ext.markdown import Markdown
 
 log_manager = LogManager(app)
 app.log_manager = log_manager
@@ -12,6 +13,8 @@ email_manager = EmailManager(app)
 app.email_manager = email_manager
 
 loginManager.init_app(app)
+
+Markdown(app)
 
 log = app.log_manager.log_main
 
