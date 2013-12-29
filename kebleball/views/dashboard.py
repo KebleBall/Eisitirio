@@ -18,7 +18,7 @@ def profile(methods=['GET','POST']):
     # [todo] - Add profile
     raise NotImplementedError('profile')
 
-@dashboard.route('/dashboard/announcement/<int:announcementID')
+@dashboard.route('/dashboard/announcement/<int:announcementID>')
 @login_required
 def announcement(announcementID):
     # [todo] - Add announcement
