@@ -1,0 +1,74 @@
+<!-- dashboard/dashboardHome.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h2>Your Tickets</h2>
+    {% if current_user.tickets %}
+        <table id="ticketsTable">
+            <thead>
+                <tr>
+                    <th>Ticket Number</th>
+                    <th>Name on Ticket</th>
+                    <th>Ticket Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in current_user.tickets %}
+                    <tr id="ticket-{{ ticket.id }}">
+                        <td>#{{ '%05d' % ticket.id }}</td>
+                        <td>{{ ticket.name | default 'Not Set' }} (<a onclick="changeTicketName({{ ticket.id }})">Change</a>)</td>
+                        <td>
+                            {% if ticket.cancelled -%}
+                                Cancelled.
+                            {% elif ticket.collected -%}
+                                Collected.
+                            {% elif ticket.paid -%}
+                                {% if ticket.payment_method == 'Free' -%}
+                                    Free Ticket.
+                                {% else -%}
+                                    Paid for by {{ ticket.payment_method }}.
+                                {% endif %}
+                            {% else -%}
+                                Awaiting {{ ticket.payment_method }} payment.
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not ticket.cancelled %}
+                                {% if not ticket.paid %}
+                                    <a href="{{ url_for('purchase.changeMethod') }}" class="button small">Change Payment Method</a>
+                                    {% if ticket.payment_method == 'Card' %}
+                                        <a href="{{ url_for('purchase.cardConfirm') }}">Complete card payment</a>
+                                    {% elif ticket.payment_method == 'Battels' %}
+                                        <a href="{{ url_for('purchase.battelsConfirm') }}">Confirm battels payment</a>
+                                    {% else %}
+                                        <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}">Contact treasurer</a>
+                                    {% endif %}
+                                {% endif %}
+                                <a href="{{ url_for('purchase.resell') }}" class="button small">Resell</a>
+                                <a href="{{ url_for('purchase.cancel') }}" class="button small">Cancel</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchaseHome') }}">buy some</a>?</p>
+    {% endif %}
+
+    <h2>Announcements</h2>
+    {% if user.announcements %}
+        {% for announcement in user.announcements %}
+            <article class="announcement">
+                <h3>{{ announcement.subject }}</h3>
+                {{ announcement.message | trim 250 False '...' | markdown }}
+                <a href="{{ url_for('dashboard.announcement', announcementID=announcement.id) }}" class="read-more">Read More</a>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p>The Keble Ball committee has not posted any announcements yet. Watch this space and check your email for important information about the Ball</p>
+    {% endif %}
+{% endblock %}
