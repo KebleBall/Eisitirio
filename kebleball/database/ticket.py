@@ -60,6 +60,20 @@ class Ticket(db.Model):
         foreign_keys=[reselling_to_id]
     )
 
+    referrer_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id'),
+        nullable=True
+    )
+    referrer = db.relationship(
+        'User',
+        backref=db.backref(
+            'referrals',
+            lazy='dynamic'
+        ),
+        foreign_keys=[referrer_id]
+    )
+
     def __init__(self, owner, price, name=None):
         if isinstance(owner, User):
             self.owner = owner
@@ -107,6 +121,12 @@ class Ticket(db.Model):
         self.paid = True
         self.paymentmethod = method
         self.expires = None
+
+    def setReferrer(self, referrer):
+        if isinstance(referrer, User):
+            self.referrer = referrer
+        else:
+            self.referrer_id = referrer
 
     def startResale(self, reselling_to):
         if isinstance(reselling_to, User):
@@ -156,3 +176,7 @@ class Ticket(db.Model):
         # [todo] - Implement ticket.cancel
 
         raise NotImplementedError
+
+    @classmethod
+    def count(self):
+        return Ticket.query.filter(Ticket.cancelled==False).count()
