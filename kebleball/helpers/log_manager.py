@@ -33,6 +33,8 @@ class LogManager(object):
         self.purchase = logging.getLogger('purchase')
         self.resale = logging.getLogger('purchase')
 
+        self.session = session
+
     def init_app(self, app):
         app.logger = self
 
@@ -65,8 +67,8 @@ class LogManager(object):
                 )
 
     def log_event(self, message, ticket=None, user=None):
-        if 'actor_id' in session:
-            actor = session['actor_id']
+        if 'actor_id' in self.session:
+            actor = self.session['actor_id']
         elif not current_user.is_anonymous():
             actor = current_user
         else:
@@ -82,6 +84,6 @@ class LogManager(object):
 
         session = db.create_scoped_session()
 
-        session.add(entry)
+        session.merge(entry)
         session.commit()
         session.close()
