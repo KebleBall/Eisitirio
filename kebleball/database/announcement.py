@@ -26,6 +26,19 @@ user_announce_link = db.Table(
     )
 )
 
+email_announce_link = db.Table(
+    'email_announce_link',
+    db.Model.metadata,
+    db.Column('user_id',
+        db.Integer,
+        db.ForeignKey('user.id')
+    ),
+    db.Column('announcement_id',
+        db.Integer,
+        db.ForeignKey('announcement.id')
+    )
+)
+
 class Announcement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     time = db.Column(db.String(50))
@@ -82,6 +95,10 @@ class Announcement(db.Model):
         backref='announcements'
     )
 
+    emails = db.relationship(
+        'User',
+        secondary=user_announce_link
+    )
 
     def __init__(self,
                  subject,
@@ -133,13 +150,13 @@ class Announcement(db.Model):
     def sendEmails(self):
         try:
             msg = MIMEText(self.content)
-            msg['Subject'] = subject
+            msg['Subject'] = self.subject
             msg['From'] = self.sender.email
 
-            for user in self.users:
+            for user in self.emails:
                 msg['To'] = user.email
                 app.email_manager.sendMsg(msg)
-                self.sent_to_last = user.id
+                self.emails.remove(user)
             self.email_sent = True
         finally:
             db.session.commit()
