@@ -7,23 +7,47 @@
     <section id="purchase" class="columns">
         {% if canBuy > 0 %}
             <form action="{{ request.path }}" method="post">
-                <input type="hidden" name="action" value="purchase" />
                 <ol id="purchaseSteps">
                     <li>
                         <h5>Choose Number of Tickets</h5>
                         <div class="row">
                             <div class="columns">
                                 <label for="numTickets">Number of Tickets: <span id="numTicketsDisplay">1</span></label>
-                                <input id="numTickets" name="numTickets" type="number" min="1" max="{{ canBuy }}" step="1" value="1" data-slider="true" data-slider-range="1,{{ canBuy }}" data-slider-snap="true" data-slider-step="1" data-slider-highlight="true" />
+                                <input
+                                    id="numTickets"
+                                    name="numTickets"
+                                    type="number"
+                                    min="1"
+                                    max="{{ canBuy }}"
+                                    step="1"
+                                    value="{% if numTickets -%}
+                                        {{ numTickets }}
+                                    {% else -%}
+                                        1
+                                    {% endif %}"
+                                    data-slider="true"
+                                    data-slider-range="1,{{ canBuy }}"
+                                    data-slider-snap="true"
+                                    data-slider-step="1"
+                                    data-slider-highlight="true"
+                                />
                             </div>
                         </div>
                         <p id="ticketInformation">
                             The base price for a ticket is &pound;{{ '%.2f' % (template_config['TICKET_PRICE'] / 100.0) }}.
                             {% if current_user.getsDiscount() %}
                                 As a current Keble student you get a &pound;{{ '%.2f' % (template_config['KEBLE_DISCOUNT'] / 100.0) }} discount on your first ticket.
-                                Your order of 1 ticket is currently worth &pound;{{ '%.2f' % ((template_config['TICKET_PRICE'] - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
+                                {% if numTickets -%}
+                                    Your order of {{ numTickets }} ticket{% if numTickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % (((template_config['TICKET_PRICE'] * numTickets) - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
+                                {% else -%}
+                                    Your order of 1 ticket is currently worth &pound;{{ '%.2f' % ((template_config['TICKET_PRICE'] - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
+                                {% endif %}
                             {% else %}
-                                Your order of 1 ticket is currently worth &pound;{{ '%.2f' % (template_config['TICKET_PRICE'] / 100.0) }}.
+                                {% if numTickets -%}
+                                    Your order of {{ numTickets }} ticket{% if numTickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % ((template_config['TICKET_PRICE'] * numTickets) / 100.0) }}.
+                                {% else -%}
+                                    Your order of 1 ticket is currently worth &pound;{{ '%.2f' % (template_config['TICKET_PRICE'] / 100.0) }}.
+                                {% endif %}
                             {% endif %}
                             Please note that this price does not reflect the value of any discounts to be applied.
                         </p>
@@ -33,39 +57,39 @@
                         <div class="row">
                             <div class="columns">
                                 {% if current_user.canPayByBattels() %}
-                                    <label for="paymentMethod-battels">
-                                        <input type="radio" name="paymentMethod" value="battels" id="paymentMethod-battels" />
+                                    <label for="paymentMethod-Battels">
+                                        <input type="radio" name="paymentMethod" value="Battels" id="paymentMethod-Battels" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Battels' %}checked="checked" {% endif %}/>
                                         Battels
                                     </label>
                                 {% endif %}
-                                <label for="paymentMethod-card">
-                                    <input type="radio" name="paymentMethod" value="card" id="paymentMethod-card" />
+                                <label for="paymentMethod-Card">
+                                    <input type="radio" name="paymentMethod" value="Card" id="paymentMethod-Card" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Card' %}checked="checked" {% endif %}/>
                                     Credit/Debit Card
                                 </label>
                                 <p class="small"><a onclick="showAlternativePayments()" style="cursor: pointer;">Can't pay by card{% if current_user.canPayByBattels() %}/battels{% endif %}?</a></p>
-                                <div id="paymentAlternatives" style="display: none;">
+                                <div id="paymentAlternatives"{% if not (form and form['paymentMethod'] and (form['paymentMethod'] == 'Cash' or form['paymentMethod'] == 'Cheque')) %} style="display: none;"{% endif %}>
                                     <p>If you wish to pay by cheque/cash, you must contact <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}">the treasurer</a> to arrange the payment before reserving your tickets here, in order to prevent your tickets expiring before payment is confirmed.</p>
-                                    <label for="paymentMethod-cash">
-                                        <input type="radio" name="paymentMethod" value="cash" id="paymentMethod-cash" />
+                                    <label for="paymentMethod-Cash">
+                                        <input type="radio" name="paymentMethod" value="Cash" id="paymentMethod-Cash" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Cash' %}checked="checked" {% endif %}/>
                                         Cash
                                     </label>
-                                    <label for="paymentMethod-cheque">
-                                        <input type="radio" name="paymentMethod" value="cheque" id="paymentMethod-cheque" />
+                                    <label for="paymentMethod-Cheque">
+                                        <input type="radio" name="paymentMethod" value="Cheque" id="paymentMethod-Cheque" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Cheque' %}checked="checked" {% endif %}/>
                                         Cheque
                                     </label>
-                                    <label for="paymentReason">Reason for cash/card payment</label>
-                                    <input type="text" name="paymentReason" id="paymentReason" />
+                                    <label for="paymentReason">Reason for cash/cheque payment</label>
+                                    <input type="text" name="paymentReason" id="paymentReason" {% if form and form['paymentReason'] %}value="{{ form['paymentReason'] }}" {% endif %}/>
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li>
                         <h5>Apply voucher code</h5>
-                        <p>If you have been given a discount code, please enter it here. If you do not have a code, leave this field blank.</p>
+                        <p>If you have been given a discount code, please enter it here. If you do not have a code, leave this field blank. Only one discount code may be used per order</p>
                         <div class="row">
                             <div class="columns">
                                 <label for="voucherCode">Discount Code:</label>
-                                <input type="text" name="voucherCode" id="voucherCode" />
+                                <input type="text" name="voucherCode" id="voucherCode" {% if form and form['voucherCode'] %}value="{{ form['voucherCode'] }}" {% endif %}/>
                                 <div id="voucherMessage" style="display: none;"></div>
                             </div>
                         </div>
@@ -76,8 +100,19 @@
                         <div class="row">
                             <div class="columns">
                                 <label for="referrerEmail">Email Address:</label>
-                                <input type="email" name="referrerEmail" id="referrerEmail" />
+                                <input type="email" name="referrerEmail" id="referrerEmail" {% if form and form['referrerEmail'] %}value="{{ form['referrerEmail'] }}" {% endif %}/>
                                 <div id="referrerMessage" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <h5>Terms and Conditions</h5>
+                        <div class="row">
+                            <div class="columns">
+                                <label for="acceptTerms">
+                                    <input type="checkbox" name="acceptTerms" value="yes" id="acceptTerms" required />
+                                    I have read and accept the <a href="{{ url_for('front.terms') }}" target="_blank">Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} Terms &amp; Conditions</a>
+                                </label>
                             </div>
                         </div>
                     </li>
@@ -96,6 +131,7 @@
 
 {% block javascripts %}
     <script src="{{ url_for('static', filename='js/vendor/simple-slider.js') }}"></script>
+
     {% if canBuy > 0 %}
         <script type="text/javascript">
             var ticketPrice = {{ template_config['TICKET_PRICE'] }};
@@ -151,7 +187,7 @@
             voucherCode.on("blur", function() {
                 if (voucherCode.val() != '') {
                     jQuery.ajax(
-                        '{{ url_for('ajax.validateVoucher', _external=True) }}',
+                        '{{ url_for('ajax.ajaxValidateVoucher', _external=True) }}',
                         {
                             'data': {
                                 'code': voucherCode.val()
@@ -159,6 +195,7 @@
                             'type': 'POST',
                             'dataType': 'json',
                             'success': function(data, code, xhr) {
+                                console.log(data);
                                 voucherMessage.attr(
                                     "class",
                                     data.class
@@ -183,7 +220,7 @@
             referrerEmail.on("blur", function() {
                 if (referrerEmail.val() != '') {
                     jQuery.ajax(
-                        '{{ url_for('ajax.validateReferrer', _external=True) }}',
+                        '{{ url_for('ajax.ajaxValidateReferrer', _external=True) }}',
                         {
                             'data': {
                                 'email': referrerEmail.val()
@@ -191,6 +228,7 @@
                             'type': 'POST',
                             'dataType': 'json',
                             'success': function(data, code, xhr) {
+                                console.log(data);
                                 referrerMessage.attr(
                                     "class",
                                     data.class

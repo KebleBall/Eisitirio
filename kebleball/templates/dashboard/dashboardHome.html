@@ -40,12 +40,12 @@
                                 {% if not ticket.cancelled %}
                                     {% if not ticket.paid %}
                                         <a href="{{ url_for('purchase.changeMethod') }}" class="button small">Change Payment Method</a>
-                                        {% if ticket.payment_method == 'Card' %}
-                                            <a href="{{ url_for('purchase.cardConfirm') }}">Complete card payment</a>
-                                        {% elif ticket.payment_method == 'Battels' %}
-                                            <a href="{{ url_for('purchase.battelsConfirm') }}">Confirm battels payment</a>
+                                        {% if ticket.paymentmethod == 'Card' %}
+                                            <a href="{{ url_for('purchase.cardConfirm') }}" class="button small">Complete card payment</a>
+                                        {% elif ticket.paymentmethod == 'Battels' %}
+                                            <a href="{{ url_for('purchase.battelsConfirm') }}" class="button small">Confirm battels payment</a>
                                         {% else %}
-                                            <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}">Contact treasurer</a>
+                                            <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}" class="button small">Contact treasurer</a>
                                         {% endif %}
                                     {% endif %}
                                     <a href="{{ url_for('purchase.resell') }}" class="button small">Resell</a>

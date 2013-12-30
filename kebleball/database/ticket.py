@@ -13,9 +13,9 @@ from kebleball.helpers import generate_key
 
 class Ticket(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    paid = db.Column(db.Boolean(), default=False)
-    collected = db.Column(db.Boolean(), default=False)
-    cancelled = db.Column(db.Boolean(), default=False)
+    paid = db.Column(db.Boolean(), default=False, nullable=False)
+    collected = db.Column(db.Boolean(), default=False, nullable=False)
+    cancelled = db.Column(db.Boolean(), default=False, nullable=False)
     paymentmethod = db.Column(
         db.Enum(
             'Battels',
@@ -27,13 +27,15 @@ class Ticket(db.Model):
         nullable=True
     )
     paymentreference = db.Column(db.String(20), nullable=True)
-    price = db.Column(db.Integer())
+    price = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(120), nullable=True)
+    note = db.Column(db.Text(), nullable=True)
     expires = db.Column(db.DateTime(), nullable=True)
 
     owner_id = db.Column(
         db.Integer,
-        db.ForeignKey('user.id')
+        db.ForeignKey('user.id'),
+        nullable=False
     )
     owner = db.relationship(
         'User',
@@ -45,7 +47,7 @@ class Ticket(db.Model):
     )
 
     resalekey = db.Column(db.String(32), nullable=True)
-    resaleconfirmed = db.Column(db.Boolean(), default=False)
+    resaleconfirmed = db.Column(db.Boolean(), default=False, nullable=False)
     reselling_to_id = db.Column(
         db.Integer,
         db.ForeignKey('user.id'),
@@ -74,21 +76,20 @@ class Ticket(db.Model):
         foreign_keys=[referrer_id]
     )
 
-    def __init__(self, owner, price, name=None):
+    def __init__(self, owner, paymentmethod, price=None):
         if hasattr(owner, 'id'):
             self.owner_id = owner.id
         else:
             self.owner_id = owner
 
-        self.price = price
-
-        if price == 0:
-            self.paid = True
-            self.paymentmethod = 'Free'
-
-        self.name = name
+        self.paymentmethod = paymentmethod
 
         self.expires = datetime.utcnow() + app.config['TICKET_EXPIRY_TIME']
+
+        if price is not None:
+            self.setPrice(price)
+        else:
+            self.setPrice(app.config['TICKET_PRICE'])
 
     def __getattr__(self, name):
         if name == 'price_pounds':
@@ -106,6 +107,14 @@ class Ticket(db.Model):
             self.owner_id
         )
 
+    def setPrice(self,price):
+        price = max(price, 0)
+
+        self.price = price
+
+        if price == 0:
+            self.markAsPaid('Free')
+
     def markAsPaid(self, method):
         if method not in [
             'Battels',
@@ -121,6 +130,15 @@ class Ticket(db.Model):
         self.paid = True
         self.paymentmethod = method
         self.expires = None
+
+    def addNote(self, note):
+        if not note.endswith('\n'):
+            note = note + '\n'
+
+        if self.note is None:
+            self.note = note
+        else:
+            self.note = self.note + note
 
     def setReferrer(self, referrer):
         if hasattr(referrer, 'id'):
@@ -162,6 +180,14 @@ class Ticket(db.Model):
 
     def completeResale(self, key):
         if self.resalekey == key:
+            self.addNote(
+                'Resold by {0}/{1} to {2}/{3}'.format(
+                    self.owner.id,
+                    self.owner.name,
+                    self.reselling_to.id,
+                    self.reselling_to.name
+                )
+            )
             self.owner = self.reselling_to
             self.reselling_to_id = None
             self.reselling_to = None
