@@ -5,7 +5,7 @@
 
 {% block content %}
     <section id="wait" class="columns">
-        <form action="{{ request.path }}" method="post">
+        <form action="{{ url_for('purchase.wait') }}" method="post">
             <ol id="purchaseSteps">
                 <li>
                     <h5>Choose Number of Tickets</h5>

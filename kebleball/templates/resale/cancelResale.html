@@ -8,7 +8,7 @@
         <p>If you have started the process of reselling tickets, and no longer wish to do resell them, please select the tickets you wish to keep and click Cancel Resale</p>
         <h3>Your Tickets</h3>
         {% if current_user.isResellingTickets() %}
-            <form action="{{ request.path }}" method="post">
+            <form action="{{ url_for('resale.cancelResale') }}" method="post">
                 <table id="ticketsTable">
                     <thead>
                         <tr>

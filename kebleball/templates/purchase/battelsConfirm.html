@@ -7,7 +7,7 @@
     <section id="battelsConfirm" class="columns">
         <h3>Your Tickets</h3>
         {% if current_user.hasUnpaidTickets('Battels') %}
-            <form action="{{ request.path }}" method="post">
+            <form action="{{ url_for('purchase.battelsConfirm') }}" method="post">
                 <table id="ticketsTable">
                     <thead>
                         <tr>

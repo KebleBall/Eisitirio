@@ -15,7 +15,7 @@
         </ul>
         <p>In addition to this, in the weeks preceding the ball, automated ticket cancellations are disabled to aid with organisation of ticket collections. If you find that you have tickets which obey the above rules, but the list below is empty, it is likely that cancellations are disabled. In this case, you should contact <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a> to arrange for your ticket to be refunded and cancelled
         <h3>Your Tickets</h3>
-        <form action="{{ request.path }}" method="post">
+        <form action="{{ url_for('purchase.cancel') }}" method="post">
             <table id="ticketsTable">
                 <thead>
                     <tr>
