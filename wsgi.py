@@ -8,11 +8,11 @@ from werkzeug.debug import DebuggedApplication
 def application(req_environ, start_response):
     if 'KEBLE_BALL_ENV' in req_environ:
         if req_environ['KEBLE_BALL_ENV'] == 'STAGING':
-            app.config.from_pyfile('kebleball/config/production.py')
+            app.config.from_pyfile('config/production.py')
             _app = DebuggedApplication(app, True)
             return _app(req_environ, start_response)
         elif req_environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
-            app.config.from_pyfile('kebleball/config/production.py')
+            app.config.from_pyfile('config/production.py')
             return app(req_environ, start_response)
         else:
             return app(req_environ, start_response)
