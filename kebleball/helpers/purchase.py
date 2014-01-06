@@ -1,6 +1,7 @@
 from kebleball.app import app
 from kebleball.database.ticket import Ticket
 from kebleball.database.user import User
+from kebleball.database.waiting import Waiting
 from datetime import datetime
 
 def canBuy(user):
@@ -11,6 +12,10 @@ def canBuy(user):
             on_sale = app.config['TICKETS_AVAILABLE']
     else:
         on_sale = app.config['TICKETS_AVAILABLE'] if app.config['TICKETS_ON_SALE'] else 0
+
+    # Don't allow people to buy tickets unless waiting list is empty
+    if Waiting.query.count() > 0:
+        on_sale = 0
 
     return max(
         min(
@@ -25,7 +30,10 @@ def canBuy(user):
 
 def canWait(user):
     can_wait_for = max(
-        app.config['MAX_TICKETS_WAITING'] - user.waitingFor(),
+        min(
+            app.config['MAX_TICKETS_WAITING'] - user.waitingFor(),
+            app.config['MAX_TICKETS'] - user.tickets.count()
+        ),
         0
     )
 

@@ -47,7 +47,10 @@ class EmailManager:
             msg['From'] = kwargs['email_from']
         except KeyError:
             msg['From'] = self.defaultfrom
-        msg['To'] = to
+        if isinstance(to, list):
+            msg['To'] = ', '.join(to)
+        else:
+            msg['To'] = to
 
         self.sendMsg(msg)
 
@@ -59,7 +62,10 @@ class EmailManager:
 
         msg['Subject'] = ("[Keble Ball] - " + subject)
         msg['From'] = msgfrom
-        msg['To'] = to
+        if isinstance(to, list):
+            msg['To'] = ', '.join(to)
+        else:
+            msg['To'] = to
 
         self.sendMsg(msg)
 
@@ -68,7 +74,7 @@ class EmailManager:
             self.smtp = smtplib.SMTP(self.smtp_host)
 
         try:
-            self.smtp.sendmail(msg['From'], msg['To'], msg.as_string())
+            self.smtp.sendmail(msg['From'], msg['To'].split(', '), msg.as_string())
         except smtplib.SMTPRecipientsRefused as e:
             self.log(
                 'error',

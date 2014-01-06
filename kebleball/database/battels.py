@@ -11,6 +11,9 @@ class Battels(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     battelsid = db.Column(db.String(6), unique=True, nullable=True)
     email = db.Column(db.String(120), unique=True, nullable=True)
+    title = db.Column(db.String(10), nullable=True)
+    surname = db.Column(db.String(60), nullable=True)
+    forenames = db.Column(db.String(60), nullable=True)
     mt = db.Column(db.Integer())
     ht = db.Column(db.Integer())
     manual = db.Column(db.Boolean())
@@ -19,10 +22,16 @@ class Battels(db.Model):
         self,
         battelsid = None,
         email = None,
+        title = None,
+        surname = None,
+        forenames = None,
         manual = False
     ):
         self.battelsid = battelsid
         self.email = email
+        self.title = title
+        self.surname = surname
+        self.forenames = forenames
         self.manual = manual
 
     def __repr__(self):
@@ -40,15 +49,43 @@ class Battels(db.Model):
                 "Battels instance has no attribute '{0}'".format(name)
             )
 
-    def charge(self, term, amount):
-        if term not in ['ht', 'mt']:
-            raise ValueError("Term '{0}' does not exist")
+    def charge(self, ticket, term):
+        if term == 'MTHT':
+            self.mt = self.mt + (ticket.price / 2)
+            self.ht = self.ht + (ticket.price - (ticket.price / 2))
+        elif term == 'MT':
+            self.mt = self.mt + ticket.price
+        elif term == 'HT':
+            self.ht = self.ht + ticket.price
+        else:
+            raise ValueError(
+                "Term '{0}' cannot be charged to battels".format(
+                    term
+                )
+            )
 
-        if not isinstance(amount, (int, long)):
-            raise TypeError("Amount must be an integer")
-
-        setattr(
-            self,
-            term,
-            getattr(self, term) + amount
+        ticket.markAsPaid(
+            'Battels',
+            'Battels {0}, {1} term'.format(
+                'manual' if battels.manual else battels.battelsid,
+                request.form['paymentTerm']
+            ),
+            battels_term=term,
+            battels=self
         )
+
+    def cancel(self, ticket):
+        if app.config['CURRENT_TERM'] == 'MT':
+            if ticket.battels_term == 'MTHT':
+                self.mt = self.mt - (ticket.price / 2)
+                self.ht = self.ht - (ticket.price - (ticket.price / 2))
+            elif term == 'MT':
+                self.mt = self.mt - ticket.price
+            elif term == 'HT':
+                self.ht = self.ht - ticket.price
+        if app.config['CURRENT_TERM'] == 'MT':
+            self.ht = self.ht - ticket.price
+        else:
+            raise ValueError("Can't refund battels tickets in the current term")
+
+        ticket.cancelled = True

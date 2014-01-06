@@ -82,7 +82,7 @@ def validateReferrer(email, current_user):
                 True,
                 {
                     'class': 'success',
-                    'message': '{0} will be credited for your order.'.format(user.name)
+                    'message': '{0} will be credited for your order.'.format(user.firstname)
                 },
                 None
             )
@@ -95,6 +95,45 @@ def validateReferrer(email, current_user):
                     'No user with that email address was found, have you '
                     'entered it correctly? The person who referred you must have '
                     'an account before they can be given credit for your order.'
+                )
+            },
+            None
+        )
+
+    return result
+
+def validateResaleEmail(email, current_user):
+    user = User.get_by_email(email)
+
+    if user:
+        if user == current_user:
+            result = (
+                False,
+                {
+                    'class': 'info',
+                    'message': "There is very little, if any, point in reselling tickets to yourself..."
+                },
+                None
+            )
+        else:
+            result = (
+                True,
+                {
+                    'class': 'success',
+                    'message': '{0} will receive an email to confirm the resale.'.format(user.name)
+                },
+                None
+            )
+    else:
+        result = (
+            False,
+            {
+                'class': 'warning',
+                'message': (
+                    'No user with that email address was found, have you '
+                    'entered it correctly? The person who you are reselling '
+                    'to must have an account before they can buy tickets from '
+                    'you.'
                 )
             },
             None

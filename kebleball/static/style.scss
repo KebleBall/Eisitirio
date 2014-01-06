@@ -67,3 +67,7 @@ a {
         @extend .message-box;
     }
 }
+
+p.small {
+    font-size: 0.75rem;
+}

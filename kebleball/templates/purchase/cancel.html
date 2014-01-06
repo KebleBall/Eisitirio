@@ -1,0 +1,66 @@
+<!-- purchase/cancel.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Cancel Tickets{% endblock %}
+
+{% block content %}
+    <section id="cancel" class="columns">
+        <p>If you wish to cancel tickets, there are a number of conditions which must be fulfilled:</p>
+        <ul>
+            <li>Your ticket must have been paid for by card or battels.</li>
+            <li>In the case of battels payment, the ticket must be cancelled before the end of 8th Week Hilary Term.</li>
+            <li>Tickets can only be refunded to the original payment method. Card payments will be refunded instantaneously (or, in as long as it takes for your and our banks to process the refund), Battels will be refunded onto your next battels bill. Note that battels refunds, similar to charges, will not show on your battels statement until the end of the current term/start of the next term.</li>
+            <li>Free or unpaid tickets can always be cancelled.</li>
+            <li>Any discounts given on cancelled tickets will not be available if you choose to purchase tickets again.</li>
+        </ul>
+        <p>In addition to this, in the weeks preceding the ball, automated ticket cancellations are disabled to aid with organisation of ticket collections. If you find that you have tickets which obey the above rules, but the list below is empty, it is likely that cancellations are disabled. In this case, you should contact <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a> to arrange for your ticket to be refunded and cancelled
+        <h3>Your Tickets</h3>
+        <form action="{{ request.path }}" method="post">
+            <table id="ticketsTable">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Ticket Number</th>
+                        <th>Name on Ticket</th>
+                        <th>Ticket Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in current_user.tickets %}
+                        {% if ticket.canBeCancelledAutomatically() %}
+                            <tr id="ticket-{{ ticket.id }}">
+                                <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.id }}" value="{{ ticket.id }}" {% if tickets and ticket.id in tickets %}checked="checked" {% endif %}/></td>
+                                <td><label for="ticketSelect-{{ ticket.id }}">#{{ '%05d' % ticket.id }}</label></td>
+                                <td><label for="ticketSelect-{{ ticket.id }}">{{ ticket.name | default('Not Set') }}</label></td>
+                                <td>
+                                    <label for="ticketSelect-{{ ticket.id }}">
+                                        {% if ticket.cancelled -%}
+                                            Cancelled.
+                                        {% elif ticket.collected -%}
+                                            Collected.
+                                        {% elif ticket.resalekey != None -%}
+                                            {% if ticket.resaleconfirmed -%}
+                                                Pending resale completion
+                                            {% else -%}
+                                                Pending resale confirmation
+                                            {% endif %}
+                                        {% elif ticket.paid -%}
+                                            {% if ticket.payment_method == 'Free' -%}
+                                                Free Ticket.
+                                            {% else -%}
+                                                Paid for by {{ ticket.paymentmethod }}.
+                                            {% endif %}
+                                        {% else -%}
+                                            Awaiting {{ ticket.paymentmethod }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                        {% endif %}
+                                    </label>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="submit" value="Cancel Tickets" class="button small" />
+        </form>
+    </section>
+{% endblock %}

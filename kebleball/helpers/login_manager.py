@@ -7,6 +7,6 @@ loginManager = LoginManager()
 def load_user(user_id):
     return User.get_by_id(user_id)
 
-loginManager.login_view = "front.login"
+loginManager.login_view = "front.home"
 
 loginManager.session_protection = "strong"

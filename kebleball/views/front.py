@@ -25,7 +25,7 @@ def home():
         form={}
     )
 
-@front.route('/login', methods=['GET','POST'])
+@front.route('/login', methods=['POST'])
 def login():
     user = User.get_by_email(request.form['email'])
 
@@ -69,8 +69,7 @@ def login():
     flash(u'Logged in successfully.', 'success')
     return redirect(request.form.get('next', False) or url_for("dashboard.dashboardHome"))
 
-
-@front.route('/register', methods=['GET','POST'])
+@front.route('/register', methods=['POST'])
 def register():
     valid = True
     flashes = []
@@ -100,10 +99,17 @@ def register():
         valid = False
 
     if (
-        'name' not in request.form or
-        request.form['name'] == ''
+        'firstname' not in request.form or
+        request.form['firstname'] == ''
     ):
-        flashes.append(u'Name cannot be blank')
+        flashes.append(u'First Name cannot be blank')
+        valid = False
+
+    if (
+        'surname' not in request.form or
+        request.form['surname'] == ''
+    ):
+        flashes.append(u'Surname cannot be blank')
         valid = False
 
     if (
@@ -165,7 +171,8 @@ def register():
     user = User(
         request.form['email'],
         request.form['password'],
-        request.form['name'],
+        request.form['firstname'],
+        request.form['surname'],
         request.form['phone'],
         request.form['college'],
         request.form['affiliation']

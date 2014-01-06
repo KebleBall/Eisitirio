@@ -17,6 +17,9 @@
             <section id="homepage-login" class="large-6 columns">
                 <h2>Log In</h2>
                 <form action="{{ url_for('front.login') }}" method="post">
+                    {% if request.args['next'] %}
+                        <input type="hidden" name="next" value="{{ request.args['next'] }}" />
+                    {% endif %}
                     <div class="row">
                         <div class="large-12 columns">
                             <label for="login-email">Email Address</label>
@@ -53,8 +56,14 @@
                 <form action="{{ url_for('front.register') }}" method="post">
                     <div class="row">
                         <div class="large-12 columns">
-                            <label for="register-name">Name</label>
-                            <input type="text" name="name" id="register-name"{% if form['name'] %} value="{{ form['name'] }}"{% endif %} />
+                            <label for="register-firstname">First Name(s)</label>
+                            <input type="text" name="firstname" id="register-firstname"{% if form['firstname'] %} value="{{ form['firstname'] }}"{% endif %} />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="large-12 columns">
+                            <label for="register-surname">Surname</label>
+                            <input type="text" name="surname" id="register-surname"{% if form['surname'] %} value="{{ form['surname'] }}"{% endif %} />
                         </div>
                     </div>
                     <div class="row">

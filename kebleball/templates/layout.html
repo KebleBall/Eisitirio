@@ -12,10 +12,10 @@
     <body>
         <header class="row">
             <section id="user" class="large-3 columns right">
-                {% if current_user.is_anonymous %}
+                {% if current_user.is_anonymous() %}
                     <p>You are not currently logged in. <a href="{{ url_for('front.login') }}">Log in.</a></p>
                 {% else %}
-                    <p>You are currently logged in as {{ current_user.name }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
+                    <p>You are currently logged in as {{ current_user.firstname }} {{ current_user.surname }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
                 {% endif %}
             </section>
             <section id="logo" class="large-6 large-centered columns">
@@ -27,7 +27,7 @@
                 <h2>{{ template_config['START_TIME'].strftime('%d') }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}</h2>
             </section>
         </header>
-        {% if not current_user.is_anonymous %}
+        {% if not current_user.is_anonymous() %}
             <nav class="row">
                 <ul id="navigation-main">
                     {% include 'blocks/dashboard-navigation.html' %}
@@ -47,7 +47,7 @@
                 <section id="flashes" class="row">
                     <ul class="large-12 columns">
                         {% for category, message in messages %}
-                            <li class="{{ category }}" title="Click to dismiss">{{ message }}</li>
+                            <li class="{{ category }}" title="Click to dismiss">{{ message|safe }}</li>
                         {% endfor %}
                     </ul>
                 </section>

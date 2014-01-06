@@ -20,36 +20,52 @@
                     {% for ticket in current_user.tickets %}
                         <tr id="ticket-{{ ticket.id }}">
                             <td>#{{ '%05d' % ticket.id }}</td>
-                            <td>{{ ticket.name | default('Not Set') }} (<a onclick="changeTicketName({{ ticket.id }})">Change</a>)</td>
+                            <td>
+                                <span id="ticketNameDisplay-{{ ticket.id }}"><span id="ticketName-{{ ticket.id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="changeTicketName({{ ticket.id }}, false)">Change</a>)</span>
+                                <span id="ticketNameForm-{{ ticket.id }}" style="display: none;"><input name="ticketNameInput-{{ ticket.id }}" id="ticketNameInput-{{ ticket.id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="changeTicketName({{ ticket.id }}, true)">Submit</button></span>
+                            </td>
                             <td>
                                 {% if ticket.cancelled -%}
                                     Cancelled.
                                 {% elif ticket.collected -%}
                                     Collected.
+                                {% elif ticket.resalekey != None -%}
+                                    {% if ticket.resaleconfirmed -%}
+                                        Pending resale completion
+                                    {% else -%}
+                                        Pending resale confirmation
+                                    {% endif %}
                                 {% elif ticket.paid -%}
                                     {% if ticket.payment_method == 'Free' -%}
                                         Free Ticket.
                                     {% else -%}
-                                        Paid for by {{ ticket.payment_method }}.
+                                        Paid for by {{ ticket.paymentmethod }}.
                                     {% endif %}
                                 {% else -%}
-                                    Awaiting {{ ticket.payment_method }} payment.
+                                    Awaiting {{ ticket.paymentmethod }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                 {% endif %}
                             </td>
                             <td>
                                 {% if not ticket.cancelled %}
                                     {% if not ticket.paid %}
-                                        <a href="{{ url_for('purchase.changeMethod') }}" class="button small">Change Payment Method</a>
-                                        {% if ticket.paymentmethod == 'Card' %}
-                                            <a href="{{ url_for('purchase.cardConfirm') }}" class="button small">Complete card payment</a>
-                                        {% elif ticket.paymentmethod == 'Battels' %}
-                                            <a href="{{ url_for('purchase.battelsConfirm') }}" class="button small">Confirm battels payment</a>
+                                        {% if ticket.paymentmethod != None %}
+                                            <a href="{{ url_for('purchase.changeMethod') }}" class="button tiny">Change Payment Method</a>
+                                            {% if ticket.paymentmethod == 'Card' %}
+                                                <a href="{{ url_for('purchase.cardConfirm') }}" class="button tiny">Complete card payment</a>
+                                            {% elif ticket.paymentmethod == 'Battels' %}
+                                                <a href="{{ url_for('purchase.battelsConfirm') }}" class="button tiny">Confirm battels payment</a>
+                                            {% else %}
+                                                <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}" class="button tiny">Contact treasurer</a>
+                                            {% endif %}
                                         {% else %}
-                                            <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}" class="button small">Contact treasurer</a>
+                                            <a href="{{ url_for('purchase.changeMethod') }}" class="button tiny">Choose Payment Method</a>
                                         {% endif %}
+                                    {% elif ticket.resalekey != None %}
+                                        <a href="{{ url_for('resale.cancelResale') }}" class="button tiny">Cancel Resale</a>
+                                    {% else %}
+                                        <a href="{{ url_for('resale.resaleHome') }}" class="button tiny">Resell</a>
                                     {% endif %}
-                                    <a href="{{ url_for('purchase.resell') }}" class="button small">Resell</a>
-                                    <a href="{{ url_for('purchase.cancel') }}" class="button small">Cancel</a>
+                                    <a href="{{ url_for('purchase.cancel') }}" class="button tiny">Cancel</a>
                                 {% endif %}
                             </td>
                         </tr>
@@ -58,6 +74,11 @@
             </table>
         {% else %}
             <p>You have no tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchaseHome') }}">buy some</a>?</p>
+        {% endif %}
+
+        {% if current_user.isWaiting() %}
+            <h3>Waiting List</h3>
+            <p>You are currently waiting for {{ current_user.waitingFor() }} tickets.</p>
         {% endif %}
 
         <h3>Announcements</h3>
@@ -76,7 +97,7 @@
             <p>The following tickets have been marked as being referred by you. Once you have referred {{ template_config['TICKET_REFERRALS'] - (get_all(current_user.referrals)|count % template_config['TICKET_REFERRALS']) }} more tickets you will earn {% if get_all(current_user.referrals)|count > template_config['TICKET_REFERRALS'] %}another{% else %}a{% endif %} free ticket.</p>
             <ul id="referralsList">
                 {% for ticket in current_user.referrals %}
-                    <li>#{{ '%05d' % ticket.id }}, owned by {{ ticket.owner.name }}</li>
+                    <li>#{{ '%05d' % ticket.id }}, owned by {{ ticket.owner.firstname }} {{ ticket.owner.surname }}</li>
                 {% endfor %}
             </ul>
         {% else %}
@@ -84,4 +105,47 @@
             <p>For every {{ template_config['TICKET_REFERRALS'] }} tickets that are referred by you, you will receive a voucher for a free ticket. The person buying the ticket must enter your email address to ensure we know you referred them.</p>
         {% endif %}
     </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+    var nameChangeURL = '{{ url_for('ajax.ajaxChangeTicketName', id=123456789, _external=True) }}'
+
+        function changeTicketName(id, formSubmit) {
+            if (formSubmit) {
+                var nameInput = $('#ticketNameInput-'+id);
+                var ticketName = $('#ticketName-'+id);
+                jQuery.ajax(
+                    nameChangeURL.replace('123456789',id),
+                    {
+                        'data': {
+                            'name': nameInput.val()
+                        },
+                        'type': 'POST',
+                        'dataType': 'json',
+                        'success': function(data, code, xhr) {
+                            if (data) {
+                                ticketName.html(nameInput.val())
+                                nameInput.attr('value',nameInput.val())
+                            } else {
+                                if (ticketName.html() == 'Not Set') {
+                                    nameInput.attr('value','')
+                                    nameInput.val('')
+                                } else {
+                                    nameInput.attr('value',ticketName.html())
+                                    nameInput.val(ticketName.html())
+                                }
+                            }
+                        }
+                    }
+                );
+
+                $('#ticketNameForm-'+id).hide();
+                $('#ticketNameDisplay-'+id).show();
+            } else {
+                $('#ticketNameDisplay-'+id).hide();
+                $('#ticketNameForm-'+id).show();
+            }
+        }
+    </script>
 {% endblock %}

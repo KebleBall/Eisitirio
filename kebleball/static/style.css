@@ -222,9 +222,9 @@ button.alert:hover, button.alert:focus, .button.alert:hover, .button.alert:focus
 /* line 209, scss/foundation/components/_buttons.scss */
 button.large, .button.large { padding-top: 1.125rem; padding-right: 2.25rem; padding-bottom: 1.1875rem; padding-left: 2.25rem; font-size: 1.25rem; }
 /* line 210, scss/foundation/components/_buttons.scss */
-button.small, .button.small { padding-top: 0.875rem; padding-right: 1.75rem; padding-bottom: 0.9375rem; padding-left: 1.75rem; font-size: 0.8125rem; }
+button.small, .button.small { padding-top: 0.75rem; padding-right: 1.5rem; padding-bottom: 0.8125rem; padding-left: 1.5rem; font-size: 0.875rem; }
 /* line 211, scss/foundation/components/_buttons.scss */
-button.tiny, .button.tiny { padding-top: 0.625rem; padding-right: 1.25rem; padding-bottom: 0.6875rem; padding-left: 1.25rem; font-size: 0.6875rem; }
+button.tiny, .button.tiny { padding-top: 0.5rem; padding-right: 1rem; padding-bottom: 0.5625rem; padding-left: 1rem; font-size: 0.875rem; }
 /* line 212, scss/foundation/components/_buttons.scss */
 button.expand, .button.expand { padding-right: 0; padding-left: 0; width: 100%; }
 /* line 214, scss/foundation/components/_buttons.scss */
@@ -287,7 +287,7 @@ form .row .row.collapse input { -moz-border-radius-bottomright: 0; -moz-border-r
 form .row input.column, form .row input.columns, form .row textarea.column, form .row textarea.columns { padding-left: 0.5rem; }
 
 /* line 306, scss/foundation/components/_forms.scss */
-label { font-size: 0.875rem; color: #4d4d4d; cursor: pointer; display: block; font-weight: normal; margin-bottom: 0.5rem; }
+label { font-size: 1rem; color: #4d4d4d; cursor: pointer; display: block; font-weight: normal; margin-bottom: 0.5rem; }
 /* line 307, scss/foundation/components/_forms.scss */
 label.right { float: none; text-align: right; }
 /* line 308, scss/foundation/components/_forms.scss */
@@ -308,7 +308,7 @@ select:hover { background: #f2f2f2 url("data:image/svg+xml;base64, PHN2ZyB4bWxuc
   select:hover { background: #f2f2f2; } }
 
 /* line 343, scss/foundation/components/_forms.scss */
-.prefix, .postfix { display: block; position: relative; z-index: 2; text-align: center; width: 100%; padding-top: 0; padding-bottom: 0; border-style: solid; border-width: 1px; overflow: hidden; font-size: 0.875rem; height: 2.3125rem; line-height: 2.3125rem; }
+.prefix, .postfix { display: block; position: relative; z-index: 2; text-align: center; width: 100%; padding-top: 0; padding-bottom: 0; border-style: solid; border-width: 1px; overflow: hidden; font-size: 1rem; height: 2.4375rem; line-height: 2.4375rem; }
 
 /* line 346, scss/foundation/components/_forms.scss */
 .postfix.button { padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-align: center; line-height: 2.125rem; border: none; }
@@ -1376,3 +1376,6 @@ a { font-weight: bold; }
 
 /* line 63, style.scss */
 #flashes ul { margin: 0; }
+
+/* line 71, style.scss */
+p.small { font-size: 0.75rem; }

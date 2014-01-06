@@ -8,6 +8,7 @@ Used to store log entries
 from kebleball.database import db
 from kebleball.database.user import User
 from kebleball.database.ticket import Ticket
+from kebleball.database.card_transaction import CardTransaction
 from datetime import datetime
 
 class Log(db.Model):
@@ -32,7 +33,8 @@ class Log(db.Model):
 
     user_id = db.Column(
         db.Integer(),
-        db.ForeignKey('user.id')
+        db.ForeignKey('user.id'),
+        nullable=True
     )
     user = db.relationship(
         User,
@@ -56,7 +58,20 @@ class Log(db.Model):
         )
     )
 
-    def __init__(self, ip, action, actor, user, ticket=None):
+    transaction_id = db.Column(
+        db.Integer(),
+        db.ForeignKey('card_transaction.id'),
+        nullable=True
+    )
+    transaction = db.relationship(
+        CardTransaction,
+        backref=db.backref(
+            'events',
+            lazy='dynamic'
+        )
+    )
+
+    def __init__(self, ip, action, actor, user, ticket=None, transaction=None):
         self.timestamp = datetime.utcnow()
         self.ip = ip
         self.action = action
@@ -76,6 +91,11 @@ class Log(db.Model):
         else:
             self.ticket_id = ticket
 
+        if hasattr(transaction, 'id'):
+            self.transaction_id = transaction.id
+        else:
+            self.transaction_id = transaction
+
     def __repr__(self):
         return '<Log {0}: {1}>'.format(
             self.id,
@@ -83,16 +103,26 @@ class Log(db.Model):
         )
 
     def display(self):
-        return '{0}: {1} acting as {2}{3} - {4}'.format(
+        return '{0}: {1} {2} acting as {3} {4}{5}{6} - {7}'.format(
             self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)'),
-            self.actor.name,
-            self.user.name,
+            self.actor.firstname,
+            self.actor.surname,
+            self.user.firstname,
+            self.user.surname,
             (
                 "" if self.ticket is None else (
                     ", in relation "
                     "to ticket {0}"
                 ).format(
                     self.ticket.id
+                )
+            ),
+            (
+                "" if self.transaction is None else (
+                    ", in relation "
+                    "to transaction {0}"
+                ).format(
+                    self.transaction.id
                 )
             ),
             self.message

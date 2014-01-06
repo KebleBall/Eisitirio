@@ -136,28 +136,42 @@ class Announcement(db.Model):
             query.filter_by(User.affiliation==self.affiliation)
 
         for user in query:
-            if ((self.has_tickets is None or
-                user.hasTickets()==self.has_tickets) and
-               (self.is_waiting is None or
-                user.isWaiting()==self.is_waiting) and
-               (self.has_collected is None or
-                user.hasCollected()==self.has_collected)):
+            if (
+                (
+                    self.has_tickets is None or
+                    user.hasTickets()==self.has_tickets
+                ) and
+                (
+                    self.is_waiting is None or
+                    user.isWaiting()==self.is_waiting
+                ) and
+                (
+                    self.has_collected is None or
+                    user.hasCollected()==self.has_collected
+                )
+            ):
                 self.users.append(user)
+                self.emails.append(user)
 
     def __repr__(self):
         return "<Announcement {0}: {1}>".format(self.id, self.subject)
 
-    def sendEmails(self):
+    def sendEmails(self, count):
         try:
             msg = MIMEText(self.content)
             msg['Subject'] = self.subject
             msg['From'] = self.sender.email
 
             for user in self.emails:
+                if count <= 0:
+                    break
                 msg['To'] = user.email
                 app.email_manager.sendMsg(msg)
                 self.emails.remove(user)
-            self.email_sent = True
+
+            self.email_sent = (len(self.emails) == 0)
         finally:
             db.session.commit()
+
+        return count
 

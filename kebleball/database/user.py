@@ -21,7 +21,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     passhash = db.Column(db.BINARY(60), nullable=False)
-    name = db.Column(db.String(120), nullable=False)
+    firstname = db.Column(db.String(120), nullable=False)
+    surname = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     secretkey = db.Column(db.String(64), nullable=True)
     secretkeyexpiry = db.Column(db.DateTime(), nullable=True)
@@ -68,10 +69,11 @@ class User(db.Model):
         )
     )
 
-    def __init__(self, email, password, name, phone, college, affiliation):
+    def __init__(self, email, password, firstname, surname, phone, college, affiliation):
         self.email = email
         self.passhash = bcrypt.generate_password_hash(password)
-        self.name = name
+        self.firstname = firstname
+        self.surname = surname
         self.phone = phone
         self.secretkey = generate_key(64)
         self.verified = False
@@ -99,7 +101,7 @@ class User(db.Model):
             self.battels = None
 
     def __repr__(self):
-        return "<User {0}: {1}>".format(self.id, self.name)
+        return "<User {0}: {1} {2}>".format(self.id, self.firstname, self.surname)
 
     def checkPassword(self, candidate):
         return bcrypt.check_password_hash(self.passhash, candidate)
@@ -108,10 +110,28 @@ class User(db.Model):
         self.passhash = bcrypt.generate_password_hash(password)
 
     def hasTickets(self):
-        return len(self.tickets) > 0
+        return self.tickets.count() > 0
 
     def hasUncollectedTickets(self):
         return len([x for x in self.tickets if not x.collected]) > 0
+
+    def hasUnresoldTickets(self):
+        return len([x for x in self.tickets if x.resalekey is None]) > 0
+
+    def isResellingTickets(self):
+        return len([x for x in self.tickets if x.resalekey is not None]) > 0
+
+    def hasUnpaidTickets(self, method=None):
+        if method is None:
+            return len([x for x in self.tickets if not x.paid]) > 0
+        else:
+            return len([x for x in self.tickets if x.paymentmethod == method and not x.paid]) > 0
+
+    def hasPaidTickets(self, method=None):
+        if method is None:
+            return len([x for x in self.tickets if x.paid]) > 0
+        else:
+            return len([x for x in self.tickets if x.paymentmethod == method and x.paid]) > 0
 
     def promote(self):
         self.role = 'Admin'
@@ -123,13 +143,16 @@ class User(db.Model):
         return self.role=='Admin'
 
     def isWaiting(self):
-        return len(self.waiting) > 0
+        return self.waiting.count() > 0
 
     def waitingFor(self):
-        return sum([x.num for x in self.waiting])
+        return sum([x.waitingfor for x in self.waiting])
 
     def canPayByBattels(self):
-        return self.battels is not None
+        return (
+            self.battels is not None and
+            app.config['CURRENT_TERM'] != 'TT'
+        )
 
     def getsDiscount(self):
         return (

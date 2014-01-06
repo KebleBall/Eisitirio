@@ -1,0 +1,106 @@
+<!-- purchase/wait.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Join Waiting List{% endblock %}
+
+{% block content %}
+    <section id="wait" class="columns">
+        <form action="{{ request.path }}" method="post">
+            <ol id="purchaseSteps">
+                <li>
+                    <h5>Choose Number of Tickets</h5>
+                    <div class="row">
+                        <div class="columns">
+                            <label for="numTickets">Number of Tickets: <span id="numTicketsDisplay">1</span></label>
+                            <input
+                                id="numTickets"
+                                name="numTickets"
+                                type="number"
+                                min="1"
+                                max="{{ canBuy }}"
+                                step="1"
+                                value="{% if numTickets -%}
+                                    {{ numTickets }}
+                                {% else -%}
+                                    1
+                                {% endif %}"
+                                data-slider="true"
+                                data-slider-range="1,{{ canWait }}"
+                                data-slider-snap="true"
+                                data-slider-step="1"
+                                data-slider-highlight="true"
+                            />
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <h5>Credit where credit is due?</h5>
+                    <p>If somebody referred you, or recommended Keble Ball to you, please enter their email address here so that we can give them credit for your order.</p>
+                    <div class="row">
+                        <div class="columns">
+                            <label for="referrerEmail">Email Address:</label>
+                            <input type="email" name="referrerEmail" id="referrerEmail" {% if form and form['referrerEmail'] %}value="{{ form['referrerEmail'] }}" {% endif %}/>
+                            <div id="referrerMessage" style="display: none;"></div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <h5>Terms and Conditions</h5>
+                    <div class="row">
+                        <div class="columns">
+                            <label for="acceptTerms">
+                                <input type="checkbox" name="acceptTerms" value="yes" id="acceptTerms" required />
+                                I have read and accept the <a href="{{ url_for('front.terms') }}" target="_blank">Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} Terms &amp; Conditions</a>
+                            </label>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <input type="submit" value="Join Waiting List" class="button tiny" />
+                </li>
+            </ol>
+        </form>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ url_for('static', filename='js/vendor/simple-slider.js') }}"></script>
+
+    <script type="text/javascript">
+        $("#numTickets").bind("slider:changed", function (event, data) {
+            $('#numTicketsDisplay').html(data.value);
+        });
+
+        var referrerEmail = $("#referrerEmail");
+        var referrerMessage = $("#referrerMessage");
+
+        referrerEmail.on("blur", function() {
+            if (referrerEmail.val() != '') {
+                jQuery.ajax(
+                    '{{ url_for('ajax.ajaxValidateReferrer', _external=True) }}',
+                    {
+                        'data': {
+                            'email': referrerEmail.val()
+                        },
+                        'type': 'POST',
+                        'dataType': 'json',
+                        'success': function(data, code, xhr) {
+                            referrerMessage.attr(
+                                "class",
+                                data.class
+                            );
+                            referrerMessage.html(data.message);
+                            referrerMessage.show(0);
+                        }
+                    }
+                );
+            } else {
+                referrerMessage.hide(0);
+            }
+        });
+
+        referrerEmail.on("change", function() {
+            referrerMessage.hide(0);
+        });
+    </script>
+{% endblock %}
