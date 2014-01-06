@@ -21,6 +21,8 @@ log = app.log_manager.log_main
 from flask.ext.login import current_user
 from .views import *
 
+import os
+
 app.register_blueprint(admin.admin)
 app.register_blueprint(ajax.ajax)
 app.register_blueprint(dashboard.dashboard)
@@ -34,6 +36,14 @@ def router():
         return redirect(url_for('dashboard.dashboardHome'))
     else:
         return redirect(url_for('front.home'))
+
+@app.route('/environment')
+def environment():
+    return (
+        app.config['ENVIRONMENT'] +
+        " - " +
+        str(os.environ)
+    )
 
 @app.errorhandler(404)
 def error404(e):
