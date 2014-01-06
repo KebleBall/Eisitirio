@@ -67,8 +67,8 @@ class Battels(db.Model):
         ticket.markAsPaid(
             'Battels',
             'Battels {0}, {1} term'.format(
-                'manual' if battels.manual else battels.battelsid,
-                request.form['paymentTerm']
+                'manual' if self.manual else self.battelsid,
+                term
             ),
             battels_term=term,
             battels=self
