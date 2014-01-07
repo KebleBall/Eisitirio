@@ -12,6 +12,19 @@ from kebleball.database.ticket import Ticket
 from kebleball.database.card_transaction import CardTransaction
 from datetime import datetime
 
+log_ticket_link = db.Table(
+    'log_ticket_link',
+    db.Model.metadata,
+    db.Column('log_id',
+        db.Integer,
+        db.ForeignKey('log.id')
+    ),
+    db.Column('ticket_id',
+        db.Integer,
+        db.ForeignKey('ticket.id')
+    )
+)
+
 class Log(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     timestamp = db.Column(db.DateTime)
@@ -46,17 +59,10 @@ class Log(db.Model):
         foreign_keys=[user_id]
     )
 
-    ticket_id = db.Column(
-        db.Integer(),
-        db.ForeignKey('ticket.id'),
-        nullable=True
-    )
-    ticket = db.relationship(
-        Ticket,
-        backref=db.backref(
-            'events',
-            lazy='dynamic'
-        )
+    tickets = db.relationship(
+        'Ticket',
+        secondary=log_ticket_link,
+        backref='log_entries'
     )
 
     transaction_id = db.Column(
@@ -72,7 +78,7 @@ class Log(db.Model):
         )
     )
 
-    def __init__(self, ip, action, actor, user, ticket=None, transaction=None):
+    def __init__(self, ip, action, actor, user, tickets=[], transaction=None):
         self.timestamp = datetime.utcnow()
         self.ip = ip
         self.action = action
@@ -87,10 +93,11 @@ class Log(db.Model):
         else:
             self.user_id = user
 
-        if hasattr(ticket, 'id'):
-            self.ticket_id = ticket.id
-        else:
-            self.ticket_id = ticket
+        for ticket in tickets:
+            if hasattr(ticket, 'id'):
+                self.tickets.append(ticket)
+            else:
+                self.tickets.append(Ticket.get_by_id(ticket))
 
         if hasattr(transaction, 'id'):
             self.transaction_id = transaction.id
@@ -113,9 +120,9 @@ class Log(db.Model):
             (
                 "" if self.ticket is None else (
                     ", in relation "
-                    "to ticket {0}"
+                    "to {0} tickets"
                 ).format(
-                    self.ticket.id
+                    self.tickets.count()
                 )
             ),
             (

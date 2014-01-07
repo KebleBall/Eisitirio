@@ -137,6 +137,12 @@ def purchaseHome():
         db.session.add_all(tickets)
         db.session.commit()
 
+        log_event(
+            'Purchased Tickets',
+            tickets,
+            current_user
+        )
+
         expires = None
         for ticket in tickets:
             if (
@@ -249,6 +255,14 @@ def wait():
         )
         db.session.commit()
 
+        log_event(
+            'Joined waiting list for {0} tickets'.format(
+                numTickets
+            ),
+            [],
+            current_user
+        )
+
         flash(
             (
                 u'You have been added to the waiting list for {0} ticket{1}.'
@@ -312,6 +326,14 @@ def changeMethod():
             ticket.setMethod(request.form['paymentMethod'], reason)
 
         db.session.commit()
+
+        log_event(
+            'Changed Payment Method to {0}'.format(
+                request.form['paymentMethod']
+            ),
+            tickets,
+            current_user
+        )
 
         flash(
             u'The payment method on the selected tickets has been changed successfully',
@@ -398,6 +420,12 @@ def battelsConfirm():
 
             db.session.commit()
 
+            log_event(
+                'Confirmed battels payment',
+                tickets,
+                current_user
+            )
+
             flash(u'Your battels payment has been confirmed','success')
 
     return render_template('purchase/battelsConfirm.html')
@@ -421,18 +449,18 @@ def cancel():
 
         cardTransactions = {}
 
-        someCancelled = False
+        cancelled = []
 
         for ticket in tickets:
             if not ticket.paid:
                 ticket.cancelled = True
-                someCancelled = True
+                cancelled.append(ticket)
             elif ticket.paymentmethod == 'Free':
                 ticket.cancelled = True
-                someCancelled = True
+                cancelled.append(ticket)
             elif ticket.paymentmethod == 'Battels':
                 ticket.battels.cancel(ticket)
-                someCancelled = True
+                cancelled.append(ticket)
             elif ticket.paymentmethod == 'Card':
                 if ticket.card_transaction_id in cardTransactions:
                     cardTransactions[ticket.card_transaction_id]['tickets'] \
@@ -451,8 +479,8 @@ def cancel():
             value = sum([t.price for t in transaction['tickets']])
 
             if transaction['transaction'].processRefund(value):
-                someCancelled = True
-                for ticket in tickets:
+                cancelled.extend(transaction['tickets'])
+                for ticket in transaction['tickets']:
                     ticket.cancelled = True
                 db.session.commit()
             else:
@@ -471,7 +499,13 @@ def cancel():
                 'warning'
             )
 
-        if someCancelled:
+        if len(cancelled) > 0:
+            log_event(
+                'Cancelled tickets',
+                cancelled,
+                current_user
+            )
+
             if refundFailed:
                 flash(
                     (

@@ -12,6 +12,7 @@ from datetime import datetime
 from kebleball.app import app
 from kebleball.helpers import generate_key
 from flask import url_for, flash
+from flask.ext.login import current_user
 
 import re
 import json
@@ -189,6 +190,14 @@ class CardTransaction(db.Model):
         if success:
             self.accesscode = response['AccessCode']
             db.session.commit()
+
+            app.log_manager.log_event(
+                'Started Card Payment',
+                self.tickets,
+                current_user,
+                self
+            )
+
             return response['SharedPaymentUrl']
         else:
             flash(
@@ -216,6 +225,19 @@ class CardTransaction(db.Model):
 
                 if status[0]:
                     if self.resultcode == '10':
+                        app.log_manager.log_event(
+                            (
+                                'Partial eWay payment for transaction {0} '
+                                'with value {1}'
+                            ).format(
+                                self.id,
+                                response['TotalAmount']
+                            ),
+                            self.tickets,
+                            current_user,
+                            self
+                        )
+
                         data = {
                             "Refund": {
                                 "TotalAmount": response['TotalAmount'],
@@ -257,18 +279,6 @@ class CardTransaction(db.Model):
                                 transaction=self,
                                 ewayresponse=response
                             )
-                            app.log_manager.log_event(
-                                (
-                                    'Partial eWay payment for transaction {0} '
-                                    'with value {1}'
-                                ).format(
-                                    self.id,
-                                    response['TotalAmount']
-                                ),
-                                None,
-                                None,
-                                self
-                            )
                             flash(
                                 (
                                     u'Your card payment was only approved for '
@@ -297,6 +307,13 @@ class CardTransaction(db.Model):
                             )
 
                         db.session.commit()
+
+                        app.log_manager.log_event(
+                            'Completed Card Payment',
+                            self.tickets,
+                            current_user,
+                            self
+                        )
 
                         flash(
                             'Your payment has completed successfully',
@@ -335,6 +352,13 @@ class CardTransaction(db.Model):
 
         db.session.commit()
 
+        app.log_manager.log_event(
+            'Cancelled Card Payment',
+            self.tickets,
+            current_user,
+            self
+        )
+
     def processRefund(self, amount):
         data = {
             "Refund": {
@@ -351,6 +375,15 @@ class CardTransaction(db.Model):
         if success:
             self.refunded = amount
             db.session.commit()
+
+            app.log_manager.log_event(
+                'Refunded £{0:.02f}'.format(
+                    amount / 100.0
+                ),
+                [],
+                current_user,
+                self
+            )
 
             return True
         else:

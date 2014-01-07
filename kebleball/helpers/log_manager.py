@@ -67,7 +67,7 @@ class LogManager(object):
                     "Logger instance has no attribute '{0}'".format(name)
                 )
 
-    def log_event(self, message, ticket=None, user=None, transaction=None):
+    def log_event(self, message, tickets=[], user=None, transaction=None):
         if 'actor_id' in self.session:
             actor = self.session['actor_id']
         elif not current_user.is_anonymous():
@@ -80,7 +80,7 @@ class LogManager(object):
             message,
             actor,
             user,
-            ticket,
+            tickets,
             transaction
         )
 

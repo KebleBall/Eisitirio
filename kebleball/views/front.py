@@ -447,5 +447,11 @@ def destroyAccount(userID, secretkey):
 @front.route('/logout')
 @login_required
 def logout():
+    log_event(
+        'Logged Out',
+        None,
+        current_user
+    )
+
     logout_user()
     return redirect(url_for('front.home'))

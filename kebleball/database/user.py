@@ -125,15 +125,45 @@ class User(db.Model):
 
     def hasUnpaidTickets(self, method=None):
         if method is None:
-            return len([x for x in self.tickets if not x.paid]) > 0
+            return len(
+                [
+                    x for x in self.tickets if (
+                        not x.paid and
+                        not x.cancelled
+                    )
+                ]
+            ) > 0
         else:
-            return len([x for x in self.tickets if x.paymentmethod == method and not x.paid]) > 0
+            return len(
+                [
+                    x for x in self.tickets if (
+                        x.paymentmethod == method and
+                        not x.paid and
+                        not x.cancelled
+                    )
+                ]
+            ) > 0
 
     def hasPaidTickets(self, method=None):
         if method is None:
-            return len([x for x in self.tickets if x.paid]) > 0
+            return len(
+                [
+                    x for x in self.tickets if (
+                        x.paid and
+                        not x.cancelled
+                    )
+                ]
+            ) > 0
         else:
-            return len([x for x in self.tickets if x.paymentmethod == method and x.paid]) > 0
+            return len(
+                [
+                    x for x in self.tickets if (
+                        x.paymentmethod == method and
+                        x.paid and
+                        not x.cancelled
+                    )
+                ]
+            ) > 0
 
     def promote(self):
         self.role = 'Admin'

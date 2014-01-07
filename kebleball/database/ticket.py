@@ -244,6 +244,12 @@ class Ticket(db.Model):
 
             db.session.commit()
 
+            app.log_manager.log_event(
+                'Started Resale',
+                tickets,
+                current_user
+            )
+
             app.email_manager.sendTemplate(
                 reselling_to.email,
                 "Confirm Ticket Resale",
@@ -300,6 +306,12 @@ class Ticket(db.Model):
 
             db.session.commit()
 
+            app.log_manager.log_event(
+                'Cancelled Resale',
+                tickets,
+                current_user
+            )
+
             app.email_manager.sendTemplate(
                 resale_from.email,
                 "Ticket Resale Cancelled",
@@ -343,6 +355,12 @@ class Ticket(db.Model):
                 ticket.resaleconfirmed = True
 
             db.session.commit()
+
+            app.log_manager.log_event(
+                'Confirmed Resale',
+                tickets,
+                current_user
+            )
 
             app.email_manager.sendTemplate(
                 resale_from.email,
@@ -406,6 +424,12 @@ class Ticket(db.Model):
                 ticket.resold = True
 
             db.session.commit()
+
+            app.log_manager.log_event(
+                'Completed Resale',
+                tickets,
+                current_user
+            )
 
             return True
         else:

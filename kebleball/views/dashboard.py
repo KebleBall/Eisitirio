@@ -145,6 +145,12 @@ def profile(methods=['GET','POST']):
 
             db.session.commit()
 
+            log_event(
+                'Updated Details',
+                None,
+                current_user
+            )
+
             flash(
                 u'Your details have been updated',
                 'success'
