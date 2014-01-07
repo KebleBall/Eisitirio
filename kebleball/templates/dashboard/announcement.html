@@ -1,0 +1,32 @@
+<!-- dashboard/profile.html -->
+{% extends 'layout.html' %}
+
+{% block title %}{{ announcement.subject }}{% endblock %}
+
+{% block content %}
+    <section id="announcement" class="columns">
+        <p>
+            Sent to users
+                {% if announcement.college == None %}
+                    at all colleges
+                {% else %}
+                    at {{ announcement.college.name }}
+                {% endif %}
+                {% if announcement.affiliation != None %}
+                    , affiliated as {{ announcement.affiliation.name }}
+                {% endif %}
+                {% if announcement.has_tickets != None %}
+                    , who{% if not announcement.has_tickets %} do not{% endif %} have tickets
+                {% endif %}
+                {% if announcement.is_waiting != None %}
+                    , who are{% if not announcement.is_waiting %} not{% endif %} waiting for tickets
+                {% endif %}
+                {% if announcement.has_collected != None %}
+                    , who have{% if not announcement.has_collected %} not{% endif %} collected tickets
+                {% endif %}
+            .
+        </p>
+        <hr />
+        {{ announcement.content|markdown }}
+    </section>
+{% endblock %}

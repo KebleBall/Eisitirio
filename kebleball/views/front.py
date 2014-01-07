@@ -393,6 +393,11 @@ def confirmEmail(userID, secretkey):
 
         user.secretkey = None
         user.verified = True
+
+        if user.newemail is not None:
+            user.email = user.newemail
+            user.newemail = None
+
         db.session.commit()
         flash(u'Your email address has been verified. You can now log in','info')
     else:

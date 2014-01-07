@@ -434,6 +434,12 @@ class Ticket(db.Model):
         else:
             return False
 
+    def canChangeName(self):
+        return not (
+            app.config['LOCKDOWN_MODE'] or
+            self.cancelled
+        )
+
     @staticmethod
     def count():
         return Ticket.query.filter(Ticket.cancelled==False).count()

@@ -1,0 +1,83 @@
+<!-- dashboard/profile.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Update your Details{% endblock %}
+
+{% block content %}
+    <section id="profile" class="columns">
+        <form action="{{ url_for('dashboard.profile') }}" method="post">
+            <fieldset>
+                <legend>Your Details</legend>
+                <div class="row">
+                    <div class="large-6 columns">
+                        <label for="firstname">First Name(s)</label>
+                        <input type="text" name="firstname" id="firstname" value="{{ current_user.firstname }}" />
+                    </div>
+                    <div class="large-6 columns">
+                        <label for="surname">Surname</label>
+                        <input type="text" name="surname" id="surname" value="{{ current_user.surname }}" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-6 columns">
+                        <label for="email">Email Address</label>
+                        <input type="email" name="email" id="email" value="{{ current_user.email }}" />
+                    </div>
+                    <div class="large-6 columns">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" name="phone" id="phone" value="{{ current_user.phone }}" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-6 columns">
+                        <label for="college">College</label>
+                        <select name="college" id="college">
+                            {% for college in colleges %}
+                                {% if current_user.college_id == college.id %}
+                                    <option value="{{ college.id }}" selected="selected">{{ college.name }}</option>
+                                {% else %}
+                                    <option value="{{ college.id }}">{{ college.name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="large-6 columns">
+                        <label for="affiliation">Affiliation</label>
+                        <select name="affiliation" id="affiliation">
+                            {% for affiliation in affiliations %}
+                                {% if current_user.affiliation_id == affiliation.id %}
+                                    <option value="{{ affiliation.id }}" selected="selected">{{ affiliation.name }}</option>
+                                {% else %}
+                                    <option value="{{ affiliation.id }}">{{ affiliation.name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Change your Password</legend>
+                <p class="small">Leave blank to keep current password</p>
+                <div class="row">
+                    <div class="large-4 columns">
+                        <label for="oldpassword">Old Password</label>
+                        <input type="password" name="oldpassword" id="oldpassword" />
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="password">New Password</label>
+                        <input type="password" name="password" id="password" />
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="confirm">Confirm New Password</label>
+                        <input type="password" name="confirm" id="confirm" />
+                    </div>
+                </div>
+            </fieldset>
+            <div class="row">
+                <div class="large-12 columns">
+                    <input type="submit" value="Update Details" class="button small" />
+                </div>
+            </div>
+        </form>
+    </section>
+{% endblock %}

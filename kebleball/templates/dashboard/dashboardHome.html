@@ -21,8 +21,12 @@
                         <tr id="ticket-{{ ticket.id }}">
                             <td>#{{ '%05d' % ticket.id }}</td>
                             <td>
-                                <span id="ticketNameDisplay-{{ ticket.id }}"><span id="ticketName-{{ ticket.id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="changeTicketName({{ ticket.id }}, false)">Change</a>)</span>
-                                <span id="ticketNameForm-{{ ticket.id }}" style="display: none;"><input name="ticketNameInput-{{ ticket.id }}" id="ticketNameInput-{{ ticket.id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="changeTicketName({{ ticket.id }}, true)">Submit</button></span>
+                                {% if ticket.canChangeName() %}
+                                    <span id="ticketNameDisplay-{{ ticket.id }}"><span id="ticketName-{{ ticket.id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="changeTicketName({{ ticket.id }}, false)">Change</a>)</span>
+                                    <span id="ticketNameForm-{{ ticket.id }}" style="display: none;"><input name="ticketNameInput-{{ ticket.id }}" id="ticketNameInput-{{ ticket.id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="changeTicketName({{ ticket.id }}, true)">Submit</button></span>
+                                {% else %}
+                                    {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
+                                {% endif %}
                             </td>
                             <td>
                                 {% if ticket.cancelled -%}
@@ -82,15 +86,21 @@
         {% endif %}
 
         <h3>Announcements</h3>
-        {% for announcement in current_user.announcements %}
-            <article class="announcement">
-                <h3>{{ announcement.subject }}</h3>
-                {{ announcement.message | trim(250, False, '...') | markdown }}
-                <a href="{{ url_for('dashboard.announcement', announcementID=announcement.id) }}" class="read-more">Read More</a>
-            </article>
-        {% else %}
-            <p>The Keble Ball committee has not posted any announcements yet. Watch this space and check your email for important information about the Ball</p>
-        {% endfor %}
+            <ul id="announcements">
+                {% for announcement in current_user.announcements %}
+                    <li>
+                        <article class="announcement">
+                            <h5>{{ announcement.subject }}</h5>
+                            {{ announcement.content | truncate(250) | markdown }}
+                            <a href="{{ url_for('dashboard.announcement', announcementID=announcement.id) }}" class="read-more">Read More</a>
+                        </article>
+                    </li>
+                {% else %}
+                    <li>
+                        <p>The Keble Ball committee has not posted any announcements yet. Watch this space and check your email for important information about the Ball</p>
+                    </li>
+                {% endfor %}
+            </ul>
 
         <h3>Referrals</h3>
         {% if get_all(current_user.referrals) %}

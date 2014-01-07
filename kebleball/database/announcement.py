@@ -10,8 +10,8 @@ from kebleball.database import db
 from kebleball.database.user import User
 from kebleball.database.college import College
 from kebleball.database.affiliation import Affiliation
-import smtplib
 from email.mime.text import MIMEText
+from datetime import datetime
 
 user_announce_link = db.Table(
     'user_announce_link',
@@ -45,9 +45,6 @@ class Announcement(db.Model):
     content = db.Column(db.Text(65536))
     subject = db.Column(db.Text(256))
     send_email = db.Column(db.Boolean)
-
-    # UserID of last person email sent to
-    sent_to_last = db.Column(db.Integer)
 
     # Has email been sent to all relevant users?
     email_sent = db.Column(db.Boolean)
@@ -97,25 +94,30 @@ class Announcement(db.Model):
 
     emails = db.relationship(
         'User',
-        secondary=user_announce_link
+        secondary=email_announce_link
     )
 
     def __init__(self,
                  subject,
                  content,
+                 sender,
                  send_email,
                  college=None,
                  has_tickets=None,
                  affiliation=None,
                  is_waiting=None,
                  has_collected=None):
-        self.time = datetime.datetime.now()
+        self.time = datetime.now()
         self.subject = subject
         self.content = content
         self.has_tickets = has_tickets
         self.is_waiting = is_waiting
         self.has_collected = has_collected
-        self.users = []
+
+        if hasattr(sender, 'id'):
+            self.sender_id = sender.id
+        else:
+            self.sender_id = sender
 
         if hasattr(college, 'id'):
             self.college_id = college.id
@@ -127,15 +129,15 @@ class Announcement(db.Model):
         else:
             self.affiliation_id = affiliation
 
-        query = User.filter_by(User.id>self.sent_to_last)
+        query = User.query
 
-        if self.college is not None:
-            query.filter_by(User.college==self.college)
+        if self.college_id is not None:
+            query = query.filter(User.college_id==self.college_id)
 
-        if self.affiliation is not None:
-            query.filter_by(User.affiliation==self.affiliation)
+        if self.affiliation_id is not None:
+            query = query.filter(User.affiliation_id==self.affiliation_id)
 
-        for user in query:
+        for user in query.all():
             if (
                 (
                     self.has_tickets is None or
@@ -175,3 +177,6 @@ class Announcement(db.Model):
 
         return count
 
+    @staticmethod
+    def get_by_id(id):
+        return Announcement.query.filter(Announcement.id==id).first()
