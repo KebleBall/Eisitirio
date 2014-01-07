@@ -1,3 +1,4 @@
+# coding: utf-8
 from flask import Blueprint, Response, request
 
 from kebleball.app import app

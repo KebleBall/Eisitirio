@@ -1,3 +1,4 @@
+# coding: utf-8
 from kebleball.database.voucher import Voucher
 from kebleball.database.user import User
 

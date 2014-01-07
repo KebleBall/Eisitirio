@@ -1,3 +1,4 @@
+# coding: utf-8
 import random, string
 
 __all__ = ['logger', 'login_manager']

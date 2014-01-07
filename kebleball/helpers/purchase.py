@@ -1,3 +1,4 @@
+# coding: utf-8
 from kebleball.app import app
 from kebleball.database.ticket import Ticket
 from kebleball.database.user import User

@@ -1,3 +1,4 @@
+# coding: utf-8
 from flask import url_for, redirect, render_template, request
 
 from .app import app
