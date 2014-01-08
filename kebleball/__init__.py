@@ -9,7 +9,7 @@ def check_for_maintenance():
     if os.path.exists('/var/www/flask_kebleball/.maintenance'):
         app.config['MAINTENANCE_MODE'] = True
         if (
-            request.path != url_for('maintenance') and
+            'maintenance' not in request.path and
             'static' not in request.path
         ):
             return redirect(url_for('maintenance'))
