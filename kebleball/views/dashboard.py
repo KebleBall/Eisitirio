@@ -9,6 +9,7 @@ from kebleball.database.announcement import Announcement
 from kebleball.helpers import generate_key
 
 log = app.log_manager.log_dashboard
+log_event = app.log_manager.log_event
 
 dashboard = Blueprint('dashboard', __name__)
 

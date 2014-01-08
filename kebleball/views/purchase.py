@@ -470,8 +470,6 @@ def cancel():
                         'tickets': [ticket]
                     }
 
-        #raise Exception
-
         refundFailed = False
 
         for transaction in cardTransactions.itervalues():
@@ -484,6 +482,8 @@ def cancel():
                 db.session.commit()
             else:
                 refundFailed = True
+
+        db.session.commit()
 
         if refundFailed:
             flash(
@@ -518,7 +518,5 @@ def cancel():
                     u'All of the tickets you selected have been cancelled.',
                     'info'
                 )
-
-        db.session.commit()
 
     return render_template('purchase/cancel.html')

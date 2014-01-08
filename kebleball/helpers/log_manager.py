@@ -84,8 +84,5 @@ class LogManager(object):
             transaction
         )
 
-        session = db.create_scoped_session()
-
-        session.merge(entry)
-        session.commit()
-        session.close()
+        db.session.add(entry)
+        db.session.commit()

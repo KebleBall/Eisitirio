@@ -238,12 +238,6 @@ def passwordReset():
                 "passwordResetFail.email"
             )
         else:
-            log_event(
-                'Started password reset',
-                [],
-                user
-            )
-
             user.secretkey = generate_key(64)
             user.secretkeyexpiry = (
                 datetime.utcnow() +
@@ -251,6 +245,12 @@ def passwordReset():
             )
 
             db.session.commit()
+
+            log_event(
+                'Started password reset',
+                [],
+                user
+            )
 
             app.email_manager.sendTemplate(
                 request.form['email'],
@@ -297,16 +297,16 @@ def emailConfirm():
                 "emailConfirmFail.email"
             )
         else:
+            user.secretkey = generate_key(64)
+            user.secretkeyexpiry = None
+
+            db.session.commit()
+
             log_event(
                 'Requested email confirm',
                 [],
                 user
             )
-
-            user.secretkey = generate_key(64)
-            user.secretkeyexpiry = None
-
-            db.session.commit()
 
             app.email_manager.sendTemplate(
                 request.form['email'],
@@ -366,16 +366,17 @@ def resetPassword(userID, secretkey):
                 )
             )
         else:
+            user.setPassword(request.form['password'])
+            user.secretkey = None
+            user.secretkeyexpiry = None
+            db.session.commit()
+
             log_event(
                 'Completed password reset',
                 [],
                 user
             )
 
-            user.setPassword(request.form['password'])
-            user.secretkey = None
-            user.secretkeyexpiry = None
-            db.session.commit()
             flash(u'Your password has been reset, please log in.','success')
             return redirect(url_for('front.home'))
     else:
@@ -386,12 +387,6 @@ def confirmEmail(userID, secretkey):
     user = User.get_by_id(userID)
 
     if user is not None and user.secretkey == secretkey:
-        log_event(
-            'Confirmed email',
-            [],
-            user
-        )
-
         user.secretkey = None
         user.verified = True
 
@@ -400,6 +395,13 @@ def confirmEmail(userID, secretkey):
             user.newemail = None
 
         db.session.commit()
+
+        log_event(
+            'Confirmed email',
+            [],
+            user
+        )
+
         flash(u'Your email address has been verified. You can now log in','info')
     else:
         flash(u'Could not confirm email address. Check that you have used the correct link','warning')
@@ -412,12 +414,6 @@ def destroyAccount(userID, secretkey):
 
     if user is not None and user.secretkey == secretkey:
         if not user.is_verified():
-            log_event(
-                'Deleted account with email address {0}'.format(
-                    user.email
-                )
-            )
-
             for entry in user.events:
                 entry.message = (
                     entry.message +
@@ -429,6 +425,12 @@ def destroyAccount(userID, secretkey):
 
             db.session.delete(user)
             db.session.commit()
+
+            log_event(
+                'Deleted account with email address {0}'.format(
+                    user.email
+                )
+            )
 
             flash(u'The account has been deleted.','info')
         else:

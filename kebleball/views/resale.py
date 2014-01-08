@@ -8,7 +8,6 @@ from kebleball.database.user import User
 from kebleball.database.ticket import Ticket
 
 log = app.log_manager.log_resale
-log_event = app.log_manager.log_event
 
 resale = Blueprint('resale', __name__)
 
