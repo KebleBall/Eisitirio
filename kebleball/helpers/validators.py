@@ -85,7 +85,7 @@ def validateReferrer(email, current_user):
                     'class': 'success',
                     'message': '{0} will be credited for your order.'.format(user.firstname)
                 },
-                None
+                user
             )
     else:
         result = (
