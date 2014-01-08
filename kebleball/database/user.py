@@ -59,8 +59,8 @@ class User(db.Model):
         nullable=True
     )
     verified = db.Column(
-        db.Boolean, ,
-        default=False
+        db.Boolean,
+        default=False,
         nullable=False
     )
     deleted = db.Column(

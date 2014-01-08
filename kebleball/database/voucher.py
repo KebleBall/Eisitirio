@@ -22,8 +22,7 @@ class Voucher(db.Model):
     )
     expires = db.Column(
         db.DateTime(),
-        nullable=True,
-        nullable=False
+        nullable=True
     )
     discounttype = db.Column(
         db.Enum(
