@@ -5,6 +5,7 @@
 
 {% block content %}
     <section id="wait" class="columns">
+        <p>N.B. Tickets will be allocated in the blocks in which you request them. If you request 8 tickets at once, you will not receive any tickets until all 8 become available. If you wish for tickets to be allocated to you as soon as they become available, please join the waiting list for 1 or 2 tickets at a time.</p>
         <form action="{{ url_for('purchase.wait') }}" method="post">
             <ol id="purchaseSteps">
                 <li>

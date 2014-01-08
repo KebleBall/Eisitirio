@@ -18,13 +18,32 @@ purchase = Blueprint('purchase', __name__)
 @purchase.route('/purchase', methods=['GET','POST'])
 @login_required
 def purchaseHome():
+    (buyingPermitted, ticketsAvailable, goToWait, canBuyMessage) = canBuy(current_user)
+
+    if not buyingPermitted:
+        flash(
+            u'You cannot currently purchase tickets, because ' + canBuyMessage,
+            'info'
+        )
+        if goToWait:
+            flash(
+                (
+                    u'Please join the waiting list, and you will be allocated '
+                    u'tickets as they become available'
+                ),
+                'info'
+            )
+            return redirect(url_for('purchase.wait'))
+        else:
+            return redirect(url_for('dashboard.dashboardHome'))
+
     if request.method == 'POST':
         valid = True
         flashes = []
 
         numTickets = int(request.form['numTickets'])
 
-        if numTickets > canBuy(current_user):
+        if numTickets > ticketsAvailable:
             valid = False
             flashes.append(u'You cannot buy that many tickets')
         elif numTickets < 1:
@@ -88,7 +107,7 @@ def purchaseHome():
                 'purchase/purchaseHome.html',
                 form=request.form,
                 numTickets=numTickets,
-                canBuy=canBuy(current_user)
+                canBuy=ticketsAvailable
             )
 
         tickets = []
@@ -186,31 +205,32 @@ def purchaseHome():
         else:
             return redirect(url_for('dashboard.dashboardHome'))
     else:
-        if canBuy(current_user) == 0:
-            flash(
-                (
-                    u'There are no tickets currently available for Keble Ball. '
-                    u'If you would like tickets for the Ball, please join the '
-                    u'waiting list.'
-                ),
-                'info'
-            )
-            return redirect(url_for('purchase.wait'))
         return render_template(
             'purchase/purchaseHome.html',
-            canBuy=canBuy(current_user)
+            canBuy=ticketsAvailable
         )
 
 @purchase.route('/purchase/wait', methods=['GET','POST'])
 @login_required
 def wait():
+    (waitingPermitted, waitingAvailable, canWaitMessage) = canWait(current_user)
+    if not waitingPermitted:
+        flash(
+            (
+                u'You cannot join the waiting list at this time because ' +
+                canWaitMessage
+            ),
+            'info'
+        )
+        return redirect(url_for('dashboard.dashboardHome'))
+
     if request.method == 'POST':
         valid = True
         flashes = []
 
         numTickets = int(request.form['numTickets'])
 
-        if numTickets > canWait(current_user):
+        if numTickets > waitingAvailable:
             valid = False
             flashes.append(u'You cannot wait for that many tickets')
         elif numTickets < 1:
@@ -243,7 +263,7 @@ def wait():
                 'purchase/purchaseHome.html',
                 form=request.form,
                 numTickets=numTickets,
-                canWait=canWait(current_user)
+                canWait=waitingAvailable
             )
 
         db.session.add(
@@ -275,18 +295,9 @@ def wait():
 
         return redirect(url_for('dashboard.dashboardHome'))
     else:
-        if canWait(current_user) == 0:
-            flash(
-                (
-                    u'You are currently unable to join the waiting list. '
-                    u'Please try again later.'
-                ),
-                'info'
-            )
-            return redirect(url_for('dashboard.dashboardHome'))
         return render_template(
             'purchase/wait.html',
-            canWait=canWait(current_user)
+            canWait=waitingAvailable
         )
 
 @purchase.route('/purchase/change-method', methods=['GET','POST'])
@@ -484,8 +495,6 @@ def cancel():
                 db.session.commit()
             else:
                 refundFailed = True
-
-        db.session.commit()
 
         if refundFailed:
             flash(

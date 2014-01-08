@@ -8,42 +8,142 @@ from datetime import datetime
 def canBuy(user):
     if isinstance(app.config['TICKETS_ON_SALE'], datetime):
         if app.config['TICKETS_ON_SALE'] > datetime.utcnow():
-            on_sale = 0
+            on_sale = False
         else:
-            on_sale = app.config['TICKETS_AVAILABLE']
+            on_sale = True
     else:
-        on_sale = app.config['TICKETS_AVAILABLE'] if app.config['TICKETS_ON_SALE'] else 0
+        on_sale = app.config['TICKETS_ON_SALE']
+
+    if not on_sale:
+        (waitingAllowed, waitFor, message) = canWait(user)
+        return (
+            False,
+            0,
+            waitingAllowed,
+            (
+                'tickets are currently not on sale. Tickets may become '
+                'available for purchase or through the waiting list, please '
+                'check back at a later date.'
+            )
+        )
 
     # Don't allow people to buy tickets unless waiting list is empty
     if Waiting.query.count() > 0:
-        on_sale = 0
+        return (
+            False,
+            0,
+            True,
+            'there are currently people waiting for tickets.'
+        )
 
-    return max(
+    unpaidTickets = user.tickets \
+        .filter(Ticket.cancelled==False) \
+        .filter(Ticket.paid==False) \
+        .count()
+    if unpaidTickets >= app.config['MAX_UNPAID_TICKETS']:
+        return (
+            False,
+            0,
+            False,
+            (
+                'you have too many unpaid tickets. Please pay '
+                'for your tickets before reserving any more.'
+            )
+        )
+
+    ticketsOwned = user.tickets \
+        .filter(Ticket.cancelled==False) \
+        .count()
+    if ticketsOwned >= app.config['MAX_TICKETS']:
+        return (
+            False,
+            0,
+            False,
+            (
+                'you have too many tickets. Please contact <a href="{0}">the '
+                'ticketing officer</a> if you wish to purchase more than {1} '
+                'tickets.'
+            ).format(
+                app.config['TICKETS_EMAIL_LINK'],
+                app.config['MAX_TICKETS']
+            )
+        )
+
+    ticketsAvailable = app.config['TICKETS_AVAILABLE'] - Ticket.count()
+    if ticketsAvailable <= 0:
+        return (
+            False,
+            0,
+            True,
+            (
+                'there are no tickets currently available. Tickets may become '
+                'available for purchase or through the waiting list, please '
+                'check back at a later date.'
+            )
+        )
+
+    return (
+        True,
         min(
-            on_sale,
-            app.config['TICKETS_AVAILABLE'] - Ticket.count(),
+            ticketsAvailable,
             app.config['MAX_TICKETS_PER_TRANSACTION'],
-            app.config['MAX_UNPAID_TICKETS'] - user.tickets.filter(Ticket.paid==False).count(),
-            app.config['MAX_TICKETS'] - user.tickets.count()
+            app.config['MAX_TICKETS'] - ticketsOwned,
+            app.config['MAX_UNPAID_TICKETS'] - unpaidTickets
         ),
-        0
+        False,
+        None
     )
 
 def canWait(user):
-    can_wait_for = max(
-        min(
-            app.config['MAX_TICKETS_WAITING'] - user.waitingFor(),
-            app.config['MAX_TICKETS'] - user.tickets.count()
-        ),
-        0
-    )
-
     if isinstance(app.config['WAITING_OPEN'], datetime):
         if app.config['WAITING_OPEN'] > datetime.utcnow():
-            return 0
+            waitingOpen = False
         else:
-            return can_wait_for
+            waitingOpen = True
     else:
-        return can_wait_for if app.config['WAITING_OPEN'] else 0
+        waitingOpen = app.config['WAITING_OPEN']
 
-    return
+    if not waitingOpen:
+        return (
+            False,
+            0,
+            'the waiting list is currently closed.'
+        )
+
+    ticketsOwned = user.tickets \
+        .filter(Ticket.cancelled==False) \
+        .count()
+    if ticketsOwned >= app.config['MAX_TICKETS']:
+        return (
+            False,
+            0,
+            (
+                'you have too many tickets. Please contact <a href="{0}">the '
+                'ticketing officer</a> if you wish to purchase more than {1} '
+                'tickets.'
+            ).format(
+                app.config['TICKETS_EMAIL_LINK'],
+                app.config['MAX_TICKETS']
+            )
+        )
+
+    waitingFor = user.waitingFor()
+    if waitingFor >= app.config['MAX_TICKETS_WAITING']:
+        return (
+            False,
+            0,
+            (
+                'you are already waiting for too many tickets. Please rejoin '
+                'the waiting list once you have been allocated the tickets '
+                'you are currently waiting for.'
+            )
+        )
+
+    return (
+        True,
+        min(
+            app.config['MAX_TICKETS_WAITING'] - waitingFor,
+            app.config['MAX_TICKETS'] - ticketsOwned
+        ),
+        None
+    )
