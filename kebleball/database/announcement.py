@@ -41,18 +41,43 @@ email_announce_link = db.Table(
 )
 
 class Announcement(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.String(50))
-    content = db.Column(db.Text(65536))
-    subject = db.Column(db.Text(256))
-    send_email = db.Column(db.Boolean)
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        nullable=False
+    )
+    time = db.Column(
+        db.String(50),
+        nullable=False
+    )
+    content = db.Column(
+        db.Text(65536),
+        nullable=False
+    )
+    subject = db.Column(
+        db.Text(256),
+        nullable=False
+    )
+    send_email = db.Column(
+        db.Boolean,
+        default=True,
+        nullable=False
+    )
+    email_sent = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
 
-    # Has email been sent to all relevant users?
-    email_sent = db.Column(db.Boolean)
-
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    sender = db.relationship('User',
-        backref=db.backref('announcements-sent',
+    sender_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id'),
+        nullable=False
+    )
+    sender = db.relationship(
+        'User',
+        backref=db.backref(
+            'announcements-sent',
             lazy='dynamic'
         )
     )
@@ -83,9 +108,18 @@ class Announcement(db.Model):
         )
     )
 
-    is_waiting = db.Column(db.Boolean, nullable=True)
-    has_tickets = db.Column(db.Boolean, nullable=True)
-    has_collected = db.Column(db.Boolean, nullable=True)
+    is_waiting = db.Column(
+        db.Boolean,
+        nullable=True
+    )
+    has_tickets = db.Column(
+        db.Boolean,
+        nullable=True
+    )
+    has_collected = db.Column(
+        db.Boolean,
+        nullable=True
+    )
 
     users = db.relationship(
         'User',

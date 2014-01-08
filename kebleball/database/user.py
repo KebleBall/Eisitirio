@@ -19,24 +19,71 @@ import re
 bcrypt = Bcrypt(app)
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    newemail = db.Column(db.String(120), nullable=True)
-    passhash = db.Column(db.BINARY(60), nullable=False)
-    firstname = db.Column(db.String(120), nullable=False)
-    surname = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
-    secretkey = db.Column(db.String(64), nullable=True)
-    secretkeyexpiry = db.Column(db.DateTime(), nullable=True)
-    verified = db.Column(db.Boolean, nullable=False)
-    deleted = db.Column(db.Boolean, nullable=False)
-    note = db.Column(db.Text, nullable=True)
-    role = db.Column(db.Enum('User', 'Admin'), nullable=False)
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        nullable=False
+    )
+    email = db.Column(
+        db.String(120),
+        unique=True,
+        nullable=False
+    )
+    newemail = db.Column(
+        db.String(120),
+        unique=True,
+        nullable=True
+    )
+    passhash = db.Column(
+        db.BINARY(60),
+        nullable=False
+    )
+    firstname = db.Column(
+        db.String(120),
+        nullable=False
+    )
+    surname = db.Column(
+        db.String(120),
+        nullable=False
+    )
+    phone = db.Column(
+        db.String(20),
+        nullable=False
+    )
+    secretkey = db.Column(
+        db.String(64),
+        nullable=True
+    )
+    secretkeyexpiry = db.Column(
+        db.DateTime(),
+        nullable=True
+    )
+    verified = db.Column(
+        db.Boolean, ,
+        default=False
+        nullable=False
+    )
+    deleted = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
+    note = db.Column(
+        db.Text,
+        nullable=True
+    )
+    role = db.Column(
+        db.Enum(
+            'User',
+            'Admin'
+        ),
+        nullable=False
+    )
 
     college_id = db.Column(
         db.Integer,
         db.ForeignKey('college.id'),
-        nullable=True
+        nullable=False
     )
     college = db.relationship(
         'College',
@@ -48,7 +95,8 @@ class User(db.Model):
 
     affiliation_id = db.Column(
         db.Integer,
-        db.ForeignKey('affiliation.id')
+        db.ForeignKey('affiliation.id'),
+        nullable=False
     )
     affiliation = db.relationship(
         'Affiliation',

@@ -9,15 +9,48 @@ Used to manage Battels charges
 from kebleball.database import db
 
 class Battels(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    battelsid = db.Column(db.String(6), unique=True, nullable=True)
-    email = db.Column(db.String(120), unique=True, nullable=True)
-    title = db.Column(db.String(10), nullable=True)
-    surname = db.Column(db.String(60), nullable=True)
-    forenames = db.Column(db.String(60), nullable=True)
-    mt = db.Column(db.Integer())
-    ht = db.Column(db.Integer())
-    manual = db.Column(db.Boolean())
+    id = db.Column(
+        db.Integer(),
+        primary_key=True,
+        nullable=False
+    )
+    battelsid = db.Column(
+        db.String(6),
+        unique=True,
+        nullable=True
+    )
+    email = db.Column(
+        db.String(120),
+        unique=True,
+        nullable=True
+    )
+    title = db.Column(
+        db.String(10),
+        nullable=True
+    )
+    surname = db.Column(
+        db.String(60),
+        nullable=True
+    )
+    forenames = db.Column(
+        db.String(60),
+        nullable=True
+    )
+    mt = db.Column(
+        db.Integer(),
+        default=0,
+        nullable=False
+    )
+    ht = db.Column(
+        db.Integer(),
+        default=0,
+        nullable=False
+    )
+    manual = db.Column(
+        db.Boolean(),
+        default=False,
+        nullable=False
+    )
 
     def __init__(
         self,

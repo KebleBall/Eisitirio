@@ -19,12 +19,31 @@ import json
 import requests
 
 class CardTransaction(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    commenced = db.Column(db.DateTime(), nullable=False)
-    completed = db.Column(db.DateTime(), nullable=True)
-    accesscode = db.Column(db.String(200), nullable=True)
-    resultcode = db.Column(db.String(2), nullable=True)
-    ewayid = db.Column(db.Integer(), nullable=True)
+    id = db.Column(
+        db.Integer(),
+        primary_key=True,
+        nullable=False
+    )
+    commenced = db.Column(
+        db.DateTime(),
+        nullable=False
+    )
+    completed = db.Column(
+        db.DateTime(),
+        nullable=True
+    )
+    accesscode = db.Column(
+        db.String(200),
+        nullable=True
+    )
+    resultcode = db.Column(
+        db.String(2),
+        nullable=True
+    )
+    ewayid = db.Column(
+        db.Integer(),
+        nullable=True
+    )
 
     user_id = db.Column(
         db.Integer,

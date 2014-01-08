@@ -10,17 +10,31 @@ from kebleball.database import db
 from datetime import datetime
 
 class Statistic(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    timestamp = db.Column(db.DateTime)
+    id = db.Column(
+        db.Integer(),
+        primary_key=True,
+        nullable=False
+    )
+    timestamp = db.Column(
+        db.DateTime,
+        nullable=False
+    )
     group = db.Column(
         db.Enum(
             'Colleges',
             'Payments',
             'Sales'
-        )
+        ),
+        nullable=False
     )
-    statistic = db.Column(db.String(25))
-    value = db.Column(db.Integer())
+    statistic = db.Column(
+        db.String(25),
+        nullable=False
+    )
+    value = db.Column(
+        db.Integer(),
+        nullable=False
+    )
 
     def __init__(self, group, statistic, value):
         if group not in ['Colleges','Payments','Sales']:

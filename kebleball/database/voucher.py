@@ -11,29 +11,53 @@ from kebleball.database.user import User
 from datetime import datetime, timedelta
 
 class Voucher(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    code = db.Column(db.String(30))
-    expires = db.Column(db.DateTime(), nullable=True)
+    id = db.Column(
+        db.Integer(),
+        primary_key=True,
+        nullable=False
+    )
+    code = db.Column(
+        db.String(30),
+        nullable=False
+    )
+    expires = db.Column(
+        db.DateTime(),
+        nullable=True,
+        nullable=False
+    )
     discounttype = db.Column(
         db.Enum(
             'Fixed Price',
             'Fixed Discount',
             'Percentage Discount'
-        )
+        ),
+        nullable=False
     )
-    discountvalue = db.Column(db.Integer())
+    discountvalue = db.Column(
+        db.Integer(),
+        nullable=False
+    )
     appliesto = db.Column(
         db.Enum(
             'Ticket',
             'Transaction'
-        )
+        ),
+        nullable=False
     )
-    singleuse = db.Column(db.Boolean())
-    used = db.Column(db.Boolean(), default=False)
+    singleuse = db.Column(
+        db.Boolean(),
+        nullable=False
+    )
+    used = db.Column(
+        db.Boolean(),
+        default=False,
+        nullable=True
+    )
 
     used_by_id = db.Column(
         db.Integer,
-        db.ForeignKey('user.id')
+        db.ForeignKey('user.id'),
+        nullable=True
     )
     used_by = db.relationship(
         'User',
@@ -88,14 +112,14 @@ class Voucher(db.Model):
         return Voucher.query().filter_by(Voucher.code==code).first()
 
     def apply(self, tickets, user):
-        if self.used:
+        if self.singleuse and self.used:
             return (False, tickets, 'Voucher has already been used.')
 
         if self.expires is not None and self.expires < datetime.utcnow():
             return (False, tickets, 'Voucher has expired.')
 
+        self.used = True
         if self.singleuse:
-            self.used = True
             if hasattr(user, 'id'):
                 self.used_by_id = user.id
             else:

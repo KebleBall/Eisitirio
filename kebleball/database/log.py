@@ -26,9 +26,19 @@ log_ticket_link = db.Table(
 )
 
 class Log(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    timestamp = db.Column(db.DateTime)
-    ip = db.Column(db.String(45))
+    id = db.Column(
+        db.Integer(),
+        primary_key=True,
+        nullable=False
+    )
+    timestamp = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+    ip = db.Column(
+        db.String(45),
+        nullable=False
+    )
     action = db.Column(db.Text())
 
     actor_id = db.Column(

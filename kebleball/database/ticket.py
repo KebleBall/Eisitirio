@@ -33,11 +33,31 @@ ticket_transaction_link = db.Table(
 )
 
 class Ticket(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    paid = db.Column(db.Boolean(), default=False, nullable=False)
-    collected = db.Column(db.Boolean(), default=False, nullable=False)
-    cancelled = db.Column(db.Boolean(), default=False, nullable=False)
-    resold = db.Column(db.Boolean(), default=False, nullable=False)
+    id = db.Column(
+        db.Integer(),
+        primary_key=True,
+        nullable=False
+    )
+    paid = db.Column(
+        db.Boolean(),
+        default=False,
+        nullable=False
+    )
+    collected = db.Column(
+        db.Boolean(),
+        default=False,
+        nullable=False
+    )
+    cancelled = db.Column(
+        db.Boolean(),
+        default=False,
+        nullable=False
+    )
+    resold = db.Column(
+        db.Boolean(),
+        default=False,
+        nullable=False
+    )
     paymentmethod = db.Column(
         db.Enum(
             'Battels',
@@ -48,11 +68,34 @@ class Ticket(db.Model):
         ),
         nullable=True
     )
-    paymentreference = db.Column(db.String(50), nullable=True)
-    price = db.Column(db.Integer(), nullable=False)
-    name = db.Column(db.String(120), nullable=True)
-    note = db.Column(db.Text(), nullable=True)
-    expires = db.Column(db.DateTime(), nullable=True)
+    paymentreference = db.Column(
+        db.String(50),
+        nullable=True
+    )
+    price = db.Column(
+        db.Integer(),
+        nullable=False
+    )
+    name = db.Column(
+        db.String(120),
+        nullable=True
+    )
+    note = db.Column(
+        db.Text(),
+        nullable=True
+    )
+    expires = db.Column(
+        db.DateTime(),
+        nullable=True
+    )
+    resalekey = db.Column(
+        db.String(32),
+        nullable=True
+    )
+    resaleconfirmed = db.Column(
+        db.Boolean(),
+        nullable=True
+    )
 
     owner_id = db.Column(
         db.Integer,
@@ -68,8 +111,6 @@ class Ticket(db.Model):
         foreign_keys=[owner_id]
     )
 
-    resalekey = db.Column(db.String(32), nullable=True)
-    resaleconfirmed = db.Column(db.Boolean(), default=False, nullable=False)
     reselling_to_id = db.Column(
         db.Integer,
         db.ForeignKey('user.id'),

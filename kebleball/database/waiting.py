@@ -11,13 +11,24 @@ from kebleball.database.user import User
 from datetime import datetime
 
 class Waiting(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    waitingsince = db.Column(db.DateTime())
-    waitingfor = db.Column(db.Integer())
+    id = db.Column(
+        db.Integer(),
+        primary_key=True,
+        nullable=False
+    )
+    waitingsince = db.Column(
+        db.DateTime(),
+        nullable=False
+    )
+    waitingfor = db.Column(
+        db.Integer(),
+        nullable=False
+    )
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey('user.id')
+        db.ForeignKey('user.id'),
+        nullable=False
     )
     user = db.relationship(
         'User',
@@ -30,7 +41,8 @@ class Waiting(db.Model):
 
     referrer_id = db.Column(
         db.Integer,
-        db.ForeignKey('user.id')
+        db.ForeignKey('user.id'),
+        nullable=True
     )
     referrer = db.relationship(
         'User',
