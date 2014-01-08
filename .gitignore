@@ -2,3 +2,4 @@
 config/*
 .watsonrc
 *.sass-cache*
+cron_timestamp.txt

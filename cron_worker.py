@@ -5,6 +5,16 @@ from datetime import datetime, timedelta
 import os, sys
 from contextlib import contextmanager
 from kebleball.app import app
+
+if (
+    'KEBLE_BALL_ENV' in os.environ and
+    os.environ['KEBLE_BALL_ENV'] in [
+        'PRODUCTION',
+        'STAGING'
+    ]
+):
+    app.config.from_pyfile('config/production.py')
+
 from kebleball.database import *
 from kebleball.helpers.email_manager import EmailManager
 from sqlalchemy import func
