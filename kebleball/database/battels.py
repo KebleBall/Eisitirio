@@ -7,6 +7,7 @@ Used to manage Battels charges
 """
 
 from kebleball.database import db
+from kebleball.app import app
 
 class Battels(db.Model):
     id = db.Column(
@@ -117,7 +118,7 @@ class Battels(db.Model):
                 self.mt = self.mt - ticket.price
             elif term == 'HT':
                 self.ht = self.ht - ticket.price
-        if app.config['CURRENT_TERM'] == 'MT':
+        if app.config['CURRENT_TERM'] == 'HT':
             self.ht = self.ht - ticket.price
         else:
             raise ValueError("Can't refund battels tickets in the current term")
