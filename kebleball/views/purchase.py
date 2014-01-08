@@ -453,9 +453,11 @@ def cancel():
         for ticket in tickets:
             if not ticket.paid:
                 ticket.cancelled = True
+                db.session.commit()
                 cancelled.append(ticket)
             elif ticket.paymentmethod == 'Free':
                 ticket.cancelled = True
+                db.session.commit()
                 cancelled.append(ticket)
             elif ticket.paymentmethod == 'Battels':
                 ticket.battels.cancel(ticket)
