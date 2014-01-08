@@ -17,9 +17,9 @@ dashboard = Blueprint('dashboard', __name__)
 def dashboardHome():
     return render_template('dashboard/dashboardHome.html')
 
-@dashboard.route('/dashboard/profile')
+@dashboard.route('/dashboard/profile', methods=['GET','POST'])
 @fresh_login_required
-def profile(methods=['GET','POST']):
+def profile():
     if request.method == 'POST':
         valid = True
         flashes = []
