@@ -1,6 +1,6 @@
 # coding: utf-8
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flask.ext.login import login_required, fresh_login_required
+from flask.ext.login import login_required, fresh_login_required, current_user
 
 from kebleball.app import app
 from kebleball.database.college import College
