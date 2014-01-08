@@ -34,7 +34,7 @@ def login():
         if user:
             log_event(
                 'Failed login attempt - invalid password',
-                None,
+                [],
                 user
             )
 
@@ -44,7 +44,7 @@ def login():
     if not user.verified:
         log_event(
             'Failed login attempt - not verified',
-            None,
+            [],
             user
         )
         flash(
@@ -63,7 +63,7 @@ def login():
 
     log_event(
         'Logged in',
-        None,
+        [],
         user
     )
 
@@ -184,7 +184,7 @@ def register():
 
     log_event(
         'Registered',
-        None,
+        [],
         user
     )
 
@@ -240,7 +240,7 @@ def passwordReset():
         else:
             log_event(
                 'Started password reset',
-                None,
+                [],
                 user
             )
 
@@ -299,7 +299,7 @@ def emailConfirm():
         else:
             log_event(
                 'Requested email confirm',
-                None,
+                [],
                 user
             )
 
@@ -368,7 +368,7 @@ def resetPassword(userID, secretkey):
         else:
             log_event(
                 'Completed password reset',
-                None,
+                [],
                 user
             )
 
@@ -388,7 +388,7 @@ def confirmEmail(userID, secretkey):
     if user is not None and user.secretkey == secretkey:
         log_event(
             'Confirmed email',
-            None,
+            [],
             user
         )
 
@@ -434,7 +434,7 @@ def destroyAccount(userID, secretkey):
         else:
             log_event(
                 'Attempted deletion of verified account',
-                None,
+                [],
                 user
             )
 
@@ -449,7 +449,7 @@ def destroyAccount(userID, secretkey):
 def logout():
     log_event(
         'Logged Out',
-        None,
+        [],
         current_user
     )
 

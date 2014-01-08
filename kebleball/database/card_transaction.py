@@ -174,7 +174,7 @@ class CardTransaction(db.Model):
                     endpoint,
                     r.status_code
                 ),
-                None,
+                [],
                 None,
                 self
             )

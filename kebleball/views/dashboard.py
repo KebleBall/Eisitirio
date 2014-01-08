@@ -147,7 +147,7 @@ def profile():
 
             log_event(
                 'Updated Details',
-                None,
+                [],
                 current_user
             )
 
