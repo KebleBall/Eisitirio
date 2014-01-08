@@ -1,6 +1,6 @@
 # coding: utf-8
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flask.ext.login import login_required, fresh_login_required, current_user
+from flask.ext.login import login_required, current_user
 
 from kebleball.app import app
 from kebleball.database.college import College
@@ -18,7 +18,7 @@ def dashboardHome():
     return render_template('dashboard/dashboardHome.html')
 
 @dashboard.route('/dashboard/profile', methods=['GET','POST'])
-@fresh_login_required
+@login_required
 def profile():
     if request.method == 'POST':
         valid = True

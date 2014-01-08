@@ -1,6 +1,6 @@
 # coding: utf-8
 from flask import Blueprint, request, render_template, flash, redirect, url_for
-from flask.ext.login import login_required, fresh_login_required, current_user
+from flask.ext.login import login_required, current_user
 
 from kebleball.app import app
 from kebleball.database.ticket import Ticket
@@ -288,7 +288,6 @@ def wait():
             'purchase/wait.html',
             canWait=canWait(current_user)
         )
-
 
 @purchase.route('/purchase/change-method', methods=['GET','POST'])
 @login_required
