@@ -22,9 +22,9 @@
                 <a href="{{ url_for('router') }}">
                     <img src="{{ url_for('static', filename='images/logo.png') }}" />
                 </a>
-                <h2>Keble Ball</h2>
+                <h2 class="blue">Keble Ball</h2>
                 <h1 class="red">{{ template_config['THEME'] }}</h1>
-                <h2>{{ template_config['START_TIME'].strftime('%d') }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}</h2>
+                <h2 class="blue">{{ template_config['START_TIME'].strftime('%d') }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}</h2>
             </section>
         </header>
         {% if not current_user.is_anonymous() %}

@@ -2,6 +2,18 @@
 from flask import url_for, redirect, render_template, request
 
 from .app import app
+
+# Put here so that it updates config before loginManager.login_user gets called
+@app.before_request
+def check_for_maintenance():
+    if os.path.exists('/var/www/flask_kebleball/.maintenance'):
+        app.config['MAINTENANCE_MODE'] = True
+        if (
+            request.path != url_for('maintenance') and
+            'static' not in request.path
+        ):
+            return redirect(url_for('maintenance'))
+
 from kebleball.helpers.log_manager import LogManager
 from kebleball.helpers.login_manager import loginManager
 from kebleball.helpers.email_manager import EmailManager
@@ -45,6 +57,10 @@ def environment():
         " - " +
         str(os.environ)
     )
+
+@app.route('/maintenance')
+def maintenance():
+    return render_template('maintenance.html'), 503
 
 @app.errorhandler(404)
 def error404(e):

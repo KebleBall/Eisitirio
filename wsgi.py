@@ -15,5 +15,5 @@ def application(req_environ, start_response):
         elif req_environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
             app.config.from_pyfile('config/production.py')
             return app(req_environ, start_response)
-        else:
-            return app(req_environ, start_response)
+    else:
+        return app(req_environ, start_response)

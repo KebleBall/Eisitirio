@@ -9,7 +9,10 @@ loginManager = LoginManager()
 
 @loginManager.user_loader
 def load_user(user_id):
-    return User.get_by_id(user_id)
+    if current_app.config['MAINTENANCE_MODE']:
+        return loginManager.anonymous_user
+    else:
+        return User.get_by_id(user_id)
 
 loginManager.login_view = "front.home"
 
