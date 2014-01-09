@@ -47,6 +47,7 @@ class User(db.Model):
         db.String(120),
         nullable=False
     )
+    fullname = db.column_property(firstname + " " + surname)
     phone = db.Column(
         db.String(20),
         nullable=False
