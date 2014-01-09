@@ -13,7 +13,7 @@
         <header class="row">
             <section id="user" class="large-3 columns right">
                 {% if current_user.is_anonymous() %}
-                    <p>You are not currently logged in. <a href="{{ url_for('front.login') }}">Log in.</a></p>
+                    <p>You are not currently logged in. <a href="{{ url_for('front.home') }}#log-in-form">Log in.</a></p>
                 {% else %}
                     <p>You are currently logged in as {{ current_user.firstname }} {{ current_user.surname }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
                 {% endif %}

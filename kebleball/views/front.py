@@ -92,12 +92,7 @@ def register():
             ),
             'error'
         )
-        return render_template(
-            'front/home.html',
-            colleges = College.query.all(),
-            affiliations = Affiliation.query.all(),
-            form={}
-        )
+        return redirect(url_for('front.home'))
 
     if (
         'password' not in request.form or

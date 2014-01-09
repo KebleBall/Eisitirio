@@ -15,6 +15,7 @@
         </p>
         <div class="row">
             <section id="homepage-login" class="large-6 columns">
+                <a id="log-in-form"></a>
                 <h2>Log In</h2>
                 <form action="{{ url_for('front.login') }}" method="post">
                     {% if request.args['next'] %}
@@ -100,7 +101,7 @@
                                     <option value="---" disabled="disabled" selected="selected">---</option>
                                 {% endif %}
                                 {% for college in colleges %}
-                                    {% if form['college'] and form['college'] == college.id %}
+                                    {% if form['college'] and form['college']|int(-1) == college.id %}
                                         <option value="{{ college.id }}" selected="selected">{{ college.name }}</option>
                                     {% else %}
                                         <option value="{{ college.id }}">{{ college.name }}</option>
@@ -119,7 +120,7 @@
                                     <option value="---" disabled="disabled" selected="selected">---</option>
                                 {% endif %}
                                 {% for affiliation in affiliations %}
-                                    {% if form['affiliation'] and form['affiliation'] == affiliation.id %}
+                                    {% if form['affiliation'] and form['affiliation']|int(-1) == affiliation.id %}
                                         <option value="{{ affiliation.id }}" selected="selected">{{ affiliation.name }}</option>
                                     {% else %}
                                         <option value="{{ affiliation.id }}">{{ affiliation.name }}</option>

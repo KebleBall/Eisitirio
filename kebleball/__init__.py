@@ -101,8 +101,12 @@ def utility_processor():
         else:
             return 'th'
 
+    def raise_exception():
+        raise Exception
+
     return dict(
         get_all=get_all,
         get_ord=get_ord,
+        raise_exception=raise_exception,
         template_config={key: app.config[key] for key in app.config['TEMPLATE_CONFIG_KEYS']}
     )
