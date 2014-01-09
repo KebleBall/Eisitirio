@@ -14,6 +14,7 @@ from flask.ext.bcrypt import Bcrypt
 from kebleball.helpers import generate_key
 
 from datetime import datetime
+from passlib.hash import bcrypt as passlib_bcrypt
 import re
 
 bcrypt = Bcrypt(app)
@@ -145,7 +146,7 @@ class User(db.Model):
         if battels is not None:
             self.battels = battels
         elif re.match('(.*?)@keble\.ox\.ac\.uk$',email) is not None:
-            self.battels = Battels(None, None, True)
+            self.battels = Battels(None, None, None, None, None, True)
             db.session.add(self.battels)
         else:
             self.battels = None
@@ -154,7 +155,17 @@ class User(db.Model):
         return "<User {0}: {1} {2}>".format(self.id, self.firstname, self.surname)
 
     def checkPassword(self, candidate):
-        return bcrypt.check_password_hash(self.passhash, candidate)
+        try:
+            return bcrypt.check_password_hash(self.passhash, candidate)
+        except ValueError:
+            if passlib_bcrypt.verify(candidate, self.passhash):
+                self.passhash = bcrypt.generate_password_hash(candidate)
+                db.session.commit()
+                return True
+            else:
+                return False
+
+        return False
 
     def setPassword(self, password):
         self.passhash = bcrypt.generate_password_hash(password)

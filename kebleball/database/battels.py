@@ -84,10 +84,15 @@ class Battels(db.Model):
                 "Battels instance has no attribute '{0}'".format(name)
             )
 
-    def charge(self, ticket, term):
+    def charge(self, ticket, term, wholepounds=False):
         if term == 'MTHT':
-            self.mt = self.mt + (ticket.price / 2)
-            self.ht = self.ht + (ticket.price - (ticket.price / 2))
+            if wholepounds:
+                half = ((ticket.price // 200) * 100)
+            else:
+                half = (ticket.price / 2)
+
+            self.mt = self.mt + half
+            self.ht = self.ht + (ticket.price - half)
         elif term == 'MT':
             self.mt = self.mt + ticket.price
         elif term == 'HT':

@@ -37,6 +37,14 @@ def login():
                 [],
                 user
             )
+        else:
+            log_event(
+                'Failed login attempt - invalid email {0}'.format(
+                    request.form['email']
+                ),
+                [],
+                None
+            )
 
         flash(u'Could not complete log in. Invalid email or password.', 'error')
         return redirect(url_for('front.home'))
