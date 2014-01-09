@@ -1,13 +1,13 @@
-@import "scss/normalize";
+@import "scss/vendor/normalize";
 
 @import "scss/variables";
 
-@import "scss/foundation";
+@import "scss/vendor/foundation";
 
 @import "scss/fonts/quicksand";
 @import "scss/fonts/metshige";
 
-@import "scss/simple-slider";
+@import "scss/vendor/simple-slider";
 
 .blue {
     color: $blue;
