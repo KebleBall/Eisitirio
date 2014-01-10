@@ -32,26 +32,27 @@ def file_lock(lock_file):
         finally:
             os.remove(lock_file)
 
-with file_lock('/var/www/flask_kebleball/kebleball/cron.lock'):
+with file_lock(os.path.abspath('./cron.lock')):
     email_manager = EmailManager(app)
     app.email_manager = email_manager
 
-    try:
-        with open('cron_timestamp.txt', 'r') as f:
-            timestamp = int(f.read().strip())
-    except IOError:
-        print 'cron_timestamp.txt not found'
-        timestamp = 0
-
-    last_run = datetime.fromtimestamp(timestamp)
     now = datetime.utcnow()
 
-    with open('cron_timestamp.txt', 'w') as f:
-        f.write(now.strftime('%s'))
+    try:
+        with open('cron_timestamp_5min.txt', 'r') as f:
+            timestamp_5min = int(f.read().strip())
+    except IOError:
+        print 'cron_timestamp_5min.txt not found'
+        timestamp_5min = 0
 
-    difference = now - last_run
+    last_run_5min = datetime.fromtimestamp(timestamp_5min)
 
-    if difference > timedelta(minutes=5):
+    difference_5min = now - last_run_5min
+
+    if difference_5min > timedelta(minutes=5):
+        with open('cron_timestamp_5min.txt', 'w') as f:
+            f.write(now.strftime('%s'))
+
         emails_count = app.config['EMAILS_BATCH']
 
         announcements = Announcement.query \
@@ -138,7 +139,21 @@ with file_lock('/var/www/flask_kebleball/kebleball/cron.lock'):
 
         db.session.commit()
 
-    if difference > timedelta(minutes=20):
+    try:
+        with open('cron_timestamp_20min.txt', 'r') as f:
+            timestamp_20min = int(f.read().strip())
+    except IOError:
+        print 'cron_timestamp_20min.txt not found'
+        timestamp_20min = 0
+
+    last_run_20min = datetime.fromtimestamp(timestamp_20min)
+
+    difference_20min = now - last_run_20min
+
+    if difference_20min > timedelta(minutes=20):
+        with open('cron_timestamp_20min.txt', 'w') as f:
+            f.write(now.strftime('%s'))
+
         statistic_limit = now - app.config['STATISTICS_KEEP']
 
         Statistic.query.filter(Statistic.timestamp < statistic_limit).delete()
@@ -209,7 +224,21 @@ with file_lock('/var/www/flask_kebleball/kebleball/cron.lock'):
         db.session.add_all(statistics)
         db.session.commit()
 
-    if difference > timedelta(days=1):
+    try:
+        with open('cron_timestamp_1day.txt', 'r') as f:
+            timestamp_1day = int(f.read().strip())
+    except IOError:
+        print 'cron_timestamp_1day.txt not found'
+        timestamp_1day = 0
+
+    last_run_1day = datetime.fromtimestamp(timestamp_1day)
+
+    difference_1day = now - last_run_1day
+
+    if difference_1day > timedelta(days=1):
+        with open('cron_timestamp_1day.txt', 'w') as f:
+            f.write(now.strftime('%s'))
+
         _3days = now + timedelta(days=3)
         _2days = now + timedelta(days=3)
         _1day = now + timedelta(days=1)
