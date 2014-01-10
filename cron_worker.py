@@ -32,7 +32,7 @@ def file_lock(lock_file):
         finally:
             os.remove(lock_file)
 
-with file_lock('/tmp/kebleball_cron.lock'):
+with file_lock('/var/www/flask_kebleball/kebleball/cron.lock'):
     email_manager = EmailManager(app)
     app.email_manager = email_manager
 
