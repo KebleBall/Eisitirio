@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, send_file
 
 from kebleball.app import app
 from kebleball.helpers.login_manager import admin_required
@@ -8,8 +8,12 @@ from kebleball.database.college import College
 from kebleball.database.affiliation import Affiliation
 from kebleball.database.ticket import Ticket
 from kebleball.database.log import Log
+from kebleball.database.statistic import Statistic
 from sqlalchemy.sql import text
 from dateutil.parser import parse
+from kebleball.helpers.statistic_plots import create_plot
+from StringIO import StringIO
+import csv
 
 log = app.log_manager.log_admin
 
@@ -297,8 +301,7 @@ def viewTransaction(id):
 @admin.route('/admin/statistics')
 @admin_required
 def statistics():
-    # [todo] - Add statistics
-    raise NotImplementedError('statistics')
+    return render_template('admin/statistics.html')
 
 @admin.route('/admin/announcements')
 @admin_required
@@ -315,35 +318,160 @@ def vouchers():
 @admin.route('/admin/graphs/sales')
 @admin_required
 def graphSales():
-    # [todo] - Add graphSales
-    raise NotImplementedError('graphSales')
+    statistics = Statistic.query \
+        .filter(Statistic.group == 'Sales') \
+        .order_by(Statistic.timestamp) \
+        .all()
+
+    statisticKeys = [
+        ('Available', 'g-'),
+        ('Ordered', 'b-'),
+        ('Paid', 'r-'),
+        ('Cancelled', 'y-'),
+        ('Collected', 'c-'),
+        ('Waiting', 'm-')
+    ]
+
+    plots = {
+        key: {
+            'timestamps': [],
+            'datapoints': [],
+            'line': line,
+            'currentValue': 0
+        } for (key, line) in statisticKeys
+    }
+
+    for statistic in statistics:
+        plots[statistic.statistic]['timestamps'].append(statistic.timestamp)
+        plots[statistic.statistic]['datapoints'].append(statistic.value)
+        plots[statistic.statistic]['currentValue'] = statistic.value
+
+    return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
 
 @admin.route('/admin/graphs/colleges')
 @admin_required
 def graphColleges():
-    # [todo] - Add graphColleges
-    raise NotImplementedError('graphColleges')
+    statistics = Statistic.query \
+        .filter(Statistic.group == 'Colleges') \
+        .order_by(Statistic.timestamp) \
+        .all()
+
+    statisticKeys = [
+        ("All Souls", "r^-"),
+        ("Balliol", "g^-"),
+        ("Blackfriars", "b^-"),
+        ("Brasenose", "c^-"),
+        ("Campion Hall", "m^-"),
+        ("Christ Church", "y^-"),
+        ("Corpus Christi", "ro-"),
+        ("Exeter", "go-"),
+        ("Green Templeton", "bo-"),
+        ("Harris Manchester", "co-"),
+        ("Hertford", "mo-"),
+        ("Jesus", "yo-"),
+        ("Keble", "rs-"),
+        ("Kellogg", "gs-"),
+        ("Lady Margaret Hall", "bs-"),
+        ("Linacre", "cs-"),
+        ("Lincoln", "ms-"),
+        ("Magdelen", "ys-"),
+        ("Mansfield", "r*-"),
+        ("Merton", "g*-"),
+        ("New", "b*-"),
+        ("None", "c*-"),
+        ("Nuffield", "m*-"),
+        ("Oriel", "y*-"),
+        ("Other", "r+-"),
+        ("Pembroke", "g+-"),
+        ("Queen's", "b+-"),
+        ("Regent's Park", "c+-"),
+        ("Somerville", "m+-"),
+        ("St Anne's", "y+-"),
+        ("St Antony's", "rx-"),
+        ("St Benet's Hall", "gx-"),
+        ("St Catherine's", "bx-"),
+        ("St Cross", "cx-"),
+        ("St Edmund Hall", "mx-"),
+        ("St Hilda's", "yx-"),
+        ("St Hugh's", "rD-"),
+        ("St John's", "gD-"),
+        ("St Peter's", "bD-"),
+        ("St Stephen's House", "cD-"),
+        ("Trinity", "mD-"),
+        ("University", "yD-"),
+        ("Wadham", "rH-"),
+        ("Wolfson", "gH-"),
+        ("Worcester", "bH-"),
+        ("Wycliffe Hall", "cH-")
+    ]
+
+    plots = {
+        key: {
+            'timestamps': [],
+            'datapoints': [],
+            'line': line,
+            'currentValue': 0
+        } for (key, line) in statisticKeys
+    }
+
+    for statistic in statistics:
+        plots[statistic.statistic]['timestamps'].append(statistic.timestamp)
+        plots[statistic.statistic]['datapoints'].append(statistic.value)
+        plots[statistic.statistic]['currentValue'] = statistic.value
+
+    return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
 
 @admin.route('/admin/graphs/payments')
 @admin_required
 def graphPayments():
-    # [todo] - Add graphPayments
-    raise NotImplementedError('graphPayments')
+    statistics = Statistic.query \
+        .filter(Statistic.group == 'Payments') \
+        .order_by(Statistic.timestamp) \
+        .all()
 
-@admin.route('/admin/data/sales')
-@admin_required
-def dataSales():
-    # [todo] - Add dataSales
-    raise NotImplementedError('dataSales')
+    statisticKeys = [
+        ('Battels', 'g-'),
+        ('Card', 'b-'),
+        ('Cash', 'r-'),
+        ('Cheque', 'y-'),
+        ('Free', 'c-')
+    ]
 
-@admin.route('/admin/data/colleges')
-@admin_required
-def dataColleges():
-    # [todo] - Add dataColleges
-    raise NotImplementedError('dataColleges')
+    plots = {
+        key: {
+            'timestamps': [],
+            'datapoints': [],
+            'line': line,
+            'currentValue': 0
+        } for (key, line) in statisticKeys
+    }
 
-@admin.route('/admin/data/payments')
+    for statistic in statistics:
+        plots[statistic.statistic]['timestamps'].append(statistic.timestamp)
+        plots[statistic.statistic]['datapoints'].append(statistic.value)
+        plots[statistic.statistic]['currentValue'] = statistic.value
+
+    return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
+
+@admin.route('/admin/data/<group>')
 @admin_required
-def dataPayments():
-    # [todo] - Add dataPayments
-    raise NotImplementedError('dataPayments')
+def data(group):
+    statistics = Statistic.query \
+        .filter(Statistic.group == group.title()) \
+        .order_by(Statistic.timestamp) \
+        .all()
+
+    csvdata = StringIO()
+    csvwriter = csv.writer(csvdata)
+
+    for stat in statistics:
+        csvwriter.writerow(
+            [
+                stat.timestamp.strftime('%c'),
+                stat.statistic,
+                stat.value
+            ]
+        )
+
+    csvdata.seek(0)
+    return send_file(csvdata, mimetype="text/csv")
