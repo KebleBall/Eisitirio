@@ -277,26 +277,42 @@ def adminHome(page=1):
 @admin.route('/admin/view/user/<int:id>')
 @admin_required
 def viewUser(id):
-    # [todo] - Add viewUser
-    raise NotImplementedError('viewUser')
+    user = User.get_by_id(id)
+
+    return render_template(
+        'admin/viewUser.html',
+        user=user
+    )
 
 @admin.route('/admin/view/ticket/<int:id>')
 @admin_required
 def viewTicket(id):
-    # [todo] - Add viewTicket
-    raise NotImplementedError('viewTicket')
+    ticket = Ticket.get_by_id(id)
+
+    return render_template(
+        'admin/viewTicket.html',
+        ticket=ticket
+    )
 
 @admin.route('/admin/view/log/<int:id>')
 @admin_required
 def viewLog(id):
-    # [todo] - Add viewLog
-    raise NotImplementedError('viewLog')
+    log = Log.get_by_id(id)
+
+    return render_template(
+        'admin/viewLog.html',
+        log=log
+    )
 
 @admin.route('/admin/view/transaction/<int:id>')
 @admin_required
 def viewTransaction(id):
-    # [todo] - Add viewTransaction
-    raise NotImplementedError('viewTransaction')
+    transaction = CardTransaction.get_by_id(id)
+
+    return render_template(
+        'admin/viewTransaction.html',
+        transaction=transaction
+    )
 
 @admin.route('/admin/statistics')
 @admin_required

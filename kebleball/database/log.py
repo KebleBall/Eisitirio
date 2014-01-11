@@ -145,3 +145,7 @@ class Log(db.Model):
             ),
             self.message
         )
+
+    @staticmethod
+    def get_by_id(id):
+        return Log.query.filter(Log.id == int(id)).first()
