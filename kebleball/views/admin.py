@@ -3,12 +3,15 @@ from flask import Blueprint, render_template, request, flash, send_file
 
 from kebleball.app import app
 from kebleball.helpers.login_manager import admin_required
+from kebleball.database import db
 from kebleball.database.user import User
 from kebleball.database.college import College
 from kebleball.database.affiliation import Affiliation
 from kebleball.database.ticket import Ticket
 from kebleball.database.log import Log
 from kebleball.database.statistic import Statistic
+from kebleball.database.waiting import Waiting
+from kebleball.database.card_transaction import CardTransaction
 from sqlalchemy.sql import text
 from dateutil.parser import parse
 from kebleball.helpers.statistic_plots import create_plot
@@ -330,6 +333,26 @@ def announcements():
 def vouchers():
     # [todo] - Add vouchers
     raise NotImplementedError('vouchers')
+
+@admin.route('/admin/delete/waiting/<int:id>')
+@admin_required
+def deleteWaiting(id):
+    waiting = Waiting.get_by_id(id)
+
+    if waiting:
+        db.session.delete(waiting)
+        db.session.commit()
+        flash(
+            u'Waiting list entry deleted',
+            'success'
+        )
+    else:
+        flash(
+            u'Waiting list entry not found, could not delete.',
+            'error'
+        )
+
+    return redirect(request.referrer or url_for(admin.adminHome))
 
 @admin.route('/admin/graphs/sales')
 @admin_required

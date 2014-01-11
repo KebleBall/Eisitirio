@@ -1,0 +1,116 @@
+<!-- admin/viewUser.html -->
+{% extends 'layout.html' %}
+
+{% block title %}{% if not user %}No User Found{% else %}View User - {{ user.fullname }}{% endif %}{% endblock %}
+
+{% block content %}
+    <section id="viewUser" class="columns">
+        {% if not user %}
+            <p>No user was found with that ID.</p>
+        {% else %}
+            <h4>User Details</h4>
+            <p><strong>First Name(s)</strong>: {{ user.firstname }}</p>
+            <p><strong>Last Name(s)</strong>: {{ user.surname }}</p>
+            <p><strong>Email</strong>: {{ user.email }}</p>
+            <p><strong>Phone</strong>: {{ user.phone }}</p>
+            <p><strong>College</strong>: {{ user.college.name }}</p>
+            <p><strong>Affiliation</strong>: {{ user.affiliation.name }}</p>
+            {% if user.battels != None and not user.battels.manual %}
+                <p><strong>Battels ID</strong>: {{ user.battels.battelsid }}</p>
+                <p><strong>MT Battels Charge</strong>: &pound;{{ '%.2f' % (user.battels.mt / 100.0) }}</p>
+                <p><strong>HT Battels Charge</strong>: &pound;{{ '%.2f' % (user.battels.ht / 100.0) }}</p>
+            {% endif %}
+            <h4>User Status</h4>
+            <ul>
+                <li>User <strong>is{% if not user.verified %} not{% endif %}</strong> verified.</li>
+                <li>User <strong>is{% if not user.deleted %} not{% endif %}</strong> deleted.</li>
+                <li>User <strong>is{% if not user.isAdmin() %} not{% endif %}</strong> an administrator.</li>
+                <li>User <strong>has{% if not user.hasTickets() %} no{% endif %}</strong> tickets.</li>
+                <li>User <strong>has{% if not user.hasUnpaidTickets() %} no{% endif %}</strong> unpaid tickets.</li>
+                <li>User <strong>has{% if not user.hasPaidTickets() %} no{% endif %}</strong> paid tickets.</li>
+                <li>User <strong>has{% if not user.hasUncollectedTickets() %} no{% endif %}</strong> uncollected tickets.</li>
+                <li>User <strong>is{% if not user.isWaiting() %} not{% endif %}</strong> waiting.</li>
+                <li>User <strong>is{% if not user.isResellingTickets() %} not{% endif %}</strong> reselling tickets.</li>
+                <li>User <strong>can{% if not user.canPayByBattels() %} not{% endif %}</strong> pay for tickets by battels.</li>
+            </ul>
+            <h4>User Notes</h4>
+            {% if user.note %}
+                {{ user.note|markdown }}
+            {% else %}
+                <p>No notes.</p>
+            {% endif %}
+            <h4>User's Tickets</h4>
+            {% if user.tickets.count() > 0 %}
+                <table id="ticketsTable">
+                    <thead>
+                        <tr>
+                            <th>Ticket Number</th>
+                            <th>Name on Ticket</th>
+                            <th>Ticket Status</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in user.tickets %}
+                            <tr id="ticket-{{ ticket.id }}">
+                                <td>#{{ '%05d' % ticket.id }}</td>
+                                <td>
+                                    {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
+                                </td>
+                                <td>
+                                    {% if ticket.cancelled -%}
+                                        Cancelled.
+                                    {% elif ticket.collected -%}
+                                        Collected.
+                                    {% elif ticket.resalekey != None -%}
+                                        {% if ticket.resaleconfirmed -%}
+                                            Pending resale completion
+                                        {% else -%}
+                                            Pending resale confirmation
+                                        {% endif %}
+                                    {% elif ticket.paid -%}
+                                        {% if ticket.payment_method == 'Free' -%}
+                                            Free Ticket.
+                                        {% else -%}
+                                            Paid for by {{ ticket.paymentmethod }}.
+                                        {% endif %}
+                                    {% else -%}
+                                        Awaiting {{ ticket.paymentmethod }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin.viewTicket', id=ticket.id) }}" class="button tiny">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No tickets.</p>
+            {% endif %}
+            <h4>User's Waiting</h4>
+            {% if user.waiting.count() > 0 %}
+                <table id="waitingTable">
+                    <thead>
+                        <tr>
+                            <th>Waiting for</th>
+                            <th>Waiting since</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for waiting in user.waiting %}
+                            <tr>
+                                <td>{{ waiting.waitingfor }}</td>
+                                <td>{{ waiting.waitingsince.strftime('%c') }}</td>
+                                <td><a href="{{ url_for('admin.deleteWaiting', id=waiting.id) }}" class="button tiny">Remove</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Not Waiting.</p>
+            {% endif %}
+        {% endif %}
+    </section>
+{% endblock %}

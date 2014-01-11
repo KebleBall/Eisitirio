@@ -75,3 +75,7 @@ class Waiting(db.Model):
             self.waitingfor,
             '' if self.waitingfor == 1 else 's'
         )
+
+    @staticmethod
+    def get_by_id(id):
+        return Ticket.query.filter(Ticket.id == int(id)).first()
