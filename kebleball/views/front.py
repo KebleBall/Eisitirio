@@ -452,6 +452,22 @@ def destroyAccount(userID, secretkey):
 @front.route('/logout')
 @login_required
 def logout():
+    if 'actor_id' in session:
+        log_event(
+            'Finished impersonating user',
+            [],
+            current_user
+        )
+
+        actor = User.get_by_id(session['actor_id'])
+
+        if actor:
+            login_user(
+                actor
+            )
+
+            return redirect(url_for('admin.adminHome'))
+
     log_event(
         'Logged Out',
         [],

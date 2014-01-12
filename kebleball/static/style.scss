@@ -75,3 +75,15 @@ p.small {
 table .button {
     margin: 0;
 }
+
+#giveTickets {
+    input {
+        display: inline;
+        &[type="number"] {
+            width: 5rem;
+        }
+        &[type="text"] {
+            width: auto;
+        }
+    }
+}

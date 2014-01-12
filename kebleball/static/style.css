@@ -1382,3 +1382,10 @@ p.small { font-size: 0.75rem; }
 
 /* line 75, style.scss */
 table .button { margin: 0; }
+
+/* line 80, style.scss */
+#giveTickets input { display: inline; }
+/* line 82, style.scss */
+#giveTickets input[type="number"] { width: 5rem; }
+/* line 85, style.scss */
+#giveTickets input[type="text"] { width: auto; }

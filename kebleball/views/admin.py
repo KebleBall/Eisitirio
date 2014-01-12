@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask import Blueprint, render_template, request, flash, send_file, redirect, url_for
+from flask import Blueprint, render_template, request, flash, send_file, redirect, url_for, session
 
 from kebleball.app import app
 from kebleball.helpers.login_manager import admin_required
@@ -13,12 +13,14 @@ from kebleball.database.statistic import Statistic
 from kebleball.database.waiting import Waiting
 from kebleball.database.card_transaction import CardTransaction
 from flask.ext.sqlalchemy import Pagination
+from flask.ext.login import current_user, login_user
 from dateutil.parser import parse
 from kebleball.helpers.statistic_plots import create_plot
 from StringIO import StringIO
 import csv
 
 log = app.log_manager.log_admin
+log_event = app.log_manager.log_event
 
 admin = Blueprint('admin', __name__)
 
@@ -314,32 +316,202 @@ def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
 @admin.route('/admin/user/<int:id>/impersonate')
 @admin_required
 def impersonateUser(id):
-    raise NotImplementedError('impersonateUser')
+    user = User.get_by_id(id)
 
-@admin.route('/admin/user/<int:id>/give')
+    if user:
+        session['actor_id'] = current_user.id
+
+        login_user(
+            user,
+            remember=False
+        )
+
+        log_event(
+            'Started impersonating user',
+            [],
+            user
+        )
+
+        return redirect(url_for('dashboard.dashboardHome'))
+    else:
+        flash(
+            u'Could not find user, could not impersonate.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
+@admin.route('/admin/user/<int:id>/give', methods=['POST'])
 @admin_required
 def giveUser(id):
-    raise NotImplementedError('giveUser')
+    user = User.get_by_id(id)
 
-@admin.route('/admin/user/<int:id>/note')
+    if user:
+        price = (
+            int(request.form['givePricePounds']) * 100 +
+            int(request.form['givePricePence'])
+        )
+        numTickets=int(request.form['giveNumTickets'])
+
+        if (
+            'giveReason' not in request.form or
+            request.form['giveReason'] == ''
+        ):
+            note = 'Given by {0} (#{1}) for no reason.'.format(
+                current_user.fullname,
+                current_user.id
+            )
+        else:
+            note = 'Given by {0} (#{1}) with reason: {2}.'.format(
+                current_user.fullname,
+                current_user.id,
+                request.form['giveReason']
+            )
+
+        tickets = []
+
+        for i in xrange(numTickets):
+            ticket = Ticket(
+                user,
+                None,
+                price
+            )
+            ticket.addNote(note)
+            tickets.append(ticket)
+
+        db.session.add_all(tickets)
+        db.session.commit()
+
+        log_event(
+            'Gave {0} tickets'.format(
+                numTickets
+            ),
+            tickets,
+            user
+        )
+
+        flash(
+            u'Gave {0} {1} tickets'.format(
+                user.firstname,
+                numTickets
+            ),
+            'success'
+        )
+
+        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+    else:
+        flash(
+            u'Could not find user, could not give tickets.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
+@admin.route('/admin/user/<int:id>/note', methods=['POST'])
 @admin_required
 def noteUser(id):
-    raise NotImplementedError('noteUser')
+    user = User.get_by_id(id)
+
+    if user:
+        user.note = request.form['notes']
+        db.session.commit()
+
+        log_event(
+            'Updated notes',
+            [],
+            user
+        )
+
+        flash(
+            u'Notes set successfully.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+    else:
+        flash(
+            u'Could not find user, could not set notes.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/user/<int:id>/verify')
 @admin_required
 def verifyUser(id):
-    raise NotImplementedError('verifyUser')
+    user = User.get_by_id(id)
+
+    if user:
+        user.verified = True
+        db.session.commit()
+
+        log_event(
+            'Verified email',
+            [],
+            user
+        )
+
+        flash(
+            u'User marked as verified.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+    else:
+        flash(
+            u'Could not find user, could not verify.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/user/<int:id>/demote')
 @admin_required
 def demoteUser(id):
-    raise NotImplementedError('demoteUser')
+    user = User.get_by_id(id)
+
+    if user:
+        user.demote()
+        db.session.commit()
+
+        log_event(
+            'Demoted user',
+            [],
+            user
+        )
+
+        flash(
+            u'User demoted.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+    else:
+        flash(
+            u'Could not find user, could not demote.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/user/<int:id>/promote')
 @admin_required
 def promoteUser(id):
-    raise NotImplementedError('promoteUser')
+    user = User.get_by_id(id)
+
+    if user:
+        user.promote()
+        db.session.commit()
+
+        log_event(
+            'Promoted user',
+            [],
+            user
+        )
+
+        flash(
+            u'User promoted.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+    else:
+        flash(
+            u'Could not find user, could not promote.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/ticket/<int:id>/view')
 @admin_required
