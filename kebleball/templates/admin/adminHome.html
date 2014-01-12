@@ -211,8 +211,8 @@
             </fieldset>
             <div class="row">
                 <div class="large-3 columns">
-                    {% if currentPage > 1 %}
-                        <input type="submit" formaction="{{ url_for('admin.adminHome', page=(currentPage-1)) }}" value="Previous Page" class="button"/>
+                    {% if category != None and results.has_prev %}
+                        <input type="submit" formaction="{{ url_for('admin.adminHome', page=results.prev_num) }}" value="Previous Page" class="button"/>
                     {% else %}
                         &nbsp;
                     {% endif %}
@@ -234,15 +234,15 @@
                     </div>
                 </div>
                 <div class="large-3 columns">
-                    {% if canGoForwards %}
-                        <input type="submit" formaction="{{ url_for('admin.adminHome', page=(currentPage+1)) }}" value="Next Page" class="button right"/>
+                    {% if category != None and results.has_next %}
+                        <input type="submit" formaction="{{ url_for('admin.adminHome', page=results.next_num) }}" value="Next Page" class="button right"/>
                     {% else %}
                         &nbsp;
                     {% endif %}
                 </div>
             </div>
         </form>
-        {% if userResults %}
+        {% if category == 'User' %}
             <h3>User Search Results</h3>
             <table id="usersTable">
                 <thead>
@@ -254,7 +254,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for user in userResults %}
+                    {% for user in results.items %}
                         <tr id="user-{{ user.id }}">
                             <td>#{{ '%05d' % user.id }}</td>
                             <td>{{ user.fullname }}</td>
@@ -264,7 +264,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-        {% elif ticketResults %}
+        {% elif category == 'Ticket' %}
             <h3>Ticket Search Results</h3>
             <table id="ticketsTable">
                 <thead>
@@ -276,7 +276,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for ticket in ticketResults %}
+                    {% for ticket in results.items %}
                         <tr id="ticket-{{ ticket.id }}">
                             <td>#{{ '%05d' % ticket.id }}</td>
                             <td>{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</td>
@@ -306,7 +306,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-        {% elif logResults %}
+        {% elif category == 'Log' %}
             <h3>Log Search Results</h3>
             <table id="ticketsTable">
                 <thead>
@@ -320,7 +320,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for log in logResults %}
+                    {% for log in results.items %}
                         <tr id="log-{{ log.id }}">
                             <td>{{ log.timestamp.strftime('%c') }}</td>
                             <td>{{ log.ip }}</td>
@@ -332,8 +332,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-        {% elif ranQuery %}
-            <h3>No {% if currentPage > 1 %}More {% endif %}Results Found</h3>
         {% endif %}
     </section>
 {% endblock %}

@@ -12,7 +12,7 @@ from kebleball.database.log import Log
 from kebleball.database.statistic import Statistic
 from kebleball.database.waiting import Waiting
 from kebleball.database.card_transaction import CardTransaction
-from sqlalchemy.sql import text
+from flask.ext.sqlalchemy import Pagination
 from dateutil.parser import parse
 from kebleball.helpers.statistic_plots import create_plot
 from StringIO import StringIO
@@ -23,13 +23,11 @@ log = app.log_manager.log_admin
 admin = Blueprint('admin', __name__)
 
 @admin.route('/admin', methods=['GET', 'POST'])
-@admin.route('/admin/<int:page>', methods=['GET', 'POST'])
+@admin.route('/admin/page/<int:page>', methods=['GET', 'POST'])
 @admin_required
 def adminHome(page=1):
-    userResults = []
-    ticketResults = []
-    logResults = []
-    canGoForwards = False
+    results = None
+    category = None
     form = {}
 
     if request.method == 'POST':
@@ -219,10 +217,8 @@ def adminHome(page=1):
                         User.events
                     )
 
-            userQuery = userQuery.limit(numPerPage)
-            userQuery = userQuery.offset(numPerPage * (page - 1))
-            userResults = userQuery.all()
-            canGoForwards = (len(userResults) == numPerPage)
+            results = userQuery.paginate(page, numPerPage)
+            category = 'User'
         elif request.form['search'] == 'ticket':
             if hasUserFilter:
                 ticketQuery = ticketQuery.join(
@@ -236,10 +232,8 @@ def adminHome(page=1):
                     Ticket.log_entries
                 )
 
-            ticketQuery = ticketQuery.limit(numPerPage)
-            ticketQuery = ticketQuery.offset(numPerPage * (page - 1))
-            ticketResults = ticketQuery.all()
-            canGoForwards = (len(ticketResults) == numPerPage)
+            results = ticketQuery.paginate(page, numPerPage)
+            category = 'Ticket'
         elif request.form['search'] == 'log':
             if hasUserFilter:
                 if request.form['logUser'] == 'Actor':
@@ -259,22 +253,16 @@ def adminHome(page=1):
                     Log.tickets
                 )
 
-            logQuery = logQuery.limit(numPerPage)
-            logQuery = logQuery.offset(numPerPage * (page - 1))
-            logResults = logQuery.all()
-            canGoForwards = (len(logResults) == numPerPage)
+            results = logQuery.paginate(page, numPerPage)
+            category = 'Log'
 
     return render_template(
         'admin/adminHome.html',
         form=form,
         colleges = College.query.all(),
         affiliations = Affiliation.query.all(),
-        userResults=userResults,
-        ticketResults=ticketResults,
-        logResults=logResults,
-        ranQuery=(request.method == 'POST'),
-        currentPage=page,
-        canGoForwards=canGoForwards
+        results=results,
+        category=category
     )
 
 @admin.route('/admin/user/<int:id>/view')
