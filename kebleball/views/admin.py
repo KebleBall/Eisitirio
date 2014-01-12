@@ -277,10 +277,10 @@ def adminHome(page=1):
         canGoForwards=canGoForwards
     )
 
-@admin.route('/admin/view/user/<int:id>')
-@admin.route('/admin/view/user/<int:id>/page/selfactions/<int:selfActionsPage>')
-@admin.route('/admin/view/user/<int:id>/page/actions/<int:actionsPage>')
-@admin.route('/admin/view/user/<int:id>/page/events/<int:eventsPage>')
+@admin.route('/admin/user/<int:id>/view')
+@admin.route('/admin/user/<int:id>/view/page/selfactions/<int:selfActionsPage>')
+@admin.route('/admin/user/<int:id>/view/page/actions/<int:actionsPage>')
+@admin.route('/admin/user/<int:id>/view/page/events/<int:eventsPage>')
 @admin_required
 def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
     user = User.get_by_id(id)
@@ -323,7 +323,37 @@ def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
         eventsPage=eventsPage
     )
 
-@admin.route('/admin/view/ticket/<int:id>')
+@admin.route('/admin/user/<int:id>/impersonate')
+@admin_required
+def impersonateUser(id):
+    raise NotImplementedError('impersonateUser')
+
+@admin.route('/admin/user/<int:id>/give')
+@admin_required
+def giveUser(id):
+    raise NotImplementedError('giveUser')
+
+@admin.route('/admin/user/<int:id>/note')
+@admin_required
+def noteUser(id):
+    raise NotImplementedError('noteUser')
+
+@admin.route('/admin/user/<int:id>/verify')
+@admin_required
+def verifyUser(id):
+    raise NotImplementedError('verifyUser')
+
+@admin.route('/admin/user/<int:id>/demote')
+@admin_required
+def demoteUser(id):
+    raise NotImplementedError('demoteUser')
+
+@admin.route('/admin/user/<int:id>/promote')
+@admin_required
+def promoteUser(id):
+    raise NotImplementedError('promoteUser')
+
+@admin.route('/admin/ticket/<int:id>/view')
 @admin_required
 def viewTicket(id):
     ticket = Ticket.get_by_id(id)
@@ -333,7 +363,12 @@ def viewTicket(id):
         ticket=ticket
     )
 
-@admin.route('/admin/view/log/<int:id>')
+@admin.route('/admin/ticket/collect')
+@admin_required
+def collectTicket():
+    raise NotImplementedError('collectTicket')
+
+@admin.route('/admin/log/<int:id>/view')
 @admin_required
 def viewLog(id):
     log = Log.get_by_id(id)
@@ -343,7 +378,7 @@ def viewLog(id):
         log=log
     )
 
-@admin.route('/admin/view/transaction/<int:id>')
+@admin.route('/admin/transaction/<int:id>/view')
 @admin_required
 def viewTransaction(id):
     transaction = CardTransaction.get_by_id(id)
