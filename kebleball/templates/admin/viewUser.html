@@ -111,6 +111,129 @@
             {% else %}
                 <p>Not Waiting.</p>
             {% endif %}
+            <h4>User's Card Transactions</h4>
+            {% if user.transactions.count() > 0 %}
+                <table id="transactionTable">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Commenced</th>
+                            <th>Success</th>
+                            <th>Status</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in user.transactions %}
+                            <tr>
+                                <td>{{ '%05d' % transaction.id }}</td>
+                                <td>{{ transaction.commenced.strftime('%c') }}</td>
+                                <td>{{ transaction.getSuccess() }}</td>
+                                <td>{{ transaction.getStatus()[1] }}</td>
+                                <td><a href="{{ url_for('admin.viewTransaction', id=transaction.id) }}" class="button tiny">View</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No transactions.</p>
+            {% endif %}
+            <a id="selfActions"></a>
+            <h4>User's Events (performed by user)</h4>
+            {% if selfActions.items %}
+                <table id="selfActionsTable">
+                    <thead>
+                        <tr>
+                            <th>Log ID</th>
+                            <th>Timestamp</th>
+                            <th>Message</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in selfActions.items %}
+                            <tr>
+                                <td>{{ '%05d' % log.id }}</td>
+                                <td>{{ log.timestamp.strftime('%c') }}</td>
+                                <td>{{ log.action }}</td>
+                                <td><a href="{{ url_for('admin.viewLog', id=log.id) }}" class="button tiny">View</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if selfActions.has_prev %}
+                    <a href="{{ url_for('admin.viewUser', id=user.id, selfActionsPage=(selfActionsPage-1)) }}#selfActions" class="button tiny">Previous Page</a>
+                {% endif %}
+                {% if selfActions.has_next %}
+                    <a href="{{ url_for('admin.viewUser', id=user.id, selfActionsPage=(selfActionsPage+1)) }}#selfActions" class="button tiny">Next Page</a>
+                {% endif %}
+            {% else %}
+                <p>No events performed by user on self.</p>
+            {% endif %}
+            <a id="events"></a>
+            <h4>User's Events (performed by others)</h4>
+            {% if events.items %}
+                <table id="eventsTable">
+                    <thead>
+                        <tr>
+                            <th>Log ID</th>
+                            <th>Timestamp</th>
+                            <th>Message</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in events.items %}
+                            <tr>
+                                <td>{{ '%05d' % log.id }}</td>
+                                <td>{{ log.timestamp.strftime('%c') }}</td>
+                                <td>{{ log.action }}</td>
+                                <td><a href="{{ url_for('admin.viewLog', id=log.id) }}" class="button tiny">View</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if events.has_prev %}
+                    <a href="{{ url_for('admin.viewUser', id=user.id, eventsPage=(eventsPage-1)) }}#events" class="button tiny">Previous Page</a>
+                {% endif %}
+                {% if events.has_next %}
+                    <a href="{{ url_for('admin.viewUser', id=user.id, eventsPage=(eventsPage+1)) }}#events" class="button tiny">Next Page</a>
+                {% endif %}
+            {% else %}
+                <p>No events performed on user by others.</p>
+            {% endif %}
+            <a id="otherActions"></a>
+            <h4>User's Actions (performed on others)</h4>
+            {% if otherActions.items %}
+                <table id="otherActionsTable">
+                    <thead>
+                        <tr>
+                            <th>Log ID</th>
+                            <th>Timestamp</th>
+                            <th>Message</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in otherActions.items %}
+                            <tr>
+                                <td>{{ '%05d' % log.id }}</td>
+                                <td>{{ log.timestamp.strftime('%c') }}</td>
+                                <td>{{ log.action }}</td>
+                                <td><a href="{{ url_for('admin.viewLog', id=log.id) }}" class="button tiny">View</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if otherActions.has_prev %}
+                    <a href="{{ url_for('admin.viewUser', id=user.id, actionsPage=(actionsPage-1)) }}#otherActions" class="button tiny">Previous Page</a>
+                {% endif %}
+                {% if otherActions.has_next %}
+                    <a href="{{ url_for('admin.viewUser', id=user.id, actionsPage=(actionsPage+1)) }}#otherActions" class="button tiny">Next Page</a>
+                {% endif %}
+            {% else %}
+                <p>No events performed by user on others.</p>
+            {% endif %}
         {% endif %}
     </section>
 {% endblock %}

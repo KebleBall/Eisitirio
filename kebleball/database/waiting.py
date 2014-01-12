@@ -78,4 +78,4 @@ class Waiting(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        return Ticket.query.filter(Ticket.id == int(id)).first()
+        return Waiting.query.filter(Waiting.id == int(id)).first()

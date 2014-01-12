@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask import Blueprint, render_template, request, flash, send_file
+from flask import Blueprint, render_template, request, flash, send_file, redirect, url_for
 
 from kebleball.app import app
 from kebleball.helpers.login_manager import admin_required
@@ -278,13 +278,49 @@ def adminHome(page=1):
     )
 
 @admin.route('/admin/view/user/<int:id>')
+@admin.route('/admin/view/user/<int:id>/page/selfactions/<int:selfActionsPage>')
+@admin.route('/admin/view/user/<int:id>/page/actions/<int:actionsPage>')
+@admin.route('/admin/view/user/<int:id>/page/events/<int:eventsPage>')
 @admin_required
-def viewUser(id):
+def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
     user = User.get_by_id(id)
+
+    if user:
+        selfActions = user.actions \
+            .filter(Log.actor_id == Log.user_id) \
+            .paginate(
+                selfActionsPage,
+                10,
+                True
+            )
+        otherActions = user.actions \
+            .filter(Log.actor_id != Log.user_id) \
+            .paginate(
+                actionsPage,
+                10,
+                True
+            )
+        events = user.events \
+            .filter(Log.actor_id != Log.user_id) \
+            .paginate(
+                eventsPage,
+                10,
+                True
+            )
+    else:
+        selfActions = None
+        otherActions = None
+        events = None
 
     return render_template(
         'admin/viewUser.html',
-        user=user
+        user=user,
+        selfActions=selfActions,
+        otherActions=otherActions,
+        events=events,
+        selfActionsPage=selfActionsPage,
+        actionsPage=actionsPage,
+        eventsPage=eventsPage
     )
 
 @admin.route('/admin/view/ticket/<int:id>')

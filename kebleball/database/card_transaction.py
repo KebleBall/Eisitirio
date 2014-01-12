@@ -152,6 +152,15 @@ class CardTransaction(db.Model):
         except KeyError as e:
             return (False, 'Unknown response: {0}'.format(e.args[0]))
 
+    def getSuccess(self):
+        success = self.getStatus()[0]
+        if success is None:
+            return 'Incomplete'
+        elif success:
+            return 'Successful'
+        else:
+            return 'Unsuccessful'
+
     def sendRequest(self, endpoint, data=None):
         url = app.config['EWAY_API_BASE'] + endpoint + '.json'
         payload = json.dumps(data)

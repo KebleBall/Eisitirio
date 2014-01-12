@@ -1379,3 +1379,6 @@ a { font-weight: bold; }
 
 /* line 71, style.scss */
 p.small { font-size: 0.75rem; }
+
+/* line 75, style.scss */
+table .button { margin: 0; }
