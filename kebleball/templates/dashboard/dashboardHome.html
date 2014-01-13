@@ -5,7 +5,7 @@
 
 {% block content %}
     <section id="dashboard" class="columns">
-        <h3>Your Tickets</h3>
+        <h3>Your Tickets <a href="{{ url_for('purchase.purchaseHome') }}" class="button">Buy Tickets</a></h3>
         {% if current_user.tickets.count() > 0 %}
             <table id="ticketsTable">
                 <thead>

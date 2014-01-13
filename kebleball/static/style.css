@@ -1389,3 +1389,6 @@ table .button { margin: 0; }
 #giveTickets input[type="number"] { width: 5rem; }
 /* line 85, style.scss */
 #giveTickets input[type="text"] { width: auto; }
+
+/* line 91, style.scss */
+#dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }

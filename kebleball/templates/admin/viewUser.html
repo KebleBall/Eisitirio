@@ -123,6 +123,35 @@
             {% else %}
                 <p>Not Waiting.</p>
             {% endif %}
+            <h4>User's Referrals</h4>
+            {% if user.referrals.count() > 0 %}
+                <table id="ticketsTable">
+                    <thead>
+                        <tr>
+                            <th>Ticket Number</th>
+                            <th>Name on Ticket</th>
+                            <th>Ticket Owner</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in user.referrals %}
+                            <tr id="ticket-{{ ticket.id }}">
+                                <td>#{{ '%05d' % ticket.id }}</td>
+                                <td>
+                                    {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
+                                </td>
+                                <td>{{ ticket.owner.fullname }}</td>
+                                <td>
+                                    <a href="{{ url_for('admin.viewTicket', id=ticket.id) }}" class="button tiny">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No referrals.</p>
+            {% endif %}
             <h4>User's Card Transactions</h4>
             {% if user.transactions.count() > 0 %}
                 <table id="transactionTable">

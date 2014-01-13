@@ -143,7 +143,11 @@ class Ticket(db.Model):
     transactions = db.relationship(
         'CardTransaction',
         secondary=ticket_transaction_link,
-        backref='tickets'
+        backref=db.backref(
+            'tickets',
+            lazy='dynamic'
+        ),
+        lazy='dynamic'
     )
 
     card_transaction_id = db.Column(

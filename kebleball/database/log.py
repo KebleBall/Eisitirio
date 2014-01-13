@@ -72,7 +72,11 @@ class Log(db.Model):
     tickets = db.relationship(
         'Ticket',
         secondary=log_ticket_link,
-        backref='log_entries'
+        backref=db.backref(
+            'log_entries',
+            lazy='dynamic'
+        ),
+        lazy='dynamic'
     )
 
     transaction_id = db.Column(

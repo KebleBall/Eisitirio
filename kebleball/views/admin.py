@@ -513,20 +513,73 @@ def promoteUser(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
+@admin.route('/admin/user/<int:id>/collect', methods=['GET','POST'])
+@admin_required
+def collectTickets(id):
+    raise NotImplementedError('collectTickets')
+
 @admin.route('/admin/ticket/<int:id>/view')
 @admin_required
-def viewTicket(id):
+def viewTicket(id, eventsPage=1):
     ticket = Ticket.get_by_id(id)
+
+    if ticket:
+        events = ticket.log_entries \
+            .paginate(
+                eventsPage,
+                10,
+                True
+            )
+    else:
+        events = None
 
     return render_template(
         'admin/viewTicket.html',
-        ticket=ticket
+        ticket=ticket,
+        events=events,
+        eventsPage=eventsPage
     )
 
-@admin.route('/admin/ticket/collect')
+@admin.route('/admin/ticket/<int:id>/note', methods=['POST'])
 @admin_required
-def collectTicket():
-    raise NotImplementedError('collectTicket')
+def noteTicket(id):
+    ticket = Ticket.get_by_id(id)
+
+    if ticket:
+        ticket.note = request.form['notes']
+        db.session.commit()
+
+        log_event(
+            'Updated notes',
+            [ticket]
+        )
+
+        flash(
+            u'Notes set successfully.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+    else:
+        flash(
+            u'Could not find ticket, could not set notes.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
+@admin.route('/admin/ticket/<int:id>/markpaid')
+@admin_required
+def markTicketPaid(id):
+    raise NotImplementedError('markTicketPaid')
+
+@admin.route('/admin/ticket/<int:id>/autocancel')
+@admin_required
+def autoCancelTicket(id):
+    raise NotImplementedError('autoCancelTicket')
+
+@admin.route('/admin/ticket/<int:id>/cancel')
+@admin_required
+def cancelTicket(id):
+    raise NotImplementedError('cancelTicket')
 
 @admin.route('/admin/log/<int:id>/view')
 @admin_required
