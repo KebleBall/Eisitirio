@@ -11,7 +11,8 @@ def create_plot(plots, xLimMin, xLimMax):
             plot['timestamps'],
             plot['datapoints'],
             plot['line'],
-            label=(label + ' - ' + str(plot['currentValue']))
+            label=(label + ' - ' + str(plot['currentValue'])),
+            markevery=18
         )
 
 
