@@ -205,7 +205,7 @@ class CardTransaction(db.Model):
             "CancelUrl": url_for("purchase.ewayCancel", id=self.id, _external=True),
             "Method": "ProcessPayment",
             "TransactionType": "Purchase",
-            "LogoUrl": "https://www.kebleball.com/tickets/static/ewayhead.jpg",
+            "LogoUrl": "https://www.kebleball.com/assets/building_big.jpg",
             "HeaderText": "Keble Ball {0}".format(
                 app.config['START_TIME'].strftime('%Y')
             ),
