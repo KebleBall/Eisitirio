@@ -20,5 +20,15 @@
         <a href="{{ url_for('admin.graphColleges') }}" target="_blank">
             <img src="{{ url_for('admin.graphColleges') }}" />
         </a>
+        <h4>Revenue Report</h4>
+        <p>Total Value of Tickets Sold: &pound;{{ '%.2f' % (totalValue / 100) }}</p>
+        <p>Total Value of Paid Tickets: &pound;{{ '%.2f' % (paidValue / 100) }}</p>
+        <p>Total Value of Cancelled/Expired Tickets: &pound;{{ '%.2f' % (cancelledValue / 100) }}</p>
+        <h5>By Payment Method</h5>
+        <ul>
+            {% for value, method in paymentMethodValues %}
+                <li>{{ method }}: &pound;{{ '%.2f' % (value / 100) }}</li>
+            {% endfor %}
+        </ul>
     </section>
 {% endblock %}

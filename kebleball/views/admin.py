@@ -17,6 +17,7 @@ from flask.ext.login import current_user, login_user
 from dateutil.parser import parse
 from kebleball.helpers.statistic_plots import create_plot
 from StringIO import StringIO
+from sqlalchemy import func
 import csv
 
 log = app.log_manager.log_admin
@@ -733,7 +734,35 @@ def refundTransaction(id):
 @admin.route('/admin/statistics')
 @admin_required
 def statistics():
-    return render_template('admin/statistics.html')
+    totalValue = db.session \
+        .query(func.sum(Ticket.price)) \
+        .filter(Ticket.cancelled != True) \
+        .scalar()
+
+    paidValue = db.session \
+        .query(func.sum(Ticket.price)) \
+        .filter(Ticket.paid == True) \
+        .filter(Ticket.cancelled != True) \
+        .scalar()
+
+    cancelledValue = db.session \
+        .query(func.sum(Ticket.price)) \
+        .filter(Ticket.cancelled == True) \
+        .scalar()
+
+    paymentMethodValues = db.session \
+        .query(func.sum(Ticket.price), Ticket.paymentmethod) \
+        .filter(Ticket.cancelled != True) \
+        .group_by(Ticket.paymentmethod) \
+        .all()
+
+    return render_template(
+        'admin/statistics.html',
+        totalValue=totalValue,
+        paidValue=paidValue,
+        cancelledValue=cancelledValue,
+        paymentMethodValues=paymentMethodValues
+    )
 
 @admin.route('/admin/announcements')
 @admin_required
