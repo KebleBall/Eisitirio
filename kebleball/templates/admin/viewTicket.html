@@ -47,7 +47,6 @@
                         <li><a href="{{ url_for('admin.autoCancelTicket', id=ticket.id) }}" class="button tiny">Refund &amp; Cancel</a></li>
                     {% endif %}
                     <li><a href="{{ url_for('admin.cancelTicket', id=ticket.id) }}" class="button tiny">Cancel</a><span class="small">N.B. This does not process any refund on the ticket</span></li>
-                    }
                 {% endif %}
                 <li><a href="{{ url_for('admin.markTicketPaid', id=ticket.id) }}" class="button tiny">Mark as Paid</a></li>
             </ul>
@@ -96,7 +95,7 @@
                             <tr>
                                 <td>{{ '%05d' % log.id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="url_for('admin.viewUser', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
+                                <td><a href="{{ url_for('admin.viewUser', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
                                 <td>{{ log.action }}</td>
                                 <td><a href="{{ url_for('admin.viewLog', id=log.id) }}" class="button tiny">View</a></td>
                             </tr>

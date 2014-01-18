@@ -44,6 +44,11 @@ class CardTransaction(db.Model):
         db.Integer(),
         nullable=True
     )
+    refunded = db.Column(
+        db.Integer(),
+        nullable=False,
+        default=0
+    )
 
     user_id = db.Column(
         db.Integer,
@@ -401,7 +406,7 @@ class CardTransaction(db.Model):
         )
 
         if success:
-            self.refunded = amount
+            self.refunded = self.refunded + amount
             db.session.commit()
 
             app.log_manager.log_event(

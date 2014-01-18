@@ -519,6 +519,7 @@ def collectTickets(id):
     raise NotImplementedError('collectTickets')
 
 @admin.route('/admin/ticket/<int:id>/view')
+@admin.route('/admin/ticket/<int:id>/view/page/<int:eventsPage>')
 @admin_required
 def viewTicket(id, eventsPage=1):
     ticket = Ticket.get_by_id(id)
@@ -569,17 +570,98 @@ def noteTicket(id):
 @admin.route('/admin/ticket/<int:id>/markpaid')
 @admin_required
 def markTicketPaid(id):
-    raise NotImplementedError('markTicketPaid')
+    ticket = Ticket.get_by_id(id)
+
+    if ticket:
+        ticket.paid = True
+        db.session.commit()
+
+        log_event(
+            'Marked as paid',
+            [ticket]
+        )
+
+        flash(
+            u'Ticket successfully marked as paid.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+    else:
+        flash(
+            u'Could not find ticket, could not mark as paid.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/ticket/<int:id>/autocancel')
 @admin_required
 def autoCancelTicket(id):
-    raise NotImplementedError('autoCancelTicket')
+    ticket = Ticket.get_by_id(id)
+
+    if ticket:
+        if not ticket.canBeCancelledAutomatically():
+            flash(
+                u'Could not automatically cancel ticket.',
+                'warning'
+            )
+            return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+
+        if ticket.paymentmethod == 'Battels':
+            ticket.battels.cancel(ticket)
+        elif ticket.paymentmethod == 'Card':
+            refundResult = ticket.card_transaction.processRefund(ticket.price)
+            if not refundResult:
+                flash(
+                    u'Could not process card refund.',
+                    'warning'
+                )
+                return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+
+        ticket.cancelled = True
+        db.session.commit()
+
+        log_event(
+            'Cancelled and refunded ticket',
+            [ticket]
+        )
+
+        flash(
+            u'Ticket cancelled successfully.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+    else:
+        flash(
+            u'Could not find ticket, could not cancel.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/ticket/<int:id>/cancel')
 @admin_required
 def cancelTicket(id):
-    raise NotImplementedError('cancelTicket')
+    ticket = Ticket.get_by_id(id)
+
+    if ticket:
+        ticket.cancelled = True
+        db.session.commit()
+
+        log_event(
+            'Marked ticket as cancelled',
+            [ticket]
+        )
+
+        flash(
+            u'Ticket cancelled successfully.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+    else:
+        flash(
+            u'Could not find ticket, could not cancel.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/log/<int:id>/view')
 @admin_required
@@ -592,14 +674,61 @@ def viewLog(id):
     )
 
 @admin.route('/admin/transaction/<int:id>/view')
+@admin.route('/admin/transaction/<int:id>/view/page/<int:eventsPage>')
 @admin_required
-def viewTransaction(id):
+def viewTransaction(id, eventsPage=1):
     transaction = CardTransaction.get_by_id(id)
+
+    if transaction:
+        events = transaction.events \
+            .paginate(
+                eventsPage,
+                10,
+                True
+            )
+    else:
+        events = None
 
     return render_template(
         'admin/viewTransaction.html',
-        transaction=transaction
+        transaction=transaction,
+        events=events,
+        eventsPage=eventsPage
     )
+
+@admin.route('/admin/transaction/<int:id>/refund', methods=['POST'])
+@admin_required
+def refundTransaction(id):
+    transaction = CardTransaction.get_by_id(id)
+
+    if transaction:
+        amount = int(request.form['refundAmountPounds']) * 100 + int(request.form['refundAmountPence'])
+
+        if amount > (transaction.getValue() - transaction.refunded):
+            flash(
+                u'Cannot refund more than has been charged.',
+                'warning'
+            )
+            return redirect(request.referrer or url_for('admin.viewTransaction', id=transaction.id))
+
+        result = transaction.processRefund(amount)
+
+        if not result:
+            flash(
+                u'Could not process refund.',
+                'warning'
+            )
+        else:flash(
+                u'Refund processed successfully.',
+                'success'
+            )
+        return redirect(request.referrer or url_for('admin.viewTransaction', id=transaction.id))
+    else:
+        flash(
+            u'Could not find transaction, could not cancel.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/statistics')
 @admin_required
