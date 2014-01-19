@@ -1,0 +1,34 @@
+<!-- admin/collectTickets.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Ticket Collection{% endblock %}
+
+{% block content %}
+    <section id="collectTickets" class="columns">
+        <p>To process a ticket collection, select the tickets to be collected below and press collect. The tickets will be assigned a collection number which will be shown to you. You should then give the customer the tickets with those numbers. Tickets must be paid for, have assigned names, not be cancelled and not already collected to appear in the list below.</p>
+        <h3>{{ user.fullname }}'s Tickets</h3>
+        <form action="{{ url_for('admin.collectTickets', id=user.id) }}" method="post">
+            <table id="ticketsTable">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Ticket Number</th>
+                        <th>Name on Ticket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in user.tickets %}
+                        {% if ticket.canBeCollected() %}
+                            <tr id="ticket-{{ ticket.id }}">
+                                <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.id }}" value="{{ ticket.id }}" {% if tickets and ticket.id in tickets %}checked="checked" {% endif %}/></td>
+                                <td><label for="ticketSelect-{{ ticket.id }}">#{{ '%05d' % ticket.id }}</label></td>
+                                <td><label for="ticketSelect-{{ ticket.id }}">{{ ticket.name }}</label></td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="submit" value="Collect" class="button small" />
+        </form>
+    </section>
+{% endblock %}

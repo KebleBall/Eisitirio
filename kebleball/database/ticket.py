@@ -48,6 +48,11 @@ class Ticket(db.Model):
         default=False,
         nullable=False
     )
+    collected_id = db.Column(
+        db.Integer(),
+        unique=True,
+        nullable=True
+    )
     cancelled = db.Column(
         db.Boolean(),
         default=False,
@@ -505,10 +510,19 @@ class Ticket(db.Model):
         else:
             return False
 
+    def canBeCollected(self):
+        return (
+            self.paid and
+            not self.collected and
+            not self.cancelled and
+            self.name is not None
+        )
+
     def canChangeName(self):
         return not (
             app.config['LOCKDOWN_MODE'] or
-            self.cancelled
+            self.cancelled or
+            self.collected
         )
 
     @staticmethod

@@ -12,6 +12,9 @@
             <p><strong>Price</strong>: &pound;{{ '%.2f' % (ticket.price / 100.0) }}</p>
             <p><strong>Name on ticket</strong>: {{ ticket.name }}</p>
             <p><strong>Owner</strong>: <a href="{{ url_for('admin.viewUser', id=ticket.owner_id) }}">{{ ticket.owner.fullname }}</a></p>
+            {% if ticket.collected %}
+                <p><strong>Collected as</strong>: #{{ '%04d' % ticket.collected_id }}</p>
+            {% endif %}
             <p><strong>Payment method</strong>: {{ ticket.paymentmethod }}</p>
             <p><strong>Payment reference</strong>: {{ ticket.paymentreference }}</p>
             {% if ticket.referrer_id != None %}

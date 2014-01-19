@@ -517,7 +517,51 @@ def promoteUser(id):
 @admin.route('/admin/user/<int:id>/collect', methods=['GET','POST'])
 @admin_required
 def collectTickets(id):
-    raise NotImplementedError('collectTickets')
+    user = User.get_by_id(id)
+
+    if user:
+        if request.method == 'POST':
+            tickets = Ticket.query \
+                .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
+                .filter(Ticket.owner_id == user.id) \
+                .all()
+
+            global last_id
+            last_id = db.session.query(func.max(Ticket.collected_id)).scalar()
+            if last_id is None:
+                last_id = 0
+
+            first = last_id + 1
+
+            for ticket in tickets:
+                if ticket.canBeCollected():
+                    last_id = last_id + 1
+                    ticket.collected_id = last_id
+                    ticket.collected = True
+
+            db.session.commit()
+
+            flash(
+                (
+                    u'Tickets have been marked as collected. Give the '
+                    u'customer tickets {0}-{1}'
+                ).format(
+                    first,
+                    last_id
+                ),
+                'success'
+            )
+
+        return render_template(
+            'admin/collectTickets.html',
+            user=user
+        )
+    else:
+        flash(
+            u'Could not find user, could not process ticket collection.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/ticket/<int:id>/view')
 @admin.route('/admin/ticket/<int:id>/view/page/<int:eventsPage>')
