@@ -521,38 +521,6 @@ def collectTickets(id):
     user = User.get_by_id(id)
 
     if user:
-        if request.method == 'POST':
-            tickets = Ticket.query \
-                .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-                .filter(Ticket.owner_id == user.id) \
-                .all()
-
-            global last_id
-            last_id = db.session.query(func.max(Ticket.collected_id)).scalar()
-            if last_id is None:
-                last_id = 0
-
-            first = last_id + 1
-
-            for ticket in tickets:
-                if ticket.canBeCollected():
-                    last_id = last_id + 1
-                    ticket.collected_id = last_id
-                    ticket.collected = True
-
-            db.session.commit()
-
-            flash(
-                (
-                    u'Tickets have been marked as collected. Give the '
-                    u'customer tickets {0}-{1}'
-                ).format(
-                    first,
-                    last_id
-                ),
-                'success'
-            )
-
         return render_template(
             'admin/collectTickets.html',
             user=user
@@ -586,6 +554,35 @@ def viewTicket(id, eventsPage=1):
         events=events,
         eventsPage=eventsPage
     )
+
+@admin.route('/admin/ticket/<int:id>/collect', methods=['POST'])
+@admin_required
+def collectTicket(id):
+    ticket = Ticket.get_by_id(id)
+
+    if ticket:
+        ticket.barcode = request.form['barcode']
+        ticket.collected = True
+        db.session.commit()
+
+        log_event(
+            'Collected',
+            [ticket]
+        )
+
+        flash(
+            u'Ticket marked as collected with barcode number {0}.'.format(
+                request.form['barcode']
+            ),
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.collectTickets', id=ticket.owner_id))
+    else:
+        flash(
+            u'Could not find ticket, could mark as collected.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/ticket/<int:id>/note', methods=['POST'])
 @admin_required

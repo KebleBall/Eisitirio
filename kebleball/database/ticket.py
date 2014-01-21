@@ -48,8 +48,8 @@ class Ticket(db.Model):
         default=False,
         nullable=False
     )
-    collected_id = db.Column(
-        db.Integer(),
+    barcode = db.Column(
+        db.String(20),
         unique=True,
         nullable=True
     )
