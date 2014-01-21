@@ -56,7 +56,7 @@ with file_lock(os.path.abspath('./cron.lock')):
         emails_count = app.config['EMAILS_BATCH']
 
         announcements = Announcement.query \
-            .filter(Announcement.send_email == False) \
+            .filter(Announcement.send_email == True) \
             .filter(Announcement.email_sent == False) \
             .all()
 
@@ -240,7 +240,7 @@ with file_lock(os.path.abspath('./cron.lock')):
             f.write(now.strftime('%s'))
 
         _3days = now + timedelta(days=3)
-        _2days = now + timedelta(days=3)
+        _2days = now + timedelta(days=2)
         _1day = now + timedelta(days=1)
 
         tickets_3days = Ticket.query \
@@ -254,7 +254,8 @@ with file_lock(os.path.abspath('./cron.lock')):
             email_manager.sendTemplate(
                 ticket.owner.email,
                 'Tickets Expiring',
-                'ticketsExpiring3days.email'
+                'ticketsExpiring3days.email',
+                ticket=ticket
             )
 
         tickets_1day = Ticket.query \
@@ -268,5 +269,6 @@ with file_lock(os.path.abspath('./cron.lock')):
             email_manager.sendTemplate(
                 ticket.owner.email,
                 'Final Warning: Tickets Expiring',
-                'ticketsExpiring1day.email'
+                'ticketsExpiring1day.email',
+                ticket=ticket
             )
