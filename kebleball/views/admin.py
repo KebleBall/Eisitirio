@@ -918,12 +918,45 @@ def announcements(page=1):
 @admin.route('/admin/announcement/<int:id>/delete')
 @admin_required
 def deleteAnnouncement(id):
-    raise NotImplementedError('deleteAnnouncement')
+    announcement = Announcement.get_by_id(id)
+
+    if announcement:
+        db.session.delete(announcement)
+        db.session.commit()
+
+        flash(
+            u'Announcement deleted successfully',
+            'success'
+        )
+    else:
+        flash(
+            u'Could not find announcement, could not delete',
+            'warning'
+        )
+
+    return redirect(request.referrer or url_for('admin.announcements'))
 
 @admin.route('/admin/announcement/<int:id>/cancel')
 @admin_required
 def cancelAnnouncementEmails(id):
-    raise NotImplementedError('cancelAnnouncementEmails')
+    announcement = Announcement.get_by_id(id)
+
+    if announcement:
+        announcement.emails = []
+        announcement.send_email = False
+        db.session.commit()
+
+        flash(
+            u'Announcement emails cancelled successfully',
+            'success'
+        )
+    else:
+        flash(
+            u'Could not find announcement, could not cancel emails',
+            'warning'
+        )
+
+    return redirect(request.referrer or url_for('admin.announcements'))
 
 @admin.route('/admin/vouchers')
 @admin_required
