@@ -46,8 +46,8 @@ class Announcement(db.Model):
         primary_key=True,
         nullable=False
     )
-    time = db.Column(
-        db.String(50),
+    timestamp = db.Column(
+        db.DateTime(),
         nullable=False
     )
     content = db.Column(
@@ -120,6 +120,10 @@ class Announcement(db.Model):
         db.Boolean,
         nullable=True
     )
+    has_uncollected = db.Column(
+        db.Boolean,
+        nullable=True
+    )
 
     users = db.relationship(
         'User',
@@ -129,7 +133,8 @@ class Announcement(db.Model):
 
     emails = db.relationship(
         'User',
-        secondary=email_announce_link
+        secondary=email_announce_link,
+        lazy='dynamic'
     )
 
     def __init__(self,
@@ -141,13 +146,16 @@ class Announcement(db.Model):
                  has_tickets=None,
                  affiliation=None,
                  is_waiting=None,
-                 has_collected=None):
-        self.time = datetime.now()
+                 has_collected=None,
+                 has_uncollected=None):
+        self.timestamp = datetime.utcnow()
         self.subject = subject
         self.content = content
+        self.send_email = send_email
         self.has_tickets = has_tickets
         self.is_waiting = is_waiting
         self.has_collected = has_collected
+        self.has_uncollected = has_uncollected
 
         if hasattr(sender, 'id'):
             self.sender_id = sender.id
@@ -184,11 +192,16 @@ class Announcement(db.Model):
                 ) and
                 (
                     self.has_collected is None or
-                    user.hasCollected()==self.has_collected
+                    user.hasCollectedTickets()==self.has_collected
+                ) and
+                (
+                    self.has_uncollected is None or
+                    user.hasUncollectedTickets()==self.has_uncollected
                 )
             ):
                 self.users.append(user)
-                self.emails.append(user)
+                if send_email:
+                    self.emails.append(user)
 
     def __repr__(self):
         return "<Announcement {0}: {1}>".format(self.id, self.subject)
@@ -202,12 +215,16 @@ class Announcement(db.Model):
             for user in self.emails:
                 if count <= 0:
                     break
-                msg['To'] = user.email
+                try:
+                    msg.replace_header('To', user.email)
+                except KeyError:
+                    msg['To'] = user.email
                 app.email_manager.sendMsg(msg)
                 self.emails.remove(user)
-
-            self.email_sent = (len(self.emails) == 0)
+                count = count - 1
         finally:
+            db.session.commit()
+            self.email_sent = (self.emails.count() == 0)
             db.session.commit()
 
         return count

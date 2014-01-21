@@ -7,6 +7,7 @@ from kebleball.database import db
 from kebleball.database.user import User
 from kebleball.database.college import College
 from kebleball.database.affiliation import Affiliation
+from kebleball.database.announcement import Announcement
 from kebleball.database.ticket import Ticket
 from kebleball.database.log import Log
 from kebleball.database.statistic import Statistic
@@ -808,11 +809,124 @@ def statistics():
         paymentMethodValues=paymentMethodValues
     )
 
-@admin.route('/admin/announcements')
+@admin.route('/admin/announcements', methods=['GET','POST'])
+@admin.route('/admin/announcements/page/<int:page>', methods=['GET','POST'])
 @admin_required
-def announcements():
-    # [todo] - Add announcements
-    raise NotImplementedError('announcements')
+def announcements(page=1):
+    form = {}
+
+    if request.method == 'POST':
+        form = request.form
+
+        success = True
+
+        if 'subject' not in form or form['subject'] == '':
+            flash(
+                u'Subject must not be blank',
+                'warning'
+            )
+            success = False
+
+        if 'message' not in form or form['message'] == '':
+            flash(
+                u'Message must not be blank',
+                'warning'
+            )
+            success = False
+
+        if 'tickets' in form and form['tickets'] == 'no':
+            if 'collected' in form and form['collected'] == 'yes':
+                flash(
+                    u'A person cannot have no tickets and have collected tickets',
+                    'warning'
+                )
+                success = False
+            if 'uncollected' in form and form['uncollected'] == 'yes':
+                flash(
+                    u'A person cannot have no tickets and have uncollected tickets',
+                    'warning'
+                )
+                success = False
+
+        if success:
+            college = None
+            if 'college' in form and form['college'] != 'any':
+                college = int(form['college'])
+
+            affiliation = None
+            if 'affiliation' in form and form['affiliation'] != 'any':
+                affiliation = int(form['affiliation'])
+
+            has_tickets = None
+            if 'tickets' in form:
+                if form['tickets'] == 'yes':
+                    has_tickets = True
+                elif form['tickets'] == 'no':
+                    has_tickets = False
+
+            is_waiting = None
+            if 'waiting' in form:
+                if form['waiting'] == 'yes':
+                    is_waiting = True
+                elif form['waiting'] == 'no':
+                    is_waiting = False
+
+            has_collected = None
+            if 'collected' in form:
+                if form['collected'] == 'yes':
+                    has_collected = True
+                elif form['collected'] == 'no':
+                    has_collected = False
+
+            has_uncollected = None
+            if 'uncollected' in form:
+                if form['uncollected'] == 'yes':
+                    has_uncollected = True
+                elif form['uncollected'] == 'no':
+                    has_uncollected = False
+
+            send_email = 'sendEmails' in form and form['sendEmails'] == 'yes'
+
+            announcement = Announcement(
+                form['subject'],
+                form['message'],
+                current_user,
+                send_email,
+                college,
+                affiliation,
+                has_tickets,
+                is_waiting,
+                has_collected,
+                has_uncollected
+            )
+
+            db.session.add(announcement)
+            db.session.commit()
+
+            flash(
+                u'Announcement created successfully',
+                'success'
+            )
+
+            form = {}
+
+    return render_template(
+        'admin/announcements.html',
+        colleges=College.query.all(),
+        affiliations=Affiliation.query.all(),
+        announcements=Announcement.query.paginate(page, 10, False),
+        form=form
+    )
+
+@admin.route('/admin/announcement/<int:id>/delete')
+@admin_required
+def deleteAnnouncement(id):
+    raise NotImplementedError('deleteAnnouncement')
+
+@admin.route('/admin/announcement/<int:id>/cancel')
+@admin_required
+def cancelAnnouncementEmails(id):
+    raise NotImplementedError('cancelAnnouncementEmails')
 
 @admin.route('/admin/vouchers')
 @admin_required

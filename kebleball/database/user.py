@@ -177,6 +177,9 @@ class User(db.Model):
     def hasUncollectedTickets(self):
         return len([x for x in self.tickets if not x.collected]) > 0
 
+    def hasCollectedTickets(self):
+        return len([x for x in self.tickets if x.collected]) > 0
+
     def hasUnresoldTickets(self):
         return len([x for x in self.tickets if x.resalekey is None]) > 0
 

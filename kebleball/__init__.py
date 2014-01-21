@@ -1,5 +1,6 @@
 # coding: utf-8
 from flask import url_for, redirect, render_template, request
+from jinja2 import Markup
 
 from .app import app
 
@@ -104,9 +105,30 @@ def utility_processor():
     def raise_exception():
         raise Exception
 
+    def form_value(form, field):
+        if field in form:
+            return Markup('value="{0}" '.format(form[field]))
+        else:
+            return ''
+
+    def form_selected(form, field, value):
+        if field in form and form[field] == str(value):
+            return Markup('selected="selected" ')
+        else:
+            return ''
+
+    def form_checked(form, field, value):
+        if field in form and form[field] == str(value):
+            return Markup('checked="checked" ')
+        else:
+            return ''
+
     return dict(
         get_all=get_all,
         get_ord=get_ord,
         raise_exception=raise_exception,
+        form_value=form_value,
+        form_selected=form_selected,
+        form_checked=form_checked,
         template_config={key: app.config[key] for key in app.config['TEMPLATE_CONFIG_KEYS']}
     )
