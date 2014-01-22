@@ -105,9 +105,11 @@ def utility_processor():
     def raise_exception():
         raise Exception
 
-    def form_value(form, field):
+    def form_value(form, field, default=None):
         if field in form:
             return Markup('value="{0}" '.format(form[field]))
+        elif default is not None:
+            return Markup('value="{0}" '.format(default))
         else:
             return ''
 

@@ -13,13 +13,17 @@ from kebleball.database.log import Log
 from kebleball.database.statistic import Statistic
 from kebleball.database.waiting import Waiting
 from kebleball.database.card_transaction import CardTransaction
+from kebleball.database.voucher import Voucher
 from flask.ext.sqlalchemy import Pagination
 from flask.ext.login import current_user, login_user
 from dateutil.parser import parse
+from datetime import datetime
 from kebleball.helpers.statistic_plots import create_plot
+from kebleball.helpers import generate_key
 from StringIO import StringIO
 from sqlalchemy import func
 import csv
+import re
 
 log = app.log_manager.log_admin
 log_event = app.log_manager.log_event
@@ -958,13 +962,132 @@ def cancelAnnouncementEmails(id):
 
     return redirect(request.referrer or url_for('admin.announcements'))
 
-@admin.route('/admin/vouchers')
+@admin.route('/admin/vouchers', methods=['GET','POST'])
+@admin.route('/admin/vouchers/page/<int:page>', methods=['GET','POST'])
 @admin_required
-def vouchers():
-    # [todo] - Add vouchers
-    raise NotImplementedError('vouchers')
+def vouchers(page=1):
+    form = {}
 
-@admin.route('/admin/delete/waiting/<int:id>')
+    if request.method == 'POST':
+        form = request.form
+
+        success = True
+
+        expires = None
+
+        if 'expires' in form and form['expires'] != '':
+            try:
+                expires = parse(form['expires'])
+                if expires < datetime.utcnow():
+                    flash(
+                        u'Expiry date cannot be in the past',
+                        'warning'
+                    )
+                    success = False
+            except KeyError, ValueError:
+                flash(
+                    u'Could not parse expiry date',
+                    'warning'
+                )
+                success = False
+
+        if 'voucherType' not in form or form['voucherType'] == '':
+            flash(
+                u'You must select a discout type',
+                'warning'
+            )
+            success = False
+        elif form['voucherType'] == 'Fixed Price':
+            value = int(form['fixedPricePounds']) * 100 + int(form['fixedPricePence'])
+        elif form['voucherType'] == 'Fixed Discount':
+            value = int(form['fixedDiscountPounds']) * 100 + int(form['fixedDiscountPence'])
+        else:
+            value = int(form['fixedDiscount'])
+            if value > 100:
+                flash(
+                    u'Cannot give greater than 100% discount',
+                    'warning'
+                )
+                success = False
+
+        if not re.match('[a-zA-Z0-9]+',form['voucherPrefix']):
+            flash(
+                u'Voucher prefix must be non-empty and contain only letters and numbers',
+                'warning'
+            )
+            success = False
+
+        if success:
+            numVouchers = int(form['numVouchers'])
+            singleUse = 'singleUse' in form and form['singleUse'] == 'yes'
+
+            for i in xrange(numVouchers):
+                key = generate_key(10)
+                voucher = Voucher(
+                    '{0}-{1}'.format(
+                        form['voucherPrefix'],
+                        key
+                    ),
+                    expires,
+                    form['voucherType'],
+                    value,
+                    form['appliesTo'],
+                    singleUse
+                )
+                db.session.add(voucher)
+
+            db.session.commit()
+
+            flash(
+                u'Voucher(s) created successfully',
+                'success'
+            )
+
+            form = {}
+
+    vouchers = Voucher.query
+
+    if 'search' in request.args:
+        vouchers = vouchers.filter(
+            Voucher.code.like(
+                '%{0}%'.format(
+                    request.args['search']
+                )
+            )
+        )
+
+    vouchers = vouchers.paginate(
+        page,
+        10
+    )
+
+    return render_template(
+        'admin/vouchers.html',
+        form=form,
+        vouchers=vouchers
+    )
+
+@admin.route('/admin/voucher/<int:id>/delete')
+@admin_required
+def deleteVoucher(id):
+    voucher = Voucher.get_by_id(id)
+
+    if voucher:
+        db.session.delete(voucher)
+        db.session.commit()
+        flash(
+            u'Voucher deleted successfully',
+            'success'
+        )
+    else:
+        flash(
+            u'Could not find voucher to delete',
+            'warning'
+        )
+
+    return redirect(request.referrer or url_for('admin.vouchers'))
+
+@admin.route('/admin/waiting/<int:id>/delete')
 @admin_required
 def deleteWaiting(id):
     waiting = Waiting.get_by_id(id)
@@ -982,7 +1105,7 @@ def deleteWaiting(id):
             'error'
         )
 
-    return redirect(request.referrer or url_for(admin.adminHome))
+    return redirect(request.referrer or url_for('admin.adminHome'))
 
 @admin.route('/admin/graphs/sales')
 @admin_required
