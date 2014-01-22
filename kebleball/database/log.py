@@ -152,4 +152,9 @@ class Log(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        return Log.query.filter(Log.id == int(id)).first()
+        log = Log.query.filter(Log.id==int(id)).first()
+
+        if not log:
+            return None
+
+        return log

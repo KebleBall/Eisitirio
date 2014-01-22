@@ -531,4 +531,9 @@ class Ticket(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        return Ticket.query.filter(Ticket.id == int(id)).first()
+        ticket = Ticket.query.filter(Ticket.id==int(id)).first()
+
+        if not ticket:
+            return None
+
+        return ticket

@@ -25,3 +25,12 @@ class College(db.Model):
 
     def __repr__(self):
         return "<College {0}: {1}>".format(self.id, self.name)
+
+    @staticmethod
+    def get_by_id(id):
+        college = College.query.filter(College.id==int(id)).first()
+
+        if not college:
+            return None
+
+        return college

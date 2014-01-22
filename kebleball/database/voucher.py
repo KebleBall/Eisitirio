@@ -141,3 +141,12 @@ class Voucher(db.Model):
         ticket.addNote('Used voucher {0}/{1}'.format(self.id, self.code))
 
         return ticket
+
+    @staticmethod
+    def get_by_id(id):
+        voucher = Voucher.query.filter(Voucher.id==int(id)).first()
+
+        if not voucher:
+            return None
+
+        return voucher

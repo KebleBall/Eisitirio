@@ -231,4 +231,9 @@ class Announcement(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        return Announcement.query.filter(Announcement.id==id).first()
+        announcement = Announcement.query.filter(Announcement.id==int(id)).first()
+
+        if not announcement:
+            return None
+
+        return announcement

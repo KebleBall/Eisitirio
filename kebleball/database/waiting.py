@@ -78,4 +78,9 @@ class Waiting(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        return Waiting.query.filter(Waiting.id == int(id)).first()
+        waiting = Waiting.query.filter(Waiting.id==int(id)).first()
+
+        if not waiting:
+            return None
+
+        return waiting

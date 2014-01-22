@@ -424,4 +424,9 @@ class CardTransaction(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        return CardTransaction.query.filter(CardTransaction.id == id).first()
+        transaction = CardTransaction.query.filter(CardTransaction.id==int(id)).first()
+
+        if not transaction:
+            return None
+
+        return transaction

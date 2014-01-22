@@ -292,8 +292,3 @@ class User(db.Model):
             return None
 
         return user
-
-    def delete(self):
-        # [todo] - Implement user.delete
-
-        raise NotImplementedError

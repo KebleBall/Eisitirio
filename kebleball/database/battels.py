@@ -130,3 +130,21 @@ class Battels(db.Model):
 
         ticket.cancelled = True
         db.session.commit()
+
+    @staticmethod
+    def get_by_id(id):
+        battels = Battels.query.filter(Battels.id==int(id)).first()
+
+        if not battels:
+            return None
+
+        return battels
+
+    @staticmethod
+    def get_by_battelsid(id):
+        battels = Battels.query.filter(Battels.battelsid==int(id)).first()
+
+        if not battels:
+            return None
+
+        return battels

@@ -24,3 +24,12 @@ class Affiliation(db.Model):
 
     def __repr__(self):
         return "<Affiliation {0}: {1}>".format(self.id, self.name)
+
+    @staticmethod
+    def get_by_id(id):
+        affiliation = Affiliation.query.filter(Affiliation.id==int(id)).first()
+
+        if not affiliation:
+            return None
+
+        return affiliation
