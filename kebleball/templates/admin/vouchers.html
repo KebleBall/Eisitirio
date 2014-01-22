@@ -1,0 +1,184 @@
+<!-- admin/vouchers.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Vouchers{% endblock %}
+
+{% block content %}
+    <section id="vouchers" class="columns">
+        <h4>Create Voucher(s)</h4>
+        <form action="{{ url_for('admin.vouchers') }}" method="post">
+            <div class="row">
+                <div class="large-6 columns">
+                    <label for="voucherPrefix">Voucher Prefix</label>
+                    <input type="text" name="voucherPrefix" id="voucherPrefix" {{ form_value(form,'voucherPrefix') }}/>
+                </div>
+                <div class="large-6 columns">
+                    <label for="expires">Expires (leave blank for never)</label>
+                    <input type="text" name="expires" id="expires" {{ form_value(form,'expires') }}/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-4 columns">
+                    <label for="numVouchers">Number of Vouchers</label>
+                    <input type="number" min="1" step="1" value="1" name="numVouchers" id="numVouchers" {{ form_value(form,'numVouchers') }}/>
+                </div>
+                <div class="large-4 columns">
+                    <label for="appliesTo">Applies To</label>
+                    <select id="appliesTo" name="appliesTo">
+                        <option value="Ticket" {{ form_selected(form,'appliesTo','Ticket') }}>Single Ticket</option>
+                        <option value="Transaction" {{ form_selected(form,'appliesTo','Transaction') }}>All Tickets in Transaction</option>
+                    </select>
+                </div>
+                <div class="large-4 columns">
+                    <label for="singleUse">Single Use</label>
+                    <select name="singleUse" id="singleUse">
+                        <option value="yes" {{ form_selected(form,'singleUse','yes') }}>Yes</option>
+                        <option value="no" {{ form_selected(form,'singleUse','no') }}>No</option>
+                    </select>
+                </div>
+            </div>
+            <fieldset>
+                <legend>Discount Type</legend>
+                <div class="row">
+                    <div class="large-4 columns">
+                        <label for="fixedPrice">
+                            <input type="radio" name="voucherType" id="fixedPrice" value="Fixed Price" {{ form_checked(form,'voucherType','Fixed Price') }}/>
+                            Fixed Price
+                        </label>
+                        <div class="row collapse">
+                            <div class="small-3 columns">
+                                <span class="prefix">&pound;</span>
+                            </div>
+                            <div class="small-4 columns">
+                                <input type="number" name="fixedPricePounds" min="0" step="1" {{ form_value(form,'fixedPricePounds','0') }}/>
+                            </div>
+                            <div class="small-1 columns">
+                                <span class="prefix postfix">.</span>
+                            </div>
+                            <div class="small-4 columns">
+                                <input type="number" name="fixedPricePence" min="0" max="99" step="1" {{ form_value(form,'fixedPricePence','0') }}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="fixedDiscount">
+                            <input type="radio" name="voucherType" id="fixedDiscount" value="Fixed Discount" {{ form_checked(form,'voucherType','Fixed Discount') }}/>
+                            Fixed Discount
+                        </label>
+                        <div class="row collapse">
+                            <div class="small-3 columns">
+                                <span class="prefix">&pound;</span>
+                            </div>
+                            <div class="small-4 columns">
+                                <input type="number" name="fixedDiscountPounds" min="0" step="1" {{ form_value(form,'fixedDiscountPounds','0') }}/>
+                            </div>
+                            <div class="small-1 columns">
+                                <span class="prefix postfix">.</span>
+                            </div>
+                            <div class="small-4 columns">
+                                <input type="number" name="fixedDiscountPence" min="0" max="99" step="1" {{ form_value(form,'fixedDiscountPence','0') }}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="percentageDiscount">
+                            <input type="radio" name="voucherType" id="percentageDiscount" value="Percentage Discount" {{ form_checked(form,'voucherType','Percentage Discount') }}/>
+                            Percentage Discount
+                        </label>
+                        <div class="row collapse">
+                            <div class="small-9 columns">
+                                <input type="number" name="fixedDiscount" min="0" max="100" step="1" {{ form_value(form,'fixedDiscount','0') }}/>
+                            </div>
+                            <div class="small-3 columns">
+                                <span class="postfix">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <input type="submit" value="Create Vouchers" class="button small" />
+        </form>
+        <h4>Existing Vouchers</h4>
+        <div class="row">
+            <div class="large-3 columns">
+                {% if vouchers.has_prev %}
+                    <a href="{{ url_for('admin.vouchers', page=vouchers.prev_num) }}{% if 'search' in request.args %}?{{ request.args['search'] }}{% endif %}" class="button small">Previous</a>
+                {% else %}
+                    &nbsp;
+                {% endif %}
+            </div>
+            <div class="large-6 columns">
+                <form action="{{ url_for('admin.vouchers') }}" method="get">
+                    <div class="row collapse">
+                        <div class="large-9 columns">
+                            <input type="text" name="search" {% if 'search' in request.args %}value="{{ request.args['search'] }}" {% endif %}/>
+                        </div>
+                        <div class="large-3 columns">
+                            <input type="submit" value="Search" class="button postfix" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="large-3 columns">
+                {% if vouchers.has_next %}
+                    <a href="{{ url_for('admin.vouchers', page=vouchers.next_num) }}{% if 'search' in request.args %}?{{ request.args['search'] }}{% endif %}" class="button small">Next</a>
+                {% else %}
+                    &nbsp;
+                {% endif %}
+            </div>
+        </div>
+        {% if vouchers.items %}
+            <table id="vouchersTable">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Discount</th>
+                        <th>Applies To</th>
+                        <th>Expires</th>
+                        <th>Single Use</th>
+                        <th>Used</th>
+                        <th>Used By</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for voucher in vouchers.items %}
+                        <tr>
+                            <td>{{ voucher.code }}</td>
+                            <td>
+                                {{ voucher.discounttype }}:
+                                {% if voucher.discounttype == 'Percentage Discount' %}
+                                    {{ voucher.discountvalue }}%
+                                {% else %}
+                                    &pound;{{ '%.02f' % (voucher.discountvalue / 100) }}
+                                {% endif %}
+                            </td>
+                            <td>{{ voucher.appliesto }}</td>
+                            <td>
+                                {% if voucher.expires != None %}
+                                    {{ voucher.expires.strftime('%c') }}
+                                {% else %}
+                                    Never
+                                {% endif %}
+                            </td>
+                            <td>{% if voucher.singleuse %}Yes{% else %}No{% endif %}</td>
+                            <td>{% if voucher.used %}Yes{% else %}No{% endif %}</td>
+                            <td>
+                                {% if voucher.used_by_id != None %}
+                                    <a href="{{ url_for('admin.viewUser', id=voucher.used_by_id) }}">{{ voucher.used_by.fullname }}</a>
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.deleteVoucher', id=voucher.id) }}" class="button small">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </section>
+{% endblock %}
