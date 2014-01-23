@@ -13,7 +13,7 @@
             <p><strong>Name on ticket</strong>: {{ ticket.name }}</p>
             <p><strong>Owner</strong>: <a href="{{ url_for('admin.viewUser', id=ticket.owner_id) }}">{{ ticket.owner.fullname }}</a></p>
             {% if ticket.collected %}
-                <p><strong>Collected as</strong>: #{{ '%04d' % ticket.collected_id }}</p>
+                <p><strong>Collected as</strong>: {{ ticket.barcode }}</p>
             {% endif %}
             <p><strong>Payment method</strong>: {{ ticket.paymentmethod }}</p>
             <p><strong>Payment reference</strong>: {{ ticket.paymentreference }}</p>
@@ -51,7 +51,9 @@
                     {% endif %}
                     <li><a href="{{ url_for('admin.cancelTicket', id=ticket.id) }}" class="button tiny">Cancel</a><span class="small">N.B. This does not process any refund on the ticket</span></li>
                 {% endif %}
-                <li><a href="{{ url_for('admin.markTicketPaid', id=ticket.id) }}" class="button tiny">Mark as Paid</a></li>
+                {% if not ticket.paid %}
+                    <li><a href="{{ url_for('admin.markTicketPaid', id=ticket.id) }}" class="button tiny">Mark as Paid</a></li>
+                {% endif %}
             </ul>
             <h4>Ticket's Card Transactions</h4>
             {% if ticket.transactions.count() > 0 %}

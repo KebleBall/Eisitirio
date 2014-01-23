@@ -205,10 +205,9 @@ class Ticket(db.Model):
             )
 
     def __repr__(self):
-        return '<Ticket {0} owned by {1} {2} ({3})>'.format(
+        return '<Ticket {0} owned by {1} ({2})>'.format(
             self.id,
-            self.owner.firstname,
-            self.owner.surname,
+            self.owner.fullname,
             self.owner_id
         )
 
@@ -462,9 +461,9 @@ class Ticket(db.Model):
                 ticket.addNote(
                     'Resold by {0}/{1} to {2}/{3}'.format(
                         ticket.owner.id,
-                        ticket.owner.name,
+                        ticket.owner.fullname,
                         ticket.reselling_to.id,
-                        ticket.reselling_to.name
+                        ticket.reselling_to.fullname
                     )
                 )
                 ticket.owner = ticket.reselling_to

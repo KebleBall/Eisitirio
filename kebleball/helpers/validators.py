@@ -121,7 +121,7 @@ def validateResaleEmail(email, current_user):
                 True,
                 {
                     'class': 'success',
-                    'message': '{0} will receive an email to confirm the resale.'.format(user.name)
+                    'message': '{0} will receive an email to confirm the resale.'.format(user.firstname)
                 },
                 None
             )

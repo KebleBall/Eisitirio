@@ -37,7 +37,7 @@
                                         {% if ticket.cancelled -%}
                                             Cancelled.
                                         {% elif ticket.collected -%}
-                                            Collected as #{{ '%04d' % ticket.collected_id }}.
+                                            Collected as {{ ticket.barcode }}.
                                         {% elif ticket.resalekey != None -%}
                                             {% if ticket.resaleconfirmed -%}
                                                 Pending resale completion

@@ -333,7 +333,7 @@ def changeMethod():
             reason = None
 
         for ticket in tickets:
-            ticket.setMethod(request.form['paymentMethod'], reason)
+            ticket.setPaymentMethod(request.form['paymentMethod'], reason)
 
         db.session.commit()
 

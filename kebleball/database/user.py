@@ -117,7 +117,7 @@ class User(db.Model):
         'Battels',
         backref=db.backref(
             'user',
-            lazy='dynamic'
+            uselist=False
         )
     )
 

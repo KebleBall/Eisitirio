@@ -54,3 +54,12 @@ class Statistic(db.Model):
             self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)'),
             self.value
         )
+
+    @staticmethod
+    def get_by_id(id):
+        statistic = Statistic.query.filter(Statistic.id==int(id)).first()
+
+        if not statistic:
+            return None
+
+        return statistic
