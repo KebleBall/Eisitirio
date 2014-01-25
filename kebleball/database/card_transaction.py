@@ -271,22 +271,9 @@ class CardTransaction(db.Model):
                             self
                         )
 
-                        data = {
-                            "Refund": {
-                                "TotalAmount": response['TotalAmount'],
-                                "TransactionID": response['TransactionID']
-                            }
-                        }
-
-                        (refundSuccess, refundResponse) = self.sendRequest(
-                            'DirectRefund',
-                            data
-                        )
+                        refundSuccess = self.processRefund(response['TotalAmount'])
 
                         if refundSuccess:
-                            self.refunded = response['TotalAmount']
-                            db.session.commit()
-
                             flash(
                                 (
                                     u'Your card payment was only authorised '
@@ -405,18 +392,41 @@ class CardTransaction(db.Model):
             data
         )
 
-        if success:
-            self.refunded = self.refunded + amount
+        if success and response['TransactionStatus']:
+            refundedAmount = response['Refund']['TotalAmount']
+
+            self.refunded = self.refunded + refundedAmount
             db.session.commit()
 
             app.log_manager.log_event(
                 'Refunded £{0:.02f}'.format(
-                    amount / 100.0
+                    refundedAmount / 100.0
                 ),
                 [],
                 current_user,
                 self
             )
+
+            if refundedAmount != amount:
+                app.email_manager.sendTemplate(
+                    [
+                        app.config['TREASURER_EMAIL'],
+                        app.config['TICKETS_EMAIL']
+                    ],
+                    "Partial Refund",
+                    "partialRefund.email",
+                    transaction=self,
+                    ewayresponse=response
+                )
+                flash(
+                    (
+                        u'Your card refund was only approved for '
+                        u'a partial amount. An email has been '
+                        u'sent to Keble Ball staff, and the '
+                        u'refund will be manually completed.'
+                    ),
+                    'warning'
+                )
 
             return True
         else:
