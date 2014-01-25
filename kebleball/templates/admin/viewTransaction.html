@@ -23,7 +23,7 @@
             <ul>
                 <li>Transaction {% if transaction.completed != null %}was{% else %}is{% endif %} <strong>{{ transaction.getSuccess()|lower }}</strong>.</li>
                 <li>Transaction <strong>is{% if not transaction.refunded > 0 %} not{% endif %}</strong> partially refunded.</li>
-                <li>Transaction <strong>is{% if not transaction.refunded > transaction.getValue() %} not{% endif %}</strong> fully refunded.</li>
+                <li>Transaction <strong>is{% if not transaction.refunded >= transaction.getValue() %} not{% endif %}</strong> fully refunded.</li>
                 <li>Transaction <strong>was{% if not transaction.resultcode == 'CX' %} not{% endif %}</strong> cancelled.</li>
             </ul>
             <h4>Actions</h4>

@@ -206,6 +206,8 @@ def adminHome(page=1):
             logQuery = logQuery.filter(Log.action.like('%' + request.form['logMessage'] + '%'))
             hasLogFilter = True
 
+        logQuery = logQuery.order_by(Log.timestamp.desc())
+
         if request.form['search'] == 'user':
             if hasTicketFilter:
                 userQuery = userQuery.join(
@@ -284,6 +286,7 @@ def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
     if user:
         selfActions = user.actions \
             .filter(Log.actor_id == Log.user_id) \
+            .order_by(Log.timestamp.desc()) \
             .paginate(
                 selfActionsPage,
                 10,
@@ -291,6 +294,7 @@ def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
             )
         otherActions = user.actions \
             .filter(Log.actor_id != Log.user_id) \
+            .order_by(Log.timestamp.desc()) \
             .paginate(
                 actionsPage,
                 10,
@@ -298,6 +302,7 @@ def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
             )
         events = user.events \
             .filter(Log.actor_id != Log.user_id) \
+            .order_by(Log.timestamp.desc()) \
             .paginate(
                 eventsPage,
                 10,

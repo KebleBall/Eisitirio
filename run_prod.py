@@ -5,5 +5,5 @@ import os
 from kebleball import app
 
 if __name__ == '__main__':
-    os.environ['KEBLE_BALL_ENV'] = 'PRODUCTION'
+    app.config.from_pyfile('config/production.py')
     app.run()
