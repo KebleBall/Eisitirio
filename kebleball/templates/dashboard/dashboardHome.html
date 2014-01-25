@@ -104,7 +104,7 @@
 
         <h3>Referrals</h3>
         {% if current_user.referrals.count() > 0 %}
-            <p>The following tickets have been marked as being referred by you. Once you have referred {{ template_config['TICKET_REFERRALS'] - (current_user.referrals.count() % template_config['TICKET_REFERRALS']) }} more tickets you will earn {% if current_user.referrals.count() > template_config['TICKET_REFERRALS'] %}another{% else %}a{% endif %} free ticket.</p>
+            <p>The following tickets have been marked as being referred by you.</p>
             <ul id="referralsList">
                 {% for ticket in current_user.referrals %}
                     <li>#{{ '%05d' % ticket.id }}, owned by {{ ticket.owner.firstname }} {{ ticket.owner.surname }}</li>
@@ -112,7 +112,6 @@
             </ul>
         {% else %}
             <p>You haven't referred any tickets yet</p>
-            <p>For every {{ template_config['TICKET_REFERRALS'] }} tickets that are referred by you, you will receive a voucher for a free ticket. The person buying the ticket must enter your email address to ensure we know you referred them.</p>
         {% endif %}
     </section>
 {% endblock %}
