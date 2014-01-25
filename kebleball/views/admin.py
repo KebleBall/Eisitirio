@@ -790,16 +790,25 @@ def statistics():
         .filter(Ticket.cancelled != True) \
         .scalar()
 
+    if totalValue is None:
+        totalValue = 0
+
     paidValue = db.session \
         .query(func.sum(Ticket.price)) \
         .filter(Ticket.paid == True) \
         .filter(Ticket.cancelled != True) \
         .scalar()
 
+    if paidValue is None:
+        paidValue = 0
+
     cancelledValue = db.session \
         .query(func.sum(Ticket.price)) \
         .filter(Ticket.cancelled == True) \
         .scalar()
+
+    if cancelledValue is None:
+        cancelledValue = 0
 
     paymentMethodValues = db.session \
         .query(func.sum(Ticket.price), Ticket.paymentmethod) \
