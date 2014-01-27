@@ -172,16 +172,16 @@ class User(db.Model):
         self.passhash = bcrypt.generate_password_hash(password)
 
     def hasTickets(self):
-        return self.tickets.count() > 0
+        return len([x for x in self.tickets if not x.cancelled]) > 0
 
     def hasUncollectedTickets(self):
-        return len([x for x in self.tickets if not x.collected]) > 0
+        return len([x for x in self.tickets if not x.cancelled and not x.collected]) > 0
 
     def hasCollectedTickets(self):
-        return len([x for x in self.tickets if x.collected]) > 0
+        return len([x for x in self.tickets if not x.cancelled and x.collected]) > 0
 
     def hasUnresoldTickets(self):
-        return len([x for x in self.tickets if x.resalekey is None]) > 0
+        return len([x for x in self.tickets if not x.cancelled and x.resalekey is None]) > 0
 
     def isResellingTickets(self):
         return len([x for x in self.tickets if x.resalekey is not None]) > 0
