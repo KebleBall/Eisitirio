@@ -383,7 +383,11 @@ def resetPassword(userID, secretkey):
             flash(u'Your password has been reset, please log in.','success')
             return redirect(url_for('front.home'))
     else:
-        return render_template('front/resetPassword.html')
+        return render_template(
+            'front/resetPassword.html',
+            userID=userID,
+            secretkey=secretkey
+        )
 
 @front.route('/confirmemail/<int:userID>/<secretkey>')
 def confirmEmail(userID, secretkey):
