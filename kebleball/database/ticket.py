@@ -217,7 +217,7 @@ class Ticket(db.Model):
         self.price = price
 
         if price == 0:
-            self.markAsPaid('Free')
+            self.markAsPaid('Free', 'Free Ticket')
 
     def setPaymentMethod(self, method, reason=None):
         if method in ['Cash','Cheque']:
