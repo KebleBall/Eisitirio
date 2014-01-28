@@ -72,7 +72,7 @@ class CardTransaction(db.Model):
         self.tickets = tickets
         self.commenced = datetime.utcnow()
 
-    def __repr__():
+    def __repr__(self):
         status = self.getStatus()
         if status[0] is None:
             statusStr = 'Uncompleted'
