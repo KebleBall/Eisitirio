@@ -37,4 +37,4 @@ def create_plot(plots, xLimMin, xLimMax):
     )
 
     image.seek(0)
-    return send_file(image, mimetype="image/png")
+    return send_file(image, mimetype="image/png", cache_timeout=900)

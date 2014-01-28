@@ -1280,4 +1280,4 @@ def data(group):
         )
 
     csvdata.seek(0)
-    return send_file(csvdata, mimetype="text/csv")
+    return send_file(csvdata, mimetype="text/csv", cache_timeout=900)
