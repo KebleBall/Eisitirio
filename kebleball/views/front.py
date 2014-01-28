@@ -213,7 +213,8 @@ def register():
     flash(
         (
             u'Before you can log in, you must confirm your email address. '
-            u'Please check your email for further instructions.'
+            u'Please check your email for further instructions. If the message '
+            u'does not arrive, please check your spam/junk mail folder.'
         ),
         'info'
     )
