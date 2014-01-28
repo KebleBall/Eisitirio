@@ -25,6 +25,13 @@ class EmailManager:
 
         atexit.register(self.shutdown)
 
+    def smtp_open(self):
+        try:
+            status = self.smtp.noop()[0]
+        except:  # smtplib.SMTPServerDisconnected
+            status = -1
+        return True if status == 250 else False
+
     def get_template(self, template):
         if self.jinjaenv is None:
             self.jinjaenv = Environment(
@@ -74,7 +81,7 @@ class EmailManager:
         self.sendMsg(msg)
 
     def sendMsg(self, msg):
-        if self.smtp is None:
+        if self.smtp is None or not self.smtp_open():
             self.smtp = smtplib.SMTP(self.smtp_host)
 
         try:
@@ -129,5 +136,5 @@ class EmailManager:
             )
 
     def shutdown(self):
-        if self.smtp is not None:
+        if self.smtp is not None and self.smtp_open():
             self.smtp.quit()
