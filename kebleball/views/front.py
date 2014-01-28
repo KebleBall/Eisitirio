@@ -422,8 +422,8 @@ def destroyAccount(userID, secretkey):
     if user is not None and user.secretkey == secretkey:
         if not user.is_verified():
             for entry in user.events:
-                entry.message = (
-                    entry.message +
+                entry.action = (
+                    entry.action +
                     " (destroyed user with email address {0})".format(
                         self.email
                     )
