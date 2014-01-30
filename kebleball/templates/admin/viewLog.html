@@ -12,8 +12,10 @@
             <p><strong>Timestamp</strong>: {{ log.timestamp.strftime('%c') }}</p>
             <p><strong>IP Address</strong>: {{ log.ip }}</p>
             <p><strong>Message</strong>: {{ log.action }}</p>
-            <p><strong>User</strong>: <a href="{{ url_for('admin.viewUser', id=log.user_id) }}">{{ log.user.fullname }}</a></p>
-            {% if log.actor_id != log.user_id %}
+            {% if log.user_id != None %}
+                <p><strong>User</strong>: <a href="{{ url_for('admin.viewUser', id=log.user_id) }}">{{ log.user.fullname }}</a></p>
+            {% endif %}
+            {% if log.actor_id != log.user_id and log.actor_id != None %}
                 <p><strong>Actor</strong>: <a href="{{ url_for('admin.viewUser', id=log.actor_id) }}">{{ log.actor.fullname }}</a></p>
             {% endif %}
             {% if log.transaction_id != None %}
