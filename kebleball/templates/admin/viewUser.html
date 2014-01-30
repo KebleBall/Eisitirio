@@ -161,6 +161,7 @@
                     <thead>
                         <tr>
                             <th>Transaction ID</th>
+                            <th>eWay ID</th>
                             <th>Commenced</th>
                             <th>Success</th>
                             <th>Status</th>
@@ -171,6 +172,7 @@
                         {% for transaction in user.transactions %}
                             <tr>
                                 <td>{{ '%05d' % transaction.id }}</td>
+                                <td>{% if transaction.ewayid != None %}{{ transaction.ewayid }}{% else %}N/A{% endif %}
                                 <td>{{ transaction.commenced.strftime('%c') }}</td>
                                 <td>{{ transaction.getSuccess() }}</td>
                                 <td>{{ transaction.getStatus()[1] }}</td>
