@@ -430,6 +430,7 @@ class CardTransaction(db.Model):
 
             return True
         else:
+            app.log_manager.log_purchase('warning',str(response))
             return False
 
     @staticmethod
