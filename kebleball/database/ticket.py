@@ -416,7 +416,7 @@ class Ticket(db.Model):
                 resale_from.email,
                 "Complete Ticket Resale",
                 "completeResale.email",
-                resale_to=resale_from,
+                resale_to=resale_to,
                 completeurl=url_for(
                     'resale.resaleComplete',
                     resale_from=resale_from.id,
