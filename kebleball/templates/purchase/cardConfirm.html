@@ -5,6 +5,7 @@
 
 {% block content %}
     <section id="cardConfirm" class="columns">
+        <p><strong>IMPORTANT</strong>: Once you have pressed the "Pay Now" button after entering your card details on our payment gateway, and have reached a page with a button reading "Finalize Payment", your card has been charged. You must then return to our site by pressing the "Finalize Payment" button, so that we are made aware that the payment is completed. If you have reached this page, but your tickets still show as unpaid on our system, please <strong>DO NOT</strong> attempt payment again, but instead contact <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a> for assistance.</p>
         <h3>Your Tickets</h3>
         {% if current_user.hasUnpaidTickets('Card') %}
             <form action="{{ url_for('purchase.cardConfirm') }}" method="post">
