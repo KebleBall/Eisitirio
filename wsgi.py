@@ -5,7 +5,11 @@ sys.path.append(os.path.realpath(__file__).replace('/wsgi.py',''))
 
 from kebleball import app
 from werkzeug.debug import DebuggedApplication
+import newrelic.agent
 
+newrelic.agent.initialize('/var/www/flask_kebleball/newrelic.ini')
+
+@newrelic.agent.wsgi_application()
 def application(req_environ, start_response):
     if 'KEBLE_BALL_ENV' in req_environ:
         if req_environ['KEBLE_BALL_ENV'] == 'STAGING':
