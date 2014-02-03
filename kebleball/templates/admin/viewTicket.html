@@ -35,7 +35,7 @@
                 <li>Ticket <strong>is{% if not ticket.paid %} not{% endif %}</strong> paid.</li>
                 <li>Ticket <strong>is{% if not ticket.cancelled %} not{% endif %}</strong> cancelled.</li>
                 <li>Ticket <strong>is{% if not ticket.collected %} not{% endif %}</strong> collected.</li>
-                <li>Ticket <strong>is{% if ticket.reselling_to_id != None %} not{% endif %}</strong> being resold.</li>
+                <li>Ticket <strong>is{% if ticket.reselling_to_id == None %} not{% endif %}</strong> being resold.</li>
                 <li>Ticket <strong>has{% if not ticket.resold %} not{% endif %}</strong> been resold.</li>
             </ul>
             <h4>Ticket Notes</h4>

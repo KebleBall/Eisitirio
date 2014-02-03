@@ -46,29 +46,27 @@ class EmailManager:
     def sendTemplate(self, to, subject, template, **kwargs):
         template = self.get_template(template)
 
-        msg = MIMEText(
-            template.render(**kwargs)
-        )
-
-        msg['Subject'] = ("[Keble Ball] - " + subject)
         try:
-            msg['From'] = kwargs['email_from']
+            msgfrom = kwargs['email_from']
         except KeyError:
-            msg['From'] = self.defaultfrom
+            msgfrom = self.defaultfrom
 
-        if isinstance(to, list):
-            for email in to:
-                msg['To'] = email
-        else:
-            msg['To'] = to
-
-        self.sendMsg(msg)
+        self.sendText(
+            to,
+            subject,
+            template.render(**kwargs),
+            msgfrom
+        )
 
     def sendText(self, to, subject, text, msgfrom=None):
         if msgfrom is None:
             msgfrom = self.defaultfrom
 
-        msg = MIMEText(text)
+        msg = MIMEText(
+            text,
+            'plain',
+            'utf-8'
+        )
 
         msg['Subject'] = ("[Keble Ball] - " + subject)
         msg['From'] = msgfrom

@@ -199,7 +199,8 @@ class CardTransaction(db.Model):
             "Customer": {
               "Reference": "U{0:05d}".format(self.user.id),
               "FirstName": self.user.firstname,
-              "LastName": self.user.surname
+              "LastName": self.user.surname,
+              "Email": self.user.email
             },
             "Payment": {
               "TotalAmount": self.getValue(),

@@ -224,29 +224,17 @@ with file_lock(os.path.abspath('./cron.lock')):
         db.session.add_all(statistics)
         db.session.commit()
 
-    try:
-        with open('cron_timestamp_1day.txt', 'r') as f:
-            timestamp_1day = int(f.read().strip())
-    except IOError:
-        print 'cron_timestamp_1day.txt not found'
-        timestamp_1day = 0
-
-    last_run_1day = datetime.fromtimestamp(timestamp_1day)
-
-    difference_1day = now - last_run_1day
-
-    if difference_1day > timedelta(days=1):
-        with open('cron_timestamp_1day.txt', 'w') as f:
-            f.write(now.strftime('%s'))
-
-        _3days = now + timedelta(days=3)
-        _2days = now + timedelta(days=2)
-        _1day = now + timedelta(days=1)
+        _3day_start = now + timedelta(days=3)
+        _3day_end = now + timedelta(days=3, minutes=20)
+        _1day_start = now + timedelta(days=1)
+        _1day_end = now + timedelta(days=1, minutes=20)
 
         tickets_3days = Ticket.query \
             .filter(Ticket.expires != None) \
-            .filter(Ticket.expires > _2days) \
-            .filter(Ticket.expires < _3days) \
+            .filter(Ticket.expires > _3day_start) \
+            .filter(Ticket.expires < _3day_end) \
+            .filter(Ticket.cancelled == False) \
+            .filter(Ticket.paid == False) \
             .group_by(Ticket.owner_id) \
             .all()
 
@@ -260,8 +248,10 @@ with file_lock(os.path.abspath('./cron.lock')):
 
         tickets_1day = Ticket.query \
             .filter(Ticket.expires != None) \
-            .filter(Ticket.expires > now) \
-            .filter(Ticket.expires < _1day) \
+            .filter(Ticket.expires > _1day_start) \
+            .filter(Ticket.expires < _1day_end) \
+            .filter(Ticket.cancelled == False) \
+            .filter(Ticket.paid == False) \
             .group_by(Ticket.owner_id) \
             .all()
 

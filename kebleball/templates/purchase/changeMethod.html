@@ -19,7 +19,7 @@
                     </thead>
                     <tbody>
                         {% for ticket in current_user.tickets %}
-                            {% if not ticket.paid %}
+                            {% if not ticket.paid and not ticket.cancelled %}
                                 <tr id="ticket-{{ ticket.id }}">
                                     <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.id }}" value="{{ ticket.id }}" {% if tickets and ticket.id in tickets %}checked="checked" {% endif %}/></td>
                                     <td><label for="ticketSelect-{{ ticket.id }}">#{{ '%05d' % ticket.id }}</label></td>
