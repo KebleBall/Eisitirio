@@ -1,0 +1,17 @@
+# [todo] - Limited ticket release
+# [todo] - Individually enable payment methods
+# [todo] - Make all on/off switches support datetime and add helper class
+# [fix] - Card Refunds
+# [todo] - Add more fields to announcement - Paid/Unpaid, Payment Method
+# [todo] - Make notification emails use a last_notified field
+# [todo] - Set up alerts when errors are logged
+# [fix] - Make sure log entries are recording actor/user correctly
+# [fix] - Add logging to cron_worker
+# [todo] - Write documentation
+# [todo] - Gift tickets
+# [todo] - Admin set ticket names
+# [todo] - Automatically set ticket terms
+# [todo] - Session timeout
+# [todo] - Show waiting list
+# [todo] - Switches to activate cron_worker functions
+# [todo] - Ticket checking interface
