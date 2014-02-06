@@ -325,7 +325,7 @@ def changeMethod():
             flash(u'You must give a reason for paying by cash or cheque.', 'error')
             return render_template(
                 'purchase/changeMethod.html',
-                tickets = request.form['tickets']
+                tickets=request.form.getlist('tickets[]')
             )
         elif 'paymentReason' in request.form:
             reason = request.form['paymentReason']

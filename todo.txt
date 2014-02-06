@@ -15,3 +15,5 @@
 # [todo] - Show waiting list
 # [todo] - Switches to activate cron_worker functions
 # [todo] - Ticket checking interface
+# [todo] - Add cancelled to search
+# [fix] - Make num per page remember on search

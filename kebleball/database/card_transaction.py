@@ -332,7 +332,7 @@ class CardTransaction(db.Model):
                         app.log_manager.log_event(
                             'Completed Card Payment',
                             self.tickets,
-                            current_user,
+                            self.user_id,
                             self
                         )
 
@@ -376,7 +376,7 @@ class CardTransaction(db.Model):
         app.log_manager.log_event(
             'Cancelled Card Payment',
             self.tickets,
-            current_user,
+            self.user_id,
             self
         )
 

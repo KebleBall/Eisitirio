@@ -7,6 +7,7 @@ from kebleball.database import db
 from kebleball.database.college import College
 from kebleball.database.affiliation import Affiliation
 from kebleball.database.announcement import Announcement
+from kebleball.database.user import User
 from kebleball.helpers import generate_key
 
 log = app.log_manager.log_dashboard

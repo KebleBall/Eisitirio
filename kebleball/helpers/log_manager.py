@@ -75,6 +75,9 @@ class LogManager(object):
         else:
             actor = None
 
+        if user is not None and user.is_anonymous():
+            user = None
+
         entry = Log(
             request.remote_addr,
             message,

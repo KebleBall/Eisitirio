@@ -77,6 +77,7 @@ def error404(e):
 #@app.errorhandler(Exception)
 @app.errorhandler(500)
 @app.errorhandler(405)
+@app.errorhandler(400)
 def error500(e):
     log(
         'error',
