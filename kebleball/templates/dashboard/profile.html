@@ -27,6 +27,11 @@
                         <label for="phone">Phone Number</label>
                         <input type="text" name="phone" id="phone" value="{{ current_user.phone }}" />
                     </div>
+                    {% if current_user.newemail != None %}
+                        <div class="large-12 columns">
+                            <div class="message-box info">Awaiting verification of new email address {{ current_user.newemail }}</div>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="row">
                     <div class="large-6 columns">

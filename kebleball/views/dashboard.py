@@ -9,6 +9,7 @@ from kebleball.database.affiliation import Affiliation
 from kebleball.database.announcement import Announcement
 from kebleball.database.user import User
 from kebleball.helpers import generate_key
+from datetime import datetime, timedelta
 
 log = app.log_manager.log_dashboard
 log_event = app.log_manager.log_event
@@ -119,8 +120,8 @@ def profile():
                     "emailChangeConfirm.email",
                     confirmurl=url_for(
                         'front.confirmEmail',
-                        userID=user.id,
-                        secretkey=user.secretkey,
+                        userID=current_user.id,
+                        secretkey=current_user.secretkey,
                         _external=True
                     )
                 )
@@ -131,7 +132,7 @@ def profile():
                         u'sure that we can contact you if necessary. Please '
                         u'check your email for further instructions.'
                     ),
-                    info
+                    'info'
                 )
 
             if (

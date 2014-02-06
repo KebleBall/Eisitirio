@@ -1362,7 +1362,7 @@ a { font-weight: bold; }
 #copyright { text-align: center; }
 
 /* line 36, style.scss */
-.message-box, #flashes li { display: block; border: 3px solid; padding: 0.5em; margin: 0.5em; }
+.message-box, #flashes li { display: block; border: 3px solid; padding: 0.5em; margin-bottom: 0.5em; }
 /* line 41, style.scss */
 .message-box.error, #flashes li.error { background-color: #f3afbf; border: 3px solid #f31323; }
 /* line 45, style.scss */
@@ -1376,19 +1376,21 @@ a { font-weight: bold; }
 
 /* line 63, style.scss */
 #flashes ul { margin: 0; }
+/* line 66, style.scss */
+#flashes li { margin: 0.5em; }
 
-/* line 71, style.scss */
+/* line 72, style.scss */
 p.small { font-size: 0.75rem; }
 
-/* line 75, style.scss */
+/* line 76, style.scss */
 table .button { margin: 0; }
 
-/* line 81, style.scss */
+/* line 82, style.scss */
 #giveTickets input, #refundTransaction input { display: inline; }
-/* line 83, style.scss */
+/* line 84, style.scss */
 #giveTickets input[type="number"], #refundTransaction input[type="number"] { width: 5rem; }
-/* line 86, style.scss */
+/* line 87, style.scss */
 #giveTickets input[type="text"], #refundTransaction input[type="text"] { width: auto; }
 
-/* line 92, style.scss */
+/* line 93, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
