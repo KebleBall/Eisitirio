@@ -10,7 +10,7 @@ import logging
 from kebleball.database import db
 from kebleball.database.log import Log
 from flask import session, current_app
-from flask.ext.login import current_user, request
+from flask.ext.login import current_user, request, AnonymousUserMixin
 
 class LogManager(object):
     def __init__(self, app):
@@ -75,7 +75,10 @@ class LogManager(object):
         else:
             actor = None
 
-        if user is not None and user.is_anonymous():
+        if (
+            user is not None and
+            not isinstance(user, AnonymousUserMixin)
+        ):
             user = None
 
         entry = Log(
