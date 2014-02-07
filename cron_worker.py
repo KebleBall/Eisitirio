@@ -172,7 +172,10 @@ with file_lock(os.path.abspath('./cron.lock')):
             'Ordered':
                 Ticket.count(),
             'Paid':
-                Ticket.query.filter(Ticket.paid == True).count(),
+                Ticket.query \
+                    .filter(Ticket.paid == True) \
+                    .filter(Ticket.cancelled == False) \
+                    .count(),
             'Cancelled':
                 Ticket.query.filter(Ticket.cancelled == True).count(),
             'Collected':
