@@ -228,9 +228,9 @@ with file_lock(os.path.abspath('./cron.lock')):
         db.session.commit()
 
         _3day_start = now + timedelta(days=3)
-        _3day_end = now + timedelta(days=3, minutes=20)
+        _3day_end = now + timedelta(days=3) + difference_20min
         _1day_start = now + timedelta(days=1)
-        _1day_end = now + timedelta(days=1, minutes=20)
+        _1day_end = now + timedelta(days=1) + difference_20min
 
         tickets_3days = Ticket.query \
             .filter(Ticket.expires != None) \
