@@ -116,6 +116,8 @@ with file_lock(os.path.abspath('./cron.lock')):
 
                 db.session.commit()
 
+                tickets_available = tickets_available - wait.waitingfor
+
         tickets_expired = Ticket.query \
             .filter(Ticket.expires != None) \
             .filter(Ticket.expires < datetime.utcnow()) \

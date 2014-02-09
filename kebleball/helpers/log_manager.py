@@ -75,10 +75,7 @@ class LogManager(object):
         else:
             actor = None
 
-        if (
-            user is not None and
-            not isinstance(user, AnonymousUserMixin)
-        ):
+        if isinstance(user, AnonymousUserMixin):
             user = None
 
         entry = Log(
