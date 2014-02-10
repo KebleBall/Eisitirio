@@ -11,7 +11,8 @@ def check_for_maintenance():
         app.config['MAINTENANCE_MODE'] = True
         if (
             'maintenance' not in request.path and
-            'static' not in request.path
+            'static' not in request.path and
+            request.remote_addr != '129.67.54.70'
         ):
             return redirect(url_for('maintenance'))
 
