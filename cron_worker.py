@@ -121,12 +121,14 @@ with file_lock(os.path.abspath('./cron.lock')):
         tickets_expired = Ticket.query \
             .filter(Ticket.expires != None) \
             .filter(Ticket.expires < datetime.utcnow()) \
+            .filter(Ticket.cancelled == False) \
             .filter(Ticket.paid == False) \
             .all()
 
         for ticket in tickets_expired:
             ticket.addNote('Cancelled due to non-payment within time limit')
             ticket.cancelled = True
+            ticket.expires = None
 
         db.session.commit()
 
