@@ -715,6 +715,36 @@ def cancelTicket(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
+@admin.route('/admin/ticket/validate', methods=['POST', 'GET'])
+@admin_required
+def validateTicket():
+    valid = None
+    message = None
+
+    if request.method == 'POST':
+        ticket = Ticket.query.filter(Ticket.barcode==request.form['barcode']).first()
+
+        if not ticket:
+            valid = False
+            message = "No such ticket with barcode {0}".format(request.form['barcode'])
+        elif ticket.entered:
+            valid = False
+            message = (
+                "Ticket has already been used for "
+                "entry. Check ID against {0}"
+            ).format(ticket.name)
+        else:
+            ticket.entered = True
+            db.session.commit()
+            valid = True
+            message = "Permit Entry"
+
+    return render_template(
+        'admin/validateTicket.html',
+        valid=valid,
+        message=message
+    )
+
 @admin.route('/admin/log/<int:id>/view')
 @admin_required
 def viewLog(id):
