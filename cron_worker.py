@@ -6,14 +6,12 @@ import os, sys
 from contextlib import contextmanager
 from kebleball.app import app
 
-if (
-    'KEBLE_BALL_ENV' in os.environ and
-    os.environ['KEBLE_BALL_ENV'] in [
-        'PRODUCTION',
-        'STAGING'
-    ]
-):
-    app.config.from_pyfile('config/production.py')
+if 'KEBLE_BALL_ENV' in os.environ:
+    if os.environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
+        app.config.from_pyfile('config/production.py')
+    elif os.environ['KEBLE_BALL_ENV'] == 'STAGING:
+        app.config.from_pyfile('config/staging.py')
+
 
 from kebleball.database import *
 from kebleball.helpers.email_manager import EmailManager
@@ -32,17 +30,17 @@ def file_lock(lock_file):
         finally:
             os.remove(lock_file)
 
-with file_lock(os.path.abspath('./cron.lock')):
+with file_lock(os.path.abspath('./' + app.config['ENVIRONMENT'] + '.cron.lock')):
     email_manager = EmailManager(app)
     app.email_manager = email_manager
 
     now = datetime.utcnow()
 
     try:
-        with open('cron_timestamp_5min.txt', 'r') as f:
+        with open(app.config['ENVIRONMENT'] + '_cron_timestamp_5min.txt', 'r') as f:
             timestamp_5min = int(f.read().strip())
     except IOError:
-        print 'cron_timestamp_5min.txt not found'
+        print app.config['ENVIRONMENT'] + '_cron_timestamp_5min.txt not found'
         timestamp_5min = 0
 
     last_run_5min = datetime.fromtimestamp(timestamp_5min)
@@ -50,7 +48,7 @@ with file_lock(os.path.abspath('./cron.lock')):
     difference_5min = now - last_run_5min
 
     if difference_5min > timedelta(minutes=5):
-        with open('cron_timestamp_5min.txt', 'w') as f:
+        with open(app.config['ENVIRONMENT'] + '_cron_timestamp_5min.txt', 'w') as f:
             f.write(now.strftime('%s'))
 
         emails_count = app.config['EMAILS_BATCH']
@@ -144,10 +142,10 @@ with file_lock(os.path.abspath('./cron.lock')):
         db.session.commit()
 
     try:
-        with open('cron_timestamp_20min.txt', 'r') as f:
+        with open(app.config['ENVIRONMENT'] + '_cron_timestamp_20min.txt', 'r') as f:
             timestamp_20min = int(f.read().strip())
     except IOError:
-        print 'cron_timestamp_20min.txt not found'
+        print app.config['ENVIRONMENT'] + '_cron_timestamp_20min.txt not found'
         timestamp_20min = 0
 
     last_run_20min = datetime.fromtimestamp(timestamp_20min)
@@ -155,7 +153,7 @@ with file_lock(os.path.abspath('./cron.lock')):
     difference_20min = now - last_run_20min
 
     if difference_20min > timedelta(minutes=20):
-        with open('cron_timestamp_20min.txt', 'w') as f:
+        with open(app.config['ENVIRONMENT'] + '_cron_timestamp_20min.txt', 'w') as f:
             f.write(now.strftime('%s'))
 
         statistic_limit = now - app.config['STATISTICS_KEEP']
