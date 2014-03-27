@@ -14,6 +14,7 @@ class EmailManager:
     def __init__(self, app):
         self.defaultfrom = app.config['EMAIL_FROM']
         self.smtp_host = app.config['SMTP_HOST']
+        self.send_emails = app.config['SEND_EMAILS']
 
         app.emailer = self
 
@@ -79,6 +80,13 @@ class EmailManager:
         self.sendMsg(msg)
 
     def sendMsg(self, msg):
+        if not self.send_emails:
+            self.log(
+                'info',
+                'Email not sent per application policy'
+            )
+            return
+
         if self.smtp is None or not self.smtp_open():
             self.smtp = smtplib.SMTP(self.smtp_host)
 
