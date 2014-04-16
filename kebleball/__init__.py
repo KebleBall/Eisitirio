@@ -19,6 +19,7 @@ from kebleball.helpers.log_manager import LogManager
 from kebleball.helpers.login_manager import loginManager
 from kebleball.helpers.email_manager import EmailManager
 from flask.ext.markdown import Markdown
+from werkzeug.exceptions import NotFound
 
 log_manager = LogManager(app)
 app.log_manager = log_manager
@@ -63,6 +64,7 @@ def environment():
 def maintenance():
     return render_template('maintenance.html'), 503
 
+@app.errorhandler(NotFound)
 @app.errorhandler(404)
 def error404(e):
     log(
@@ -74,19 +76,30 @@ def error404(e):
     )
     return render_template('404.html'), 404
 
-#@app.errorhandler(Exception)
-@app.errorhandler(500)
-@app.errorhandler(405)
-@app.errorhandler(400)
-def error500(e):
+def serverError(code, error):
     log(
         'error',
         '500 server error for URL {0}, error {1}'.format(
             request.url,
-            e
+            error
         )
     )
-    return render_template('500.html')
+    return render_template('500.html'), code
+
+#@app.errorhandler(Exception)
+@app.errorhandler(500)
+def error500(e):
+    return serverError(500, e)
+
+
+@app.errorhandler(405)
+def error500(e):
+    return serverError(405, e)
+
+
+@app.errorhandler(400)
+def error500(e):
+    return serverError(400, e)
 
 @app.context_processor
 def utility_processor():
