@@ -9,7 +9,7 @@ from kebleball.app import app
 if 'KEBLE_BALL_ENV' in os.environ:
     if os.environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
         app.config.from_pyfile('config/production.py')
-    elif os.environ['KEBLE_BALL_ENV'] == 'STAGING:
+    elif os.environ['KEBLE_BALL_ENV'] == 'STAGING':
         app.config.from_pyfile('config/staging.py')
 
 
