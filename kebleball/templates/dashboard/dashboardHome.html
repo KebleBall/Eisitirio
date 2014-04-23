@@ -50,7 +50,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if not ticket.cancelled %}
+                                {% if not (ticket.cancelled or ticket.collected) %}
                                     {% if not ticket.paid %}
                                         {% if ticket.paymentmethod != None %}
                                             <a href="{{ url_for('purchase.changeMethod') }}" class="button tiny">Change Payment Method</a>

@@ -495,6 +495,8 @@ class Ticket(db.Model):
             return False
         elif app.config['LOCKDOWN_MODE']:
             return False
+        elif self.collected:
+            return False
         elif self.resalekey is not None:
             return False
         elif self.resold:
@@ -520,6 +522,15 @@ class Ticket(db.Model):
             not self.collected and
             not self.cancelled and
             self.name is not None
+        )
+
+    def canBeResold(self):
+        return (
+            self.paid and
+            not self.collected and
+            not self.cancelled and
+            self.resalekey == None and
+            not app.config['LOCKDOWN_MODE']
         )
 
     def canChangeName(self):
