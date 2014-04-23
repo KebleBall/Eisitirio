@@ -143,8 +143,8 @@ class Announcement(db.Model):
                  sender,
                  send_email,
                  college=None,
-                 has_tickets=None,
                  affiliation=None,
+                 has_tickets=None,
                  is_waiting=None,
                  has_collected=None,
                  has_uncollected=None):
