@@ -737,7 +737,7 @@ def validateTicket():
             ticket.entered = True
             db.session.commit()
             valid = True
-            message = "Permit Entry"
+            message = "Permit entry for {0}".format(ticket.name)
 
     return render_template(
         'admin/validateTicket.html',
