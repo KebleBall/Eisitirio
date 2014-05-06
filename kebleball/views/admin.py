@@ -567,6 +567,15 @@ def viewTicket(id, eventsPage=1):
 @admin.route('/admin/ticket/<int:id>/collect', methods=['POST'])
 @admin_required
 def collectTicket(id):
+    existing = Ticket.query.filter(Ticket.barcode==request.form['barcode']).count()
+
+    if existing > 0:
+        flash(
+            u'Barcode has already been used for a ticket.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
     ticket = Ticket.get_by_id(id)
 
     if ticket:
