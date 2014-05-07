@@ -740,8 +740,11 @@ def validateTicket():
             valid = False
             message = (
                 "Ticket has already been used for "
-                "entry. Check ID against {0}"
-            ).format(ticket.name)
+                "entry. Check ID against {0} (owned by {1})"
+            ).format(
+                ticket.name,
+                ticket.owner.fullname
+            )
         else:
             ticket.entered = True
             db.session.commit()
