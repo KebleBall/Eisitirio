@@ -111,6 +111,12 @@
                     </div>
                     <div class="row">
                         <div class="columns">
+                            <label for="ticketBarcode">Ticket Barcode</label>
+                            <input type="text" name="ticketBarcode" id="ticketBarcode" {% if form['ticketBarcode'] %}value="{{ form['ticketBarcode'] }}" {% endif %}/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="columns">
                             <label for="ticketMinPrice">Minimum Ticket Price</label>
                             <input type="number" name="ticketMinPrice" id="ticketMinPrice" {% if form['ticketMinPrice'] %}value="{{ form['ticketMinPrice'] }}" {% endif %}/>
                         </div>
