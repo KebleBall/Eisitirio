@@ -116,6 +116,13 @@ def adminHome(page=1):
             hasTicketFilter = True
 
         if (
+            'ticketBarcode' in request.form and
+            request.form['ticketBarcode'] != ''
+        ):
+            ticketQuery = ticketQuery.filter(Ticket.barcode == request.form['ticketBarcode'])
+            hasTicketFilter = True
+
+        if (
             'ticketMinPrice' in request.form and
             request.form['ticketMinPrice'] != ''
         ):
