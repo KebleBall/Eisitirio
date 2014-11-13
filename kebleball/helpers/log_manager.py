@@ -14,6 +14,8 @@ from flask.ext.login import current_user, request, AnonymousUserMixin
 
 class LogManager(object):
     def __init__(self, app):
+        app.log_manager = self
+
         logging.basicConfig(
             level=app.config['LOG_LEVEL'],
             format=(

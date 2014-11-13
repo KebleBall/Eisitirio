@@ -1,22 +1,26 @@
 # coding: utf-8
+#
 from functools import wraps
 
-from flask import redirect, url_for, flash, current_app
-from flask.ext.login import LoginManager, current_user
-from kebleball.database.user import User
+from flask import current_app
+from flask import flash
+from flask import redirect
+from flask import url_for
+from flask.ext import login as flask_login
 
-loginManager = LoginManager()
+from kebleball import database as db
 
-@loginManager.user_loader
+LOGIN_MANAGER = flask_login.LoginManager()
+
+@LOGIN_MANAGER.user_loader
 def load_user(user_id):
     if current_app.config['MAINTENANCE_MODE']:
-        return loginManager.anonymous_user
+        return LOGIN_MANAGER.anonymous_user
     else:
-        return User.get_by_id(user_id)
+        return db.User.get_by_id(user_id)
 
-loginManager.login_view = "front.home"
-
-loginManager.session_protection = "strong"
+LOGIN_MANAGER.login_view = "front.home"
+LOGIN_MANAGER.session_protection = "strong"
 
 # Crude duplicate of the Flask-Login login_required decorator
 def admin_required(func):
@@ -24,9 +28,9 @@ def admin_required(func):
     def decorated_view(*args, **kwargs):
         if current_app.login_manager._login_disabled:
             return func(*args, **kwargs)
-        elif not current_user.is_authenticated():
+        elif not flask_login.current_user.is_authenticated():
             return current_app.login_manager.unauthorized()
-        elif not current_user.isAdmin():
+        elif not flask_login.current_user.isAdmin():
             flash(
                 u'You are not permitted to perform that action',
                 'error'

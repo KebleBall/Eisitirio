@@ -21,7 +21,7 @@
                         <tr id="ticket-{{ ticket.id }}">
                             <td>#{{ '%05d' % ticket.id }}</td>
                             <td>
-                                {% if ticket.canChangeName() %}
+                                {% if ticket.can_change_name() %}
                                     <span id="ticketNameDisplay-{{ ticket.id }}"><span id="ticketName-{{ ticket.id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="changeTicketName({{ ticket.id }}, false)">Change</a>)</span>
                                     <span id="ticketNameForm-{{ ticket.id }}" style="display: none;"><input name="ticketNameInput-{{ ticket.id }}" id="ticketNameInput-{{ ticket.id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="changeTicketName({{ ticket.id }}, true)">Submit</button></span>
                                 {% else %}

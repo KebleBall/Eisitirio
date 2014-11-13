@@ -15,9 +15,9 @@ from datetime import datetime, timedelta
 log = app.log_manager.log_front
 log_event = app.log_manager.log_event
 
-front = Blueprint('front', __name__)
+FRONT = Blueprint('front', __name__)
 
-@front.route('/home')
+@FRONT.route('/home')
 def home():
     return render_template(
         'front/home.html',
@@ -26,7 +26,7 @@ def home():
         form={}
     )
 
-@front.route('/login', methods=['POST'])
+@FRONT.route('/login', methods=['POST'])
 def login():
     user = User.get_by_email(request.form['email'])
 
@@ -78,7 +78,7 @@ def login():
     flash(u'Logged in successfully.', 'success')
     return redirect(request.form.get('next', False) or url_for("dashboard.dashboardHome"))
 
-@front.route('/register', methods=['POST'])
+@FRONT.route('/register', methods=['POST'])
 def register():
     valid = True
     flashes = []
@@ -220,11 +220,11 @@ def register():
     )
     return redirect(url_for('front.home'))
 
-@front.route('/terms')
+@FRONT.route('/terms')
 def terms():
     return render_template('front/terms.html')
 
-@front.route('/passwordreset', methods=['GET','POST'])
+@FRONT.route('/passwordreset', methods=['GET','POST'])
 def passwordReset():
     if request.method == 'POST':
         user = User.get_by_email(request.form['email'])
@@ -283,7 +283,7 @@ def passwordReset():
     else:
         return render_template('front/passwordReset.html')
 
-@front.route('/emailconfirm', methods=['GET','POST'])
+@FRONT.route('/emailconfirm', methods=['GET','POST'])
 def emailConfirm():
     if request.method == 'POST':
         user = User.get_by_email(request.form['email'])
@@ -345,7 +345,7 @@ def emailConfirm():
     else:
         return render_template('front/emailConfirm.html')
 
-@front.route('/resetpassword/<int:userID>/<secretkey>', methods=['GET', 'POST'])
+@FRONT.route('/resetpassword/<int:userID>/<secretkey>', methods=['GET', 'POST'])
 def resetPassword(userID, secretkey):
     user = User.get_by_id(userID)
 
@@ -390,7 +390,7 @@ def resetPassword(userID, secretkey):
             secretkey=secretkey
         )
 
-@front.route('/confirmemail/<int:userID>/<secretkey>')
+@FRONT.route('/confirmemail/<int:userID>/<secretkey>')
 def confirmEmail(userID, secretkey):
     user = User.get_by_id(userID)
 
@@ -416,7 +416,7 @@ def confirmEmail(userID, secretkey):
 
     return redirect(url_for('front.home'))
 
-@front.route('/destroyaccount/<int:userID>/<secretkey>')
+@FRONT.route('/destroyaccount/<int:userID>/<secretkey>')
 def destroyAccount(userID, secretkey):
     user = User.get_by_id(userID)
 
@@ -454,7 +454,7 @@ def destroyAccount(userID, secretkey):
 
     return redirect(url_for('front.home'))
 
-@front.route('/logout')
+@FRONT.route('/logout')
 @login_required
 def logout():
     if 'actor_id' in session:

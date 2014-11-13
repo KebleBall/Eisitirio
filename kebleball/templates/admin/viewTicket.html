@@ -46,7 +46,7 @@
             <h4>Actions</h4>
             <ul>
                 {% if not ticket.cancelled %}
-                    {% if ticket.canBeCancelledAutomatically() %}
+                    {% if ticket.can_be_cancelled_automatically() %}
                         <li><a href="{{ url_for('admin.autoCancelTicket', id=ticket.id) }}" class="button tiny">Refund &amp; Cancel</a></li>
                     {% endif %}
                     <li><a href="{{ url_for('admin.cancelTicket', id=ticket.id) }}" class="button tiny">Cancel</a><span class="small">N.B. This does not process any refund on the ticket</span></li>

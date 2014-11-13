@@ -16,7 +16,7 @@ class EmailManager:
         self.smtp_host = app.config['SMTP_HOST']
         self.send_emails = app.config['SEND_EMAILS']
 
-        app.emailer = self
+        app.email_manager = self
 
         self.log = app.log_manager.log_email
 

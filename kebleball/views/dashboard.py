@@ -14,14 +14,14 @@ from datetime import datetime, timedelta
 log = app.log_manager.log_dashboard
 log_event = app.log_manager.log_event
 
-dashboard = Blueprint('dashboard', __name__)
+DASHBOARD = Blueprint('dashboard', __name__)
 
-@dashboard.route('/dashboard')
+@DASHBOARD.route('/dashboard')
 @login_required
 def dashboardHome():
     return render_template('dashboard/dashboardHome.html')
 
-@dashboard.route('/dashboard/profile', methods=['GET','POST'])
+@DASHBOARD.route('/dashboard/profile', methods=['GET','POST'])
 @login_required
 def profile():
     if request.method == 'POST':
@@ -166,7 +166,7 @@ def profile():
         affiliations = Affiliation.query.all()
     )
 
-@dashboard.route('/dashboard/announcement/<int:announcementID>')
+@DASHBOARD.route('/dashboard/announcement/<int:announcementID>')
 @login_required
 def announcement(announcementID):
     announcement = Announcement.get_by_id(announcementID)

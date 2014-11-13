@@ -12,9 +12,9 @@ import json
 
 log = app.log_manager.log_ajax
 
-ajax = Blueprint('ajax', __name__)
+AJAX = Blueprint('ajax', __name__)
 
-@ajax.route('/ajax/validate/voucher', methods=['POST'])
+@AJAX.route('/ajax/validate/voucher', methods=['POST'])
 def ajaxValidateVoucher():
     (result, response, voucher) = validateVoucher(request.form['code'])
 
@@ -23,7 +23,7 @@ def ajaxValidateVoucher():
 
     return Response(json.dumps(response), mimetype="text/json")
 
-@ajax.route('/ajax/validate/referrer', methods=['POST'])
+@AJAX.route('/ajax/validate/referrer', methods=['POST'])
 def ajaxValidateReferrer():
     (result, response, referrer) = validateReferrer(request.form['email'], current_user)
 
@@ -32,7 +32,7 @@ def ajaxValidateReferrer():
 
     return Response(json.dumps(response), mimetype="text/json")
 
-@ajax.route('/ajax/validate/resale-email', methods=['POST'])
+@AJAX.route('/ajax/validate/resale-email', methods=['POST'])
 def ajaxValidateResaleEmail():
     (result, response, buyer) = validateResaleEmail(request.form['email'], current_user)
 
@@ -41,7 +41,7 @@ def ajaxValidateResaleEmail():
 
     return Response(json.dumps(response), mimetype="text/json")
 
-@ajax.route('/ajax/change/ticket/<int:id>/name', methods=['POST'])
+@AJAX.route('/ajax/change/ticket/<int:id>/name', methods=['POST'])
 def ajaxChangeTicketName(id):
     ticket = Ticket.get_by_id(id)
 

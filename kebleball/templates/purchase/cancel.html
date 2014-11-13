@@ -27,7 +27,7 @@
                 </thead>
                 <tbody>
                     {% for ticket in current_user.tickets %}
-                        {% if ticket.canBeCancelledAutomatically() %}
+                        {% if ticket.can_be_cancelled_automatically() %}
                             <tr id="ticket-{{ ticket.id }}">
                                 <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.id }}" value="{{ ticket.id }}" {% if tickets and ticket.id in tickets %}checked="checked" {% endif %}/></td>
                                 <td><label for="ticketSelect-{{ ticket.id }}">#{{ '%05d' % ticket.id }}</label></td>

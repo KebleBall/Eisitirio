@@ -9,9 +9,9 @@ from kebleball.database.ticket import Ticket
 
 log = app.log_manager.log_resale
 
-resale = Blueprint('resale', __name__)
+RESALE = Blueprint('resale', __name__)
 
-@resale.route('/resale', methods=['GET','POST'])
+@RESALE.route('/resale', methods=['GET','POST'])
 @login_required
 def resaleHome():
     if request.method == 'POST':
@@ -39,7 +39,7 @@ def resaleHome():
             )
             return(render_template('resale/resaleHome.html'))
 
-        Ticket.startResale(tickets, resale_to)
+        Ticket.start_resale(tickets, resale_to)
 
         flash(
             u'The resale process has been started',
@@ -48,7 +48,7 @@ def resaleHome():
 
     return(render_template('resale/resaleHome.html'))
 
-@resale.route('/resale/cancel', methods=['GET','POST'])
+@RESALE.route('/resale/cancel', methods=['GET','POST'])
 @login_required
 def cancelResale():
     if request.method == 'POST':
@@ -76,10 +76,10 @@ def cancelResale():
 
     return(render_template('resale/cancelResale.html'))
 
-@resale.route('/resale/confirm/<int:resale_from>/<int:resale_to>/<key>')
+@RESALE.route('/resale/confirm/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
 def resaleConfirm(resale_from, resale_to, key):
-    if Ticket.confirmResale(resale_from, resale_to, key):
+    if Ticket.confirm_resale(resale_from, resale_to, key):
         flash(
             (
                 u'The resale arrangement has been confirmed. '
@@ -101,10 +101,10 @@ def resaleConfirm(resale_from, resale_to, key):
 
     return redirect(url_for('dashboard.dashboardHome'))
 
-@resale.route('/resale/complete/<int:resale_from>/<int:resale_to>/<key>')
+@RESALE.route('/resale/complete/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
 def resaleComplete(resale_from, resale_to, key):
-    if Ticket.completeResale(resale_from, resale_to, key):
+    if Ticket.complete_resale(resale_from, resale_to, key):
         flash(
             (
                 u'The resale arrangement has been completed, and the tickets '
@@ -126,10 +126,10 @@ def resaleComplete(resale_from, resale_to, key):
 
     return redirect(url_for('dashboard.dashboardHome'))
 
-@resale.route('/resale/cancel/<int:resale_from>/<int:resale_to>/<key>')
+@RESALE.route('/resale/cancel/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
 def resaleCancel(resale_from, resale_to, key):
-    if Ticket.cancelResale(resale_from, resale_to, key):
+    if Ticket.cancel_resale(resale_from, resale_to, key):
         flash(
             u'The resale arrangement has been cancelled.',
             'info'

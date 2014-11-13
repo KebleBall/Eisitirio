@@ -319,7 +319,7 @@ class CardTransaction(db.Model):
                             )
                     else:
                         for ticket in self.tickets:
-                            ticket.markAsPaid(
+                            ticket.mark_as_paid(
                                 'Card',
                                 'Card Transaction {0}'.format(
                                     self.id

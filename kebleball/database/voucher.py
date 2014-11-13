@@ -132,13 +132,13 @@ class Voucher(db.Model):
 
     def applyToTicket(self, ticket):
         if self.discounttype == 'Fixed Price':
-            ticket.setPrice(self.discountvalue)
+            ticket.set_price(self.discountvalue)
         elif self.discounttype == 'Fixed Discount':
-            ticket.setPrice(ticket.price - self.discountvalue)
+            ticket.set_price(ticket.price - self.discountvalue)
         else:
-            ticket.setPrice(ticket.price * (100 - self.discountvalue) / 100)
+            ticket.set_price(ticket.price * (100 - self.discountvalue) / 100)
 
-        ticket.addNote('Used voucher {0}/{1}'.format(self.id, self.code))
+        ticket.add_note('Used voucher {0}/{1}'.format(self.id, self.code))
 
         return ticket
 

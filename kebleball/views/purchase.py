@@ -13,9 +13,9 @@ from kebleball.helpers.validators import validateVoucher, validateReferrer
 log = app.log_manager.log_purchase
 log_event = app.log_manager.log_event
 
-purchase = Blueprint('purchase', __name__)
+PURCHASE = Blueprint('purchase', __name__)
 
-@purchase.route('/purchase', methods=['GET','POST'])
+@PURCHASE.route('/purchase', methods=['GET','POST'])
 @login_required
 def purchaseHome():
     (buyingPermitted, ticketsAvailable, goToWait, canBuyMessage) = canBuy(current_user)
@@ -138,7 +138,7 @@ def purchaseHome():
             request.form['paymentMethod'] == 'Cheque'
         ):
             for ticket in tickets:
-                ticket.addNote(
+                ticket.add_note(
                     request.form['paymentMethod'] +
                     ' payment reason: ' +
                     request.form['paymentReason']
@@ -151,7 +151,7 @@ def purchaseHome():
 
         if referrer is not None:
             for ticket in tickets:
-                ticket.setReferrer(referrer)
+                ticket.set_referrer(referrer)
 
         db.session.add_all(tickets)
         db.session.commit()
@@ -210,7 +210,7 @@ def purchaseHome():
             canBuy=ticketsAvailable
         )
 
-@purchase.route('/purchase/wait', methods=['GET','POST'])
+@PURCHASE.route('/purchase/wait', methods=['GET','POST'])
 @login_required
 def wait():
     (waitingPermitted, waitingAvailable, canWaitMessage) = canWait(current_user)
@@ -300,7 +300,7 @@ def wait():
             canWait=waitingAvailable
         )
 
-@purchase.route('/purchase/change-method', methods=['GET','POST'])
+@PURCHASE.route('/purchase/change-method', methods=['GET','POST'])
 @login_required
 def changeMethod():
     if request.method == 'POST':
@@ -333,7 +333,7 @@ def changeMethod():
             reason = None
 
         for ticket in tickets:
-            ticket.setPaymentMethod(request.form['paymentMethod'], reason)
+            ticket.set_payment_method(request.form['paymentMethod'], reason)
 
         db.session.commit()
 
@@ -352,7 +352,7 @@ def changeMethod():
 
     return render_template('purchase/changeMethod.html')
 
-@purchase.route('/purchase/card-confirm', methods=['GET','POST'])
+@PURCHASE.route('/purchase/card-confirm', methods=['GET','POST'])
 @login_required
 def cardConfirm():
     if request.method == 'POST':
@@ -380,7 +380,7 @@ def cardConfirm():
 
     return render_template('purchase/cardConfirm.html')
 
-@purchase.route('/purchase/eway-success/<int:id>')
+@PURCHASE.route('/purchase/eway-success/<int:id>')
 def ewaySuccess(id):
     transaction = CardTransaction.get_by_id(id)
 
@@ -388,7 +388,7 @@ def ewaySuccess(id):
 
     return redirect(url_for('dashboard.dashboardHome'))
 
-@purchase.route('/purchase/eway-cancel/<int:id>')
+@PURCHASE.route('/purchase/eway-cancel/<int:id>')
 def ewayCancel(id):
     transaction = CardTransaction.get_by_id(id)
 
@@ -396,7 +396,7 @@ def ewayCancel(id):
 
     return redirect(url_for('dashboard.dashboardHome'))
 
-@purchase.route('/purchase/battels-confirm', methods=['GET','POST'])
+@PURCHASE.route('/purchase/battels-confirm', methods=['GET','POST'])
 @login_required
 def battelsConfirm():
     if not current_user.canPayByBattels():
@@ -440,7 +440,7 @@ def battelsConfirm():
 
     return render_template('purchase/battelsConfirm.html')
 
-@purchase.route('/purchase/cancel', methods=['GET','POST'])
+@PURCHASE.route('/purchase/cancel', methods=['GET','POST'])
 @login_required
 def cancel():
     if request.method == 'POST':
@@ -453,7 +453,7 @@ def cancel():
             tickets.remove(None)
 
         tickets = filter(
-            (lambda x: x.canBeCancelledAutomatically()),
+            (lambda x: x.can_be_cancelled_automatically()),
             tickets
         )
 

@@ -1,21 +1,19 @@
 # coding: utf-8
-"""
-college.py
+"""Model for a user's college."""
 
-Contains College class
-Used to associate users with their colleges
-"""
+from kebleball import database as db
 
-from kebleball.database import db
+DB = db.DB
 
-class College(db.Model):
-    id = db.Column(
-        db.Integer(),
+class College(DB.Model):
+    """Model for a user's college."""
+    id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    name = db.Column(
-        db.String(50),
+    name = DB.Column(
+        DB.String(50),
         unique=True,
         nullable=False
     )
@@ -28,9 +26,11 @@ class College(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        college = College.query.filter(College.id==int(id)).first()
+        """Get a college object by its ID."""
+        college = College.query.filter(College.id == int(id)).first()
 
         if not college:
             return None
 
         return college
+

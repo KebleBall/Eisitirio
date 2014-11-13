@@ -1,21 +1,30 @@
 # coding: utf-8
-import site, os, sys
-site.addsitedir('/var/www/flask_kebleball/lib/python2.7/site-packages/')
-sys.path.append(os.path.realpath(__file__).replace('/wsgi.py',''))
+"""WSGI wrapper for the Keble Ball Ticketing System."""
 
-from kebleball import app
+import os
+import site
+import sys
+
+site.addsitedir('/var/www/flask_kebleball/lib/python2.7/site-packages/')
+sys.path.append(os.path.realpath(__file__).replace('/wsgi.py', ''))
+
 import newrelic.agent
+
+import kebleball
 
 newrelic.agent.initialize('/var/www/flask_kebleball/newrelic.ini')
 
+APP = kebleball.APP
+
 @newrelic.agent.wsgi_application()
 def application(req_environ, start_response):
+    """Wrapper around actual application to load config based on environment."""
     if 'KEBLE_BALL_ENV' in req_environ:
         if req_environ['KEBLE_BALL_ENV'] == 'STAGING':
-            app.config.from_pyfile('config/staging.py')
-            return app(req_environ, start_response)
+            APP.config.from_pyfile('config/staging.py')
+            return APP(req_environ, start_response)
         elif req_environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
-            app.config.from_pyfile('config/production.py')
-            return app(req_environ, start_response)
+            APP.config.from_pyfile('config/production.py')
+            return APP(req_environ, start_response)
     else:
-        return app(req_environ, start_response)
+        return APP(req_environ, start_response)

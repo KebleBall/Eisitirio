@@ -1,52 +1,50 @@
 # coding: utf-8
-"""
-waiting.py
+"""Model for entries on the waiting list."""
 
-Contains Waiting class
-Used to store data about users waiting for tickets
-"""
-
-from kebleball.database import db
-from kebleball.database.user import User
 from datetime import datetime
 
-class Waiting(db.Model):
-    id = db.Column(
-        db.Integer(),
+from kebleball import database as db
+
+DB = db.DB
+
+class Waiting(DB.Model):
+    """Model for entries on the waiting list."""
+    id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    waitingsince = db.Column(
-        db.DateTime(),
+    waitingsince = DB.Column(
+        DB.DateTime(),
         nullable=False
     )
-    waitingfor = db.Column(
-        db.Integer(),
+    waitingfor = DB.Column(
+        DB.Integer(),
         nullable=False
     )
 
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    user_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.id'),
         nullable=False
     )
-    user = db.relationship(
+    user = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'waiting',
             lazy='dynamic'
         ),
         foreign_keys=[user_id]
     )
 
-    referrer_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    referrer_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.id'),
         nullable=True
     )
-    referrer = db.relationship(
+    referrer = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'waiting_referrals',
             lazy='dynamic'
         ),
@@ -78,7 +76,7 @@ class Waiting(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        waiting = Waiting.query.filter(Waiting.id==int(id)).first()
+        waiting = Waiting.query.filter(Waiting.id == int(id)).first()
 
         if not waiting:
             return None

@@ -1,12 +1,10 @@
 #! /usr/bin/env python2
 # coding: utf-8
+"""Executable to run the Keble Ball Ticketing System in development mode."""
 
-from kebleball import app
+import kebleball
 
-from werkzeug.contrib.profiler import ProfilerMiddleware
-
-f = open('/tmp/kebleball.profiler.log', 'w')
+APP = kebleball.APP
 
 if __name__ == '__main__':
-    app.wsgi_app = ProfilerMiddleware(app.wsgi_app, f, ('cumtime','time','calls'))
-    app.run()
+    APP.run()

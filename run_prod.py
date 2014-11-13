@@ -1,9 +1,11 @@
 #! /usr/bin/env python2
 # coding: utf-8
+"""Executable to run the Keble Ball Ticketing System in production mode."""
 
-import os
-from kebleball import app
+import kebleball
+
+APP = kebleball.APP
 
 if __name__ == '__main__':
-    app.config.from_pyfile('config/production.py')
-    app.run()
+    APP.config.from_pyfile('config/production.py')
+    APP.run()

@@ -28,10 +28,10 @@ import re
 log = app.log_manager.log_admin
 log_event = app.log_manager.log_event
 
-admin = Blueprint('admin', __name__)
+ADMIN = Blueprint('admin', __name__)
 
-@admin.route('/admin', methods=['GET', 'POST'])
-@admin.route('/admin/page/<int:page>', methods=['GET', 'POST'])
+@ADMIN.route('/admin', methods=['GET', 'POST'])
+@ADMIN.route('/admin/page/<int:page>', methods=['GET', 'POST'])
 @admin_required
 def adminHome(page=1):
     results = None
@@ -282,10 +282,10 @@ def adminHome(page=1):
         category=category
     )
 
-@admin.route('/admin/user/<int:id>/view')
-@admin.route('/admin/user/<int:id>/view/page/selfactions/<int:selfActionsPage>')
-@admin.route('/admin/user/<int:id>/view/page/actions/<int:actionsPage>')
-@admin.route('/admin/user/<int:id>/view/page/events/<int:eventsPage>')
+@ADMIN.route('/admin/user/<int:id>/view')
+@ADMIN.route('/admin/user/<int:id>/view/page/selfactions/<int:selfActionsPage>')
+@ADMIN.route('/admin/user/<int:id>/view/page/actions/<int:actionsPage>')
+@ADMIN.route('/admin/user/<int:id>/view/page/events/<int:eventsPage>')
 @admin_required
 def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
     user = User.get_by_id(id)
@@ -331,7 +331,7 @@ def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
         eventsPage=eventsPage
     )
 
-@admin.route('/admin/user/<int:id>/impersonate')
+@ADMIN.route('/admin/user/<int:id>/impersonate')
 @admin_required
 def impersonateUser(id):
     user = User.get_by_id(id)
@@ -358,7 +358,7 @@ def impersonateUser(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/user/<int:id>/give', methods=['POST'])
+@ADMIN.route('/admin/user/<int:id>/give', methods=['POST'])
 @admin_required
 def giveUser(id):
     user = User.get_by_id(id)
@@ -393,7 +393,7 @@ def giveUser(id):
                 None,
                 price
             )
-            ticket.addNote(note)
+            ticket.add_note(note)
             tickets.append(ticket)
 
         db.session.add_all(tickets)
@@ -423,7 +423,7 @@ def giveUser(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/user/<int:id>/note', methods=['POST'])
+@ADMIN.route('/admin/user/<int:id>/note', methods=['POST'])
 @admin_required
 def noteUser(id):
     user = User.get_by_id(id)
@@ -450,7 +450,7 @@ def noteUser(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/user/<int:id>/verify')
+@ADMIN.route('/admin/user/<int:id>/verify')
 @admin_required
 def verifyUser(id):
     user = User.get_by_id(id)
@@ -477,7 +477,7 @@ def verifyUser(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/user/<int:id>/demote')
+@ADMIN.route('/admin/user/<int:id>/demote')
 @admin_required
 def demoteUser(id):
     user = User.get_by_id(id)
@@ -504,7 +504,7 @@ def demoteUser(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/user/<int:id>/promote')
+@ADMIN.route('/admin/user/<int:id>/promote')
 @admin_required
 def promoteUser(id):
     user = User.get_by_id(id)
@@ -531,7 +531,7 @@ def promoteUser(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/user/<int:id>/collect', methods=['GET','POST'])
+@ADMIN.route('/admin/user/<int:id>/collect', methods=['GET','POST'])
 @admin_required
 def collectTickets(id):
     user = User.get_by_id(id)
@@ -548,8 +548,8 @@ def collectTickets(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/ticket/<int:id>/view')
-@admin.route('/admin/ticket/<int:id>/view/page/<int:eventsPage>')
+@ADMIN.route('/admin/ticket/<int:id>/view')
+@ADMIN.route('/admin/ticket/<int:id>/view/page/<int:eventsPage>')
 @admin_required
 def viewTicket(id, eventsPage=1):
     ticket = Ticket.get_by_id(id)
@@ -571,7 +571,7 @@ def viewTicket(id, eventsPage=1):
         eventsPage=eventsPage
     )
 
-@admin.route('/admin/ticket/<int:id>/collect', methods=['POST'])
+@ADMIN.route('/admin/ticket/<int:id>/collect', methods=['POST'])
 @admin_required
 def collectTicket(id):
     existing = Ticket.query.filter(Ticket.barcode==request.form['barcode']).count()
@@ -609,7 +609,7 @@ def collectTicket(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/ticket/<int:id>/note', methods=['POST'])
+@ADMIN.route('/admin/ticket/<int:id>/note', methods=['POST'])
 @admin_required
 def noteTicket(id):
     ticket = Ticket.get_by_id(id)
@@ -635,7 +635,7 @@ def noteTicket(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/ticket/<int:id>/markpaid')
+@ADMIN.route('/admin/ticket/<int:id>/markpaid')
 @admin_required
 def markTicketPaid(id):
     ticket = Ticket.get_by_id(id)
@@ -661,13 +661,13 @@ def markTicketPaid(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/ticket/<int:id>/autocancel')
+@ADMIN.route('/admin/ticket/<int:id>/autocancel')
 @admin_required
 def autoCancelTicket(id):
     ticket = Ticket.get_by_id(id)
 
     if ticket:
-        if not ticket.canBeCancelledAutomatically():
+        if not ticket.can_be_cancelled_automatically():
             flash(
                 u'Could not automatically cancel ticket.',
                 'warning'
@@ -705,7 +705,7 @@ def autoCancelTicket(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/ticket/<int:id>/cancel')
+@ADMIN.route('/admin/ticket/<int:id>/cancel')
 @admin_required
 def cancelTicket(id):
     ticket = Ticket.get_by_id(id)
@@ -731,7 +731,7 @@ def cancelTicket(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/ticket/validate', methods=['POST', 'GET'])
+@ADMIN.route('/admin/ticket/validate', methods=['POST', 'GET'])
 @admin_required
 def validateTicket():
     valid = None
@@ -764,7 +764,7 @@ def validateTicket():
         message=message
     )
 
-@admin.route('/admin/log/<int:id>/view')
+@ADMIN.route('/admin/log/<int:id>/view')
 @admin_required
 def viewLog(id):
     log = Log.get_by_id(id)
@@ -774,8 +774,8 @@ def viewLog(id):
         log=log
     )
 
-@admin.route('/admin/transaction/<int:id>/view')
-@admin.route('/admin/transaction/<int:id>/view/page/<int:eventsPage>')
+@ADMIN.route('/admin/transaction/<int:id>/view')
+@ADMIN.route('/admin/transaction/<int:id>/view/page/<int:eventsPage>')
 @admin_required
 def viewTransaction(id, eventsPage=1):
     transaction = CardTransaction.get_by_id(id)
@@ -797,7 +797,7 @@ def viewTransaction(id, eventsPage=1):
         eventsPage=eventsPage
     )
 
-@admin.route('/admin/transaction/<int:id>/refund', methods=['POST'])
+@ADMIN.route('/admin/transaction/<int:id>/refund', methods=['POST'])
 @admin_required
 def refundTransaction(id):
     transaction = CardTransaction.get_by_id(id)
@@ -831,7 +831,7 @@ def refundTransaction(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/statistics')
+@ADMIN.route('/admin/statistics')
 @admin_required
 def statistics():
     totalValue = db.session \
@@ -873,8 +873,8 @@ def statistics():
         paymentMethodValues=paymentMethodValues
     )
 
-@admin.route('/admin/announcements', methods=['GET','POST'])
-@admin.route('/admin/announcements/page/<int:page>', methods=['GET','POST'])
+@ADMIN.route('/admin/announcements', methods=['GET','POST'])
+@ADMIN.route('/admin/announcements/page/<int:page>', methods=['GET','POST'])
 @admin_required
 def announcements(page=1):
     form = {}
@@ -982,7 +982,7 @@ def announcements(page=1):
         form=form
     )
 
-@admin.route('/admin/announcement/<int:id>/delete')
+@ADMIN.route('/admin/announcement/<int:id>/delete')
 @admin_required
 def deleteAnnouncement(id):
     announcement = Announcement.get_by_id(id)
@@ -1003,7 +1003,7 @@ def deleteAnnouncement(id):
 
     return redirect(request.referrer or url_for('admin.announcements'))
 
-@admin.route('/admin/announcement/<int:id>/cancel')
+@ADMIN.route('/admin/announcement/<int:id>/cancel')
 @admin_required
 def cancelAnnouncementEmails(id):
     announcement = Announcement.get_by_id(id)
@@ -1025,8 +1025,8 @@ def cancelAnnouncementEmails(id):
 
     return redirect(request.referrer or url_for('admin.announcements'))
 
-@admin.route('/admin/vouchers', methods=['GET','POST'])
-@admin.route('/admin/vouchers/page/<int:page>', methods=['GET','POST'])
+@ADMIN.route('/admin/vouchers', methods=['GET','POST'])
+@ADMIN.route('/admin/vouchers/page/<int:page>', methods=['GET','POST'])
 @admin_required
 def vouchers(page=1):
     form = {}
@@ -1130,7 +1130,7 @@ def vouchers(page=1):
         vouchers=vouchers
     )
 
-@admin.route('/admin/voucher/<int:id>/delete')
+@ADMIN.route('/admin/voucher/<int:id>/delete')
 @admin_required
 def deleteVoucher(id):
     voucher = Voucher.get_by_id(id)
@@ -1150,7 +1150,7 @@ def deleteVoucher(id):
 
     return redirect(request.referrer or url_for('admin.vouchers'))
 
-@admin.route('/admin/waiting/<int:id>/delete')
+@ADMIN.route('/admin/waiting/<int:id>/delete')
 @admin_required
 def deleteWaiting(id):
     waiting = Waiting.get_by_id(id)
@@ -1170,7 +1170,7 @@ def deleteWaiting(id):
 
     return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/graphs/sales')
+@ADMIN.route('/admin/graphs/sales')
 @admin_required
 def graphSales():
     statistics = Statistic.query \
@@ -1203,7 +1203,7 @@ def graphSales():
 
     return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
 
-@admin.route('/admin/graphs/colleges')
+@ADMIN.route('/admin/graphs/colleges')
 @admin_required
 def graphColleges():
     statistics = Statistic.query \
@@ -1276,7 +1276,7 @@ def graphColleges():
 
     return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
 
-@admin.route('/admin/graphs/payments')
+@ADMIN.route('/admin/graphs/payments')
 @admin_required
 def graphPayments():
     statistics = Statistic.query \
@@ -1308,7 +1308,7 @@ def graphPayments():
 
     return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
 
-@admin.route('/admin/data/<group>')
+@ADMIN.route('/admin/data/<group>')
 @admin_required
 def data(group):
     statistics = Statistic.query \
