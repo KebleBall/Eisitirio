@@ -5,7 +5,6 @@ user.py
 Contains User class
 """
 
-from datetime import datetime
 import re
 
 from flask import flash
@@ -325,7 +324,6 @@ class User(db.Model):
             new_affiliation = Affiliation.get_by_id(affiliation)
 
         if (
-
                 old_affiliation != new_affiliation and
                 new_affiliation.name == "Graduand"
         ):

@@ -1,10 +1,10 @@
 # coding: utf-8
+
 from kebleball.app import app
 from kebleball.database.ticket import Ticket
 from kebleball.database.user import User
 from kebleball.database.waiting import Waiting
 from kebleball.helpers import get_boolean_config
-from datetime import datetime
 
 def canBuy(user):
     if get_boolean_config('TICKETS_ON_SALE'):
@@ -123,13 +123,7 @@ def canBuy(user):
     )
 
 def canWait(user):
-    if isinstance(app.config['WAITING_OPEN'], datetime):
-        if app.config['WAITING_OPEN'] > datetime.utcnow():
-            waitingOpen = False
-        else:
-            waitingOpen = True
-    else:
-        waitingOpen = app.config['WAITING_OPEN']
+    waitingOpen = get_boolean_config('WAITING_OPEN')
 
     if not waitingOpen:
         return (
