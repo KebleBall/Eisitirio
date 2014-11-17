@@ -86,7 +86,7 @@ def serverError(code, error):
     )
     return render_template('500.html'), code
 
-@app.errorhandler(Exception)
+# @app.errorhandler(Exception)
 @app.errorhandler(500)
 def error500(e):
     return serverError(500, e)
