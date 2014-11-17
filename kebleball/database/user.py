@@ -5,21 +5,20 @@ user.py
 Contains User class
 """
 
+from datetime import datetime
+import re
+
 from flask import flash
 from flask import url_for
 from flask.ext.bcrypt import Bcrypt
 
+from kebleball.app import app
 from kebleball.database import db
+from kebleball.database.affiliation import Affiliation
 from kebleball.database.battels import Battels
 from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
-from kebleball.app import app
 from kebleball.helpers import generate_key
 from kebleball.helpers import get_boolean_config
-
-from datetime import datetime
-from passlib.hash import bcrypt as passlib_bcrypt
-import re
 
 bcrypt = Bcrypt(app)
 
@@ -159,17 +158,7 @@ class User(db.Model):
         return "<User {0}: {1} {2}>".format(self.id, self.firstname, self.surname)
 
     def checkPassword(self, candidate):
-        try:
-            return bcrypt.check_password_hash(self.passhash, candidate)
-        except ValueError:
-            if passlib_bcrypt.verify(candidate, self.passhash):
-                self.passhash = bcrypt.generate_password_hash(candidate)
-                db.session.commit()
-                return True
-            else:
-                return False
-
-        return False
+        return bcrypt.check_password_hash(self.passhash, candidate)
 
     def setPassword(self, password):
         self.passhash = bcrypt.generate_password_hash(password)
