@@ -1,12 +1,12 @@
 # coding: utf-8
 import site, os, sys
-site.addsitedir('/var/www/flask_kebleball/lib/python2.7/site-packages/')
+site.addsitedir('/var/www/flask/lib/python2.7/site-packages/')
 sys.path.append(os.path.realpath(__file__).replace('/wsgi.py',''))
 
 from kebleball import app
 import newrelic.agent
 
-newrelic.agent.initialize('/var/www/flask_kebleball/newrelic.ini')
+newrelic.agent.initialize('/var/www/flask/newrelic.ini')
 
 @newrelic.agent.wsgi_application()
 def application(req_environ, start_response):
