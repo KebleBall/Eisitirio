@@ -5,17 +5,19 @@ user.py
 Contains User class
 """
 
+import re
+
+from flask import flash
+from flask import url_for
+from flask.ext.bcrypt import Bcrypt
+
+from kebleball.app import app
 from kebleball.database import db
+from kebleball.database.affiliation import Affiliation
 from kebleball.database.battels import Battels
 from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
-from kebleball.app import app
-from flask.ext.bcrypt import Bcrypt
 from kebleball.helpers import generate_key
-
-from datetime import datetime
-from passlib.hash import bcrypt as passlib_bcrypt
-import re
+from kebleball.helpers import get_boolean_config
 
 bcrypt = Bcrypt(app)
 
@@ -121,6 +123,12 @@ class User(db.Model):
         )
     )
 
+    graduand_verified = db.Column(
+        db.Boolean,
+        default=None,
+        nullable=True
+    )
+
     def __init__(self, email, password, firstname, surname, phone, college, affiliation):
         self.email = email
         self.passhash = bcrypt.generate_password_hash(password)
@@ -131,6 +139,7 @@ class User(db.Model):
         self.verified = False
         self.deleted = False
         self.role = 'User'
+        self.graduand_verified = None
 
         if hasattr(college, 'id'):
             self.college_id = college.id
@@ -142,31 +151,13 @@ class User(db.Model):
         else:
             self.affiliation_id = affiliation
 
-        battels = Battels.query.filter(Battels.email==email).first()
-
-        if battels is not None:
-            self.battels = battels
-        elif re.match('(.*?)@keble\.ox\.ac\.uk$',email) is not None:
-            self.battels = Battels(None, None, None, None, None, True)
-            db.session.add(self.battels)
-        else:
-            self.battels = None
+        self.battels = Battels.query.filter(Battels.email==email).first()
 
     def __repr__(self):
         return "<User {0}: {1} {2}>".format(self.id, self.firstname, self.surname)
 
     def checkPassword(self, candidate):
-        try:
-            return bcrypt.check_password_hash(self.passhash, candidate)
-        except ValueError:
-            if passlib_bcrypt.verify(candidate, self.passhash):
-                self.passhash = bcrypt.generate_password_hash(candidate)
-                db.session.commit()
-                return True
-            else:
-                return False
-
-        return False
+        return bcrypt.check_password_hash(self.passhash, candidate)
 
     def setPassword(self, password):
         self.passhash = bcrypt.generate_password_hash(password)
@@ -251,8 +242,7 @@ class User(db.Model):
 
     def getsDiscount(self):
         return (
-            self.college.name == 'Keble' and
-            self.affiliation.name == 'Student' and
+            self.is_keble_member() and
             app.config['KEBLE_DISCOUNT'] > 0 and
             self.tickets.count() == 0
         )
@@ -292,3 +282,76 @@ class User(db.Model):
             return None
 
         return user
+
+    def verify_graduand_status(self):
+        self.graduand_verified = True
+
+        db.session.commit()
+
+    def deny_graduand_status(self):
+        self.graduand_verified = False
+
+        db.session.commit()
+
+    def is_keble_member(self):
+        return (
+            self.college.name == "Keble" and
+            self.battels is not None
+        )
+
+    def is_verified_graduand(self):
+        return (
+            self.college.name == "Keble" and
+            self.affiliation.name == "Graduand" and
+            self.graduand_verified == True
+        )
+
+    def is_unverified_graduand(self):
+        return (
+            self.college.name == "Keble" and
+            self.affiliation.name == "Graduand" and
+            self.graduand_verified is None
+        )
+
+    def update_affiliation(self, affiliation):
+        old_affiliation = self.affiliation
+
+        if hasattr(affiliation, 'id'):
+            self.affiliation_id = affiliation.id
+            new_affiliation = affiliation
+        else:
+            self.affiliation_id = affiliation
+            new_affiliation = Affiliation.get_by_id(affiliation)
+
+        if (
+                old_affiliation != new_affiliation and
+                new_affiliation.name == "Graduand"
+        ):
+            self.graduand_verified = None
+
+    def maybe_verify_graduand(self, is_new=True):
+        if (
+                self.is_unverified_graduand() and
+                not get_boolean_config('TICKETS_ON_SALE')
+        ):
+            app.email_manager.sendTemplate(
+                app.config['TICKETS_EMAIL'],
+                "Verify Graduand",
+                "verify_graduand.email",
+                user=self,
+                url=url_for('admin.verify_graduands', _external=True)
+            )
+            flash(
+                (
+                    u'Your graduand status must be verified before you will be '
+                    u'able to purchase tickets. You will receive an email when '
+                    u'your status has been verified.'
+                ),
+                u'info'
+            )
+
+    def add_manual_battels(self):
+        self.battels = Battels(None, self.email, None, self.firstname,
+                               self.surname, True)
+        db.session.add(self.battels)
+        db.session.commit()

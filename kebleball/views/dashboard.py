@@ -143,9 +143,9 @@ def profile():
 
             current_user.firstname = request.form['firstname']
             current_user.surname = request.form['surname']
-            current_user.affiliation_id = request.form['phone']
+            current_user.phone = request.form['phone']
             current_user.college_id = request.form['college']
-            current_user.affiliation_id = request.form['affiliation']
+            current_user.update_affiliation(request.form['affiliation'])
 
             db.session.commit()
 
@@ -159,6 +159,8 @@ def profile():
                 u'Your details have been updated',
                 'success'
             )
+
+            current_user.maybe_verify_graduand()
 
     return render_template(
         'dashboard/profile.html',

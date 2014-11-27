@@ -1,0 +1,7 @@
+Hi!
+
+{{ user.fullname }} has just provided their status as being a Keble Graduand. You should log in to the Keble Ball Ticketing System at {{ url }} to confirm whether they are a Keble Graduand so that they can buy tickets as soon as possible.
+
+Best Wishes,
+
+The Keble Ball Ticketing System
