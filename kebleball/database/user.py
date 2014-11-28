@@ -286,6 +286,13 @@ class User(db.Model):
     def verify_graduand_status(self):
         self.graduand_verified = True
 
+        app.email_manager.sendTemplate(
+            self.email,
+            "Graduand Status Verified - Buy Your Tickets Now!",
+            "graduand_verified.email",
+            url=url_for('purchase.purchaseHome', _external=True)
+        )
+
         db.session.commit()
 
     def deny_graduand_status(self):
