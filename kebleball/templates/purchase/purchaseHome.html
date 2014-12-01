@@ -33,19 +33,19 @@
                         </div>
                     </div>
                     <p id="ticketInformation">
-                        The base price for a ticket is &pound;{{ '%.2f' % (template_config['TICKET_PRICE'] / 100.0) }}.
+                        The base price for a ticket is &pound;{{ '%.2f' % (current_user.get_base_ticket_price() / 100.0) }}.
                         {% if current_user.getsDiscount() %}
                             As a current Keble student you get a &pound;{{ '%.2f' % (template_config['KEBLE_DISCOUNT'] / 100.0) }} discount on your first ticket.
                             {% if numTickets -%}
-                                Your order of {{ numTickets }} ticket{% if numTickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % (((template_config['TICKET_PRICE'] * numTickets) - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
+                                Your order of {{ numTickets }} ticket{% if numTickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % (((current_user.get_base_ticket_price() * numTickets) - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
                             {% else -%}
-                                Your order of 1 ticket is currently worth &pound;{{ '%.2f' % ((template_config['TICKET_PRICE'] - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
+                                Your order of 1 ticket is currently worth &pound;{{ '%.2f' % ((current_user.get_base_ticket_price() - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
                             {% endif %}
                         {% else %}
                             {% if numTickets -%}
-                                Your order of {{ numTickets }} ticket{% if numTickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % ((template_config['TICKET_PRICE'] * numTickets) / 100.0) }}.
+                                Your order of {{ numTickets }} ticket{% if numTickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % ((current_user.get_base_ticket_price() * numTickets) / 100.0) }}.
                             {% else -%}
-                                Your order of 1 ticket is currently worth &pound;{{ '%.2f' % (template_config['TICKET_PRICE'] / 100.0) }}.
+                                Your order of 1 ticket is currently worth &pound;{{ '%.2f' % (current_user.get_base_ticket_price() / 100.0) }}.
                             {% endif %}
                         {% endif %}
                         Please note that this price does not reflect the value of any discounts to be applied.
@@ -127,7 +127,7 @@
     <script src="{{ url_for('static', filename='js/vendor/simple-slider.js') }}"></script>
 
     <script type="text/javascript">
-        var ticketPrice = {{ template_config['TICKET_PRICE'] }};
+        var ticketPrice = {{ current_user.get_base_ticket_price() }};
         var kebleDiscount = {{ template_config['KEBLE_DISCOUNT'] }};
         var getsDiscount = {% if current_user.getsDiscount() %}true{% else %}false{% endif %};
 
@@ -150,7 +150,7 @@
                     ticketMessage +
                     " As a current Keble student you get a &pound;" +
                     (kebleDiscount / 100.0).toFixed(2) +
-                    "discount on your first ticket."
+                    " discount on your first ticket."
                 );
                 totalPrice = totalPrice - kebleDiscount;
             }

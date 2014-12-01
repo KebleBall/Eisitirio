@@ -160,7 +160,7 @@ def profile():
                 'success'
             )
 
-            current_user.maybe_verify_graduand()
+            current_user.maybe_verify_affiliation()
 
     return render_template(
         'dashboard/profile.html',

@@ -119,7 +119,7 @@ def purchaseHome():
                 Ticket(
                     current_user,
                     request.form['paymentMethod'],
-                    app.config['TICKET_PRICE'] - app.config['KEBLE_DISCOUNT']
+                    current_user.get_base_ticket_price() - app.config['KEBLE_DISCOUNT']
                 )
             )
             start = 1
@@ -131,7 +131,7 @@ def purchaseHome():
                 Ticket(
                     current_user,
                     request.form['paymentMethod'],
-                    app.config['TICKET_PRICE']
+                    current_user.get_base_ticket_price()
                 )
             )
 

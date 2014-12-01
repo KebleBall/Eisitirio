@@ -557,50 +557,48 @@ def add_manual_battels(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@admin.route('/admin/user/<int:id>/verify_graduand_status')
+@admin.route('/admin/user/<int:id>/verify_affiliation')
 @admin_required
-def verify_graduand_status(id):
+def verify_affiliation(id):
     user = User.get_by_id(id)
 
     if user:
-        user.verify_graduand_status()
+        user.verify_affiliation()
 
         log_event(
-            'Verified graduand status',
+            'Verified affiliation',
             [],
             user
         )
 
-    return redirect(url_for('admin.verify_graduands'))
+    return redirect(url_for('admin.verify_affiliations'))
 
-@admin.route('/admin/user/<int:id>/deny_graduand_status')
+@admin.route('/admin/user/<int:id>/deny_affiliation')
 @admin_required
-def deny_graduand_status(id):
+def deny_affiliation(id):
     user = User.get_by_id(id)
 
     if user:
-        user.deny_graduand_status()
+        user.deny_affiliation()
 
         log_event(
-            'Denied graduand status',
+            'Denied affiliation',
             [],
             user
         )
 
-    return redirect(url_for('admin.verify_graduands'))
+    return redirect(url_for('admin.verify_affiliations'))
 
-@admin.route("/admin/verify_graduands")
+@admin.route("/admin/verify_affiliations")
 @admin_required
-def verify_graduands():
+def verify_affiliations():
     users = User.query.filter(
         User.college.has(name="Keble")
     ).filter(
-        User.affiliation.has(name="Graduand")
-    ).filter(
-        User.graduand_verified == None
+        User.affiliation_verified == None
     ).all()
 
-    return render_template('admin/verify_graduands.html', users=users)
+    return render_template('admin/verify_affiliations.html', users=users)
 
 @admin.route('/admin/user/<int:id>/collect', methods=['GET','POST'])
 @admin_required

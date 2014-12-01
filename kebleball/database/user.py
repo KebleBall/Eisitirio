@@ -123,7 +123,7 @@ class User(db.Model):
         )
     )
 
-    graduand_verified = db.Column(
+    affiliation_verified = db.Column(
         db.Boolean,
         default=None,
         nullable=True
@@ -139,7 +139,7 @@ class User(db.Model):
         self.verified = False
         self.deleted = False
         self.role = 'User'
-        self.graduand_verified = None
+        self.affiliation_verified = None
 
         if hasattr(college, 'id'):
             self.college_id = college.id
@@ -242,7 +242,8 @@ class User(db.Model):
 
     def getsDiscount(self):
         return (
-            self.is_keble_member() and
+            self.college.name == "Keble" and
+            self.affiliation.name == "Student" and
             app.config['KEBLE_DISCOUNT'] > 0 and
             self.tickets.count() == 0
         )
@@ -283,35 +284,25 @@ class User(db.Model):
 
         return user
 
-    def verify_graduand_status(self):
-        self.graduand_verified = True
+    def verify_affiliation(self):
+        self.affiliation_verified = True
+
+        app.email_manager.sendTemplate(
+            self.email,
+            "Affiliation Verified - Buy Your Tickets Now!",
+            "affiliation_verified.email",
+            url=url_for('purchase.purchaseHome', _external=True)
+        )
 
         db.session.commit()
 
-    def deny_graduand_status(self):
-        self.graduand_verified = False
+        if self.affiliation.name == "Student":
+            self.add_manual_battels()
+
+    def deny_affiliation(self):
+        self.affiliation_verified = False
 
         db.session.commit()
-
-    def is_keble_member(self):
-        return (
-            self.college.name == "Keble" and
-            self.battels is not None
-        )
-
-    def is_verified_graduand(self):
-        return (
-            self.college.name == "Keble" and
-            self.affiliation.name == "Graduand" and
-            self.graduand_verified == True
-        )
-
-    def is_unverified_graduand(self):
-        return (
-            self.college.name == "Keble" and
-            self.affiliation.name == "Graduand" and
-            self.graduand_verified is None
-        )
 
     def update_affiliation(self, affiliation):
         old_affiliation = self.affiliation
@@ -325,25 +316,46 @@ class User(db.Model):
 
         if (
                 old_affiliation != new_affiliation and
-                new_affiliation.name == "Graduand"
+                self.college.name == "Keble" and
+                new_affiliation.name not in [
+                    "Other",
+                    "None",
+                    "Graduate/Alumnus"
+                ]
         ):
-            self.graduand_verified = None
+            self.affiliation_verified = None
 
-    def maybe_verify_graduand(self, is_new=True):
+    def maybe_verify_affiliation(self):
         if (
-                self.is_unverified_graduand() and
+                self.affiliation_verified is None and
                 not get_boolean_config('TICKETS_ON_SALE')
         ):
+            if (
+                    self.college.name != "Keble" or
+                    self.affiliation.name in [
+                        "Other",
+                        "None",
+                        "Graduate/Alumnus"
+                    ] or
+                    (
+                        self.affiliation.name == "Student" and
+                        self.battels_id is not None
+                    )
+            ):
+                self.affiliation_verified = True
+                db.session.commit()
+                return
+
             app.email_manager.sendTemplate(
                 app.config['TICKETS_EMAIL'],
-                "Verify Graduand",
-                "verify_graduand.email",
+                "Verify Affiliation",
+                "verify_affiliation.email",
                 user=self,
-                url=url_for('admin.verify_graduands', _external=True)
+                url=url_for('admin.verify_affiliations', _external=True)
             )
             flash(
                 (
-                    u'Your graduand status must be verified before you will be '
+                    u'Your affiliation must be verified before you will be '
                     u'able to purchase tickets. You will receive an email when '
                     u'your status has been verified.'
                 ),
@@ -355,3 +367,12 @@ class User(db.Model):
                                self.surname, True)
         db.session.add(self.battels)
         db.session.commit()
+
+    def get_base_ticket_price(self):
+        if (
+                self.college.name == "Keble" and
+                self.affiliation.name == "Staff/Fellow"
+        ):
+            return app.config["KEBLE_STAFF_TICKET_PRICE"]
+        else:
+            return app.config["TICKET_PRICE"]
