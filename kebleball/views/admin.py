@@ -531,6 +531,75 @@ def promoteUser(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
+@admin.route('/admin/user/<int:id>/add_manual_battels')
+@admin_required
+def add_manual_battels(id):
+    user = User.get_by_id(id)
+
+    if user:
+        user.add_manual_battels()
+
+        log_event(
+            'Manually set up battels',
+            [],
+            user
+        )
+
+        flash(
+            u'Battels set up for user.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+    else:
+        flash(
+            u'Could not find user, could not manually set up battels.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
+@admin.route('/admin/user/<int:id>/verify_affiliation')
+@admin_required
+def verify_affiliation(id):
+    user = User.get_by_id(id)
+
+    if user:
+        user.verify_affiliation()
+
+        log_event(
+            'Verified affiliation',
+            [],
+            user
+        )
+
+    return redirect(url_for('admin.verify_affiliations'))
+
+@admin.route('/admin/user/<int:id>/deny_affiliation')
+@admin_required
+def deny_affiliation(id):
+    user = User.get_by_id(id)
+
+    if user:
+        user.deny_affiliation()
+
+        log_event(
+            'Denied affiliation',
+            [],
+            user
+        )
+
+    return redirect(url_for('admin.verify_affiliations'))
+
+@admin.route("/admin/verify_affiliations")
+@admin_required
+def verify_affiliations():
+    users = User.query.filter(
+        User.college.has(name="Keble")
+    ).filter(
+        User.affiliation_verified == None
+    ).all()
+
+    return render_template('admin/verify_affiliations.html', users=users)
+
 @admin.route('/admin/user/<int:id>/collect', methods=['GET','POST'])
 @admin_required
 def collectTickets(id):
