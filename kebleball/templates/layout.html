@@ -30,7 +30,7 @@
                 {% endif %}
             </section>
             <section id="logo" class="large-6 large-centered columns">
-                <a href="{{ url_for('router') }}">
+                <a href="/">
                     <img src="{{ url_for('static', filename='images/logo.png') }}" />
                 </a>
                 <h3>{{ template_config['START_TIME'].day }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}</h3>
