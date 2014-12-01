@@ -5,17 +5,19 @@ user.py
 Contains User class
 """
 
+import re
+
+from flask import flash
+from flask import url_for
+from flask.ext.bcrypt import Bcrypt
+
+from kebleball.app import app
 from kebleball.database import db
+from kebleball.database.affiliation import Affiliation
 from kebleball.database.battels import Battels
 from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
-from kebleball.app import app
-from flask.ext.bcrypt import Bcrypt
 from kebleball.helpers import generate_key
-
-from datetime import datetime
-from passlib.hash import bcrypt as passlib_bcrypt
-import re
+from kebleball.helpers import get_boolean_config
 
 bcrypt = Bcrypt(app)
 
@@ -121,6 +123,12 @@ class User(db.Model):
         )
     )
 
+    affiliation_verified = db.Column(
+        db.Boolean,
+        default=None,
+        nullable=True
+    )
+
     def __init__(self, email, password, firstname, surname, phone, college, affiliation):
         self.email = email
         self.passhash = bcrypt.generate_password_hash(password)
@@ -131,6 +139,7 @@ class User(db.Model):
         self.verified = False
         self.deleted = False
         self.role = 'User'
+        self.affiliation_verified = None
 
         if hasattr(college, 'id'):
             self.college_id = college.id
@@ -142,31 +151,13 @@ class User(db.Model):
         else:
             self.affiliation_id = affiliation
 
-        battels = Battels.query.filter(Battels.email==email).first()
-
-        if battels is not None:
-            self.battels = battels
-        elif re.match('(.*?)@keble\.ox\.ac\.uk$',email) is not None:
-            self.battels = Battels(None, None, None, None, None, True)
-            db.session.add(self.battels)
-        else:
-            self.battels = None
+        self.battels = Battels.query.filter(Battels.email==email).first()
 
     def __repr__(self):
         return "<User {0}: {1} {2}>".format(self.id, self.firstname, self.surname)
 
     def checkPassword(self, candidate):
-        try:
-            return bcrypt.check_password_hash(self.passhash, candidate)
-        except ValueError:
-            if passlib_bcrypt.verify(candidate, self.passhash):
-                self.passhash = bcrypt.generate_password_hash(candidate)
-                db.session.commit()
-                return True
-            else:
-                return False
-
-        return False
+        return bcrypt.check_password_hash(self.passhash, candidate)
 
     def setPassword(self, password):
         self.passhash = bcrypt.generate_password_hash(password)
@@ -251,8 +242,8 @@ class User(db.Model):
 
     def getsDiscount(self):
         return (
-            self.college.name == 'Keble' and
-            self.affiliation.name == 'Student' and
+            self.college.name == "Keble" and
+            self.affiliation.name == "Student" and
             app.config['KEBLE_DISCOUNT'] > 0 and
             self.tickets.count() == 0
         )
@@ -292,3 +283,96 @@ class User(db.Model):
             return None
 
         return user
+
+    def verify_affiliation(self):
+        self.affiliation_verified = True
+
+        app.email_manager.sendTemplate(
+            self.email,
+            "Affiliation Verified - Buy Your Tickets Now!",
+            "affiliation_verified.email",
+            url=url_for('purchase.purchaseHome', _external=True)
+        )
+
+        db.session.commit()
+
+        if self.affiliation.name == "Student":
+            self.add_manual_battels()
+
+    def deny_affiliation(self):
+        self.affiliation_verified = False
+
+        db.session.commit()
+
+    def update_affiliation(self, affiliation):
+        old_affiliation = self.affiliation
+
+        if hasattr(affiliation, 'id'):
+            self.affiliation_id = affiliation.id
+            new_affiliation = affiliation
+        else:
+            self.affiliation_id = affiliation
+            new_affiliation = Affiliation.get_by_id(affiliation)
+
+        if (
+                old_affiliation != new_affiliation and
+                self.college.name == "Keble" and
+                new_affiliation.name not in [
+                    "Other",
+                    "None",
+                    "Graduate/Alumnus"
+                ]
+        ):
+            self.affiliation_verified = None
+
+    def maybe_verify_affiliation(self):
+        if (
+                self.affiliation_verified is None and
+                not get_boolean_config('TICKETS_ON_SALE')
+        ):
+            if (
+                    self.college.name != "Keble" or
+                    self.affiliation.name in [
+                        "Other",
+                        "None",
+                        "Graduate/Alumnus"
+                    ] or
+                    (
+                        self.affiliation.name == "Student" and
+                        self.battels_id is not None
+                    )
+            ):
+                self.affiliation_verified = True
+                db.session.commit()
+                return
+
+            app.email_manager.sendTemplate(
+                app.config['TICKETS_EMAIL'],
+                "Verify Affiliation",
+                "verify_affiliation.email",
+                user=self,
+                url=url_for('admin.verify_affiliations', _external=True)
+            )
+            flash(
+                (
+                    u'Your affiliation must be verified before you will be '
+                    u'able to purchase tickets. You will receive an email when '
+                    u'your status has been verified.'
+                ),
+                u'info'
+            )
+
+    def add_manual_battels(self):
+        self.battels = Battels(None, self.email, None, self.firstname,
+                               self.surname, True)
+        db.session.add(self.battels)
+        db.session.commit()
+
+    def get_base_ticket_price(self):
+        if (
+                self.college.name == "Keble" and
+                self.affiliation.name == "Staff/Fellow"
+        ):
+            return app.config["KEBLE_STAFF_TICKET_PRICE"]
+        else:
+            return app.config["TICKET_PRICE"]

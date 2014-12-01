@@ -1,7 +1,9 @@
 # coding: utf-8
-import random, string
+from datetime import datetime
+import random
+import string
 
-__all__ = ['logger', 'login_manager']
+from kebleball.app import app
 
 def generate_key(length, choices=None):
     if choices is None:
@@ -12,3 +14,9 @@ def generate_key(length, choices=None):
         )
 
     return ''.join(random.choice(choices) for x in xrange(length))
+
+def get_boolean_config(key):
+    if isinstance(app.config[key], datetime):
+        return datetime.utcnow() >= app.config[key]
+    else:
+        return app.config[key]

@@ -1,37 +1,36 @@
 @import "vendor/foundation/functions";
 
-$blue: #8ed0b7;
-$red: #f26772;
 $white: #f9f6f1;
 $black: #070707;
-$dark-grey: #222;
-$light-grey: #c6c6c6;
+$purple: #971f60;
+$grey: #808080;
 
 $rem-base: 16px;
 
-$body-bg: url('images/background.jpg') $white;
-$body-font-color: $black;
-$body-font-family: Quicksand, sans-serif;
+$body-bg: $black;
+$body-font-color: $white;
+$body-font-family: "Open Sans", Helvetica, sans-serif;
 $body-font-weight: lighter;
-$primary-color: $blue;
-$secondary-color: $light-grey;
 
-$header-font-family: Metshige, sans-serif;
+$primary-color: $purple;
+$secondary-color: $grey;
+
+$header-font-family: "Chopin Script", serif;
 $header-font-weight: normal;
-$header-font-color: $black;
+$header-font-color: $white;
 $header-line-height: 1em;
 $header-top-margin: 0.3em;
 $header-bottom-margin: 0.2em;
 
-$h1-font-size: 2rem;
-$h2-font-size: 1.8rem;
-$h3-font-size: 1.6rem;
-$h4-font-size: 1.4rem;
-$h5-font-size: 1.2rem;
-$h6-font-size: 1rem;
+$h1-font-size: 4rem;
+$h2-font-size: 3.6rem;
+$h3-font-size: 3.2rem;
+$h4-font-size: 2.8rem;
+$h5-font-size: 2.4rem;
+$h6-font-size: 2rem;
 
-$anchor-font-color: $dark-grey;
-$anchor-font-color-hover: $light-grey;
+$anchor-font-color: $grey;
+$anchor-font-color-hover: $purple;
 
 $button-tny: rem-calc(8);
 $button-sml: rem-calc(12);
@@ -39,6 +38,7 @@ $button-font-tny: rem-calc(14);
 $button-font-sml: rem-calc(14);
 
 $form-label-font-size: 1rem;
+$form-label-font-color: #ccc;
 
 $legend-bg: transparent;
 

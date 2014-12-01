@@ -15,8 +15,12 @@
             <p><strong>Phone</strong>: {{ user.phone }}</p>
             <p><strong>College</strong>: {{ user.college.name }}</p>
             <p><strong>Affiliation</strong>: {{ user.affiliation.name }}</p>
-            {% if user.battels != None and not user.battels.manual %}
-                <p><strong>Battels ID</strong>: {{ user.battels.battelsid }}</p>
+            {% if user.battels != None %}
+                {% if not user.battels.manual %}
+                    <p><strong>Battels ID</strong>: {{ user.battels.battelsid }}</p>
+                {% else %}
+                    <p><strong>Battels Manually Added</strong></p>
+                {% endif %}
                 <p><strong>MT Battels Charge</strong>: &pound;{{ '%.2f' % (user.battels.mt / 100.0) }}</p>
                 <p><strong>HT Battels Charge</strong>: &pound;{{ '%.2f' % (user.battels.ht / 100.0) }}</p>
             {% endif %}
@@ -52,7 +56,10 @@
                 {% if user.hasUncollectedTickets() %}
                     <li><a href="{{ url_for('admin.collectTickets', id=user.id) }}" class="button tiny">Collect Tickets</a></li>
                 {% endif %}
-                <li><form action="{{ url_for('admin.giveUser', id=user.id) }}" method="post" id="giveTickets">Give user <input type="number" name="giveNumTickets" min="1" value="1" step="1" /> tickets at &pound;<input type="number" name="givePricePounds" min="0" value="{{ '%d' % (template_config['TICKET_PRICE'] / 100) }}" step="1" />.<input type="number" name="givePricePence" min="0" value="{{ template_config['TICKET_PRICE'] % 100 }}" step="1" max="99" /> each with reason <input type="text" name="giveReason" />. <input type="submit" class="button tiny" /></form></li>
+                {% if user.battels == None %}
+                    <li><a href="{{ url_for('admin.add_manual_battels', id=user.id) }}" class="button tiny">Manually setup battelling</a></li>
+                {% endif %}
+                <li><form action="{{ url_for('admin.giveUser', id=user.id) }}" method="post" id="giveTickets">Give user <input type="number" name="giveNumTickets" min="1" value="1" step="1" /> tickets at &pound;<input type="number" name="givePricePounds" min="0" value="{{ '%d' % (user.get_base_ticket_price() / 100) }}" step="1" />.<input type="number" name="givePricePence" min="0" value="{{ user.get_base_ticket_price() % 100 }}" step="1" max="99" /> each with reason <input type="text" name="giveReason" />. <input type="submit" class="button tiny" /></form></li>
             </ul>
             <h4>User's Tickets</h4>
             {% if user.tickets.count() > 0 %}

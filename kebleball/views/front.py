@@ -218,6 +218,9 @@ def register():
         ),
         'info'
     )
+
+    user.maybe_verify_affiliation()
+
     return redirect(url_for('front.home'))
 
 @front.route('/terms')

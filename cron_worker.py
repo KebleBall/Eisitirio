@@ -80,7 +80,7 @@ with file_lock(os.path.abspath('./' + app.config['ENVIRONMENT'] + '.cron.lock'))
                         Ticket(
                             wait.user,
                             None,
-                            app.config['TICKET_PRICE'] - app.config['KEBLE_DISCOUNT']
+                            wait.user.get_base_ticket_price() - app.config['KEBLE_DISCOUNT']
                         )
                     )
                     start = 1
@@ -92,7 +92,7 @@ with file_lock(os.path.abspath('./' + app.config['ENVIRONMENT'] + '.cron.lock'))
                         Ticket(
                             wait.user,
                             None,
-                            app.config['TICKET_PRICE']
+                            wait.user.get_base_ticket_price()
                         )
                     )
 

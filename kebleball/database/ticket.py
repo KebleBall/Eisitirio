@@ -185,20 +185,16 @@ class Ticket(db.Model):
         foreign_keys=[battels_id]
     )
 
-    def __init__(self, owner, paymentmethod, price=None):
+    def __init__(self, owner, paymentmethod, price):
         if hasattr(owner, 'id'):
             self.owner_id = owner.id
         else:
             self.owner_id = owner
 
         self.paymentmethod = paymentmethod
+        self.price = price
 
         self.expires = datetime.utcnow() + app.config['TICKET_EXPIRY_TIME']
-
-        if price is not None:
-            self.setPrice(price)
-        else:
-            self.setPrice(app.config['TICKET_PRICE'])
 
     def __getattr__(self, name):
         if name == 'price_pounds':
