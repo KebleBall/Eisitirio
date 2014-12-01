@@ -1800,6 +1800,7 @@ th.hide-for-touch { display: table-cell !important; }
 /* line 659, scss/vendor/foundation/components/_visibility.scss */
 .touch th.show-for-touch { display: table-cell !important; }
 
+@font-face { font-family: 'Adele'; src: url("fonts/adele/adele-light-webfont-webfont.eot"); src: url("fonts/adele/adele-light-webfont-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/adele/adele-light-webfont-webfont.woff2") format("woff2"), url("fonts/adele/adele-light-webfont-webfont.woff") format("woff"), url("fonts/adele/adele-light-webfont-webfont.ttf") format("truetype"), url("fonts/adele/adele-light-webfont-webfont.svg#adeleadele") format("svg"); font-weight: lighter; font-style: normal; }
 @font-face { font-family: 'Chopin Script'; src: url("fonts/chopinscript/chopinscript-webfont.eot"); src: url("fonts/chopinscript/chopinscript-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/chopinscript/chopinscript-webfont.woff2") format("woff2"), url("fonts/chopinscript/chopinscript-webfont.woff") format("woff"), url("fonts/chopinscript/chopinscript-webfont.ttf") format("truetype"), url("fonts/chopinscript/chopinscript-webfont.svg#chopinscriptmedium") format("svg"); font-weight: normal; font-style: normal; }
 /* line 2, scss/vendor/_simple-slider.scss */
 .slider > .dragger { background: #222; background: -webkit-linear-gradient(top, #222, black); background: -moz-linear-gradient(top, #222, black); background: linear-gradient(top, #222, black); -webkit-box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2); -moz-box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2); box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2); -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px; border: 1px solid black; width: 16px; height: 16px; }
@@ -1810,50 +1811,61 @@ th.hide-for-touch { display: table-cell !important; }
 /* line 41, scss/vendor/_simple-slider.scss */
 .slider > .highlight-track { background-color: #c6c6c6; }
 
-/* line 16, style.scss */
+/* line 17, style.scss */
 a { font-weight: bold; }
 
-/* line 20, style.scss */
-#logo { padding-top: 2em; padding-bottom: 2em; text-align: center; }
+/* line 21, style.scss */
+#logo { padding-bottom: 2em; text-align: center; }
+/* line 24, style.scss */
+#logo a { color: #fff; }
+/* line 27, style.scss */
+#logo h1 { font-size: 4rem; margin-bottom: 0; }
+/* line 31, style.scss */
+#logo h4 { font-size: 2rem; margin-bottom: 0; }
+/* line 35, style.scss */
+#logo h3 { font-size: 2.5rem; margin-top: 0; }
 
-/* line 26, style.scss */
+/* line 41, style.scss */
 #user { text-align: right; }
 
-/* line 30, style.scss */
+/* line 45, style.scss */
 #copyright { text-align: center; }
 
-/* line 34, style.scss */
-.message-box, #flashes li { display: block; border: 3px solid; padding: 0.5em; margin-bottom: 0.5em; }
-/* line 39, style.scss */
-.message-box.error, #flashes li.error { background-color: #f3afbf; border: 3px solid #f31323; }
-/* line 43, style.scss */
-.message-box.warning, #flashes li.warning { background-color: #f3cf9f; border: 3px solid #f38323; }
-/* line 47, style.scss */
-.message-box.success, #flashes li.success { background-color: #83ef9f; border: 3px solid #338323; }
-/* line 51, style.scss */
-.message-box.info, #flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
+/* line 49, style.scss */
+.adele { font-family: "Adele", sans-serif; text-transform: uppercase; font-weight: lighter; }
+
 /* line 55, style.scss */
+.message-box, #flashes li { display: block; border: 3px solid; padding: 0.5em; margin-bottom: 0.5em; }
+/* line 60, style.scss */
+.message-box.error, #flashes li.error { background-color: #f3afbf; border: 3px solid #f31323; }
+/* line 64, style.scss */
+.message-box.warning, #flashes li.warning { background-color: #f3cf9f; border: 3px solid #f38323; }
+/* line 68, style.scss */
+.message-box.success, #flashes li.success { background-color: #83ef9f; border: 3px solid #338323; }
+/* line 72, style.scss */
+.message-box.info, #flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
+/* line 76, style.scss */
 .message-box p:last-child, #flashes li p:last-child { margin-bottom: 0; }
 
-/* line 61, style.scss */
+/* line 82, style.scss */
 #flashes ul { margin: 0; }
-/* line 64, style.scss */
+/* line 85, style.scss */
 #flashes li { margin: 0.5em; }
 
-/* line 70, style.scss */
+/* line 91, style.scss */
 p.small { font-size: 0.75rem; }
 
-/* line 74, style.scss */
+/* line 95, style.scss */
 table .button { margin: 0; }
 
-/* line 80, style.scss */
+/* line 101, style.scss */
 #giveTickets input, #refundTransaction input { display: inline; }
-/* line 82, style.scss */
+/* line 103, style.scss */
 #giveTickets input[type="number"], #refundTransaction input[type="number"] { width: 5rem; }
-/* line 85, style.scss */
+/* line 106, style.scss */
 #giveTickets input[type="text"], #refundTransaction input[type="text"] { width: auto; }
 
-/* line 91, style.scss */
+/* line 112, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
 
 /*# sourceMappingURL=style.css.map */
