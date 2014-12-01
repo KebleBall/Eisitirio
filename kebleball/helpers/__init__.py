@@ -1,5 +1,5 @@
 # coding: utf-8
-import datetime
+from datetime import datetime
 import random
 import string
 
@@ -16,7 +16,7 @@ def generate_key(length, choices=None):
     return ''.join(random.choice(choices) for x in xrange(length))
 
 def get_boolean_config(key):
-    if isinstance(app.config[key], datetime.datetime):
+    if isinstance(app.config[key], datetime):
         return datetime.utcnow() >= app.config[key]
     else:
         return app.config[key]
