@@ -4,6 +4,7 @@
 from kebleball import app
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
+app.config.from_pyfile('config/development.py')
 app.config['PROFILE'] = True
 app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions = [30])
 
