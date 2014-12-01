@@ -107,7 +107,7 @@ def utility_processor():
         return query.all()
 
     def get_ord(datetime):
-        daymod = int(datetime.strftime('%d')) % 10
+        daymod = datetime.day % 10
         if daymod == 1:
             return 'st'
         elif daymod == 2:
