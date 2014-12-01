@@ -1,6 +1,7 @@
 $modules: () !default;
 @mixin exports($name) {
-  @if (index($modules, $name) == false) {
+  $module_index: index($modules, $name);
+  @if (($module_index == null) or ($module_index == false)) {
     $modules: append($modules, $name);
     @content;
   }
