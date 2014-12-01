@@ -9,6 +9,7 @@
 @import "scss/vendor/foundation/components/type";
 @import "scss/vendor/foundation/components/visibility";
 
+@import "scss/fonts/adele";
 @import "scss/fonts/chopinscript";
 
 @import "scss/vendor/simple-slider";
@@ -18,9 +19,23 @@ a {
 }
 
 #logo {
-    padding-top: 2em;
     padding-bottom: 2em;
     text-align: center;
+    a {
+        color: #fff;
+    }
+    h1 {
+        font-size: 4rem;
+        margin-bottom: 0;
+    }
+    h4 {
+        font-size: 2rem;
+        margin-bottom: 0;
+    }
+    h3 {
+        font-size: 2.5rem;
+        margin-top: 0;
+    }
 }
 
 #user {
@@ -29,6 +44,12 @@ a {
 
 #copyright {
     text-align: center;
+}
+
+.adele {
+    font-family: "Adele", sans-serif;
+    text-transform: uppercase;
+    font-weight: lighter;
 }
 
 .message-box {
