@@ -11,7 +11,10 @@ newrelic.agent.initialize('/var/www/flask/newrelic.ini')
 @newrelic.agent.wsgi_application()
 def application(req_environ, start_response):
     if 'KEBLE_BALL_ENV' in req_environ:
-        if req_environ['KEBLE_BALL_ENV'] == 'STAGING':
+        if req_environ['KEBLE_BALL_ENV'] == 'DEVELOPMENT':
+            app.config.from_pyfile('config/development.py')
+            return app(req_environ, start_response)
+        elif req_environ['KEBLE_BALL_ENV'] == 'STAGING':
             app.config.from_pyfile('config/staging.py')
             return app(req_environ, start_response)
         elif req_environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
