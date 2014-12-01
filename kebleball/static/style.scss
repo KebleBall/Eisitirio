@@ -2,26 +2,24 @@
 
 @import "scss/variables";
 
-@import "scss/vendor/foundation";
+@import "scss/vendor/foundation/components/buttons";
+@import "scss/vendor/foundation/components/forms";
+@import "scss/vendor/foundation/components/grid";
+@import "scss/vendor/foundation/components/tables";
+@import "scss/vendor/foundation/components/type";
+@import "scss/vendor/foundation/components/visibility";
 
-@import "scss/fonts/quicksand";
-@import "scss/fonts/metshige";
+@import "scss/fonts/chopinscript";
 
 @import "scss/vendor/simple-slider";
-
-.blue {
-    color: $blue;
-}
-
-.red {
-    color: $red;
-}
 
 a {
     font-weight: bold;
 }
 
 #logo {
+    padding-top: 2em;
+    padding-bottom: 2em;
     text-align: center;
 }
 
