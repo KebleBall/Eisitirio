@@ -360,9 +360,13 @@ class User(db.Model):
             )
 
     def add_manual_battels(self):
-        self.battels = Battels(None, self.email, None, self.firstname,
-                               self.surname, True)
-        db.session.add(self.battels)
+        self.battels = Battels.query.filter(Battels.email==self.email).first()
+
+        if not self.battels:
+            self.battels = Battels(None, self.email, None, self.firstname,
+                                   self.surname, True)
+            db.session.add(self.battels)
+
         db.session.commit()
 
     def get_base_ticket_price(self):
