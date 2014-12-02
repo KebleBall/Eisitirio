@@ -296,9 +296,6 @@ class User(db.Model):
 
         db.session.commit()
 
-        if self.affiliation.name == "Student":
-            self.add_manual_battels()
-
     def deny_affiliation(self):
         self.affiliation_verified = False
 
