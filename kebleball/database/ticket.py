@@ -192,7 +192,7 @@ class Ticket(db.Model):
             self.owner_id = owner
 
         self.paymentmethod = paymentmethod
-        self.price = price
+        self.setPrice(price)
 
         self.expires = datetime.utcnow() + app.config['TICKET_EXPIRY_TIME']
 
