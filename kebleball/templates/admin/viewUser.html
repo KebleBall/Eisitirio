@@ -36,6 +36,13 @@
                 <li>User <strong>is{% if not user.isWaiting() %} not{% endif %}</strong> waiting.</li>
                 <li>User <strong>is{% if not user.isResellingTickets() %} not{% endif %}</strong> reselling tickets.</li>
                 <li>User <strong>can{% if not user.canPayByBattels() %} not{% endif %}</strong> pay for tickets by battels.</li>
+                {% if user.affiliation_verified == None %}
+                    <li>User <strong>has not</strong> had their affiliation verified.</li>
+                {% elif not user.affiliation_verified %}
+                    <li>User's affiliation was <strong>denied</strong>.</li>
+                {% else %}
+                    <li>User's affiliation was <strong>verified</strong>.</li>
+                {% endif %}
             </ul>
             <h4>User Notes</h4>
             <form action="{{ url_for('admin.noteUser', id=user.id) }}" method="post">
