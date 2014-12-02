@@ -33,7 +33,7 @@ def create_plot(plots, xLimMin, xLimMax):
         format="png",
         bbox_extra_artists=(legend,),
         bbox_inches='tight',
-        transparent=True
+        facecolor='white'
     )
 
     image.seek(0)
