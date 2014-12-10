@@ -80,9 +80,9 @@
             <p>You have no tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchaseHome') }}">buy some</a>?</p>
         {% endif %}
 
-        {% if current_user.isWaiting() %}
+        {% if current_user.is_waiting() %}
             <h3>Waiting List</h3>
-            <p>You are currently waiting for {{ current_user.waitingFor() }} tickets.</p>
+            <p>You are currently waiting for {{ current_user.waiting_for() }} tickets.</p>
         {% endif %}
 
         <h3>Announcements</h3>

@@ -87,7 +87,7 @@ def allocate_waiting():
 
         tickets = []
 
-        if wait.user.getsDiscount():
+        if wait.user.gets_discount():
             tickets.append(
                 DB.Ticket(
                     wait.user,

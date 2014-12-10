@@ -34,7 +34,7 @@
                     </div>
                     <p id="ticketInformation">
                         The base price for a ticket is &pound;{{ '%.2f' % (template_config['TICKET_PRICE'] / 100.0) }}.
-                        {% if current_user.getsDiscount() %}
+                        {% if current_user.gets_discount() %}
                             As a current Keble student you get a &pound;{{ '%.2f' % (template_config['KEBLE_DISCOUNT'] / 100.0) }} discount on your first ticket.
                             {% if numTickets -%}
                                 Your order of {{ numTickets }} ticket{% if numTickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % (((template_config['TICKET_PRICE'] * numTickets) - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
@@ -55,7 +55,7 @@
                     <h5>Choose Payment Method</h5>
                     <div class="row">
                         <div class="columns">
-                            {% if current_user.canPayByBattels() %}
+                            {% if current_user.can_pay_by_battels() %}
                                 <label for="paymentMethod-Battels">
                                     <input type="radio" name="paymentMethod" value="Battels" id="paymentMethod-Battels" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Battels' %}checked="checked" {% endif %}/>
                                     Battels
@@ -65,7 +65,7 @@
                                 <input type="radio" name="paymentMethod" value="Card" id="paymentMethod-Card" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Card' %}checked="checked" {% endif %}/>
                                 Credit/Debit Card
                             </label>
-                            <p class="small"><a onclick="showAlternativePayments()" style="cursor: pointer;">Can't pay by card{% if current_user.canPayByBattels() %}/battels{% endif %}?</a></p>
+                            <p class="small"><a onclick="showAlternativePayments()" style="cursor: pointer;">Can't pay by card{% if current_user.can_pay_by_battels() %}/battels{% endif %}?</a></p>
                             <div id="paymentAlternatives"{% if not (form and form['paymentMethod'] and (form['paymentMethod'] == 'Cash' or form['paymentMethod'] == 'Cheque')) %} style="display: none;"{% endif %}>
                                 <p>If you wish to pay by cheque/cash, you must contact <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}">the treasurer</a> to arrange the payment before reserving your tickets here, in order to prevent your tickets expiring before payment is confirmed.</p>
                                 <label for="paymentMethod-Cash">
@@ -129,7 +129,7 @@
     <script type="text/javascript">
         var ticketPrice = {{ template_config['TICKET_PRICE'] }};
         var kebleDiscount = {{ template_config['KEBLE_DISCOUNT'] }};
-        var getsDiscount = {% if current_user.getsDiscount() %}true{% else %}false{% endif %};
+        var getsDiscount = {% if current_user.gets_discount() %}true{% else %}false{% endif %};
 
         function getPlural(num) {
             if (num == 1) {

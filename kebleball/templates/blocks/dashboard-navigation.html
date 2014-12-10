@@ -1,12 +1,12 @@
 <li><a href="{{ url_for('dashboard.dashboardHome') }}">Dashboard Home</a></li>
 <li><a href="{{ url_for('dashboard.profile') }}">Update your Details</a></li>
 <li><a href="{{ url_for('purchase.purchaseHome') }}">Buy Tickets</a></li>
-{% if current_user.hasUnpaidTickets() %}
+{% if current_user.has_unpaid_tickets() %}
     <li><a href="{{ url_for('purchase.changeMethod') }}">Change Ticket Payment Methods</a></li>
-    {% if current_user.hasUnpaidTickets('Card') %}
+    {% if current_user.has_unpaid_tickets('Card') %}
         <li><a href="{{ url_for('purchase.cardConfirm') }}">Complete Card Payments</a></li>
     {% endif %}
-    {% if current_user.hasUnpaidTickets('Battels') %}
+    {% if current_user.has_unpaid_tickets('Battels') %}
         <li><a href="{{ url_for('purchase.battelsConfirm') }}">Complete Battels Payments</a></li>
     {% endif %}
 {% endif %}

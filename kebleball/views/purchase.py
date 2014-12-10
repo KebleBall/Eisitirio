@@ -61,7 +61,7 @@ def purchaseHome():
         ]:
             valid = False
             flashes.append(u'That is not a valid payment method')
-        elif request.form['paymentMethod'] == 'Battels' and not current_user.canPayByBattels():
+        elif request.form['paymentMethod'] == 'Battels' and not current_user.can_pay_by_battels():
             valid = False
             flashes.append(u'You cannot pay by battels')
         elif (
@@ -112,7 +112,7 @@ def purchaseHome():
 
         tickets = []
 
-        if current_user.getsDiscount():
+        if current_user.gets_discount():
             tickets.append(
                 Ticket(
                     current_user,
@@ -399,7 +399,7 @@ def ewayCancel(id):
 @PURCHASE.route('/purchase/battels-confirm', methods=['GET','POST'])
 @login_required
 def battelsConfirm():
-    if not current_user.canPayByBattels():
+    if not current_user.can_pay_by_battels():
         flash(
             u'You cannot currently pay by battels. Please change the payment '
             u'method on your tickets',

@@ -30,7 +30,7 @@ def home():
 def login():
     user = User.get_by_email(request.form['email'])
 
-    if not user or not user.checkPassword(request.form['password']):
+    if not user or not user.check_password(request.form['password']):
         if user:
             log_event(
                 'Failed login attempt - invalid password',
@@ -261,7 +261,7 @@ def passwordReset():
                 "Confirm Password Reset",
                 "passwordResetConfirm.email",
                 confirmurl=url_for(
-                    'front.resetPassword',
+                    'front.reset_password',
                     userID=user.id,
                     secretkey=user.secretkey,
                     _external=True
@@ -346,7 +346,7 @@ def emailConfirm():
         return render_template('front/emailConfirm.html')
 
 @FRONT.route('/resetpassword/<int:userID>/<secretkey>', methods=['GET', 'POST'])
-def resetPassword(userID, secretkey):
+def reset_password(userID, secretkey):
     user = User.get_by_id(userID)
 
     if user is None or user.secretkey != secretkey:
@@ -364,13 +364,13 @@ def resetPassword(userID, secretkey):
             flash(u'Passwords do not match, please try again', 'warning')
             return redirect(
                 url_for(
-                    'front.resetPassword',
+                    'front.reset_password',
                     userID=user.id,
                     secretkey=user.secretkey
                 )
             )
         else:
-            user.setPassword(request.form['password'])
+            user.set_password(request.form['password'])
             user.secretkey = None
             user.secretkeyexpiry = None
             db.session.commit()

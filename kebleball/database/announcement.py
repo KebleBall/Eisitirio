@@ -188,19 +188,19 @@ class Announcement(db.Model):
             if (
                     (
                         self.has_tickets is None or
-                        user.hasTickets() == self.has_tickets
+                        user.has_tickets() == self.has_tickets
                     ) and
                     (
                         self.is_waiting is None or
-                        user.isWaiting() == self.is_waiting
+                        user.is_waiting() == self.is_waiting
                     ) and
                     (
                         self.has_collected is None or
-                        user.hasCollectedTickets() == self.has_collected
+                        user.has_collected_tickets() == self.has_collected
                     ) and
                     (
                         self.has_uncollected is None or
-                        user.hasUncollectedTickets() == self.has_uncollected
+                        user.has_uncollected_tickets() == self.has_uncollected
                     )
             ):
                 self.users.append(user)

@@ -39,7 +39,7 @@ def profile():
             'oldpassword' in request.form and
             request.form['oldpassword'] != ''
         ):
-            if not current_user.checkPassword(request.form['oldpassword']):
+            if not current_user.check_password(request.form['oldpassword']):
                 flashes.append(u'Current password is not correct')
                 valid = False
 
@@ -139,7 +139,7 @@ def profile():
                 'oldpassword' in request.form and
                 request.form['oldpassword'] != ""
             ):
-                current_user.setPassword(request.form['password'])
+                current_user.set_password(request.form['password'])
 
             current_user.firstname = request.form['firstname']
             current_user.surname = request.form['surname']

@@ -42,7 +42,7 @@
             <nav class="row">
                 <ul id="navigation-main">
                     {% include 'blocks/dashboard-navigation.html' %}
-                    {% if current_user.isAdmin() %}
+                    {% if current_user.is_admin() %}
                         {% include 'blocks/admin-navigation.html' %}
                     {% endif %}
                 </ul>

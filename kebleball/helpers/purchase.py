@@ -127,8 +127,8 @@ def canWait(user):
             )
         )
 
-    waitingFor = user.waitingFor()
-    if waitingFor >= app.config['MAX_TICKETS_WAITING']:
+    waiting_for = user.waiting_for()
+    if waiting_for >= app.config['MAX_TICKETS_WAITING']:
         return (
             False,
             0,
@@ -142,7 +142,7 @@ def canWait(user):
     return (
         True,
         min(
-            app.config['MAX_TICKETS_WAITING'] - waitingFor,
+            app.config['MAX_TICKETS_WAITING'] - waiting_for,
             app.config['MAX_TICKETS'] - ticketsOwned
         ),
         None

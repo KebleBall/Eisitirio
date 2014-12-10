@@ -30,7 +30,7 @@ def admin_required(func):
             return func(*args, **kwargs)
         elif not flask_login.current_user.is_authenticated():
             return current_app.login_manager.unauthorized()
-        elif not flask_login.current_user.isAdmin():
+        elif not flask_login.current_user.is_admin():
             flash(
                 u'You are not permitted to perform that action',
                 'error'

@@ -121,7 +121,8 @@ class User(db.Model):
         )
     )
 
-    def __init__(self, email, password, firstname, surname, phone, college, affiliation):
+    def __init__(self, email, password, firstname,
+                 surname, phone, college, affiliation):
         self.email = email
         self.passhash = bcrypt.generate_password_hash(password)
         self.firstname = firstname
@@ -142,20 +143,21 @@ class User(db.Model):
         else:
             self.affiliation_id = affiliation
 
-        battels = Battels.query.filter(Battels.email==email).first()
+        battels = Battels.query.filter(Battels.email == email).first()
 
         if battels is not None:
             self.battels = battels
-        elif re.match('(.*?)@keble\.ox\.ac\.uk$',email) is not None:
+        elif re.match('(.*?)@keble\.ox\.ac\.uk$', email) is not None:
             self.battels = Battels(None, None, None, None, None, True)
             db.session.add(self.battels)
         else:
             self.battels = None
 
     def __repr__(self):
-        return "<User {0}: {1} {2}>".format(self.id, self.firstname, self.surname)
+        return "<User {0}: {1} {2}>".format(
+            self.id, self.firstname, self.surname)
 
-    def checkPassword(self, candidate):
+    def check_password(self, candidate):
         try:
             return bcrypt.check_password_hash(self.passhash, candidate)
         except ValueError:
@@ -168,25 +170,30 @@ class User(db.Model):
 
         return False
 
-    def setPassword(self, password):
+    def set_password(self, password):
         self.passhash = bcrypt.generate_password_hash(password)
 
-    def hasTickets(self):
-        return len([x for x in self.tickets if not x.cancelled]) > 0
+    def has_tickets(self):
+        return len([x for x in self.tickets
+                    if not x.cancelled]) > 0
 
-    def hasUncollectedTickets(self):
-        return len([x for x in self.tickets if not x.cancelled and not x.collected]) > 0
+    def has_uncollected_tickets(self):
+        return len([x for x in self.tickets
+                    if not x.cancelled and not x.collected]) > 0
 
-    def hasCollectedTickets(self):
-        return len([x for x in self.tickets if not x.cancelled and x.collected]) > 0
+    def has_collected_tickets(self):
+        return len([x for x in self.tickets
+                    if not x.cancelled and x.collected]) > 0
 
-    def hasUnresoldTickets(self):
-        return len([x for x in self.tickets if not x.cancelled and x.resalekey is None]) > 0
+    def has_unresold_tickets(self):
+        return len([x for x in self.tickets
+                    if not x.cancelled and x.resalekey is None]) > 0
 
-    def isResellingTickets(self):
-        return len([x for x in self.tickets if x.resalekey is not None]) > 0
+    def is_reselling_tickets(self):
+        return len([x for x in self.tickets
+                    if x.resalekey is not None]) > 0
 
-    def hasUnpaidTickets(self, method=None):
+    def has_unpaid_tickets(self, method=None):
         if method is None:
             return len(
                 [
@@ -207,7 +214,7 @@ class User(db.Model):
                 ]
             ) > 0
 
-    def hasPaidTickets(self, method=None):
+    def has_paid_tickets(self, method=None):
         if method is None:
             return len(
                 [
@@ -234,22 +241,22 @@ class User(db.Model):
     def demote(self):
         self.role = 'User'
 
-    def isAdmin(self):
-        return self.role=='Admin'
+    def is_admin(self):
+        return self.role == 'Admin'
 
-    def isWaiting(self):
+    def is_waiting(self):
         return self.waiting.count() > 0
 
-    def waitingFor(self):
+    def waiting_for(self):
         return sum([x.waitingfor for x in self.waiting])
 
-    def canPayByBattels(self):
+    def can_pay_by_battels(self):
         return (
             self.battels is not None and
             app.config['CURRENT_TERM'] != 'TT'
         )
 
-    def getsDiscount(self):
+    def gets_discount(self):
         return (
             self.college.name == 'Keble' and
             self.affiliation.name == 'Student' and
@@ -277,7 +284,7 @@ class User(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        user = User.query.filter(User.id==int(id)).first()
+        user = User.query.filter(User.id == int(id)).first()
 
         if not user:
             return None
@@ -286,7 +293,7 @@ class User(db.Model):
 
     @staticmethod
     def get_by_email(email):
-        user = User.query.filter(User.email==email).first()
+        user = User.query.filter(User.email == email).first()
 
         if not user:
             return None

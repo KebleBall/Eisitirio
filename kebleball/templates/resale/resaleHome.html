@@ -8,7 +8,7 @@
         <p>If you have bought tickets, and no longer require them, you can resell them to another person. Keble Ball provides only the facility to do so, it is your responsibility to arrange the exchange of any recompense for the tickets, monetary or otherwise. Keble Ball accepts no liability for any disputes resulting from the use of this facility.</p>
         <p>To perform a resale, select the tickets you wish to resell, enter the email address of the person you wish to resell them to, and click Resell Tickets. The person in question will receive an email requiring them to click a link to confirm that they wish to buy the tickets from you. Once this is done, you will receive a notification email. At this point you must arrange with them separately how you should be recompensed for the tickets. Once you are satisfied that you have been recompensed in full, you should click the link in your notification email to complete the resale.</p>
         <h3>Your Tickets</h3>
-        {% if current_user.hasUnresoldTickets() %}
+        {% if current_user.has_unresold_tickets() %}
             <form action="{{ url_for('resale.resaleHome') }}" method="post">
                 <table id="ticketsTable">
                     <thead>

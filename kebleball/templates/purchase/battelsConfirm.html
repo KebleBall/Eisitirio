@@ -6,7 +6,7 @@
 {% block content %}
     <section id="battelsConfirm" class="columns">
         <h3>Your Tickets</h3>
-        {% if current_user.hasUnpaidTickets('Battels') %}
+        {% if current_user.has_unpaid_tickets('Battels') %}
             <form action="{{ url_for('purchase.battelsConfirm') }}" method="post">
                 <table id="ticketsTable">
                     <thead>
@@ -28,7 +28,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                {% if not current_user.canPayByBattels() %}
+                {% if not current_user.can_pay_by_battels() %}
                     <p>You cannot currently pay by battels. Please <a href="{{ url_for('purchase.changeMethod') }}">change the payment method on your tickets.</a></p>
                 {% else %}
                     {% if template_config['CURRENT_TERM'] == 'MT' %}

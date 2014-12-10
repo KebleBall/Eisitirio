@@ -6,7 +6,7 @@
 {% block content %}
     <section id="changeMethod" class="columns">
         <h3>Your Tickets</h3>
-        {% if current_user.hasUnpaidTickets() %}
+        {% if current_user.has_unpaid_tickets() %}
             <form action="{{ url_for('purchase.changeMethod') }}" method="post">
                 <table id="ticketsTable">
                     <thead>
@@ -32,7 +32,7 @@
                 </table>
                 <h5>Change payment method to:</h5>
                 <input type="submit" name="paymentMethod" value="Card" class="button tiny" />
-                {% if current_user.canPayByBattels() %}
+                {% if current_user.can_pay_by_battels() %}
                     <input type="submit" name="paymentMethod" value="Battels" class="button tiny" />
                 {% endif %}
                 <input type="submit" name="paymentMethod" value="Cash" class="button tiny" />
@@ -44,7 +44,7 @@
                     <div class="large-6 columns">
                         <label for="paymentReason">Reason for cash/cheque payment:</label>
                         <input type="text" name="paymentReason" id="paymentReason" />
-                        <p class="small">Leave blank if using card{% if current_user.canPayByBattels() %} or battels{% endif %}.</p>
+                        <p class="small">Leave blank if using card{% if current_user.can_pay_by_battels() %} or battels{% endif %}.</p>
                     </div>
                 </div>
             </form>
