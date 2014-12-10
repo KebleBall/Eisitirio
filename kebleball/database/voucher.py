@@ -67,26 +67,26 @@ class Voucher(db.Model):
     )
 
     def __init__(
-        self,
-        code,
-        expires,
-        discounttype,
-        discountvalue,
-        appliesto,
-        singleuse
+            self,
+            code,
+            expires,
+            discounttype,
+            discountvalue,
+            appliesto,
+            singleuse
     ):
         if discounttype not in [
-            'Fixed Price',
-            'Fixed Discount',
-            'Percentage Discount'
+                'Fixed Price',
+                'Fixed Discount',
+                'Percentage Discount'
         ]:
             raise ValueError(
                 '{0} is not a valid discount type'.format(discounttype)
             )
 
         if appliesto not in [
-            'Ticket',
-            'Transaction'
+                'Ticket',
+                'Transaction'
         ]:
             raise ValueError(
                 '{0} is not a valid application'.format(appliesto)
@@ -107,8 +107,8 @@ class Voucher(db.Model):
         return '<Voucher: {0}/{1}>'.format(self.id, self.code)
 
     @staticmethod
-    def getByCode(code):
-        return Voucher.query().filter_by(Voucher.code==code).first()
+    def get_by_code(code):
+        return Voucher.query().filter_by(Voucher.code == code).first()
 
     def apply(self, tickets, user):
         if self.singleuse and self.used:
@@ -125,12 +125,12 @@ class Voucher(db.Model):
                 self.used_by_id = user
 
         if self.appliesto == 'Ticket':
-            tickets[0] = self.applyToTicket(tickets[0])
+            tickets[0] = self.apply_to_ticket(tickets[0])
             return (True, tickets, None)
         else:
-            return (True, [self.applyToTicket(t) for t in tickets], None)
+            return (True, [self.apply_to_ticket(t) for t in tickets], None)
 
-    def applyToTicket(self, ticket):
+    def apply_to_ticket(self, ticket):
         if self.discounttype == 'Fixed Price':
             ticket.set_price(self.discountvalue)
         elif self.discounttype == 'Fixed Discount':
@@ -144,7 +144,7 @@ class Voucher(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        voucher = Voucher.query.filter(Voucher.id==int(id)).first()
+        voucher = Voucher.query.filter(Voucher.id == int(id)).first()
 
         if not voucher:
             return None

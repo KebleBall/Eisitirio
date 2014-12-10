@@ -14,27 +14,31 @@ from kebleball.database.affiliation import Affiliation
 from email.mime.text import MIMEText
 from datetime import datetime
 
-user_announce_link = db.Table(
+USER_ANNOUNCE_LINK = db.Table(
     'user_announce_link',
     db.Model.metadata,
-    db.Column('user_id',
+    db.Column(
+        'user_id',
         db.Integer,
         db.ForeignKey('user.id')
     ),
-    db.Column('announcement_id',
+    db.Column(
+        'announcement_id',
         db.Integer,
         db.ForeignKey('announcement.id')
     )
 )
 
-email_announce_link = db.Table(
+EMAIL_ANNOUNCE_LINK = db.Table(
     'email_announce_link',
     db.Model.metadata,
-    db.Column('user_id',
+    db.Column(
+        'user_id',
         db.Integer,
         db.ForeignKey('user.id')
     ),
-    db.Column('announcement_id',
+    db.Column(
+        'announcement_id',
         db.Integer,
         db.ForeignKey('announcement.id')
     )
@@ -127,13 +131,13 @@ class Announcement(db.Model):
 
     users = db.relationship(
         'User',
-        secondary=user_announce_link,
+        secondary=USER_ANNOUNCE_LINK,
         backref='announcements'
     )
 
     emails = db.relationship(
         'User',
-        secondary=email_announce_link,
+        secondary=EMAIL_ANNOUNCE_LINK,
         lazy='dynamic'
     )
 
@@ -175,29 +179,29 @@ class Announcement(db.Model):
         query = User.query
 
         if self.college_id is not None:
-            query = query.filter(User.college_id==self.college_id)
+            query = query.filter(User.college_id == self.college_id)
 
         if self.affiliation_id is not None:
-            query = query.filter(User.affiliation_id==self.affiliation_id)
+            query = query.filter(User.affiliation_id == self.affiliation_id)
 
         for user in query.all():
             if (
-                (
-                    self.has_tickets is None or
-                    user.hasTickets()==self.has_tickets
-                ) and
-                (
-                    self.is_waiting is None or
-                    user.isWaiting()==self.is_waiting
-                ) and
-                (
-                    self.has_collected is None or
-                    user.hasCollectedTickets()==self.has_collected
-                ) and
-                (
-                    self.has_uncollected is None or
-                    user.hasUncollectedTickets()==self.has_uncollected
-                )
+                    (
+                        self.has_tickets is None or
+                        user.hasTickets() == self.has_tickets
+                    ) and
+                    (
+                        self.is_waiting is None or
+                        user.isWaiting() == self.is_waiting
+                    ) and
+                    (
+                        self.has_collected is None or
+                        user.hasCollectedTickets() == self.has_collected
+                    ) and
+                    (
+                        self.has_uncollected is None or
+                        user.hasUncollectedTickets() == self.has_uncollected
+                    )
             ):
                 self.users.append(user)
                 if send_email:
@@ -206,7 +210,7 @@ class Announcement(db.Model):
     def __repr__(self):
         return "<Announcement {0}: {1}>".format(self.id, self.subject)
 
-    def sendEmails(self, count):
+    def send_emails(self, count):
         try:
             msg = MIMEText(self.content)
             msg['Subject'] = self.subject
@@ -231,7 +235,8 @@ class Announcement(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        announcement = Announcement.query.filter(Announcement.id==int(id)).first()
+        announcement = Announcement.query.filter(
+            Announcement.id == int(id)).first()
 
         if not announcement:
             return None

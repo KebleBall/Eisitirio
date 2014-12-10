@@ -75,7 +75,7 @@ def send_announcements():
         if emails_count <= 0:
             break
 
-        emails_count = announcement.sendEmails(emails_count)
+        emails_count = announcement.send_emails(emails_count)
 
 def allocate_waiting():
     """Allocate available tickets to people on the waiting list."""

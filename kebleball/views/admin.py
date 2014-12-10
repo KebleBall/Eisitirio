@@ -949,7 +949,7 @@ def announcements(page=1):
                 elif form['uncollected'] == 'no':
                     has_uncollected = False
 
-            send_email = 'sendEmails' in form and form['sendEmails'] == 'yes'
+            send_email = 'send_emails' in form and form['send_emails'] == 'yes'
 
             announcement = Announcement(
                 form['subject'],
