@@ -29,7 +29,7 @@
             <h4>Actions</h4>
             <ul>
                 {% if transaction.get_status()[0] %}
-                    <li><form action="{{ url_for('admin.refundTransaction', id=transaction.id) }}" method="post" id="refundTransaction">Refund &pound;<input type="number" name="refundAmountPounds" min="0" step="1" />.<input type="number" name="refundAmountPence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
+                    <li><form action="{{ url_for('admin.refund_transaction', id=transaction.id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refundAmountPounds" min="0" step="1" />.<input type="number" name="refundAmountPence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
                 {% endif %}
             </ul>
             <h4>Transaction's Tickets</h4>
@@ -107,10 +107,10 @@
                     </tbody>
                 </table>
                 {% if events.has_prev %}
-                    <a href="{{ url_for('admin.view_transaction', id=transaction.id, eventsPage=(eventsPage-1)) }}#events" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin.view_transaction', id=transaction.id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
                 {% endif %}
                 {% if events.has_next %}
-                    <a href="{{ url_for('admin.view_transaction', id=transaction.id, eventsPage=(eventsPage+1)) }}#events" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin.view_transaction', id=transaction.id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events recorded.</p>

@@ -19,8 +19,8 @@
             </div>
             <div class="row">
                 <div class="large-4 columns">
-                    <label for="numVouchers">Number of Vouchers</label>
-                    <input type="number" min="1" step="1" value="1" name="numVouchers" id="numVouchers" {{ form_value(form,'numVouchers') }}/>
+                    <label for="num_vouchers">Number of Vouchers</label>
+                    <input type="number" min="1" step="1" value="1" name="num_vouchers" id="num_vouchers" {{ form_value(form,'num_vouchers') }}/>
                 </div>
                 <div class="large-4 columns">
                     <label for="appliesTo">Applies To</label>
@@ -30,10 +30,10 @@
                     </select>
                 </div>
                 <div class="large-4 columns">
-                    <label for="singleUse">Single Use</label>
-                    <select name="singleUse" id="singleUse">
-                        <option value="yes" {{ form_selected(form,'singleUse','yes') }}>Yes</option>
-                        <option value="no" {{ form_selected(form,'singleUse','no') }}>No</option>
+                    <label for="single_use">Single Use</label>
+                    <select name="single_use" id="single_use">
+                        <option value="yes" {{ form_selected(form,'single_use','yes') }}>Yes</option>
+                        <option value="no" {{ form_selected(form,'single_use','no') }}>No</option>
                     </select>
                 </div>
             </div>

@@ -1,8 +1,17 @@
 # coding: utf-8
+
+import csv
+import re
+from dateutil.parser import parse
+from datetime import datetime
+
+from flask.ext.sqlalchemy import Pagination
+from flask.ext.login import current_user, login_user
 from flask import Blueprint, render_template, request, flash, send_file, redirect, url_for, session
+from StringIO import StringIO
+from sqlalchemy import func
 
 from kebleball.app import app
-from kebleball.helpers.login_manager import admin_required
 from kebleball.database import db
 from kebleball.database.user import User
 from kebleball.database.college import College
@@ -14,16 +23,9 @@ from kebleball.database.statistic import Statistic
 from kebleball.database.waiting import Waiting
 from kebleball.database.card_transaction import CardTransaction
 from kebleball.database.voucher import Voucher
-from flask.ext.sqlalchemy import Pagination
-from flask.ext.login import current_user, login_user
-from dateutil.parser import parse
-from datetime import datetime
-from kebleball.helpers.statistic_plots import create_plot
 from kebleball.helpers import generate_key
-from StringIO import StringIO
-from sqlalchemy import func
-import csv
-import re
+from kebleball.helpers.login_manager import admin_required
+from kebleball.helpers.statistic_plots import create_plot
 
 log = app.log_manager.log_admin
 log_event = app.log_manager.log_event
@@ -39,153 +41,165 @@ def admin_home(page=1):
     form = {}
 
     if request.method == 'POST':
-        userQuery = User.query
-        hasUserFilter = False
-        ticketQuery = Ticket.query
-        hasTicketFilter = False
-        logQuery = Log.query
-        hasLogFilter = False
+        user_query = User.query
+        has_user_filter = False
+        ticket_query = Ticket.query
+        has_ticket_filter = False
+        log_query = Log.query
+        has_log_filter = False
 
-        numPerPage = int(request.form['numResults'])
+        num_per_page = int(request.form['numResults'])
         form = request.form
 
         if (
-            'userName' in request.form and
-            request.form['userName'] != ''
+                'userName' in request.form and
+                request.form['userName'] != ''
         ):
-            userQuery = userQuery.filter(User.fullname.like('%' + request.form['userName'] + '%'))
-            hasUserFilter = True
+            user_query = user_query.filter(
+                User.fullname.like('%' + request.form['userName'] + '%'))
+            has_user_filter = True
 
         if (
-            'userEmail' in request.form and
-            request.form['userEmail'] != ''
+                'userEmail' in request.form and
+                request.form['userEmail'] != ''
         ):
-            userQuery = userQuery.filter(User.email == request.form['userEmail'])
-            hasUserFilter = True
+            user_query = user_query.filter(
+                User.email == request.form['userEmail'])
+            has_user_filter = True
 
         if (
-            'userCollege' in request.form and
-            request.form['userCollege'] != '' and
-            request.form['userCollege'] != 'Any'
+                'userCollege' in request.form and
+                request.form['userCollege'] != '' and
+                request.form['userCollege'] != 'Any'
         ):
-            userQuery = userQuery.filter(User.college_id == request.form['userCollege'])
-            hasUserFilter = True
+            user_query = user_query.filter(
+                User.college_id == request.form['userCollege'])
+            has_user_filter = True
 
         if (
-            'userAffiliation' in request.form and
-            request.form['userAffiliation'] != '' and
-            request.form['userAffiliation'] != 'Any'
+                'userAffiliation' in request.form and
+                request.form['userAffiliation'] != '' and
+                request.form['userAffiliation'] != 'Any'
         ):
-            userQuery = userQuery.filter(User.affiliation_id == request.form['userAffiliation'])
-            hasUserFilter = True
+            user_query = user_query.filter(
+                User.affiliation_id == request.form['userAffiliation'])
+            has_user_filter = True
 
         if (
-            'userTickets' in request.form and
-            request.form['userTickets'] != '' and
-            request.form['userTickets'] != 'Any'
+                'userTickets' in request.form and
+                request.form['userTickets'] != '' and
+                request.form['userTickets'] != 'Any'
         ):
             if request.form['userTickets'] == 'Has':
-                userQuery = userQuery.filter(User.tickets.any())
+                user_query = user_query.filter(User.tickets.any())
             else:
-                userQuery = userQuery.filter(~User.tickets.any())
-            hasUserFilter = True
+                user_query = user_query.filter(~User.tickets.any())
+            has_user_filter = True
 
         if (
-            'userWaiting' in request.form and
-            request.form['userWaiting'] != '' and
-            request.form['userWaiting'] != 'Any'
+                'userWaiting' in request.form and
+                request.form['userWaiting'] != '' and
+                request.form['userWaiting'] != 'Any'
         ):
             if request.form['userWaiting'] == 'Is':
-                userQuery = userQuery.filter(User.waiting.any())
+                user_query = user_query.filter(User.waiting.any())
             else:
-                userQuery = userQuery.filter(~User.waiting.any())
-            hasUserFilter = True
+                user_query = user_query.filter(~User.waiting.any())
+            has_user_filter = True
 
         if (
-            'ticketNumber' in request.form and
-            request.form['ticketNumber'] != ''
+                'ticketNumber' in request.form and
+                request.form['ticketNumber'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.id == request.form['ticketNumber'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                Ticket.id == request.form['ticketNumber'])
+            has_ticket_filter = True
 
         if (
-            'ticketName' in request.form and
-            request.form['ticketName'] != ''
+                'ticketName' in request.form and
+                request.form['ticketName'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.name.like('%' + request.form['ticketName'] + '%'))
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                Ticket.name.like('%' + request.form['ticketName'] + '%'))
+            has_ticket_filter = True
 
         if (
-            'ticketBarcode' in request.form and
-            request.form['ticketBarcode'] != ''
+                'ticketBarcode' in request.form and
+                request.form['ticketBarcode'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.barcode == request.form['ticketBarcode'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                Ticket.barcode == request.form['ticketBarcode'])
+            has_ticket_filter = True
 
         if (
-            'ticketMinPrice' in request.form and
-            request.form['ticketMinPrice'] != ''
+                'ticketMinPrice' in request.form and
+                request.form['ticketMinPrice'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.price >= request.form['ticketMinPrice'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                Ticket.price >= request.form['ticketMinPrice'])
+            has_ticket_filter = True
 
         if (
-            'ticketMaxPrice' in request.form and
-            request.form['ticketMaxPrice'] != ''
+                'ticketMaxPrice' in request.form and
+                request.form['ticketMaxPrice'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.price <= request.form['ticketMaxPrice'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                Ticket.price <= request.form['ticketMaxPrice'])
+            has_ticket_filter = True
 
         if (
-            'ticketMethod' in request.form and
-            request.form['ticketMethod'] != '' and
-            request.form['ticketMethod'] != 'Any'
+                'ticketMethod' in request.form and
+                request.form['ticketMethod'] != '' and
+                request.form['ticketMethod'] != 'Any'
         ):
-            ticketQuery = ticketQuery.filter(Ticket.paymentmethod == request.form['ticketMethod'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                Ticket.paymentmethod == request.form['ticketMethod'])
+            has_ticket_filter = True
 
         if (
-            'ticketPaid' in request.form and
-            request.form['ticketPaid'] != '' and
-            request.form['ticketPaid'] != 'Any'
+                'ticketPaid' in request.form and
+                request.form['ticketPaid'] != '' and
+                request.form['ticketPaid'] != 'Any'
         ):
-            ticketQuery = ticketQuery.filter(Ticket.paid == (request.form['ticketPaid'] == 'Is'))
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                Ticket.paid == (request.form['ticketPaid'] == 'Is'))
+            has_ticket_filter = True
 
         if (
-            'ticketCollected' in request.form and
-            request.form['ticketCollected'] != '' and
-            request.form['ticketCollected'] != 'Any'
+                'ticketCollected' in request.form and
+                request.form['ticketCollected'] != '' and
+                request.form['ticketCollected'] != 'Any'
         ):
-            ticketQuery = ticketQuery.filter(Ticket.collected == (request.form['ticketCollected'] == 'Is'))
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                Ticket.collected == (request.form['ticketCollected'] == 'Is'))
+            has_ticket_filter = True
 
         if (
-            'ticketReferrer' in request.form and
-            request.form['ticketReferrer'] != '' and
-            request.form['ticketReferrer'] != 'Any'
+                'ticketReferrer' in request.form and
+                request.form['ticketReferrer'] != '' and
+                request.form['ticketReferrer'] != 'Any'
         ):
             if request.form['ticketReferrer'] == 'Has':
-                ticketQuery = ticketQuery.filter(Ticket.referrer_id != None)
+                ticket_query = ticket_query.filter(Ticket.referrer_id != None)
             else:
-                ticketQuery = ticketQuery.filter(Ticket.referrer_id == None)
-            hasTicketFilter = True
+                ticket_query = ticket_query.filter(Ticket.referrer_id == None)
+            has_ticket_filter = True
 
         if (
-            'logIP' in request.form and
-            request.form['logIP'] != ''
+                'logIP' in request.form and
+                request.form['logIP'] != ''
         ):
-            logQuery = logQuery.filter(Log.ip == request.form['logIP'])
-            hasLogFilter = True
+            log_query = log_query.filter(Log.ip == request.form['logIP'])
+            has_log_filter = True
 
         if (
-            'logStart' in request.form and
-            request.form['logStart'] != ''
+                'logStart' in request.form and
+                request.form['logStart'] != ''
         ):
             try:
-                dt = parse(request.form['logStart'])
-                logQuery = logQuery.filter(Log.timestamp >= dt)
-                hasLogFilter = True
+                dtstamp = parse(request.form['logStart'])
+                log_query = log_query.filter(Log.timestamp >= dtstamp)
+                has_log_filter = True
             except ValueError, TypeError:
                 flash(
                     'Could not parse start date/time, ignoring.',
@@ -193,13 +207,13 @@ def admin_home(page=1):
                 )
 
         if (
-            'logEnd' in request.form and
-            request.form['logEnd'] != ''
+                'logEnd' in request.form and
+                request.form['logEnd'] != ''
         ):
             try:
-                dt = parse(request.form['logEnd'])
-                logQuery = logQuery.filter(Log.timestamp <= dt)
-                hasLogFilter = True
+                dtstamp = parse(request.form['logEnd'])
+                log_query = log_query.filter(Log.timestamp <= dtstamp)
+                has_log_filter = True
             except ValueError, TypeError:
                 flash(
                     'Could not parse end date/time, ignoring.',
@@ -207,103 +221,104 @@ def admin_home(page=1):
                 )
 
         if (
-            'logMessage' in request.form and
-            request.form['logMessage'] != ''
+                'logMessage' in request.form and
+                request.form['logMessage'] != ''
         ):
-            logQuery = logQuery.filter(Log.action.like('%' + request.form['logMessage'] + '%'))
-            hasLogFilter = True
+            log_query = log_query.filter(
+                Log.action.like('%' + request.form['logMessage'] + '%'))
+            has_log_filter = True
 
-        logQuery = logQuery.order_by(Log.timestamp.desc())
+        log_query = log_query.order_by(Log.timestamp.desc())
 
         if request.form['search'] == 'user':
-            if hasTicketFilter:
-                userQuery = userQuery.join(
-                    ticketQuery.subquery(),
+            if has_ticket_filter:
+                user_query = user_query.join(
+                    ticket_query.subquery(),
                     User.tickets
                 )
 
-            if hasLogFilter:
+            if has_log_filter:
                 if request.form['logUser'] == 'Actor':
-                    userQuery = userQuery.join(
-                        logQuery.subquery(),
+                    user_query = user_query.join(
+                        log_query.subquery(),
                         User.actions
                     )
                 else:
-                    userQuery = userQuery.join(
-                        logQuery.subquery(),
+                    user_query = user_query.join(
+                        log_query.subquery(),
                         User.events
                     )
 
-            results = userQuery.paginate(page, numPerPage)
+            results = user_query.paginate(page, num_per_page)
             category = 'User'
         elif request.form['search'] == 'ticket':
-            if hasUserFilter:
-                ticketQuery = ticketQuery.join(
-                    userQuery.subquery(),
+            if has_user_filter:
+                ticket_query = ticket_query.join(
+                    user_query.subquery(),
                     Ticket.owner
                 )
 
-            if hasLogFilter:
-                ticketQuery = ticketQuery.join(
-                    logQuery.subquery(),
+            if has_log_filter:
+                ticket_query = ticket_query.join(
+                    log_query.subquery(),
                     Ticket.log_entries
                 )
 
-            results = ticketQuery.paginate(page, numPerPage)
+            results = ticket_query.paginate(page, num_per_page)
             category = 'Ticket'
         elif request.form['search'] == 'log':
-            if hasUserFilter:
+            if has_user_filter:
                 if request.form['logUser'] == 'Actor':
-                    logQuery = logQuery.join(
-                        userQuery.subquery(),
+                    log_query = log_query.join(
+                        user_query.subquery(),
                         Log.actor
                     )
                 else:
-                    logQuery = logQuery.join(
-                        userQuery.subquery(),
+                    log_query = log_query.join(
+                        user_query.subquery(),
                         Log.user
                     )
 
-            if hasTicketFilter:
-                logQuery = logQuery.join(
-                    ticketQuery.subquery(),
+            if has_ticket_filter:
+                log_query = log_query.join(
+                    ticket_query.subquery(),
                     Log.tickets
                 )
 
-            results = logQuery.paginate(page, numPerPage)
+            results = log_query.paginate(page, num_per_page)
             category = 'Log'
 
     return render_template(
         'admin/admin_home.html',
         form=form,
-        colleges = College.query.all(),
-        affiliations = Affiliation.query.all(),
+        colleges=College.query.all(),
+        affiliations=Affiliation.query.all(),
         results=results,
         category=category
     )
 
 @ADMIN.route('/admin/user/<int:id>/view')
-@ADMIN.route('/admin/user/<int:id>/view/page/selfactions/<int:selfActionsPage>')
-@ADMIN.route('/admin/user/<int:id>/view/page/actions/<int:actionsPage>')
-@ADMIN.route('/admin/user/<int:id>/view/page/events/<int:eventsPage>')
+@ADMIN.route('/admin/user/<int:id>/view/page/selfactions/<int:self_actions_page>')
+@ADMIN.route('/admin/user/<int:id>/view/page/actions/<int:actions_page>')
+@ADMIN.route('/admin/user/<int:id>/view/page/events/<int:events_page>')
 @admin_required
-def view_user(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
+def view_user(id, self_actions_page=1, actions_page=1, events_page=1):
     user = User.get_by_id(id)
 
     if user:
-        selfActions = user.actions \
+        self_actions = user.actions \
             .filter(Log.actor_id == Log.user_id) \
             .order_by(Log.timestamp.desc()) \
             .paginate(
-                selfActionsPage,
+                self_actions_page,
                 10,
                 True
             )
-        otherActions = user.actions \
+        other_actions = user.actions \
             .filter(Log.actor_id != Log.user_id) \
             .order_by(Log.timestamp.desc()) \
             .paginate(
-                actionsPage,
+                actions_page,
                 10,
                 True
             )
@@ -311,29 +326,29 @@ def view_user(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
             .filter(Log.actor_id != Log.user_id) \
             .order_by(Log.timestamp.desc()) \
             .paginate(
-                eventsPage,
+                events_page,
                 10,
                 True
             )
     else:
-        selfActions = None
-        otherActions = None
+        self_actions = None
+        other_actions = None
         events = None
 
     return render_template(
         'admin/view_user.html',
         user=user,
-        selfActions=selfActions,
-        otherActions=otherActions,
+        self_actions=self_actions,
+        other_actions=other_actions,
         events=events,
-        selfActionsPage=selfActionsPage,
-        actionsPage=actionsPage,
-        eventsPage=eventsPage
+        self_actions_page=self_actions_page,
+        actions_page=actions_page,
+        events_page=events_page
     )
 
 @ADMIN.route('/admin/user/<int:id>/impersonate')
 @admin_required
-def impersonateUser(id):
+def impersonate_user(id):
     user = User.get_by_id(id)
 
     if user:
@@ -360,7 +375,7 @@ def impersonateUser(id):
 
 @ADMIN.route('/admin/user/<int:id>/give', methods=['POST'])
 @admin_required
-def giveUser(id):
+def give_user(id):
     user = User.get_by_id(id)
 
     if user:
@@ -368,11 +383,11 @@ def giveUser(id):
             int(request.form['givePricePounds']) * 100 +
             int(request.form['givePricePence'])
         )
-        num_tickets=int(request.form['giveNumTickets'])
+        num_tickets = int(request.form['giveNumTickets'])
 
         if (
-            'giveReason' not in request.form or
-            request.form['giveReason'] == ''
+                'giveReason' not in request.form or
+                request.form['giveReason'] == ''
         ):
             note = 'Given by {0} (#{1}) for no reason.'.format(
                 current_user.fullname,
@@ -387,7 +402,7 @@ def giveUser(id):
 
         tickets = []
 
-        for i in xrange(num_tickets):
+        for _ in xrange(num_tickets):
             ticket = Ticket(
                 user,
                 None,
@@ -415,7 +430,8 @@ def giveUser(id):
             'success'
         )
 
-        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not give tickets.',
@@ -425,7 +441,7 @@ def giveUser(id):
 
 @ADMIN.route('/admin/user/<int:id>/note', methods=['POST'])
 @admin_required
-def noteUser(id):
+def note_user(id):
     user = User.get_by_id(id)
 
     if user:
@@ -442,7 +458,8 @@ def noteUser(id):
             u'Notes set successfully.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not set notes.',
@@ -452,7 +469,7 @@ def noteUser(id):
 
 @ADMIN.route('/admin/user/<int:id>/verify')
 @admin_required
-def verifyUser(id):
+def verify_user(id):
     user = User.get_by_id(id)
 
     if user:
@@ -469,7 +486,8 @@ def verifyUser(id):
             u'User marked as verified.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not verify.',
@@ -479,7 +497,7 @@ def verifyUser(id):
 
 @ADMIN.route('/admin/user/<int:id>/demote')
 @admin_required
-def demoteUser(id):
+def demote_user(id):
     user = User.get_by_id(id)
 
     if user:
@@ -496,7 +514,8 @@ def demoteUser(id):
             u'User demoted.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not demote.',
@@ -506,7 +525,7 @@ def demoteUser(id):
 
 @ADMIN.route('/admin/user/<int:id>/promote')
 @admin_required
-def promoteUser(id):
+def promote_user(id):
     user = User.get_by_id(id)
 
     if user:
@@ -523,7 +542,8 @@ def promoteUser(id):
             u'User promoted.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not promote.',
@@ -531,7 +551,7 @@ def promoteUser(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/user/<int:id>/collect', methods=['GET','POST'])
+@ADMIN.route('/admin/user/<int:id>/collect', methods=['GET', 'POST'])
 @admin_required
 def collect_tickets(id):
     user = User.get_by_id(id)
@@ -549,15 +569,15 @@ def collect_tickets(id):
         return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/ticket/<int:id>/view')
-@ADMIN.route('/admin/ticket/<int:id>/view/page/<int:eventsPage>')
+@ADMIN.route('/admin/ticket/<int:id>/view/page/<int:events_page>')
 @admin_required
-def view_ticket(id, eventsPage=1):
+def view_ticket(id, events_page=1):
     ticket = Ticket.get_by_id(id)
 
     if ticket:
         events = ticket.log_entries \
             .paginate(
-                eventsPage,
+                events_page,
                 10,
                 True
             )
@@ -568,13 +588,14 @@ def view_ticket(id, eventsPage=1):
         'admin/view_ticket.html',
         ticket=ticket,
         events=events,
-        eventsPage=eventsPage
+        events_page=events_page
     )
 
 @ADMIN.route('/admin/ticket/<int:id>/collect', methods=['POST'])
 @admin_required
-def collectTicket(id):
-    existing = Ticket.query.filter(Ticket.barcode==request.form['barcode']).count()
+def collect_ticket(id):
+    existing = Ticket.query.filter(
+        Ticket.barcode == request.form['barcode']).count()
 
     if existing > 0:
         flash(
@@ -601,7 +622,8 @@ def collectTicket(id):
             ),
             'success'
         )
-        return redirect(request.referrer or url_for('admin.collect_tickets', id=ticket.owner_id))
+        return redirect(request.referrer
+                        or url_for('admin.collect_tickets', id=ticket.owner_id))
     else:
         flash(
             u'Could not find ticket, could mark as collected.',
@@ -611,7 +633,7 @@ def collectTicket(id):
 
 @ADMIN.route('/admin/ticket/<int:id>/note', methods=['POST'])
 @admin_required
-def noteTicket(id):
+def note_ticket(id):
     ticket = Ticket.get_by_id(id)
 
     if ticket:
@@ -627,7 +649,8 @@ def noteTicket(id):
             u'Notes set successfully.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_ticket', id=ticket.id))
     else:
         flash(
             u'Could not find ticket, could not set notes.',
@@ -637,7 +660,7 @@ def noteTicket(id):
 
 @ADMIN.route('/admin/ticket/<int:id>/markpaid')
 @admin_required
-def markTicketPaid(id):
+def mark_ticket_paid(id):
     ticket = Ticket.get_by_id(id)
 
     if ticket:
@@ -653,7 +676,8 @@ def markTicketPaid(id):
             u'Ticket successfully marked as paid.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_ticket', id=ticket.id))
     else:
         flash(
             u'Could not find ticket, could not mark as paid.',
@@ -663,7 +687,7 @@ def markTicketPaid(id):
 
 @ADMIN.route('/admin/ticket/<int:id>/autocancel')
 @admin_required
-def autoCancelTicket(id):
+def auto_cancel_ticket(id):
     ticket = Ticket.get_by_id(id)
 
     if ticket:
@@ -672,18 +696,20 @@ def autoCancelTicket(id):
                 u'Could not automatically cancel ticket.',
                 'warning'
             )
-            return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
+            return redirect(request.referrer
+                            or url_for('admin.view_ticket', id=ticket.id))
 
         if ticket.paymentmethod == 'Battels':
             ticket.battels.cancel(ticket)
         elif ticket.paymentmethod == 'Card':
-            refundResult = ticket.card_transaction.process_refund(ticket.price)
-            if not refundResult:
+            refund_result = ticket.card_transaction.process_refund(ticket.price)
+            if not refund_result:
                 flash(
                     u'Could not process card refund.',
                     'warning'
                 )
-                return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
+                return redirect(request.referrer
+                                or url_for('admin.view_ticket', id=ticket.id))
 
         ticket.cancelled = True
         db.session.commit()
@@ -697,7 +723,8 @@ def autoCancelTicket(id):
             u'Ticket cancelled successfully.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_ticket', id=ticket.id))
     else:
         flash(
             u'Could not find ticket, could not cancel.',
@@ -707,7 +734,7 @@ def autoCancelTicket(id):
 
 @ADMIN.route('/admin/ticket/<int:id>/cancel')
 @admin_required
-def cancelTicket(id):
+def cancel_ticket(id):
     ticket = Ticket.get_by_id(id)
 
     if ticket:
@@ -723,13 +750,15 @@ def cancelTicket(id):
             u'Ticket cancelled successfully.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_ticket', id=ticket.id))
     else:
         flash(
             u'Could not find ticket, could not cancel.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.admin_home'))
+        return redirect(request.referrer
+                        or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/ticket/validate', methods=['POST', 'GET'])
 @admin_required
@@ -738,11 +767,13 @@ def validate_ticket():
     message = None
 
     if request.method == 'POST':
-        ticket = Ticket.query.filter(Ticket.barcode==request.form['barcode']).first()
+        ticket = Ticket.query.filter(
+            Ticket.barcode == request.form['barcode']).first()
 
         if not ticket:
             valid = False
-            message = "No such ticket with barcode {0}".format(request.form['barcode'])
+            message = "No such ticket with barcode {0}".format(
+                request.form['barcode'])
         elif ticket.entered:
             valid = False
             message = (
@@ -775,15 +806,15 @@ def view_log(id):
     )
 
 @ADMIN.route('/admin/transaction/<int:id>/view')
-@ADMIN.route('/admin/transaction/<int:id>/view/page/<int:eventsPage>')
+@ADMIN.route('/admin/transaction/<int:id>/view/page/<int:events_page>')
 @admin_required
-def view_transaction(id, eventsPage=1):
+def view_transaction(id, events_page=1):
     transaction = CardTransaction.get_by_id(id)
 
     if transaction:
         events = transaction.events \
             .paginate(
-                eventsPage,
+                events_page,
                 10,
                 True
             )
@@ -794,23 +825,25 @@ def view_transaction(id, eventsPage=1):
         'admin/view_transaction.html',
         transaction=transaction,
         events=events,
-        eventsPage=eventsPage
+        events_page=events_page
     )
 
 @ADMIN.route('/admin/transaction/<int:id>/refund', methods=['POST'])
 @admin_required
-def refundTransaction(id):
+def refund_transaction(id):
     transaction = CardTransaction.get_by_id(id)
 
     if transaction:
-        amount = int(request.form['refundAmountPounds']) * 100 + int(request.form['refundAmountPence'])
+        amount = (int(request.form['refundAmountPounds'])
+                  * 100 + int(request.form['refundAmountPence']))
 
         if amount > (transaction.get_value() - transaction.refunded):
             flash(
                 u'Cannot refund more than has been charged.',
                 'warning'
             )
-            return redirect(request.referrer or url_for('admin.view_transaction', id=transaction.id))
+            return redirect(request.referrer
+                            or url_for('admin.view_transaction', id=transaction.id))
 
         result = transaction.process_refund(amount)
 
@@ -819,11 +852,13 @@ def refundTransaction(id):
                 u'Could not process refund.',
                 'warning'
             )
-        else:flash(
+        else:
+            flash(
                 u'Refund processed successfully.',
                 'success'
             )
-        return redirect(request.referrer or url_for('admin.view_transaction', id=transaction.id))
+        return redirect(request.referrer
+                        or url_for('admin.view_transaction', id=transaction.id))
     else:
         flash(
             u'Could not find transaction, could not cancel.',
@@ -842,24 +877,24 @@ def statistics():
     if total_value is None:
         total_value = 0
 
-    paidValue = db.session \
+    paid_value = db.session \
         .query(func.sum(Ticket.price)) \
         .filter(Ticket.paid == True) \
         .filter(Ticket.cancelled != True) \
         .scalar()
 
-    if paidValue is None:
-        paidValue = 0
+    if paid_value is None:
+        paid_value = 0
 
-    cancelledValue = db.session \
+    cancelled_value = db.session \
         .query(func.sum(Ticket.price)) \
         .filter(Ticket.cancelled == True) \
         .scalar()
 
-    if cancelledValue is None:
-        cancelledValue = 0
+    if cancelled_value is None:
+        cancelled_value = 0
 
-    paymentMethodValues = db.session \
+    payment_method_values = db.session \
         .query(func.sum(Ticket.price), Ticket.paymentmethod) \
         .filter(Ticket.cancelled != True) \
         .group_by(Ticket.paymentmethod) \
@@ -868,13 +903,13 @@ def statistics():
     return render_template(
         'admin/statistics.html',
         total_value=total_value,
-        paidValue=paidValue,
-        cancelledValue=cancelledValue,
-        paymentMethodValues=paymentMethodValues
+        paid_value=paid_value,
+        cancelled_value=cancelled_value,
+        payment_method_values=payment_method_values
     )
 
-@ADMIN.route('/admin/announcements', methods=['GET','POST'])
-@ADMIN.route('/admin/announcements/page/<int:page>', methods=['GET','POST'])
+@ADMIN.route('/admin/announcements', methods=['GET', 'POST'])
+@ADMIN.route('/admin/announcements/page/<int:page>', methods=['GET', 'POST'])
 @admin_required
 def announcements(page=1):
     form = {}
@@ -1025,8 +1060,8 @@ def cancelAnnouncementEmails(id):
 
     return redirect(request.referrer or url_for('admin.announcements'))
 
-@ADMIN.route('/admin/vouchers', methods=['GET','POST'])
-@ADMIN.route('/admin/vouchers/page/<int:page>', methods=['GET','POST'])
+@ADMIN.route('/admin/vouchers', methods=['GET', 'POST'])
+@ADMIN.route('/admin/vouchers/page/<int:page>', methods=['GET', 'POST'])
 @admin_required
 def vouchers(page=1):
     form = {}
@@ -1061,9 +1096,11 @@ def vouchers(page=1):
             )
             success = False
         elif form['voucherType'] == 'Fixed Price':
-            value = int(form['fixedPricePounds']) * 100 + int(form['fixedPricePence'])
+            value = (int(form['fixedPricePounds'])
+                     * 100 + int(form['fixedPricePence']))
         elif form['voucherType'] == 'Fixed Discount':
-            value = int(form['fixedDiscountPounds']) * 100 + int(form['fixedDiscountPence'])
+            value = (int(form['fixedDiscountPounds'])
+                     * 100 + int(form['fixedDiscountPence']))
         else:
             value = int(form['fixedDiscount'])
             if value > 100:
@@ -1073,7 +1110,7 @@ def vouchers(page=1):
                 )
                 success = False
 
-        if not re.match('[a-zA-Z0-9]+',form['voucherPrefix']):
+        if not re.match('[a-zA-Z0-9]+', form['voucherPrefix']):
             flash(
                 u'Voucher prefix must be non-empty and contain only letters and numbers',
                 'warning'
@@ -1081,10 +1118,10 @@ def vouchers(page=1):
             success = False
 
         if success:
-            numVouchers = int(form['numVouchers'])
-            singleUse = 'singleUse' in form and form['singleUse'] == 'yes'
+            num_vouchers = int(form['num_vouchers'])
+            single_use = 'single_use' in form and form['single_use'] == 'yes'
 
-            for i in xrange(numVouchers):
+            for _ in xrange(num_vouchers):
                 key = generate_key(10)
                 voucher = Voucher(
                     '{0}-{1}'.format(
@@ -1095,7 +1132,7 @@ def vouchers(page=1):
                     form['voucherType'],
                     value,
                     form['appliesTo'],
-                    singleUse
+                    single_use
                 )
                 db.session.add(voucher)
 
@@ -1178,7 +1215,7 @@ def graphSales():
         .order_by(Statistic.timestamp) \
         .all()
 
-    statisticKeys = [
+    statistic_keys = [
         ('Available', 'g-'),
         ('Ordered', 'b-'),
         ('Paid', 'r-'),
@@ -1193,7 +1230,7 @@ def graphSales():
             'datapoints': [],
             'line': line,
             'currentValue': 0
-        } for (key, line) in statisticKeys
+        } for (key, line) in statistic_keys
     }
 
     for statistic in statistics:
@@ -1211,7 +1248,7 @@ def graphColleges():
         .order_by(Statistic.timestamp) \
         .all()
 
-    statisticKeys = [
+    statistic_keys = [
         ("All Souls", "r^-"),
         ("Balliol", "g^-"),
         ("Blackfriars", "b^-"),
@@ -1266,7 +1303,7 @@ def graphColleges():
             'datapoints': [],
             'line': line,
             'currentValue': 0
-        } for (key, line) in statisticKeys
+        } for (key, line) in statistic_keys
     }
 
     for statistic in statistics:
@@ -1284,7 +1321,7 @@ def graphPayments():
         .order_by(Statistic.timestamp) \
         .all()
 
-    statisticKeys = [
+    statistic_keys = [
         ('Battels', 'g-'),
         ('Card', 'b-'),
         ('Cash', 'r-'),
@@ -1298,7 +1335,7 @@ def graphPayments():
             'datapoints': [],
             'line': line,
             'currentValue': 0
-        } for (key, line) in statisticKeys
+        } for (key, line) in statistic_keys
     }
 
     for statistic in statistics:
