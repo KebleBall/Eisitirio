@@ -33,7 +33,7 @@ ADMIN = Blueprint('admin', __name__)
 @ADMIN.route('/admin', methods=['GET', 'POST'])
 @ADMIN.route('/admin/page/<int:page>', methods=['GET', 'POST'])
 @admin_required
-def adminHome(page=1):
+def admin_home(page=1):
     results = None
     category = None
     form = {}
@@ -274,7 +274,7 @@ def adminHome(page=1):
             category = 'Log'
 
     return render_template(
-        'admin/adminHome.html',
+        'admin/admin_home.html',
         form=form,
         colleges = College.query.all(),
         affiliations = Affiliation.query.all(),
@@ -287,7 +287,7 @@ def adminHome(page=1):
 @ADMIN.route('/admin/user/<int:id>/view/page/actions/<int:actionsPage>')
 @ADMIN.route('/admin/user/<int:id>/view/page/events/<int:eventsPage>')
 @admin_required
-def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
+def view_user(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
     user = User.get_by_id(id)
 
     if user:
@@ -321,7 +321,7 @@ def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
         events = None
 
     return render_template(
-        'admin/viewUser.html',
+        'admin/view_user.html',
         user=user,
         selfActions=selfActions,
         otherActions=otherActions,
@@ -350,13 +350,13 @@ def impersonateUser(id):
             user
         )
 
-        return redirect(url_for('dashboard.dashboardHome'))
+        return redirect(url_for('dashboard.dashboard_home'))
     else:
         flash(
             u'Could not find user, could not impersonate.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/user/<int:id>/give', methods=['POST'])
 @admin_required
@@ -415,13 +415,13 @@ def giveUser(id):
             'success'
         )
 
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not give tickets.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/user/<int:id>/note', methods=['POST'])
 @admin_required
@@ -442,13 +442,13 @@ def noteUser(id):
             u'Notes set successfully.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not set notes.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/user/<int:id>/verify')
 @admin_required
@@ -469,13 +469,13 @@ def verifyUser(id):
             u'User marked as verified.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not verify.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/user/<int:id>/demote')
 @admin_required
@@ -496,13 +496,13 @@ def demoteUser(id):
             u'User demoted.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not demote.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/user/<int:id>/promote')
 @admin_required
@@ -523,22 +523,22 @@ def promoteUser(id):
             u'User promoted.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+        return redirect(request.referrer or url_for('admin.view_user', id=user.id))
     else:
         flash(
             u'Could not find user, could not promote.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/user/<int:id>/collect', methods=['GET','POST'])
 @admin_required
-def collectTickets(id):
+def collect_tickets(id):
     user = User.get_by_id(id)
 
     if user:
         return render_template(
-            'admin/collectTickets.html',
+            'admin/collect_tickets.html',
             user=user
         )
     else:
@@ -546,12 +546,12 @@ def collectTickets(id):
             u'Could not find user, could not process ticket collection.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/ticket/<int:id>/view')
 @ADMIN.route('/admin/ticket/<int:id>/view/page/<int:eventsPage>')
 @admin_required
-def viewTicket(id, eventsPage=1):
+def view_ticket(id, eventsPage=1):
     ticket = Ticket.get_by_id(id)
 
     if ticket:
@@ -565,7 +565,7 @@ def viewTicket(id, eventsPage=1):
         events = None
 
     return render_template(
-        'admin/viewTicket.html',
+        'admin/view_ticket.html',
         ticket=ticket,
         events=events,
         eventsPage=eventsPage
@@ -581,7 +581,7 @@ def collectTicket(id):
             u'Barcode has already been used for a ticket.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
     ticket = Ticket.get_by_id(id)
 
@@ -601,13 +601,13 @@ def collectTicket(id):
             ),
             'success'
         )
-        return redirect(request.referrer or url_for('admin.collectTickets', id=ticket.owner_id))
+        return redirect(request.referrer or url_for('admin.collect_tickets', id=ticket.owner_id))
     else:
         flash(
             u'Could not find ticket, could mark as collected.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/ticket/<int:id>/note', methods=['POST'])
 @admin_required
@@ -627,13 +627,13 @@ def noteTicket(id):
             u'Notes set successfully.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+        return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
     else:
         flash(
             u'Could not find ticket, could not set notes.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/ticket/<int:id>/markpaid')
 @admin_required
@@ -653,13 +653,13 @@ def markTicketPaid(id):
             u'Ticket successfully marked as paid.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+        return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
     else:
         flash(
             u'Could not find ticket, could not mark as paid.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/ticket/<int:id>/autocancel')
 @admin_required
@@ -672,7 +672,7 @@ def autoCancelTicket(id):
                 u'Could not automatically cancel ticket.',
                 'warning'
             )
-            return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+            return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
 
         if ticket.paymentmethod == 'Battels':
             ticket.battels.cancel(ticket)
@@ -683,7 +683,7 @@ def autoCancelTicket(id):
                     u'Could not process card refund.',
                     'warning'
                 )
-                return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+                return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
 
         ticket.cancelled = True
         db.session.commit()
@@ -697,13 +697,13 @@ def autoCancelTicket(id):
             u'Ticket cancelled successfully.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+        return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
     else:
         flash(
             u'Could not find ticket, could not cancel.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/ticket/<int:id>/cancel')
 @admin_required
@@ -723,17 +723,17 @@ def cancelTicket(id):
             u'Ticket cancelled successfully.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
+        return redirect(request.referrer or url_for('admin.view_ticket', id=ticket.id))
     else:
         flash(
             u'Could not find ticket, could not cancel.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/ticket/validate', methods=['POST', 'GET'])
 @admin_required
-def validateTicket():
+def validate_ticket():
     valid = None
     message = None
 
@@ -759,25 +759,25 @@ def validateTicket():
             message = "Permit entry for {0}".format(ticket.name)
 
     return render_template(
-        'admin/validateTicket.html',
+        'admin/validate_ticket.html',
         valid=valid,
         message=message
     )
 
 @ADMIN.route('/admin/log/<int:id>/view')
 @admin_required
-def viewLog(id):
+def view_log(id):
     log = Log.get_by_id(id)
 
     return render_template(
-        'admin/viewLog.html',
+        'admin/view_log.html',
         log=log
     )
 
 @ADMIN.route('/admin/transaction/<int:id>/view')
 @ADMIN.route('/admin/transaction/<int:id>/view/page/<int:eventsPage>')
 @admin_required
-def viewTransaction(id, eventsPage=1):
+def view_transaction(id, eventsPage=1):
     transaction = CardTransaction.get_by_id(id)
 
     if transaction:
@@ -791,7 +791,7 @@ def viewTransaction(id, eventsPage=1):
         events = None
 
     return render_template(
-        'admin/viewTransaction.html',
+        'admin/view_transaction.html',
         transaction=transaction,
         events=events,
         eventsPage=eventsPage
@@ -810,7 +810,7 @@ def refundTransaction(id):
                 u'Cannot refund more than has been charged.',
                 'warning'
             )
-            return redirect(request.referrer or url_for('admin.viewTransaction', id=transaction.id))
+            return redirect(request.referrer or url_for('admin.view_transaction', id=transaction.id))
 
         result = transaction.process_refund(amount)
 
@@ -823,13 +823,13 @@ def refundTransaction(id):
                 u'Refund processed successfully.',
                 'success'
             )
-        return redirect(request.referrer or url_for('admin.viewTransaction', id=transaction.id))
+        return redirect(request.referrer or url_for('admin.view_transaction', id=transaction.id))
     else:
         flash(
             u'Could not find transaction, could not cancel.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/statistics')
 @admin_required
@@ -1168,7 +1168,7 @@ def deleteWaiting(id):
             'error'
         )
 
-    return redirect(request.referrer or url_for('admin.adminHome'))
+    return redirect(request.referrer or url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/graphs/sales')
 @admin_required

@@ -1,17 +1,17 @@
-<!-- admin/validateTicket.html -->
+<!-- admin/validate_ticket.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Validate Ticket{% endblock %}
 
 {% block content %}
-    <section id="validateTicket" class="columns">
+    <section id="validate_ticket" class="columns">
         {% if valid != None %}
             <div class="message-box {% if valid %}success{% else %}error{% endif %}">
                 <h1>{% if valid %}VALID{% else %}INVALID{% endif %}</h1>
                 <p>{{ message }}</p>
             </div>
         {% endif %}
-        <form action="{{ url_for('admin.validateTicket') }}" method="post">
+        <form action="{{ url_for('admin.validate_ticket') }}" method="post">
             <div class="row">
                 <div class="large-8 columns large-centered">
                     <label for="barcode">Ticket Barcode</label>

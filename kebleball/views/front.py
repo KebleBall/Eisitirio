@@ -78,7 +78,7 @@ def login():
 
     flash(u'Logged in successfully.', 'success')
     return redirect(request.form.get('next', False)
-                    or url_for("dashboard.dashboardHome"))
+                    or url_for("dashboard.dashboard_home"))
 
 @FRONT.route('/register', methods=['POST'])
 def register():
@@ -283,7 +283,7 @@ def password_reset():
 
         return redirect(url_for('front.home'))
     else:
-        return render_template('front/passwordReset.html')
+        return render_template('front/password_reset.html')
 
 @FRONT.route('/emailconfirm', methods=['GET', 'POST'])
 def email_confirm():
@@ -345,7 +345,7 @@ def email_confirm():
 
         return redirect(url_for('front.home'))
     else:
-        return render_template('front/emailConfirm.html')
+        return render_template('front/email_confirm.html')
 
 @FRONT.route('/resetpassword/<int:userID>/<secretkey>', methods=['GET', 'POST'])
 def reset_password(userID, secretkey):
@@ -387,7 +387,7 @@ def reset_password(userID, secretkey):
             return redirect(url_for('front.home'))
     else:
         return render_template(
-            'front/resetPassword.html',
+            'front/reset_password.html',
             userID=userID,
             secretkey=secretkey
         )
@@ -474,7 +474,7 @@ def logout():
                 actor
             )
 
-            return redirect(url_for('admin.adminHome'))
+            return redirect(url_for('admin.admin_home'))
 
     log_event(
         'Logged Out',

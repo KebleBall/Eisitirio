@@ -1,15 +1,15 @@
-<!-- admin/viewTransaction.html -->
+<!-- admin/view_transaction.html -->
 {% extends 'layout.html' %}
 
 {% block title %}{% if not transaction %}No Transaction Found{% else %}View Transaction - #{{ '%05d' % transaction.id }}{% endif %}{% endblock %}
 
 {% block content %}
-    <section id="viewTransaction" class="columns">
+    <section id="view_transaction" class="columns">
         {% if not transaction %}
             <p>No transaction was found with that ID.</p>
         {% else %}
             <h4>Transaction Details</h4>
-            <p><strong>User</strong>: <a href="{{ url_for('admin.viewUser', id=transaction.user_id) }}">{{ transaction.user.fullname }}</a></p>
+            <p><strong>User</strong>: <a href="{{ url_for('admin.view_user', id=transaction.user_id) }}">{{ transaction.user.fullname }}</a></p>
             <p><strong>Total Value</strong>: &pound;{{ '%.2f' % (transaction.get_value() / 100.0) }}</p>
             <p><strong>Commenced</strong>: {{ transaction.commenced.strftime('%c') }}</p>
             {% if transaction.completed != null %}
@@ -72,7 +72,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('admin.viewTicket', id=ticket.id) }}" class="button tiny">View</a>
+                                    <a href="{{ url_for('admin.view_ticket', id=ticket.id) }}" class="button tiny">View</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -99,18 +99,18 @@
                             <tr>
                                 <td>{{ '%05d' % log.id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="{{ url_for('admin.viewUser', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
+                                <td><a href="{{ url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
                                 <td>{{ log.action }}</td>
-                                <td><a href="{{ url_for('admin.viewLog', id=log.id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_log', id=log.id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% if events.has_prev %}
-                    <a href="{{ url_for('admin.viewTransaction', id=transaction.id, eventsPage=(eventsPage-1)) }}#events" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin.view_transaction', id=transaction.id, eventsPage=(eventsPage-1)) }}#events" class="button tiny">Previous Page</a>
                 {% endif %}
                 {% if events.has_next %}
-                    <a href="{{ url_for('admin.viewTransaction', id=transaction.id, eventsPage=(eventsPage+1)) }}#events" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin.view_transaction', id=transaction.id, eventsPage=(eventsPage+1)) }}#events" class="button tiny">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events recorded.</p>

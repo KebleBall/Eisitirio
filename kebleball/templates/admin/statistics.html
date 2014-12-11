@@ -4,7 +4,7 @@
 {% block title %}Data and Statistics{% endblock %}
 
 {% block content %}
-    <section id="adminHome" class="columns">
+    <section id="admin_home" class="columns">
         <h4>Sales (<a href="{{ url_for('admin.data', group='sales') }}" target="_blank">Raw Data</a>)</h4>
         <p class="small">Click on graph to view full size</p>
         <a href="{{ url_for('admin.graphSales') }}" target="_blank">

@@ -401,14 +401,14 @@ class CardTransaction(db.Model):
 
             app.log_manager.log_event(
                 'Refunded £{0:.02f}'.format(
-                    refundedAmount / 100.0
+                    refunded_amount / 100.0
                 ),
                 [],
                 current_user,
                 self
             )
 
-            if refundedAmount != amount:
+            if refunded_amount != amount:
                 app.email_manager.sendTemplate(
                     [
                         app.config['TREASURER_EMAIL'],

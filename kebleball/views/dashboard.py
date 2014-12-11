@@ -18,8 +18,8 @@ DASHBOARD = Blueprint('dashboard', __name__)
 
 @DASHBOARD.route('/dashboard')
 @login_required
-def dashboardHome():
-    return render_template('dashboard/dashboardHome.html')
+def dashboard_home():
+    return render_template('dashboard/dashboard_home.html')
 
 @DASHBOARD.route('/dashboard/profile', methods=['GET','POST'])
 @login_required
@@ -178,7 +178,7 @@ def announcement(announcementID):
             ),
             'warning'
         )
-        return redirect(url_for('dashboard.dashboardHome'))
+        return redirect(url_for('dashboard.dashboard_home'))
     else:
         return render_template(
             'dashboard/announcement.html',

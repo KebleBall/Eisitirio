@@ -1,4 +1,4 @@
-<li><a href="{{ url_for('dashboard.dashboardHome') }}">Dashboard Home</a></li>
+<li><a href="{{ url_for('dashboard.dashboard_home') }}">Dashboard Home</a></li>
 <li><a href="{{ url_for('dashboard.profile') }}">Update your Details</a></li>
 <li><a href="{{ url_for('purchase.purchaseHome') }}">Buy Tickets</a></li>
 {% if current_user.has_unpaid_tickets() %}

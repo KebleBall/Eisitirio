@@ -1,34 +1,34 @@
-<!-- admin/viewTicket.html -->
+<!-- admin/view_ticket.html -->
 {% extends 'layout.html' %}
 
 {% block title %}{% if not ticket %}No Ticket Found{% else %}View Ticket - #{{ '%05d' % ticket.id }}{% endif %}{% endblock %}
 
 {% block content %}
-    <section id="viewTicket" class="columns">
+    <section id="view_ticket" class="columns">
         {% if not ticket %}
             <p>No ticket was found with that ID.</p>
         {% else %}
             <h4>Ticket Details</h4>
             <p><strong>Price</strong>: &pound;{{ '%.2f' % (ticket.price / 100.0) }}</p>
             <p><strong>Name on ticket</strong>: {{ ticket.name }}</p>
-            <p><strong>Owner</strong>: <a href="{{ url_for('admin.viewUser', id=ticket.owner_id) }}">{{ ticket.owner.fullname }}</a></p>
+            <p><strong>Owner</strong>: <a href="{{ url_for('admin.view_user', id=ticket.owner_id) }}">{{ ticket.owner.fullname }}</a></p>
             {% if ticket.collected %}
                 <p><strong>Collected as</strong>: {{ ticket.barcode }}</p>
             {% endif %}
             <p><strong>Payment method</strong>: {{ ticket.paymentmethod }}</p>
             <p><strong>Payment reference</strong>: {{ ticket.paymentreference }}</p>
             {% if ticket.referrer_id != None %}
-                <p><strong>Referrer</strong>: <a href="{{ url_for('admin.viewUser', id=ticket.referrer_id) }}">{{ ticket.referrer.fullname }}</a></p>
+                <p><strong>Referrer</strong>: <a href="{{ url_for('admin.view_user', id=ticket.referrer_id) }}">{{ ticket.referrer.fullname }}</a></p>
             {% endif %}
             {% if ticket.card_transaction_id != None %}
-                <p><strong>Payment Transaction</strong>: <a href="{{ url_for('admin.viewTransaction', id=ticket.card_transaction_id) }}">#{{ '%05d' % ticket.card_transaction_id }}</a></p>
+                <p><strong>Payment Transaction</strong>: <a href="{{ url_for('admin.view_transaction', id=ticket.card_transaction_id) }}">#{{ '%05d' % ticket.card_transaction_id }}</a></p>
             {% endif %}
             {% if ticket.battels_id != None %}
                 <p><strong>Battels term</strong>: {{ ticket.battels_term }}</p>
-                <p><strong>Battels ID</strong>: <a href="{{ url_for('admin.viewUser', id=ticket.battels.user.id) }}">{{ ticket.battels.battelsid }}</a></p>
+                <p><strong>Battels ID</strong>: <a href="{{ url_for('admin.view_user', id=ticket.battels.user.id) }}">{{ ticket.battels.battelsid }}</a></p>
             {% endif %}
             {% if ticket.reselling_to_id != None %}
-                <p><strong>Reselling to</strong>: <a href="{{ url_for('admin.viewUser', id=ticket.reselling_to_id) }}">{{ ticket.reselling_to.fullname }}</a></p>
+                <p><strong>Reselling to</strong>: <a href="{{ url_for('admin.view_user', id=ticket.reselling_to_id) }}">{{ ticket.reselling_to.fullname }}</a></p>
             {% endif %}
             <h4>Ticket Status</h4>
             <ul>
@@ -74,7 +74,7 @@
                                 <td>{{ transaction.commenced.strftime('%c') }}</td>
                                 <td>{{ transaction.get_success() }}</td>
                                 <td>{{ transaction.get_status()[1] }}</td>
-                                <td><a href="{{ url_for('admin.viewTransaction', id=transaction.id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_transaction', id=transaction.id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -100,18 +100,18 @@
                             <tr>
                                 <td>{{ '%05d' % log.id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="{{ url_for('admin.viewUser', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
+                                <td><a href="{{ url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
                                 <td>{{ log.action }}</td>
-                                <td><a href="{{ url_for('admin.viewLog', id=log.id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_log', id=log.id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% if events.has_prev %}
-                    <a href="{{ url_for('admin.viewTicket', id=ticket.id, eventsPage=(eventsPage-1)) }}#events" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin.view_ticket', id=ticket.id, eventsPage=(eventsPage-1)) }}#events" class="button tiny">Previous Page</a>
                 {% endif %}
                 {% if events.has_next %}
-                    <a href="{{ url_for('admin.viewTicket', id=ticket.id, eventsPage=(eventsPage+1)) }}#events" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin.view_ticket', id=ticket.id, eventsPage=(eventsPage+1)) }}#events" class="button tiny">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events recorded.</p>

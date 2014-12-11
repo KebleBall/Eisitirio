@@ -1,10 +1,10 @@
-<!-- admin/viewLog.html -->
+<!-- admin/view_log.html -->
 {% extends 'layout.html' %}
 
 {% block title %}{% if not log %}No Log Entry Found{% else %}View Log Entry - #{{ '%05d' % log.id }}{% endif %}{% endblock %}
 
 {% block content %}
-    <section id="viewLog" class="columns">
+    <section id="view_log" class="columns">
         {% if not log %}
             <p>No log entry was found with that ID.</p>
         {% else %}
@@ -13,13 +13,13 @@
             <p><strong>IP Address</strong>: {{ log.ip }}</p>
             <p><strong>Message</strong>: {{ log.action }}</p>
             {% if log.user_id != None %}
-                <p><strong>User</strong>: <a href="{{ url_for('admin.viewUser', id=log.user_id) }}">{{ log.user.fullname }}</a></p>
+                <p><strong>User</strong>: <a href="{{ url_for('admin.view_user', id=log.user_id) }}">{{ log.user.fullname }}</a></p>
             {% endif %}
             {% if log.actor_id != log.user_id and log.actor_id != None %}
-                <p><strong>Actor</strong>: <a href="{{ url_for('admin.viewUser', id=log.actor_id) }}">{{ log.actor.fullname }}</a></p>
+                <p><strong>Actor</strong>: <a href="{{ url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.fullname }}</a></p>
             {% endif %}
             {% if log.transaction_id != None %}
-                <p><strong>Transaction</strong>: <a href="{{ url_for('admin.viewTransaction', id=log.transaction_id) }}">#{{ '%05d' % log.transaction_id }}</a></p>
+                <p><strong>Transaction</strong>: <a href="{{ url_for('admin.view_transaction', id=log.transaction_id) }}">#{{ '%05d' % log.transaction_id }}</a></p>
             {% endif %}
             <h4>Related Tickets</h4>
             {% if log.tickets.count() > 0 %}
@@ -61,7 +61,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('admin.viewTicket', id=ticket.id) }}" class="button tiny">View</a>
+                                    <a href="{{ url_for('admin.view_ticket', id=ticket.id) }}" class="button tiny">View</a>
                                 </td>
                             </tr>
                         {% endfor %}

@@ -35,7 +35,7 @@ def purchaseHome():
             )
             return redirect(url_for('purchase.wait'))
         else:
-            return redirect(url_for('dashboard.dashboardHome'))
+            return redirect(url_for('dashboard.dashboard_home'))
 
     if request.method == 'POST':
         valid = True
@@ -203,7 +203,7 @@ def purchaseHome():
             else:
                 return redirect(url_for('purchase.cashChequeConfirm'))
         else:
-            return redirect(url_for('dashboard.dashboardHome'))
+            return redirect(url_for('dashboard.dashboard_home'))
     else:
         return render_template(
             'purchase/purchaseHome.html',
@@ -222,7 +222,7 @@ def wait():
             ),
             'info'
         )
-        return redirect(url_for('dashboard.dashboardHome'))
+        return redirect(url_for('dashboard.dashboard_home'))
 
     if request.method == 'POST':
         valid = True
@@ -293,7 +293,7 @@ def wait():
             'success'
         )
 
-        return redirect(url_for('dashboard.dashboardHome'))
+        return redirect(url_for('dashboard.dashboard_home'))
     else:
         return render_template(
             'purchase/wait.html',
@@ -386,7 +386,7 @@ def ewaySuccess(id):
 
     transaction.processEwayPayment()
 
-    return redirect(url_for('dashboard.dashboardHome'))
+    return redirect(url_for('dashboard.dashboard_home'))
 
 @PURCHASE.route('/purchase/eway-cancel/<int:id>')
 def ewayCancel(id):
@@ -394,7 +394,7 @@ def ewayCancel(id):
 
     transaction.cancelEwayPayment()
 
-    return redirect(url_for('dashboard.dashboardHome'))
+    return redirect(url_for('dashboard.dashboard_home'))
 
 @PURCHASE.route('/purchase/battels-confirm', methods=['GET','POST'])
 @login_required

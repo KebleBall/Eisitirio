@@ -1,10 +1,10 @@
-<!-- admin/adminHome.html -->
+<!-- admin/admin_home.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Search Database{% endblock %}
 
 {% block content %}
-    <section id="adminHome" class="columns">
+    <section id="admin_home" class="columns">
         <p>Leave text fields blank to ignore</p>
         <form method="post">
             <fieldset class="row">
@@ -218,7 +218,7 @@
             <div class="row">
                 <div class="large-3 columns">
                     {% if category != None and results.has_prev %}
-                        <input type="submit" formaction="{{ url_for('admin.adminHome', page=results.prev_num) }}" value="Previous Page" class="button"/>
+                        <input type="submit" formaction="{{ url_for('admin.admin_home', page=results.prev_num) }}" value="Previous Page" class="button"/>
                     {% else %}
                         &nbsp;
                     {% endif %}
@@ -235,13 +235,13 @@
                             </select>
                         </div>
                         <div class="large-6 columns">
-                            <input type="submit" action="{{ url_for('admin.adminHome') }}" value="Search" class="button postfix"/>
+                            <input type="submit" action="{{ url_for('admin.admin_home') }}" value="Search" class="button postfix"/>
                         </div>
                     </div>
                 </div>
                 <div class="large-3 columns">
                     {% if category != None and results.has_next %}
-                        <input type="submit" formaction="{{ url_for('admin.adminHome', page=results.next_num) }}" value="Next Page" class="button right"/>
+                        <input type="submit" formaction="{{ url_for('admin.admin_home', page=results.next_num) }}" value="Next Page" class="button right"/>
                     {% else %}
                         &nbsp;
                     {% endif %}
@@ -265,7 +265,7 @@
                             <td>#{{ '%05d' % user.id }}</td>
                             <td>{{ user.fullname }}</td>
                             <td>{{ user.email }}</td>
-                            <td><a class="button small" href="{{ url_for('admin.viewUser', id=user.id) }}">View User</a></td>
+                            <td><a class="button small" href="{{ url_for('admin.view_user', id=user.id) }}">View User</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -307,7 +307,7 @@
                                     Awaiting {{ ticket.paymentmethod }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                 {% endif %}
                             </td>
-                            <td><a class="button small" href="{{ url_for('admin.viewTicket', id=ticket.id) }}">View Ticket</a></td>
+                            <td><a class="button small" href="{{ url_for('admin.view_ticket', id=ticket.id) }}">View Ticket</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -333,7 +333,7 @@
                             <td>{{ log.action }}</td>
                             <td>{{ log.actor.fullname }}</td>
                             <td>{{ log.user.fullname }}</td>
-                            <td><a class="button small" href="{{ url_for('admin.viewLog', id=log.id) }}">View Log Entry</a></td>
+                            <td><a class="button small" href="{{ url_for('admin.view_log', id=log.id) }}">View Log Entry</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

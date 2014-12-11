@@ -35,6 +35,6 @@ def admin_required(func):
                 u'You are not permitted to perform that action',
                 'error'
             )
-            return redirect(url_for('dashboard.dashboardHome'))
+            return redirect(url_for('dashboard.dashboard_home'))
         return func(*args, **kwargs)
     return decorated_view

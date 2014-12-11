@@ -165,7 +165,7 @@
                             <td>{% if voucher.used %}Yes{% else %}No{% endif %}</td>
                             <td>
                                 {% if voucher.used_by_id != None %}
-                                    <a href="{{ url_for('admin.viewUser', id=voucher.used_by_id) }}">{{ voucher.used_by.fullname }}</a>
+                                    <a href="{{ url_for('admin.view_user', id=voucher.used_by_id) }}">{{ voucher.used_by.fullname }}</a>
                                 {% else %}
                                     N/A
                                 {% endif %}

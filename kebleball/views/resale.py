@@ -99,7 +99,7 @@ def resale_confirm(resale_from, resale_to, key):
             'warning'
         )
 
-    return redirect(url_for('dashboard.dashboardHome'))
+    return redirect(url_for('dashboard.dashboard_home'))
 
 @RESALE.route('/resale/complete/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
@@ -124,7 +124,7 @@ def resale_complete(resale_from, resale_to, key):
             'warning'
         )
 
-    return redirect(url_for('dashboard.dashboardHome'))
+    return redirect(url_for('dashboard.dashboard_home'))
 
 @RESALE.route('/resale/cancel/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
@@ -146,4 +146,4 @@ def resale_cancel(resale_from, resale_to, key):
             'warning'
         )
 
-    return redirect(url_for('dashboard.dashboardHome'))
+    return redirect(url_for('dashboard.dashboard_home'))
