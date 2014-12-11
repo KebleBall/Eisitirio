@@ -551,6 +551,75 @@ def promote_user(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
+@ADMIN.route('/admin/user/<int:id>/add_manual_battels')
+@admin_required
+def add_manual_battels(id):
+    user = User.get_by_id(id)
+
+    if user:
+        user.add_manual_battels()
+
+        log_event(
+            'Manually set up battels',
+            [],
+            user
+        )
+
+        flash(
+            u'Battels set up for user.',
+            'success'
+        )
+        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+    else:
+        flash(
+            u'Could not find user, could not manually set up battels.',
+            'warning'
+        )
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
+@ADMIN.route('/admin/user/<int:id>/verify_affiliation')
+@admin_required
+def verify_affiliation(id):
+    user = User.get_by_id(id)
+
+    if user:
+        user.verify_affiliation()
+
+        log_event(
+            'Verified affiliation',
+            [],
+            user
+        )
+
+    return redirect(url_for('admin.verify_affiliations'))
+
+@ADMIN.route('/admin/user/<int:id>/deny_affiliation')
+@admin_required
+def deny_affiliation(id):
+    user = User.get_by_id(id)
+
+    if user:
+        user.deny_affiliation()
+
+        log_event(
+            'Denied affiliation',
+            [],
+            user
+        )
+
+    return redirect(url_for('admin.verify_affiliations'))
+
+@ADMIN.route("/admin/verify_affiliations")
+@admin_required
+def verify_affiliations():
+    users = User.query.filter(
+        User.college.has(name="Keble")
+    ).filter(
+        User.affiliation_verified == None
+    ).all()
+
+    return render_template('admin/verify_affiliations.html', users=users)
+
 @ADMIN.route('/admin/user/<int:id>/collect', methods=['GET', 'POST'])
 @admin_required
 def collect_tickets(id):
@@ -1270,31 +1339,31 @@ def graphColleges():
         ("Mansfield", "r*-"),
         ("Merton", "g*-"),
         ("New", "b*-"),
-        ("None", "c*-"),
-        ("Nuffield", "m*-"),
-        ("Oriel", "y*-"),
-        ("Other", "r+-"),
-        ("Pembroke", "g+-"),
-        ("Queen's", "b+-"),
-        ("Regent's Park", "c+-"),
-        ("Somerville", "m+-"),
-        ("St Anne's", "y+-"),
-        ("St Antony's", "rx-"),
-        ("St Benet's Hall", "gx-"),
-        ("St Catherine's", "bx-"),
-        ("St Cross", "cx-"),
-        ("St Edmund Hall", "mx-"),
-        ("St Hilda's", "yx-"),
-        ("St Hugh's", "rD-"),
-        ("St John's", "gD-"),
-        ("St Peter's", "bD-"),
-        ("St Stephen's House", "cD-"),
-        ("Trinity", "mD-"),
-        ("University", "yD-"),
-        ("Wadham", "rH-"),
-        ("Wolfson", "gH-"),
-        ("Worcester", "bH-"),
-        ("Wycliffe Hall", "cH-")
+        ("Nuffield", "c*-"),
+        ("Oriel", "m*-"),
+        ("Pembroke", "y*-"),
+        ("Queen's", "r+-"),
+        ("Regent's Park", "g+-"),
+        ("Somerville", "b+-"),
+        ("St Anne's", "c+-"),
+        ("St Antony's", "m+-"),
+        ("St Benet's Hall", "y+-"),
+        ("St Catherine's", "rx-"),
+        ("St Cross", "gx-"),
+        ("St Edmund Hall", "bx-"),
+        ("St Hilda's", "cx-"),
+        ("St Hugh's", "mx-"),
+        ("St John's", "yx-"),
+        ("St Peter's", "rD-"),
+        ("St Stephen's House", "gD-"),
+        ("Trinity", "bD-"),
+        ("University", "cD-"),
+        ("Wadham", "mD-"),
+        ("Wolfson", "yD-"),
+        ("Worcester", "rH-"),
+        ("Wycliffe Hall", "gH-"),
+        ("Other", "bH-"),
+        ("None", "cH-")
     ]
 
     plots = {

@@ -5,117 +5,130 @@ user.py
 Contains User class
 """
 
-from kebleball.database import db
-from kebleball.database.battels import Battels
-from kebleball.app import app
-from flask.ext.bcrypt import Bcrypt
-from kebleball.helpers import generate_key
-
-from passlib.hash import bcrypt as passlib_bcrypt
 import re
 
-BCRYPT = Bcrypt(app)
+from flask import flash
+from flask import url_for
+from flask.ext.bcrypt import Bcrypt
 
-class User(db.Model):
-    id = db.Column(
-        db.Integer,
+from kebleball import app
+from kebleball import database as db
+from kebleball import helpers
+
+APP = app.APP
+DB = db.DB
+Affiliation = db.Affiliation
+Battels = db.Battels
+College = db.College
+
+BCRYPT = Bcrypt(APP)
+
+class User(DB.Model):
+    id = DB.Column(
+        DB.Integer,
         primary_key=True,
         nullable=False
     )
-    email = db.Column(
-        db.String(120),
+    email = DB.Column(
+        DB.String(120),
         unique=True,
         nullable=False
     )
-    newemail = db.Column(
-        db.String(120),
+    newemail = DB.Column(
+        DB.String(120),
         unique=True,
         nullable=True
     )
-    passhash = db.Column(
-        db.BINARY(60),
+    passhash = DB.Column(
+        DB.BINARY(60),
         nullable=False
     )
-    firstname = db.Column(
-        db.String(120),
+    firstname = DB.Column(
+        DB.String(120),
         nullable=False
     )
-    surname = db.Column(
-        db.String(120),
+    surname = DB.Column(
+        DB.String(120),
         nullable=False
     )
-    fullname = db.column_property(firstname + " " + surname)
-    phone = db.Column(
-        db.String(20),
+    fullname = DB.column_property(firstname + " " + surname)
+    phone = DB.Column(
+        DB.String(20),
         nullable=False
     )
-    secretkey = db.Column(
-        db.String(64),
+    secretkey = DB.Column(
+        DB.String(64),
         nullable=True
     )
-    secretkeyexpiry = db.Column(
-        db.DateTime(),
+    secretkeyexpiry = DB.Column(
+        DB.DateTime(),
         nullable=True
     )
-    verified = db.Column(
-        db.Boolean,
+    verified = DB.Column(
+        DB.Boolean,
         default=False,
         nullable=False
     )
-    deleted = db.Column(
-        db.Boolean,
+    deleted = DB.Column(
+        DB.Boolean,
         default=False,
         nullable=False
     )
-    note = db.Column(
-        db.Text,
+    note = DB.Column(
+        DB.Text,
         nullable=True
     )
-    role = db.Column(
-        db.Enum(
+    role = DB.Column(
+        DB.Enum(
             'User',
             'Admin'
         ),
         nullable=False
     )
 
-    college_id = db.Column(
-        db.Integer,
-        db.ForeignKey('college.id'),
+    college_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('college.id'),
         nullable=False
     )
-    college = db.relationship(
+    college = DB.relationship(
         'College',
-        backref=db.backref(
+        backref=DB.backref(
             'users',
             lazy='dynamic'
         )
     )
 
-    affiliation_id = db.Column(
-        db.Integer,
-        db.ForeignKey('affiliation.id'),
+    affiliation_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('affiliation.id'),
         nullable=False
     )
-    affiliation = db.relationship(
+    affiliation = DB.relationship(
         'Affiliation',
-        backref=db.backref(
+        backref=DB.backref(
             'users',
             lazy='dynamic'
         )
     )
 
-    battels_id = db.Column(
-        db.Integer,
-        db.ForeignKey('battels.id'),
+    battels_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('battels.id'),
         nullable=True
     )
-    battels = db.relationship(
+    battels = DB.relationship(
         'Battels',
-        backref=db.backref(
+        backref=DB.backref(
             'user',
             uselist=False
         )
+    )
+
+    affiliation_verified = DB.Column(
+        DB.Boolean,
+        default=None,
+        nullable=True
     )
 
     def __init__(self, email, password, firstname,
@@ -125,10 +138,11 @@ class User(db.Model):
         self.firstname = firstname
         self.surname = surname
         self.phone = phone
-        self.secretkey = generate_key(64)
+        self.secretkey = helpers.generate_key(64)
         self.verified = False
         self.deleted = False
         self.role = 'User'
+        self.affiliation_verified = None
 
         if hasattr(college, 'id'):
             self.college_id = college.id
@@ -140,32 +154,14 @@ class User(db.Model):
         else:
             self.affiliation_id = affiliation
 
-        battels = Battels.query.filter(Battels.email == email).first()
-
-        if battels is not None:
-            self.battels = battels
-        elif re.match('(.*?)@keble\.ox\.ac\.uk$', email) is not None:
-            self.battels = Battels(None, None, None, None, None, True)
-            db.session.add(self.battels)
-        else:
-            self.battels = None
+        self.battels = Battels.query.filter(Battels.email == email).first()
 
     def __repr__(self):
         return "<User {0}: {1} {2}>".format(
             self.id, self.firstname, self.surname)
 
     def check_password(self, candidate):
-        try:
-            return BCRYPT.check_password_hash(self.passhash, candidate)
-        except ValueError:
-            if passlib_bcrypt.verify(candidate, self.passhash):
-                self.passhash = BCRYPT.generate_password_hash(candidate)
-                db.session.commit()
-                return True
-            else:
-                return False
-
-        return False
+        return bcrypt.check_password_hash(self.passhash, candidate)
 
     def set_password(self, password):
         self.passhash = BCRYPT.generate_password_hash(password)
@@ -255,8 +251,8 @@ class User(db.Model):
 
     def gets_discount(self):
         return (
-            self.college.name == 'Keble' and
-            self.affiliation.name == 'Student' and
+            self.college.name == "Keble" and
+            self.affiliation.name == "Student" and
             app.config['KEBLE_DISCOUNT'] > 0 and
             self.tickets.count() == 0
         )
@@ -296,3 +292,97 @@ class User(db.Model):
             return None
 
         return user
+
+    def verify_affiliation(self):
+        self.affiliation_verified = True
+
+        app.email_manager.sendTemplate(
+            self.email,
+            "Affiliation Verified - Buy Your Tickets Now!",
+            "affiliation_verified.email",
+            url=url_for('purchase.purchaseHome', _external=True)
+        )
+
+        DB.session.commit()
+
+    def deny_affiliation(self):
+        self.affiliation_verified = False
+
+        DB.session.commit()
+
+    def update_affiliation(self, affiliation):
+        old_affiliation = self.affiliation
+
+        if hasattr(affiliation, 'id'):
+            self.affiliation_id = affiliation.id
+            new_affiliation = affiliation
+        else:
+            self.affiliation_id = affiliation
+            new_affiliation = Affiliation.get_by_id(affiliation)
+
+        if (
+                old_affiliation != new_affiliation and
+                self.college.name == "Keble" and
+                new_affiliation.name not in [
+                    "Other",
+                    "None",
+                    "Graduate/Alumnus"
+                ]
+        ):
+            self.affiliation_verified = None
+
+    def maybe_verify_affiliation(self):
+        if (
+                self.affiliation_verified is None and
+                not helpers.get_boolean_config('TICKETS_ON_SALE')
+        ):
+            if (
+                    self.college.name != "Keble" or
+                    self.affiliation.name in [
+                        "Other",
+                        "None",
+                        "Graduate/Alumnus"
+                    ] or
+                    (
+                        self.affiliation.name == "Student" and
+                        self.battels_id is not None
+                    )
+            ):
+                self.affiliation_verified = True
+                DB.session.commit()
+                return
+
+            app.email_manager.sendTemplate(
+                app.config['TICKETS_EMAIL'],
+                "Verify Affiliation",
+                "verify_affiliation.email",
+                user=self,
+                url=url_for('admin.verify_affiliations', _external=True)
+            )
+            flash(
+                (
+                    u'Your affiliation must be verified before you will be '
+                    u'able to purchase tickets. You will receive an email when '
+                    u'your status has been verified.'
+                ),
+                u'info'
+            )
+
+    def add_manual_battels(self):
+        self.battels = Battels.query.filter(Battels.email==self.email).first()
+
+        if not self.battels:
+            self.battels = Battels(None, self.email, None, self.firstname,
+                                   self.surname, True)
+            DB.session.add(self.battels)
+
+        DB.session.commit()
+
+    def get_base_ticket_price(self):
+        if (
+                self.college.name == "Keble" and
+                self.affiliation.name == "Staff/Fellow"
+        ):
+            return app.config["KEBLE_STAFF_TICKET_PRICE"]
+        else:
+            return app.config["TICKET_PRICE"]

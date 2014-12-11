@@ -34,3 +34,12 @@ class Affiliation(db.Model):
 
         return affiliation
 
+AFFILIATIONS = [
+    Affiliation('Student'),
+    Affiliation('Graduand'),
+    Affiliation('Graduate/Alumnus'),
+    Affiliation('Staff/Fellow'),
+    Affiliation('Foreign Exchange Student'),
+    Affiliation('Other'),
+    Affiliation('None'),
+]

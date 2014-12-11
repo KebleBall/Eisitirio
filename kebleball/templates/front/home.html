@@ -11,7 +11,7 @@
             the system, please contact <a href="mailto:tickets@kebleball.com">the ticketing officer</a>.
         </p>
         <p>
-            Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} will take place on the night of {{ template_config['START_TIME'].strftime('%B %d') }}{{ get_ord(template_config['START_TIME']) }}. Tickets are available in advance only, there will be no tickets for sale on the door. To purchase a ticket, please register or log in
+            Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} will take place on the night of {{ template_config['START_TIME'].strftime('%B') }} {{ template_config['START_TIME'].day }}{{ get_ord(template_config['START_TIME']) }}. Tickets are available in advance only, there will be no tickets for sale on the door. To purchase a ticket, please register or log in
         </p>
         <div class="row">
             <section id="homepage-login" class="large-6 columns">
@@ -54,6 +54,7 @@
             </section>
             <section id="homepage-register" class="large-6 columns">
                 <h2>Register</h2>
+                <p>If you are a Keble Student, you must use your Keble email address in order to be able to pay by battels</p>
                 <form action="{{ url_for('front.register') }}" method="post">
                     <div class="row">
                         <div class="large-12 columns">

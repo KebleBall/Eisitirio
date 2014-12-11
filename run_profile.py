@@ -8,6 +8,7 @@ import kebleball
 
 APP = kebleball.APP
 
+APP.config.from_pyfile('config/development.py')
 APP.config['PROFILE'] = True
 APP.wsgi_app = ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
 

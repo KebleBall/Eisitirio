@@ -18,15 +18,16 @@ PURCHASE = Blueprint('purchase', __name__)
 @PURCHASE.route('/purchase', methods=['GET', 'POST'])
 @login_required
 def purchase_home():
-    (buying_permitted, tickets_available,
-     go_to_wait, can_buy_message) = canBuy(current_user)
+    (buying_permitted, tickets_available, can_buy_message) = canBuy(current_user)
 
     if not buying_permitted:
         flash(
             u'You cannot currently purchase tickets, because '
             + can_buy_message, 'info'
         )
-        if go_to_wait:
+
+        (waiting_permitted, _, _) = canWait(current_user)
+        if waiting_permitted:
             flash(
                 (
                     u'Please join the waiting list, and you will be allocated '
@@ -122,7 +123,7 @@ def purchase_home():
                 Ticket(
                     current_user,
                     request.form['paymentMethod'],
-                    app.config['TICKET_PRICE'] - app.config['KEBLE_DISCOUNT']
+                    current_user.get_base_ticket_price() - app.config['KEBLE_DISCOUNT']
                 )
             )
             start = 1
@@ -134,7 +135,7 @@ def purchase_home():
                 Ticket(
                     current_user,
                     request.form['paymentMethod'],
-                    app.config['TICKET_PRICE']
+                    current_user.get_base_ticket_price()
                 )
             )
 

@@ -33,3 +33,26 @@ Ticket = ticket.Ticket
 User = user.User
 Voucher = voucher.Voucher
 Waiting = waiting.Waiting
+
+def initialise_db(prefill=True, clear=False):
+    db.create_all()
+
+    if clear:
+        prompt = input("Are you sure you wish to clear the entire database? ")
+        if prompt.lower() in ["yes", "y"]:
+            Affiliation.query.delete()
+            Announcement.query.delete()
+            Battels.query.delete()
+            CardTransaction.query.delete()
+            College.query.delete()
+            Log.query.delete()
+            Statistic.query.delete()
+            Ticket.query.delete()
+            User.query.delete()
+            Voucher.query.delete()
+            Waiting.query.delete()
+
+    if prefill:
+        db.session.add_all(college.COLLEGES)
+        db.session.add_all(affiliation.AFFILIATIONS)
+        db.session.commit()

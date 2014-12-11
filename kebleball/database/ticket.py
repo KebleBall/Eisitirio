@@ -183,20 +183,16 @@ class Ticket(DB.Model):
         foreign_keys=[battels_id]
     )
 
-    def __init__(self, owner, paymentmethod, price=None):
+    def __init__(self, owner, paymentmethod, price):
         if hasattr(owner, 'id'):
             self.owner_id = owner.id
         else:
             self.owner_id = owner
 
         self.paymentmethod = paymentmethod
+        self.set_price(price)
 
         self.expires = datetime.utcnow() + app.config['TICKET_EXPIRY_TIME']
-
-        if price is not None:
-            self.set_price(price)
-        else:
-            self.set_price(app.config['TICKET_PRICE'])
 
     def __getattr__(self, name):
         """Magic method to generate ticket price in pounds."""

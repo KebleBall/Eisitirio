@@ -92,7 +92,10 @@ def allocate_waiting():
                 DB.Ticket(
                     wait.user,
                     None,
-                    APP.config['TICKET_PRICE'] - APP.config['KEBLE_DISCOUNT']
+                    (
+                        wait.user.get_base_ticket_price() -
+                        APP.config['KEBLE_DISCOUNT']
+                    )
                 )
             )
             start = 1
@@ -104,7 +107,7 @@ def allocate_waiting():
                 DB.Ticket(
                     wait.user,
                     None,
-                    APP.config['TICKET_PRICE']
+                    wait.user.get_base_ticket_price()
                 )
             )
 
@@ -347,6 +350,14 @@ def run_20_minutely(now):
 
 def main():
     """Check the lock, do some setup and run the tasks."""
+    if 'KEBLE_BALL_ENV' in os.environ:
+        if os.environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
+            APP.config.from_pyfile('config/production.py')
+        elif os.environ['KEBLE_BALL_ENV'] == 'STAGING':
+            APP.config.from_pyfile('config/staging.py')
+        elif os.environ['KEBLE_BALL_ENV'] == 'DEVELOPMENT':
+            APP.config.from_pyfile('config/development.py')
+
     lockfile = os.path.abspath(
         './{}.cron.lock'.format(APP.config['ENVIRONMENT'])
     )

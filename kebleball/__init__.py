@@ -117,7 +117,7 @@ def context_processor():
 
     def get_ord(datetime):
         """Get the appropriate ordinal for a number."""
-        daymod = int(datetime.strftime('%d')) % 10
+        daymod = datetime.day % 10
         if daymod == 1:
             return 'st'
         elif daymod == 2:

@@ -7,4 +7,5 @@ import kebleball
 APP = kebleball.APP
 
 if __name__ == '__main__':
+    APP.config.from_pyfile('config/development.py')
     APP.run()

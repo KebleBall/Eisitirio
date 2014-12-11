@@ -11,6 +11,7 @@ from flask.ext import login as flask_login
 from kebleball import database as db
 
 LOGIN_MANAGER = flask_login.LoginManager()
+LOGIN_MANAGER.login_message_category = 'message info'
 
 @LOGIN_MANAGER.user_loader
 def load_user(user_id):
