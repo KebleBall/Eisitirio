@@ -12,17 +12,17 @@ from kebleball.database.ticket import Ticket
 from kebleball.database.card_transaction import CardTransaction
 from datetime import datetime
 
-log_ticket_link = db.Table(
+LOG_TICKET_LINK = db.Table(
     'log_ticket_link',
     db.Model.metadata,
     db.Column('log_id',
-        db.Integer,
-        db.ForeignKey('log.id')
-    ),
+              db.Integer,
+              db.ForeignKey('log.id')
+             ),
     db.Column('ticket_id',
-        db.Integer,
-        db.ForeignKey('ticket.id')
-    )
+              db.Integer,
+              db.ForeignKey('ticket.id')
+             )
 )
 
 class Log(db.Model):
@@ -71,7 +71,7 @@ class Log(db.Model):
 
     tickets = db.relationship(
         'Ticket',
-        secondary=log_ticket_link,
+        secondary=LOG_TICKET_LINK,
         backref=db.backref(
             'log_entries',
             lazy='dynamic'
@@ -152,7 +152,7 @@ class Log(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        log = Log.query.filter(Log.id==int(id)).first()
+        log = Log.query.filter(Log.id == int(id)).first()
 
         if not log:
             return None

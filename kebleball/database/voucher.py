@@ -7,7 +7,6 @@ Used to store data about discount vouchers
 """
 
 from kebleball.database import db
-from kebleball.database.user import User
 from datetime import datetime, timedelta
 
 class Voucher(db.Model):

@@ -37,7 +37,7 @@ class Statistic(db.Model):
     )
 
     def __init__(self, group, statistic, value):
-        if group not in ['Colleges','Payments','Sales']:
+        if group not in ['Colleges', 'Payments', 'Sales']:
             raise ValueError(
                 '{0} is not a valid statistic group'.format(group)
             )
@@ -57,9 +57,10 @@ class Statistic(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        statistic = Statistic.query.filter(Statistic.id==int(id)).first()
+        statistic = Statistic.query.filter(Statistic.id == int(id)).first()
 
         if not statistic:
             return None
 
         return statistic
+

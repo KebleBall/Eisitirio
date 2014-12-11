@@ -488,7 +488,7 @@ def cancel():
         for transaction in cardTransactions.itervalues():
             value = sum([t.price for t in transaction['tickets']])
 
-            if transaction['transaction'].processRefund(value):
+            if transaction['transaction'].process_refund(value):
                 cancelled.extend(transaction['tickets'])
                 for ticket in transaction['tickets']:
                     ticket.cancelled = True

@@ -6,17 +6,15 @@ Contains CardTransaction class
 Used to store data about card payments
 """
 
-from kebleball.database import db
-from kebleball.database.user import User
 from datetime import datetime
-from kebleball.app import app
-from kebleball.helpers import generate_key
+import json
+import requests
+
 from flask import url_for, flash
 from flask.ext.login import current_user
 
-import re
-import json
-import requests
+from kebleball.app import app
+from kebleball.database import db
 
 class CardTransaction(db.Model):
     id = db.Column(
@@ -73,22 +71,22 @@ class CardTransaction(db.Model):
         self.commenced = datetime.utcnow()
 
     def __repr__(self):
-        status = self.getStatus()
+        status = self.get_status()
         if status[0] is None:
-            statusStr = 'Uncompleted'
+            status_str = 'Uncompleted'
         else:
-            statusStr = 'Successful' if status[0] else 'Failed'
+            status_str = 'Successful' if status[0] else 'Failed'
 
         return '<{0} CardTransaction: {1}, {2}'.format(
-            statusStr,
+            status_str,
             self.id,
             status[1]
         )
 
-    def getValue(self):
+    def get_value(self):
         return sum([ticket.price for ticket in self.tickets])
 
-    def getStatus(self):
+    def get_status(self):
         try:
             return {
                 None: (None, 'Transaction not completed'),
@@ -154,11 +152,11 @@ class CardTransaction(db.Model):
                 '96': (False, 'System Error'),
                 'CX': (False, 'Customer Cancelled Transaction')
             }[self.resultcode]
-        except KeyError as e:
-            return (False, 'Unknown response: {0}'.format(e.args[0]))
+        except KeyError as err:
+            return (False, 'Unknown response: {0}'.format(err.args[0]))
 
-    def getSuccess(self):
-        success = self.getStatus()[0]
+    def get_success(self):
+        success = self.get_status()[0]
         if success is None:
             return 'Incomplete'
         elif success:
@@ -166,7 +164,7 @@ class CardTransaction(db.Model):
         else:
             return 'Unsuccessful'
 
-    def sendRequest(self, endpoint, data=None):
+    def send_request(self, endpoint, data=None):
         url = app.config['EWAY_API_BASE'] + endpoint + '.json'
         payload = json.dumps(data)
         headers = {
@@ -197,18 +195,20 @@ class CardTransaction(db.Model):
     def getEwayURL(self):
         data = {
             "Customer": {
-              "Reference": "U{0:05d}".format(self.user.id),
-              "FirstName": self.user.firstname,
-              "LastName": self.user.surname,
-              "Email": self.user.email
+                "Reference": "U{0:05d}".format(self.user.id),
+                "FirstName": self.user.firstname,
+                "LastName": self.user.surname,
+                "Email": self.user.email
             },
             "Payment": {
-              "TotalAmount": self.getValue(),
-              "InvoiceReference": "Trans{0:05d}".format(self.id),
-              "CurrencyCode": "GBP"
+                "TotalAmount": self.get_value(),
+                "InvoiceReference": "Trans{0:05d}".format(self.id),
+                "CurrencyCode": "GBP"
             },
-            "RedirectUrl": url_for("purchase.ewaySuccess", id=self.id, _external=True),
-            "CancelUrl": url_for("purchase.ewayCancel", id=self.id, _external=True),
+            "RedirectUrl": url_for("purchase.ewaySuccess",
+                                   id=self.id, _external=True),
+            "CancelUrl": url_for("purchase.ewayCancel",
+                                 id=self.id, _external=True),
             "Method": "ProcessPayment",
             "TransactionType": "Purchase",
             "LogoUrl": "https://www.kebleball.com/assets/building_big.jpg",
@@ -219,7 +219,7 @@ class CardTransaction(db.Model):
             "CustomerReadOnly": True
         }
 
-        (success, response) = self.sendRequest('CreateAccessCodeShared', data)
+        (success, response) = self.send_request('CreateAccessCodeShared', data)
 
         if success:
             self.accesscode = response['AccessCode']
@@ -247,7 +247,7 @@ class CardTransaction(db.Model):
         if self.accesscode is not None:
             data = {'AccessCode': self.accesscode}
 
-            (success, response) = self.sendRequest('GetAccessCodeResult', data)
+            (success, response) = self.send_request('GetAccessCodeResult', data)
 
             if success:
                 self.completed = datetime.utcnow()
@@ -255,7 +255,7 @@ class CardTransaction(db.Model):
                 self.ewayid = response['TransactionID']
                 db.session.commit()
 
-                status = self.getStatus()
+                status = self.get_status()
 
                 if status[0]:
                     if self.resultcode == '10':
@@ -272,9 +272,9 @@ class CardTransaction(db.Model):
                             self
                         )
 
-                        refundSuccess = self.processRefund(response['TotalAmount'])
+                        refund_success = self.process_refund(response['TotalAmount'])
 
-                        if refundSuccess:
+                        if refund_success:
                             flash(
                                 (
                                     u'Your card payment was only authorised '
@@ -380,7 +380,7 @@ class CardTransaction(db.Model):
             self
         )
 
-    def processRefund(self, amount):
+    def process_refund(self, amount):
         data = {
             "Refund": {
                 "TotalAmount": amount,
@@ -388,15 +388,15 @@ class CardTransaction(db.Model):
             }
         }
 
-        (success, response) = self.sendRequest(
+        (success, response) = self.send_request(
             'DirectRefund',
             data
         )
 
         if success and response['TransactionStatus']:
-            refundedAmount = response['Refund']['TotalAmount']
+            refunded_amount = response['Refund']['TotalAmount']
 
-            self.refunded = self.refunded + refundedAmount
+            self.refunded = self.refunded + refunded_amount
             db.session.commit()
 
             app.log_manager.log_event(
@@ -431,12 +431,13 @@ class CardTransaction(db.Model):
 
             return True
         else:
-            app.log_manager.log_purchase('warning',str(response))
+            app.log_manager.log_purchase('warning', str(response))
             return False
 
     @staticmethod
     def get_by_id(id):
-        transaction = CardTransaction.query.filter(CardTransaction.id==int(id)).first()
+        transaction = CardTransaction.query.filter(
+            CardTransaction.id == int(id)).first()
 
         if not transaction:
             return None

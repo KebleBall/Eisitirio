@@ -9,8 +9,6 @@ Used to store announcements displayed on site and emailed
 from kebleball.app import app
 from kebleball.database import db
 from kebleball.database.user import User
-from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
 from email.mime.text import MIMEText
 from datetime import datetime
 

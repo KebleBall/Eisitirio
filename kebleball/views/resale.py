@@ -7,13 +7,13 @@ from kebleball.database import db
 from kebleball.database.user import User
 from kebleball.database.ticket import Ticket
 
-log = app.log_manager.log_resale
+LOG = app.log_manager.log_resale
 
 RESALE = Blueprint('resale', __name__)
 
-@RESALE.route('/resale', methods=['GET','POST'])
+@RESALE.route('/resale', methods=['GET', 'POST'])
 @login_required
-def resaleHome():
+def resale_home():
     if request.method == 'POST':
         tickets = Ticket.query \
             .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
@@ -31,13 +31,13 @@ def resaleHome():
                 u'No user with that email exists'
                 'error'
             )
-            return(render_template('resale/resaleHome.html'))
+            return render_template('resale/resaleHome.html')
         elif resale_to == current_user:
             flash(
                 u"You can't resell tickets to yourself",
                 'info'
             )
-            return(render_template('resale/resaleHome.html'))
+            return render_template('resale/resaleHome.html')
 
         Ticket.start_resale(tickets, resale_to)
 
@@ -46,9 +46,9 @@ def resaleHome():
             'info'
         )
 
-    return(render_template('resale/resaleHome.html'))
+    return render_template('resale/resaleHome.html')
 
-@RESALE.route('/resale/cancel', methods=['GET','POST'])
+@RESALE.route('/resale/cancel', methods=['GET', 'POST'])
 @login_required
 def cancelResale():
     if request.method == 'POST':
@@ -74,7 +74,7 @@ def cancelResale():
             'success'
         )
 
-    return(render_template('resale/cancelResale.html'))
+    return render_template('resale/cancelResale.html')
 
 @RESALE.route('/resale/confirm/<int:resale_from>/<int:resale_to>/<key>')
 @login_required

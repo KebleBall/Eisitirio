@@ -65,9 +65,9 @@
                                             <a href="{{ url_for('purchase.changeMethod') }}" class="button tiny">Choose Payment Method</a>
                                         {% endif %}
                                     {% elif ticket.resalekey != None %}
-                                        <a href="{{ url_for('resale.cancelResale') }}" class="button tiny">Cancel Resale</a>
+                                        <a href="{{ url_for('resale.cancel_resale') }}" class="button tiny">Cancel Resale</a>
                                     {% else %}
-                                        <a href="{{ url_for('resale.resaleHome') }}" class="button tiny">Resell</a>
+                                        <a href="{{ url_for('resale.resale_home') }}" class="button tiny">Resell</a>
                                     {% endif %}
                                     <a href="{{ url_for('purchase.cancel') }}" class="button tiny">Cancel</a>
                                 {% endif %}

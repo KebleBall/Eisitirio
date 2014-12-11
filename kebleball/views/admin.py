@@ -677,7 +677,7 @@ def autoCancelTicket(id):
         if ticket.paymentmethod == 'Battels':
             ticket.battels.cancel(ticket)
         elif ticket.paymentmethod == 'Card':
-            refundResult = ticket.card_transaction.processRefund(ticket.price)
+            refundResult = ticket.card_transaction.process_refund(ticket.price)
             if not refundResult:
                 flash(
                     u'Could not process card refund.',
@@ -805,14 +805,14 @@ def refundTransaction(id):
     if transaction:
         amount = int(request.form['refundAmountPounds']) * 100 + int(request.form['refundAmountPence'])
 
-        if amount > (transaction.getValue() - transaction.refunded):
+        if amount > (transaction.get_value() - transaction.refunded):
             flash(
                 u'Cannot refund more than has been charged.',
                 'warning'
             )
             return redirect(request.referrer or url_for('admin.viewTransaction', id=transaction.id))
 
-        result = transaction.processRefund(amount)
+        result = transaction.process_refund(amount)
 
         if not result:
             flash(

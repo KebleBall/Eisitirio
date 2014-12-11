@@ -174,8 +174,8 @@
                                 <td>{{ '%05d' % transaction.id }}</td>
                                 <td>{% if transaction.ewayid != None %}{{ transaction.ewayid }}{% else %}N/A{% endif %}
                                 <td>{{ transaction.commenced.strftime('%c') }}</td>
-                                <td>{{ transaction.getSuccess() }}</td>
-                                <td>{{ transaction.getStatus()[1] }}</td>
+                                <td>{{ transaction.get_success() }}</td>
+                                <td>{{ transaction.get_status()[1] }}</td>
                                 <td><a href="{{ url_for('admin.viewTransaction', id=transaction.id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}

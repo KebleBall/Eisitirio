@@ -7,17 +7,14 @@ Contains User class
 
 from kebleball.database import db
 from kebleball.database.battels import Battels
-from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
 from kebleball.app import app
 from flask.ext.bcrypt import Bcrypt
 from kebleball.helpers import generate_key
 
-from datetime import datetime
 from passlib.hash import bcrypt as passlib_bcrypt
 import re
 
-bcrypt = Bcrypt(app)
+BCRYPT = Bcrypt(app)
 
 class User(db.Model):
     id = db.Column(
@@ -124,7 +121,7 @@ class User(db.Model):
     def __init__(self, email, password, firstname,
                  surname, phone, college, affiliation):
         self.email = email
-        self.passhash = bcrypt.generate_password_hash(password)
+        self.passhash = BCRYPT.generate_password_hash(password)
         self.firstname = firstname
         self.surname = surname
         self.phone = phone
@@ -159,10 +156,10 @@ class User(db.Model):
 
     def check_password(self, candidate):
         try:
-            return bcrypt.check_password_hash(self.passhash, candidate)
+            return BCRYPT.check_password_hash(self.passhash, candidate)
         except ValueError:
             if passlib_bcrypt.verify(candidate, self.passhash):
-                self.passhash = bcrypt.generate_password_hash(candidate)
+                self.passhash = BCRYPT.generate_password_hash(candidate)
                 db.session.commit()
                 return True
             else:
@@ -171,7 +168,7 @@ class User(db.Model):
         return False
 
     def set_password(self, password):
-        self.passhash = bcrypt.generate_password_hash(password)
+        self.passhash = BCRYPT.generate_password_hash(password)
 
     def has_tickets(self):
         return len([x for x in self.tickets
