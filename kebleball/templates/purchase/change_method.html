@@ -1,13 +1,13 @@
-<!-- purchase/changeMethod.html -->
+<!-- purchase/change_method.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Change Ticket Payment Methods{% endblock %}
 
 {% block content %}
-    <section id="changeMethod" class="columns">
+    <section id="change_method" class="columns">
         <h3>Your Tickets</h3>
         {% if current_user.has_unpaid_tickets() %}
-            <form action="{{ url_for('purchase.changeMethod') }}" method="post">
+            <form action="{{ url_for('purchase.change_method') }}" method="post">
                 <table id="ticketsTable">
                     <thead>
                         <tr>
@@ -49,7 +49,7 @@
                 </div>
             </form>
         {% else %}
-            <p>You have no unpaid tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchaseHome') }}">buy some</a>?</p>
+            <p>You have no unpaid tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchase_home') }}">buy some</a>?</p>
         {% endif %}
     </section>
 {% endblock %}

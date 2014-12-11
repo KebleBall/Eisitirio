@@ -192,7 +192,7 @@ class CardTransaction(db.Model):
             )
             return (False, None)
 
-    def getEwayURL(self):
+    def get_eway_url(self):
         data = {
             "Customer": {
                 "Reference": "U{0:05d}".format(self.user.id),
@@ -205,9 +205,9 @@ class CardTransaction(db.Model):
                 "InvoiceReference": "Trans{0:05d}".format(self.id),
                 "CurrencyCode": "GBP"
             },
-            "RedirectUrl": url_for("purchase.ewaySuccess",
+            "RedirectUrl": url_for("purchase.eway_success",
                                    id=self.id, _external=True),
-            "CancelUrl": url_for("purchase.ewayCancel",
+            "CancelUrl": url_for("purchase.eway_cancel",
                                  id=self.id, _external=True),
             "Method": "ProcessPayment",
             "TransactionType": "Purchase",
@@ -243,7 +243,7 @@ class CardTransaction(db.Model):
             )
             return None
 
-    def processEwayPayment(self):
+    def process_eway_payment(self):
         if self.accesscode is not None:
             data = {'AccessCode': self.accesscode}
 
@@ -362,7 +362,7 @@ class CardTransaction(db.Model):
                 )
                 return None
 
-    def cancelEwayPayment(self):
+    def cancel_eway_payment(self):
         self.completed = datetime.utcnow()
         self.resultcode = 'CX'
 

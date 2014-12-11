@@ -15,17 +15,18 @@ log_event = app.log_manager.log_event
 
 PURCHASE = Blueprint('purchase', __name__)
 
-@PURCHASE.route('/purchase', methods=['GET','POST'])
+@PURCHASE.route('/purchase', methods=['GET', 'POST'])
 @login_required
-def purchaseHome():
-    (buyingPermitted, ticketsAvailable, goToWait, canBuyMessage) = canBuy(current_user)
+def purchase_home():
+    (buying_permitted, tickets_available,
+     go_to_wait, can_buy_message) = canBuy(current_user)
 
-    if not buyingPermitted:
+    if not buying_permitted:
         flash(
-            u'You cannot currently purchase tickets, because ' + canBuyMessage,
-            'info'
+            u'You cannot currently purchase tickets, because '
+            + can_buy_message, 'info'
         )
-        if goToWait:
+        if go_to_wait:
             flash(
                 (
                     u'Please join the waiting list, and you will be allocated '
@@ -41,12 +42,12 @@ def purchaseHome():
         valid = True
         flashes = []
 
-        numTickets = int(request.form['numTickets'])
+        num_tickets = int(request.form['num_tickets'])
 
-        if numTickets > ticketsAvailable:
+        if num_tickets > tickets_available:
             valid = False
             flashes.append(u'You cannot buy that many tickets')
-        elif numTickets < 1:
+        elif num_tickets < 1:
             valid = False
             flashes.append(u'You must purchase at least 1 ticket')
 
@@ -54,19 +55,20 @@ def purchaseHome():
             valid = False
             flashes.append(u'You must select a payment method')
         elif request.form['paymentMethod'] not in [
-            'Cash',
-            'Card',
-            'Cheque',
-            'Battels'
+                'Cash',
+                'Card',
+                'Cheque',
+                'Battels'
         ]:
             valid = False
             flashes.append(u'That is not a valid payment method')
-        elif request.form['paymentMethod'] == 'Battels' and not current_user.can_pay_by_battels():
+        elif (request.form['paymentMethod'] == 'Battels'
+              and not current_user.can_pay_by_battels()):
             valid = False
             flashes.append(u'You cannot pay by battels')
         elif (
-            request.form['paymentMethod'] == 'Cash' or
-            request.form['paymentMethod'] == 'Cheque'
+                request.form['paymentMethod'] == 'Cash' or
+                request.form['paymentMethod'] == 'Cheque'
         ) and (
             'paymentReason' not in request.form or
             request.form['paymentReason'] == ''
@@ -80,14 +82,17 @@ def purchaseHome():
 
         voucher = None
         if 'voucherCode' in request.form and request.form['voucherCode'] != '':
-            (result, response, voucher) = validateVoucher(request.form['voucherCode'])
+            (result, response, voucher) = validateVoucher(
+                request.form['voucherCode'])
             if not result:
                 valid = False
                 flashes.append(response['message'] + u' Please clear the discount code field to continue without using a voucher.')
 
         referrer = None
-        if 'referrerEmail' in request.form and request.form['referrerEmail'] != '':
-            (result, response, referrer) = validateReferrer(request.form['referrerEmail'], current_user)
+        if ('referrerEmail' in request.form
+                and request.form['referrerEmail'] != ''):
+            (result, response, referrer) = validateReferrer(
+                request.form['referrerEmail'], current_user)
             if not result:
                 valid = False
                 flashes.append(response['message'] + u' Please clear the referrer field to continue without giving somebody credit.')
@@ -104,10 +109,10 @@ def purchaseHome():
                 flash(msg, 'warning')
 
             return render_template(
-                'purchase/purchaseHome.html',
+                'purchase/purchase_home.html',
                 form=request.form,
-                numTickets=numTickets,
-                canBuy=ticketsAvailable
+                num_tickets=num_tickets,
+                canBuy=tickets_available
             )
 
         tickets = []
@@ -124,7 +129,7 @@ def purchaseHome():
         else:
             start = 0
 
-        for x in xrange(start, numTickets):
+        for _ in xrange(start, num_tickets):
             tickets.append(
                 Ticket(
                     current_user,
@@ -134,8 +139,8 @@ def purchaseHome():
             )
 
         if (
-            request.form['paymentMethod'] == 'Cash' or
-            request.form['paymentMethod'] == 'Cheque'
+                request.form['paymentMethod'] == 'Cash' or
+                request.form['paymentMethod'] == 'Cheque'
         ):
             for ticket in tickets:
                 ticket.add_note(
@@ -165,25 +170,25 @@ def purchaseHome():
         expires = None
         for ticket in tickets:
             if (
-                expires == None or
-                ticket.expires < expires
+                    expires == None or
+                    ticket.expires < expires
             ):
                 expires = ticket.expires
 
-        totalValue = sum([ticket.price for ticket in tickets])
+        total_value = sum([ticket.price for ticket in tickets])
 
         flash(
             (
                 u'{0} tickets have been reserved for you at a total cost of '
                 u'&pound;{1:.2f}.'
             ).format(
-                numTickets,
-                totalValue / 100.0
+                num_tickets,
+                total_value / 100.0
             ),
             'success'
         )
 
-        if totalValue > 0:
+        if total_value > 0:
             flash(
                 (
                     u'Follow the instructions below to complete payment for '
@@ -197,28 +202,28 @@ def purchaseHome():
             )
 
             if request.form['paymentMethod'] == 'Card':
-                return redirect(url_for('purchase.cardConfirm'))
+                return redirect(url_for('purchase.card_confirm'))
             elif request.form['paymentMethod'] == 'Battels':
-                return redirect(url_for('purchase.battelsConfirm'))
+                return redirect(url_for('purchase.battels_confirm'))
             else:
                 return redirect(url_for('purchase.cashChequeConfirm'))
         else:
             return redirect(url_for('dashboard.dashboard_home'))
     else:
         return render_template(
-            'purchase/purchaseHome.html',
-            canBuy=ticketsAvailable
+            'purchase/purchase_home.html',
+            canBuy=tickets_available
         )
 
-@PURCHASE.route('/purchase/wait', methods=['GET','POST'])
+@PURCHASE.route('/purchase/wait', methods=['GET', 'POST'])
 @login_required
 def wait():
-    (waitingPermitted, waitingAvailable, canWaitMessage) = canWait(current_user)
-    if not waitingPermitted:
+    (wait_permitted, wait_available, can_wait_message) = canWait(current_user)
+    if not wait_permitted:
         flash(
             (
                 u'You cannot join the waiting list at this time because ' +
-                canWaitMessage
+                can_wait_message
             ),
             'info'
         )
@@ -228,12 +233,12 @@ def wait():
         valid = True
         flashes = []
 
-        numTickets = int(request.form['numTickets'])
+        num_tickets = int(request.form['num_tickets'])
 
-        if numTickets > waitingAvailable:
+        if num_tickets > wait_available:
             valid = False
             flashes.append(u'You cannot wait for that many tickets')
-        elif numTickets < 1:
+        elif num_tickets < 1:
             valid = False
             flashes.append(u'You must wait for at least 1 ticket')
 
@@ -242,8 +247,10 @@ def wait():
             flashes.append(u'You must accept the Terms and Conditions')
 
         referrer = None
-        if 'referrerEmail' in request.form and request.form['referrerEmail'] != '':
-            (result, response, referrer) = validateReferrer(request.form['referrerEmail'], current_user)
+        if ('referrerEmail' in request.form
+                and request.form['referrerEmail'] != ''):
+            (result, response, referrer) = validateReferrer(
+                request.form['referrerEmail'], current_user)
             if not result:
                 valid = False
                 flashes.append(response['message'] + u' Please clear the referrer field to continue without giving somebody credit.')
@@ -260,16 +267,16 @@ def wait():
                 flash(msg, 'warning')
 
             return render_template(
-                'purchase/purchaseHome.html',
+                'purchase/purchase_home.html',
                 form=request.form,
-                numTickets=numTickets,
-                canWait=waitingAvailable
+                num_tickets=num_tickets,
+                canWait=wait_available
             )
 
         db.session.add(
             Waiting(
                 current_user,
-                numTickets,
+                num_tickets,
                 referrer
             )
         )
@@ -277,7 +284,7 @@ def wait():
 
         log_event(
             'Joined waiting list for {0} tickets'.format(
-                numTickets
+                num_tickets
             ),
             [],
             current_user
@@ -287,8 +294,8 @@ def wait():
             (
                 u'You have been added to the waiting list for {0} ticket{1}.'
             ).format(
-                numTickets,
-                '' if numTickets == 1 else 's'
+                num_tickets,
+                '' if num_tickets == 1 else 's'
             ),
             'success'
         )
@@ -297,12 +304,12 @@ def wait():
     else:
         return render_template(
             'purchase/wait.html',
-            canWait=waitingAvailable
+            canWait=wait_available
         )
 
-@PURCHASE.route('/purchase/change-method', methods=['GET','POST'])
+@PURCHASE.route('/purchase/change-method', methods=['GET', 'POST'])
 @login_required
-def changeMethod():
+def change_method():
     if request.method == 'POST':
         tickets = Ticket.query \
             .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
@@ -314,17 +321,17 @@ def changeMethod():
             tickets.remove(None)
 
         if (
-            (
-                request.form['paymentMethod'] == 'Cash' or
-                request.form['paymentMethod'] == 'Cheque'
-            ) and (
-                'paymentReason' not in request.form or
-                request.form['paymentReason'] == ''
-            )
+                (
+                    request.form['paymentMethod'] == 'Cash' or
+                    request.form['paymentMethod'] == 'Cheque'
+                ) and (
+                    'paymentReason' not in request.form or
+                    request.form['paymentReason'] == ''
+                )
         ):
             flash(u'You must give a reason for paying by cash or cheque.', 'error')
             return render_template(
-                'purchase/changeMethod.html',
+                'purchase/change_method.html',
                 tickets=request.form.getlist('tickets[]')
             )
         elif 'paymentReason' in request.form:
@@ -350,11 +357,11 @@ def changeMethod():
             'success'
         )
 
-    return render_template('purchase/changeMethod.html')
+    return render_template('purchase/change_method.html')
 
-@PURCHASE.route('/purchase/card-confirm', methods=['GET','POST'])
+@PURCHASE.route('/purchase/card-confirm', methods=['GET', 'POST'])
 @login_required
-def cardConfirm():
+def card_confirm():
     if request.method == 'POST':
         tickets = Ticket.query \
             .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
@@ -373,39 +380,39 @@ def cardConfirm():
         db.session.add(transaction)
         db.session.commit()
 
-        ewayURL = transaction.getEwayURL()
+        eway_url = transaction.get_eway_url()
 
-        if ewayURL is not None:
-            return redirect(ewayURL)
+        if eway_url is not None:
+            return redirect(eway_url)
 
-    return render_template('purchase/cardConfirm.html')
+    return render_template('purchase/card_confirm.html')
 
 @PURCHASE.route('/purchase/eway-success/<int:id>')
-def ewaySuccess(id):
+def eway_success(id):
     transaction = CardTransaction.get_by_id(id)
 
-    transaction.processEwayPayment()
+    transaction.process_eway_payment()
 
     return redirect(url_for('dashboard.dashboard_home'))
 
 @PURCHASE.route('/purchase/eway-cancel/<int:id>')
-def ewayCancel(id):
+def eway_cancel(id):
     transaction = CardTransaction.get_by_id(id)
 
-    transaction.cancelEwayPayment()
+    transaction.cancel_eway_payment()
 
     return redirect(url_for('dashboard.dashboard_home'))
 
-@PURCHASE.route('/purchase/battels-confirm', methods=['GET','POST'])
+@PURCHASE.route('/purchase/battels-confirm', methods=['GET', 'POST'])
 @login_required
-def battelsConfirm():
+def battels_confirm():
     if not current_user.can_pay_by_battels():
         flash(
             u'You cannot currently pay by battels. Please change the payment '
             u'method on your tickets',
             'warning'
         )
-        return redirect(url_for('purchase.changeMethod'))
+        return redirect(url_for('purchase.change_method'))
 
     if request.method == 'POST':
         tickets = Ticket.query \
@@ -418,8 +425,8 @@ def battelsConfirm():
             tickets.remove(None)
 
         if (
-            app.config['CURRENT_TERM'] == 'HT' and
-            request.form['paymentTerm'] != 'HT'
+                app.config['CURRENT_TERM'] == 'HT' and
+                request.form['paymentTerm'] != 'HT'
         ):
             flash(u'Invalid choice of payment term', 'warning')
         else:
@@ -436,11 +443,11 @@ def battelsConfirm():
                 current_user
             )
 
-            flash(u'Your battels payment has been confirmed','success')
+            flash(u'Your battels payment has been confirmed', 'success')
 
-    return render_template('purchase/battelsConfirm.html')
+    return render_template('purchase/battels_confirm.html')
 
-@PURCHASE.route('/purchase/cancel', methods=['GET','POST'])
+@PURCHASE.route('/purchase/cancel', methods=['GET', 'POST'])
 @login_required
 def cancel():
     if request.method == 'POST':
@@ -452,12 +459,9 @@ def cancel():
         while None in tickets:
             tickets.remove(None)
 
-        tickets = filter(
-            (lambda x: x.can_be_cancelled_automatically()),
-            tickets
-        )
+        tickets = [x for x in tickets if x.can_be_cancelled_automatically()]
 
-        cardTransactions = {}
+        card_transactions = {}
 
         cancelled = []
 
@@ -474,18 +478,18 @@ def cancel():
                 ticket.battels.cancel(ticket)
                 cancelled.append(ticket)
             elif ticket.paymentmethod == 'Card':
-                if ticket.card_transaction_id in cardTransactions:
-                    cardTransactions[ticket.card_transaction_id]['tickets'] \
+                if ticket.card_transaction_id in card_transactions:
+                    card_transactions[ticket.card_transaction_id]['tickets'] \
                         .append(ticket)
                 else:
-                    cardTransactions[ticket.card_transaction_id] = {
+                    card_transactions[ticket.card_transaction_id] = {
                         'transaction': ticket.card_transaction,
                         'tickets': [ticket]
                     }
 
-        refundFailed = False
+        refund_failed = False
 
-        for transaction in cardTransactions.itervalues():
+        for transaction in card_transactions.itervalues():
             value = sum([t.price for t in transaction['tickets']])
 
             if transaction['transaction'].process_refund(value):
@@ -494,9 +498,9 @@ def cancel():
                     ticket.cancelled = True
                 db.session.commit()
             else:
-                refundFailed = True
+                refund_failed = True
 
-        if refundFailed:
+        if refund_failed:
             flash(
                 (
                     u'Some of your tickets could not be automatically '
@@ -516,7 +520,7 @@ def cancel():
                 current_user
             )
 
-            if refundFailed:
+            if refund_failed:
                 flash(
                     (
                         u'Some of the tickets you selected have been '

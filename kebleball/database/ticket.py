@@ -328,7 +328,7 @@ class Ticket(DB.Model):
                     key=resalekey,
                     _external=True
                 ),
-                numTickets=len(tickets),
+                num_tickets=len(tickets),
                 resale_from=flask_login.current_user
             )
 
@@ -447,7 +447,7 @@ class Ticket(DB.Model):
                     key=resalekey,
                     _external=True
                 ),
-                numTickets=len(tickets)
+                num_tickets=len(tickets)
             )
 
             return True

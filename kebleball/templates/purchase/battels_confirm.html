@@ -1,13 +1,13 @@
-<!-- purchase/battelsConfirm.html -->
+<!-- purchase/battels_confirm.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Pay for Tickets by Battels{% endblock %}
 
 {% block content %}
-    <section id="battelsConfirm" class="columns">
+    <section id="battels_confirm" class="columns">
         <h3>Your Tickets</h3>
         {% if current_user.has_unpaid_tickets('Battels') %}
-            <form action="{{ url_for('purchase.battelsConfirm') }}" method="post">
+            <form action="{{ url_for('purchase.battels_confirm') }}" method="post">
                 <table id="ticketsTable">
                     <thead>
                         <tr>
@@ -29,7 +29,7 @@
                     </tbody>
                 </table>
                 {% if not current_user.can_pay_by_battels() %}
-                    <p>You cannot currently pay by battels. Please <a href="{{ url_for('purchase.changeMethod') }}">change the payment method on your tickets.</a></p>
+                    <p>You cannot currently pay by battels. Please <a href="{{ url_for('purchase.change_method') }}">change the payment method on your tickets.</a></p>
                 {% else %}
                     {% if template_config['CURRENT_TERM'] == 'MT' %}
                         <button type="submit" class="small" name="paymentTerm" value="MT">
@@ -45,7 +45,7 @@
                 {% endif %}
             </form>
         {% else %}
-            <p>You have no unpaid tickets marked as paying for by battels. Perhaps you'd like to <a href="{{ url_for('purchase.changeMethod') }}">change the payment method on some tickets</a> or <a href="{{ url_for('purchase.purchaseHome') }}">buy some more tickets</a>?</p>
+            <p>You have no unpaid tickets marked as paying for by battels. Perhaps you'd like to <a href="{{ url_for('purchase.change_method') }}">change the payment method on some tickets</a> or <a href="{{ url_for('purchase.purchase_home') }}">buy some more tickets</a>?</p>
         {% endif %}
     </section>
 {% endblock %}

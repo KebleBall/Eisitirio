@@ -12,16 +12,16 @@
                     <h5>Choose Number of Tickets</h5>
                     <div class="row">
                         <div class="columns">
-                            <label for="numTickets">Number of Tickets: <span id="numTicketsDisplay">1</span></label>
+                            <label for="num_tickets">Number of Tickets: <span id="num_tickets_display">1</span></label>
                             <input
-                                id="numTickets"
-                                name="numTickets"
+                                id="num_tickets"
+                                name="num_tickets"
                                 type="number"
                                 min="1"
                                 max="{{ canBuy }}"
                                 step="1"
-                                value="{% if numTickets -%}
-                                    {{ numTickets }}
+                                value="{% if num_tickets -%}
+                                    {{ num_tickets }}
                                 {% else -%}
                                     1
                                 {% endif %}"
@@ -68,8 +68,8 @@
     <script src="{{ url_for('static', filename='js/vendor/simple-slider.js') }}"></script>
 
     <script type="text/javascript">
-        $("#numTickets").bind("slider:changed", function (event, data) {
-            $('#numTicketsDisplay').html(data.value);
+        $("#num_tickets").bind("slider:changed", function (event, data) {
+            $('#num_tickets_display').html(data.value);
         });
 
         var referrerEmail = $("#referrerEmail");

@@ -1,26 +1,26 @@
-<!-- purchase/purchaseHome.html -->
+<!-- purchase/purchase_home.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Buy Tickets{% endblock %}
 
 {% block content %}
     <section id="purchase" class="columns">
-        <form action="{{ url_for('purchase.purchaseHome') }}" method="post">
+        <form action="{{ url_for('purchase.purchase_home') }}" method="post">
             <ol id="purchaseSteps">
                 <li>
                     <h5>Choose Number of Tickets</h5>
                     <div class="row">
                         <div class="columns">
-                            <label for="numTickets">Number of Tickets: <span id="numTicketsDisplay">1</span></label>
+                            <label for="num_tickets">Number of Tickets: <span id="num_tickets_display">1</span></label>
                             <input
-                                id="numTickets"
-                                name="numTickets"
+                                id="num_tickets"
+                                name="num_tickets"
                                 type="number"
                                 min="1"
                                 max="{{ canBuy }}"
                                 step="1"
-                                value="{% if numTickets -%}
-                                    {{ numTickets }}
+                                value="{% if num_tickets -%}
+                                    {{ num_tickets }}
                                 {% else -%}
                                     1
                                 {% endif %}"
@@ -36,14 +36,14 @@
                         The base price for a ticket is &pound;{{ '%.2f' % (template_config['TICKET_PRICE'] / 100.0) }}.
                         {% if current_user.gets_discount() %}
                             As a current Keble student you get a &pound;{{ '%.2f' % (template_config['KEBLE_DISCOUNT'] / 100.0) }} discount on your first ticket.
-                            {% if numTickets -%}
-                                Your order of {{ numTickets }} ticket{% if numTickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % (((template_config['TICKET_PRICE'] * numTickets) - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
+                            {% if num_tickets -%}
+                                Your order of {{ num_tickets }} ticket{% if num_tickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % (((template_config['TICKET_PRICE'] * num_tickets) - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
                             {% else -%}
                                 Your order of 1 ticket is currently worth &pound;{{ '%.2f' % ((template_config['TICKET_PRICE'] - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
                             {% endif %}
                         {% else %}
-                            {% if numTickets -%}
-                                Your order of {{ numTickets }} ticket{% if numTickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % ((template_config['TICKET_PRICE'] * numTickets) / 100.0) }}.
+                            {% if num_tickets -%}
+                                Your order of {{ num_tickets }} ticket{% if num_tickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % ((template_config['TICKET_PRICE'] * num_tickets) / 100.0) }}.
                             {% else -%}
                                 Your order of 1 ticket is currently worth &pound;{{ '%.2f' % (template_config['TICKET_PRICE'] / 100.0) }}.
                             {% endif %}
@@ -139,8 +139,8 @@
             }
         }
 
-        $("#numTickets").bind("slider:changed", function (event, data) {
-            $('#numTicketsDisplay').html(data.value);
+        $("#num_tickets").bind("slider:changed", function (event, data) {
+            $('#num_tickets_display').html(data.value);
 
             var ticketMessage = "The base price for a ticket is &pound;" + (ticketPrice / 100.0).toFixed(2) + ".";
             var totalPrice = data.value * ticketPrice;

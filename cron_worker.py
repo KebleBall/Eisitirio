@@ -120,7 +120,7 @@ def allocate_waiting():
             'You have been allocated tickets',
             'waitingAllocation.email',
             user=wait.user,
-            numTickets=wait.waitingfor,
+            num_tickets=wait.waitingfor,
             expiry=tickets[0].expires
         )
 

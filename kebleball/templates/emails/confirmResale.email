@@ -1,6 +1,6 @@
 Hi There!
 
-{{ resale_from.firstname }} {{ resale_from.surname }} ({{ resale_from.email }}) has offered to resell {{ numTickets }} tickets for Keble Ball to you.
+{{ resale_from.firstname }} {{ resale_from.surname }} ({{ resale_from.email }}) has offered to resell {{ num_tickets }} tickets for Keble Ball to you.
 
 If you wish to accept this offer, please visit the link below.
 

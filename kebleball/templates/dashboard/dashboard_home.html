@@ -5,7 +5,7 @@
 
 {% block content %}
     <section id="dashboard" class="columns">
-        <h3>Your Tickets <a href="{{ url_for('purchase.purchaseHome') }}" class="button">Buy Tickets</a></h3>
+        <h3>Your Tickets <a href="{{ url_for('purchase.purchase_home') }}" class="button">Buy Tickets</a></h3>
         {% if current_user.tickets.count() > 0 %}
             <table id="ticketsTable">
                 <thead>
@@ -53,16 +53,16 @@
                                 {% if not (ticket.cancelled or ticket.collected) %}
                                     {% if not ticket.paid %}
                                         {% if ticket.paymentmethod != None %}
-                                            <a href="{{ url_for('purchase.changeMethod') }}" class="button tiny">Change Payment Method</a>
+                                            <a href="{{ url_for('purchase.change_method') }}" class="button tiny">Change Payment Method</a>
                                             {% if ticket.paymentmethod == 'Card' %}
-                                                <a href="{{ url_for('purchase.cardConfirm') }}" class="button tiny">Complete card payment</a>
+                                                <a href="{{ url_for('purchase.card_confirm') }}" class="button tiny">Complete card payment</a>
                                             {% elif ticket.paymentmethod == 'Battels' %}
-                                                <a href="{{ url_for('purchase.battelsConfirm') }}" class="button tiny">Confirm battels payment</a>
+                                                <a href="{{ url_for('purchase.battels_confirm') }}" class="button tiny">Confirm battels payment</a>
                                             {% else %}
                                                 <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}" class="button tiny">Contact treasurer</a>
                                             {% endif %}
                                         {% else %}
-                                            <a href="{{ url_for('purchase.changeMethod') }}" class="button tiny">Choose Payment Method</a>
+                                            <a href="{{ url_for('purchase.change_method') }}" class="button tiny">Choose Payment Method</a>
                                         {% endif %}
                                     {% elif ticket.resalekey != None %}
                                         <a href="{{ url_for('resale.cancel_resale') }}" class="button tiny">Cancel Resale</a>
@@ -77,7 +77,7 @@
                 </tbody>
             </table>
         {% else %}
-            <p>You have no tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchaseHome') }}">buy some</a>?</p>
+            <p>You have no tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchase_home') }}">buy some</a>?</p>
         {% endif %}
 
         {% if current_user.is_waiting() %}

@@ -368,7 +368,7 @@ def giveUser(id):
             int(request.form['givePricePounds']) * 100 +
             int(request.form['givePricePence'])
         )
-        numTickets=int(request.form['giveNumTickets'])
+        num_tickets=int(request.form['giveNumTickets'])
 
         if (
             'giveReason' not in request.form or
@@ -387,7 +387,7 @@ def giveUser(id):
 
         tickets = []
 
-        for i in xrange(numTickets):
+        for i in xrange(num_tickets):
             ticket = Ticket(
                 user,
                 None,
@@ -401,7 +401,7 @@ def giveUser(id):
 
         log_event(
             'Gave {0} tickets'.format(
-                numTickets
+                num_tickets
             ),
             tickets,
             user
@@ -410,7 +410,7 @@ def giveUser(id):
         flash(
             u'Gave {0} {1} tickets'.format(
                 user.firstname,
-                numTickets
+                num_tickets
             ),
             'success'
         )
@@ -834,13 +834,13 @@ def refundTransaction(id):
 @ADMIN.route('/admin/statistics')
 @admin_required
 def statistics():
-    totalValue = db.session \
+    total_value = db.session \
         .query(func.sum(Ticket.price)) \
         .filter(Ticket.cancelled != True) \
         .scalar()
 
-    if totalValue is None:
-        totalValue = 0
+    if total_value is None:
+        total_value = 0
 
     paidValue = db.session \
         .query(func.sum(Ticket.price)) \
@@ -867,7 +867,7 @@ def statistics():
 
     return render_template(
         'admin/statistics.html',
-        totalValue=totalValue,
+        total_value=total_value,
         paidValue=paidValue,
         cancelledValue=cancelledValue,
         paymentMethodValues=paymentMethodValues

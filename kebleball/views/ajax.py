@@ -10,7 +10,7 @@ from flask.ext.login import current_user
 
 import json
 
-log = app.log_manager.log_ajax
+LOG = app.log_manager.log_ajax
 
 AJAX = Blueprint('ajax', __name__)
 

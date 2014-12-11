@@ -1,6 +1,6 @@
 Hi There!
 
-{{ resale_to.firstname }} {{ resale_to.surname }} ({{ resale_to.email }}) has accepted your offer to resell {{ numTickets }} for Keble Ball to them. You must now arrange payment for the tickets with them.
+{{ resale_to.firstname }} {{ resale_to.surname }} ({{ resale_to.email }}) has accepted your offer to resell {{ num_tickets }} for Keble Ball to them. You must now arrange payment for the tickets with them.
 
 Once you are satisifed that you have received appropriate recompense for the tickets, please visit the link below. The will complete the process, and the tickets will be transferred into the account of {{ resale_to.firstname }}.
 

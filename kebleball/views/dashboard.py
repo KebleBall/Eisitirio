@@ -120,7 +120,7 @@ def profile():
                     "emailChangeConfirm.email",
                     confirmurl=url_for(
                         'front.confirm_email',
-                        userID=current_user.id,
+                        user_id=current_user.id,
                         secretkey=current_user.secretkey,
                         _external=True
                     )

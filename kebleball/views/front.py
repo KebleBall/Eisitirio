@@ -199,13 +199,13 @@ def register():
         "emailConfirm.email",
         confirmurl=url_for(
             'front.confirm_email',
-            userID=user.id,
+            user_id=user.id,
             secretkey=user.secretkey,
             _external=True
         ),
         destroyurl=url_for(
             'front.destroy_account',
-            userID=user.id,
+            user_id=user.id,
             secretkey=user.secretkey,
             _external=True
         )
@@ -264,7 +264,7 @@ def password_reset():
                 "passwordResetConfirm.email",
                 confirmurl=url_for(
                     'front.reset_password',
-                    userID=user.id,
+                    user_id=user.id,
                     secretkey=user.secretkey,
                     _external=True
                 )
@@ -320,13 +320,13 @@ def email_confirm():
                 "emailConfirm.email",
                 confirmurl=url_for(
                     'front.confirm_email',
-                    userID=user.id,
+                    user_id=user.id,
                     secretkey=user.secretkey,
                     _external=True
                 ),
                 destroyurl=url_for(
                     'front.destroy_account',
-                    userID=user.id,
+                    user_id=user.id,
                     secretkey=user.secretkey,
                     _external=True
                 )
@@ -347,9 +347,9 @@ def email_confirm():
     else:
         return render_template('front/email_confirm.html')
 
-@FRONT.route('/resetpassword/<int:userID>/<secretkey>', methods=['GET', 'POST'])
-def reset_password(userID, secretkey):
-    user = User.get_by_id(userID)
+@FRONT.route('/resetpassword/<int:user_id>/<secretkey>', methods=['GET', 'POST'])
+def reset_password(user_id, secretkey):
+    user = User.get_by_id(user_id)
 
     if user is None or user.secretkey != secretkey:
         user.secretkey = None
@@ -367,7 +367,7 @@ def reset_password(userID, secretkey):
             return redirect(
                 url_for(
                     'front.reset_password',
-                    userID=user.id,
+                    user_id=user.id,
                     secretkey=user.secretkey
                 )
             )
@@ -388,13 +388,13 @@ def reset_password(userID, secretkey):
     else:
         return render_template(
             'front/reset_password.html',
-            userID=userID,
+            user_id=user_id,
             secretkey=secretkey
         )
 
-@FRONT.route('/confirmemail/<int:userID>/<secretkey>')
-def confirm_email(userID, secretkey):
-    user = User.get_by_id(userID)
+@FRONT.route('/confirmemail/<int:user_id>/<secretkey>')
+def confirm_email(user_id, secretkey):
+    user = User.get_by_id(user_id)
 
     if user is not None and user.secretkey == secretkey:
         user.secretkey = None
@@ -419,9 +419,9 @@ def confirm_email(userID, secretkey):
 
     return redirect(url_for('front.home'))
 
-@FRONT.route('/destroyaccount/<int:userID>/<secretkey>')
-def destroy_account(userID, secretkey):
-    user = User.get_by_id(userID)
+@FRONT.route('/destroyaccount/<int:user_id>/<secretkey>')
+def destroy_account(user_id, secretkey):
+    user = User.get_by_id(user_id)
 
     if user is not None and user.secretkey == secretkey:
         if not user.is_verified():

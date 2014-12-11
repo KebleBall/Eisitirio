@@ -44,7 +44,7 @@
                 <input type="submit" value="Resell Tickets" class="button small" />
             </form>
         {% else %}
-            <p>You have no paid-for tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchaseHome') }}">purchase some tickets</a>?</p>
+            <p>You have no paid-for tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchase_home') }}">purchase some tickets</a>?</p>
         {% endif %}
     </section>
 {% endblock %}
