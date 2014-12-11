@@ -315,14 +315,14 @@ class Ticket(DB.Model):
                 "Confirm Ticket Resale",
                 "confirmResale.email",
                 confirmurl=url_for(
-                    'resale.resaleConfirm',
+                    'resale.resale_confirm',
                     resale_from=flask_login.current_user.id,
                     resale_to=id,
                     key=resalekey,
                     _external=True
                 ),
                 cancelurl=url_for(
-                    'resale.resaleCancel',
+                    'resale.resale_cancel',
                     resale_from=flask_login.current_user.id,
                     resale_to=id,
                     key=resalekey,
@@ -434,14 +434,14 @@ class Ticket(DB.Model):
                 "completeResale.email",
                 resale_to=resale_to,
                 completeurl=url_for(
-                    'resale.resaleComplete',
+                    'resale.resale_complete',
                     resale_from=resale_from.id,
                     resale_to=resale_to.id,
                     key=resalekey,
                     _external=True
                 ),
                 cancelurl=url_for(
-                    'resale.resaleCancel',
+                    'resale.resale_cancel',
                     resale_from=resale_from.id,
                     resale_to=resale_to.id,
                     key=resalekey,

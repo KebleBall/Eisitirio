@@ -50,7 +50,7 @@ def resale_home():
 
 @RESALE.route('/resale/cancel', methods=['GET', 'POST'])
 @login_required
-def cancelResale():
+def cancel_resale():
     if request.method == 'POST':
         tickets = Ticket.query \
             .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
@@ -78,7 +78,7 @@ def cancelResale():
 
 @RESALE.route('/resale/confirm/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
-def resaleConfirm(resale_from, resale_to, key):
+def resale_confirm(resale_from, resale_to, key):
     if Ticket.confirm_resale(resale_from, resale_to, key):
         flash(
             (
@@ -103,7 +103,7 @@ def resaleConfirm(resale_from, resale_to, key):
 
 @RESALE.route('/resale/complete/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
-def resaleComplete(resale_from, resale_to, key):
+def resale_complete(resale_from, resale_to, key):
     if Ticket.complete_resale(resale_from, resale_to, key):
         flash(
             (
@@ -128,7 +128,7 @@ def resaleComplete(resale_from, resale_to, key):
 
 @RESALE.route('/resale/cancel/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
-def resaleCancel(resale_from, resale_to, key):
+def resale_cancel(resale_from, resale_to, key):
     if Ticket.cancel_resale(resale_from, resale_to, key):
         flash(
             u'The resale arrangement has been cancelled.',

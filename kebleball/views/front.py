@@ -12,6 +12,7 @@ from kebleball.database.affiliation import Affiliation
 
 from datetime import datetime, timedelta
 
+#Not constants but functions
 log = app.log_manager.log_front
 log_event = app.log_manager.log_event
 
@@ -21,8 +22,8 @@ FRONT = Blueprint('front', __name__)
 def home():
     return render_template(
         'front/home.html',
-        colleges = College.query.all(),
-        affiliations = Affiliation.query.all(),
+        colleges=College.query.all(),
+        affiliations=Affiliation.query.all(),
         form={}
     )
 
@@ -76,7 +77,8 @@ def login():
     )
 
     flash(u'Logged in successfully.', 'success')
-    return redirect(request.form.get('next', False) or url_for("dashboard.dashboardHome"))
+    return redirect(request.form.get('next', False)
+                    or url_for("dashboard.dashboardHome"))
 
 @FRONT.route('/register', methods=['POST'])
 def register():
@@ -95,37 +97,37 @@ def register():
         return redirect(url_for('front.home'))
 
     if (
-        'password' not in request.form or
-        'confirm' not in request.form or
-        request.form['password'] != request.form['confirm']
+            'password' not in request.form or
+            'confirm' not in request.form or
+            request.form['password'] != request.form['confirm']
     ):
         flashes.append(u'Passwords do not match')
         valid = False
 
     if (
-        'firstname' not in request.form or
-        request.form['firstname'] == ''
+            'firstname' not in request.form or
+            request.form['firstname'] == ''
     ):
         flashes.append(u'First Name cannot be blank')
         valid = False
 
     if (
-        'surname' not in request.form or
-        request.form['surname'] == ''
+            'surname' not in request.form or
+            request.form['surname'] == ''
     ):
         flashes.append(u'Surname cannot be blank')
         valid = False
 
     if (
-        'email' not in request.form or
-        request.form['email'] == ''
+            'email' not in request.form or
+            request.form['email'] == ''
     ):
         flashes.append(u'Email cannot be blank')
         valid = False
 
     if (
-        'password' not in request.form or
-        request.form['password'] == ''
+            'password' not in request.form or
+            request.form['password'] == ''
     ):
         flashes.append(u'Password cannot be blank')
         valid = False
@@ -134,22 +136,22 @@ def register():
         valid = False
 
     if (
-        'phone' not in request.form or
-        request.form['phone'] == ''
+            'phone' not in request.form or
+            request.form['phone'] == ''
     ):
         flashes.append(u'Phone cannot be blank')
         valid = False
 
     if (
-        'college' not in request.form or
-        request.form['college'] == '---'
+            'college' not in request.form or
+            request.form['college'] == '---'
     ):
         flashes.append(u'Please select a college')
         valid = False
 
     if (
-        'affiliation' not in request.form or
-        request.form['affiliation'] == '---'
+            'affiliation' not in request.form or
+            request.form['affiliation'] == '---'
     ):
         flashes.append(u'Please select an affiliation')
         valid = False
@@ -168,8 +170,8 @@ def register():
         return render_template(
             'front/home.html',
             form=request.form,
-            colleges = College.query.all(),
-            affiliations = Affiliation.query.all()
+            colleges=College.query.all(),
+            affiliations=Affiliation.query.all()
         )
 
     user = User(
@@ -196,13 +198,13 @@ def register():
         "Confirm your Email Address",
         "emailConfirm.email",
         confirmurl=url_for(
-            'front.confirmEmail',
+            'front.confirm_email',
             userID=user.id,
             secretkey=user.secretkey,
             _external=True
         ),
         destroyurl=url_for(
-            'front.destroyAccount',
+            'front.destroy_account',
             userID=user.id,
             secretkey=user.secretkey,
             _external=True
@@ -224,8 +226,8 @@ def register():
 def terms():
     return render_template('front/terms.html')
 
-@FRONT.route('/passwordreset', methods=['GET','POST'])
-def passwordReset():
+@FRONT.route('/passwordreset', methods=['GET', 'POST'])
+def password_reset():
     if request.method == 'POST':
         user = User.get_by_email(request.form['email'])
 
@@ -283,8 +285,8 @@ def passwordReset():
     else:
         return render_template('front/passwordReset.html')
 
-@FRONT.route('/emailconfirm', methods=['GET','POST'])
-def emailConfirm():
+@FRONT.route('/emailconfirm', methods=['GET', 'POST'])
+def email_confirm():
     if request.method == 'POST':
         user = User.get_by_email(request.form['email'])
 
@@ -317,13 +319,13 @@ def emailConfirm():
                 "Confirm your Email Address",
                 "emailConfirm.email",
                 confirmurl=url_for(
-                    'front.confirmEmail',
+                    'front.confirm_email',
                     userID=user.id,
                     secretkey=user.secretkey,
                     _external=True
                 ),
                 destroyurl=url_for(
-                    'front.destroyAccount',
+                    'front.destroy_account',
                     userID=user.id,
                     secretkey=user.secretkey,
                     _external=True
@@ -353,7 +355,7 @@ def reset_password(userID, secretkey):
         user.secretkey = None
         user.secretkeyexpiry = None
         db.session.commit()
-        flash(u'Could not complete password reset. Please try again','error')
+        flash(u'Could not complete password reset. Please try again', 'error')
         return redirect(url_for('front.home'))
 
     if request.method == 'POST':
@@ -381,7 +383,7 @@ def reset_password(userID, secretkey):
                 user
             )
 
-            flash(u'Your password has been reset, please log in.','success')
+            flash(u'Your password has been reset, please log in.', 'success')
             return redirect(url_for('front.home'))
     else:
         return render_template(
@@ -391,7 +393,7 @@ def reset_password(userID, secretkey):
         )
 
 @FRONT.route('/confirmemail/<int:userID>/<secretkey>')
-def confirmEmail(userID, secretkey):
+def confirm_email(userID, secretkey):
     user = User.get_by_id(userID)
 
     if user is not None and user.secretkey == secretkey:
@@ -410,14 +412,15 @@ def confirmEmail(userID, secretkey):
             user
         )
 
-        flash(u'Your email address has been verified. You can now log in','info')
+        flash(u'Your email address has been verified. You can now log in',
+              'info')
     else:
-        flash(u'Could not confirm email address. Check that you have used the correct link','warning')
+        flash(u'Could not confirm email address. Check that you have used the correct link', 'warning')
 
     return redirect(url_for('front.home'))
 
 @FRONT.route('/destroyaccount/<int:userID>/<secretkey>')
-def destroyAccount(userID, secretkey):
+def destroy_account(userID, secretkey):
     user = User.get_by_id(userID)
 
     if user is not None and user.secretkey == secretkey:
@@ -440,7 +443,7 @@ def destroyAccount(userID, secretkey):
                 )
             )
 
-            flash(u'The account has been deleted.','info')
+            flash(u'The account has been deleted.', 'info')
         else:
             log_event(
                 'Attempted deletion of verified account',
@@ -448,9 +451,9 @@ def destroyAccount(userID, secretkey):
                 user
             )
 
-            flash(u'Could not delete user account.','warning')
+            flash(u'Could not delete user account.', 'warning')
     else:
-        flash(u'Could not delete user account. Check that you have used the correct link','warning')
+        flash(u'Could not delete user account. Check that you have used the correct link', 'warning')
 
     return redirect(url_for('front.home'))
 
