@@ -1,22 +1,21 @@
 # coding: utf-8
-from flask import Blueprint, Response, request
-
-from kebleball.app import app
-from kebleball.helpers.validators import validateVoucher, validateReferrer, validateResaleEmail
-from kebleball.database import db
-from kebleball.database.ticket import Ticket
-
-from flask.ext.login import current_user
 
 import json
 
-LOG = app.log_manager.log_ajax
+from flask import Blueprint, Response, request
+from flask.ext import login
+
+from kebleball.helpers import validators
+from kebleball import database as db
+
+DB = db.DB
+Ticket = db.Ticket
 
 AJAX = Blueprint('ajax', __name__)
 
 @AJAX.route('/ajax/validate/voucher', methods=['POST'])
 def ajaxValidateVoucher():
-    (result, response, voucher) = validateVoucher(request.form['code'])
+    (result, response, voucher) = validators.validateVoucher(request.form['code'])
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
@@ -25,7 +24,7 @@ def ajaxValidateVoucher():
 
 @AJAX.route('/ajax/validate/referrer', methods=['POST'])
 def ajaxValidateReferrer():
-    (result, response, referrer) = validateReferrer(request.form['email'], current_user)
+    (result, response, referrer) = validators.validateReferrer(request.form['email'], login.current_user)
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
@@ -34,7 +33,7 @@ def ajaxValidateReferrer():
 
 @AJAX.route('/ajax/validate/resale-email', methods=['POST'])
 def ajaxValidateResaleEmail():
-    (result, response, buyer) = validateResaleEmail(request.form['email'], current_user)
+    (result, response, buyer) = validators.validateResaleEmail(request.form['email'], login.current_user)
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
@@ -48,7 +47,7 @@ def ajaxChangeTicketName(id):
     if ticket and request.form['name'] != '':
         ticket.name = request.form['name']
 
-        db.session.commit()
+        DB.session.commit()
         return Response(json.dumps(True), mimetype="text/json")
     else:
         return Response(json.dumps(False), mimetype="text/json")

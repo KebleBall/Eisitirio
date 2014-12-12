@@ -1,10 +1,13 @@
 # coding: utf-8
 
-from kebleball.app import app
-from kebleball.database.ticket import Ticket
-from kebleball.database.user import User
-from kebleball.database.waiting import Waiting
+from kebleball import app
+from kebleball import database as db
 from kebleball.helpers import get_boolean_config
+
+APP = app.APP
+Ticket = db.Ticket
+User = db.User
+Waiting = db.Waiting
 
 def canBuy(user):
     if get_boolean_config('LIMITED_RELEASE'):
@@ -57,7 +60,7 @@ def canBuy(user):
         .filter(Ticket.cancelled==False) \
         .filter(Ticket.paid==False) \
         .count()
-    if unpaidTickets >= app.config['MAX_UNPAID_TICKETS']:
+    if unpaidTickets >= APP.config['MAX_UNPAID_TICKETS']:
         return (
             False,
             0,
@@ -72,7 +75,7 @@ def canBuy(user):
         .count()
     if (
             get_boolean_config('TICKETS_ON_SALE') and
-            ticketsOwned >= app.config['MAX_TICKETS']
+            ticketsOwned >= APP.config['MAX_TICKETS']
     ):
         return (
             False,
@@ -82,13 +85,13 @@ def canBuy(user):
                 'ticketing officer</a> if you wish to purchase more than {1} '
                 'tickets.'
             ).format(
-                app.config['TICKETS_EMAIL_LINK'],
-                app.config['MAX_TICKETS']
+                APP.config['TICKETS_EMAIL_LINK'],
+                APP.config['MAX_TICKETS']
             )
         )
     elif (
             get_boolean_config('LIMITED_RELEASE') and
-            ticketsOwned >= app.config['LIMITED_RELEASE_MAX_TICKETS']
+            ticketsOwned >= APP.config['LIMITED_RELEASE_MAX_TICKETS']
     ):
         return (
             False,
@@ -97,12 +100,12 @@ def canBuy(user):
                 'you already own {0} tickets. During pre-release, only {0} '
                 'tickets may be bought per person.'
             ).format(
-                app.config['LIMITED_RELEASE_MAX_TICKETS']
+                APP.config['LIMITED_RELEASE_MAX_TICKETS']
             )
         )
 
 
-    ticketsAvailable = app.config['TICKETS_AVAILABLE'] - Ticket.count()
+    ticketsAvailable = APP.config['TICKETS_AVAILABLE'] - Ticket.count()
     if ticketsAvailable <= 0:
         return (
             False,
@@ -115,17 +118,17 @@ def canBuy(user):
         )
 
     if get_boolean_config('TICKETS_ON_SALE'):
-        max_tickets = app.config['MAX_TICKETS']
+        max_tickets = APP.config['MAX_TICKETS']
     elif get_boolean_config('LIMITED_RELEASE'):
-        max_tickets = app.config['LIMITED_RELEASE_MAX_TICKETS']
+        max_tickets = APP.config['LIMITED_RELEASE_MAX_TICKETS']
 
     return (
         True,
         min(
             ticketsAvailable,
-            app.config['MAX_TICKETS_PER_TRANSACTION'],
+            APP.config['MAX_TICKETS_PER_TRANSACTION'],
             max_tickets - ticketsOwned,
-            app.config['MAX_UNPAID_TICKETS'] - unpaidTickets
+            APP.config['MAX_UNPAID_TICKETS'] - unpaidTickets
         ),
         None
     )
@@ -143,7 +146,7 @@ def canWait(user):
     ticketsOwned = user.tickets \
         .filter(Ticket.cancelled==False) \
         .count()
-    if ticketsOwned >= app.config['MAX_TICKETS']:
+    if ticketsOwned >= APP.config['MAX_TICKETS']:
         return (
             False,
             0,
@@ -152,13 +155,13 @@ def canWait(user):
                 'ticketing officer</a> if you wish to purchase more than {1} '
                 'tickets.'
             ).format(
-                app.config['TICKETS_EMAIL_LINK'],
-                app.config['MAX_TICKETS']
+                APP.config['TICKETS_EMAIL_LINK'],
+                APP.config['MAX_TICKETS']
             )
         )
 
     waiting_for = user.waiting_for()
-    if waiting_for >= app.config['MAX_TICKETS_WAITING']:
+    if waiting_for >= APP.config['MAX_TICKETS_WAITING']:
         return (
             False,
             0,
@@ -172,8 +175,8 @@ def canWait(user):
     return (
         True,
         min(
-            app.config['MAX_TICKETS_WAITING'] - waiting_for,
-            app.config['MAX_TICKETS'] - ticketsOwned
+            APP.config['MAX_TICKETS_WAITING'] - waiting_for,
+            APP.config['MAX_TICKETS'] - ticketsOwned
         ),
         None
     )

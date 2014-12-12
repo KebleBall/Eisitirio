@@ -1,20 +1,19 @@
 # coding: utf-8
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-
-from flask.ext.login import login_user, logout_user, login_required, current_user
-
-from kebleball.app import app
-from kebleball.helpers import generate_key
-from kebleball.database import db
-from kebleball.database.user import User
-from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
 
 from datetime import datetime, timedelta
 
-#Not constants but functions
-log = app.log_manager.log_front
-log_event = app.log_manager.log_event
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask.ext import login
+
+from kebleball import app
+from kebleball.helpers import generate_key
+from kebleball import database as db
+
+APP = app.APP
+DB = db.DB
+User = db.User
+College = db.College
+Affiliation = db.Affiliation
 
 FRONT = Blueprint('front', __name__)
 
@@ -28,18 +27,18 @@ def home():
     )
 
 @FRONT.route('/login', methods=['POST'])
-def login():
+def do_login():
     user = User.get_by_email(request.form['email'])
 
     if not user or not user.check_password(request.form['password']):
         if user:
-            log_event(
+            APP.log_manager.log_event(
                 'Failed login attempt - invalid password',
                 [],
                 user
             )
         else:
-            log_event(
+            APP.log_manager.log_event(
                 'Failed login attempt - invalid email {0}'.format(
                     request.form['email']
                 ),
@@ -51,7 +50,7 @@ def login():
         return redirect(url_for('front.home'))
 
     if not user.verified:
-        log_event(
+        APP.log_manager.log_event(
             'Failed login attempt - not verified',
             [],
             user
@@ -62,7 +61,7 @@ def login():
         )
         return redirect(url_for('front.home'))
 
-    login_user(
+    login.login_user(
         user,
         remember=(
             'remember-me' in request.form and
@@ -70,7 +69,7 @@ def login():
         )
     )
 
-    log_event(
+    APP.log_manager.log_event(
         'Logged in',
         [],
         user
@@ -187,13 +186,13 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    log_event(
+    APP.log_manager.log_event(
         'Registered',
         [],
         user
     )
 
-    app.email_manager.sendTemplate(
+    APP.email_manager.sendTemplate(
         request.form['email'],
         "Confirm your Email Address",
         "emailConfirm.email",
@@ -235,7 +234,7 @@ def password_reset():
         user = User.get_by_email(request.form['email'])
 
         if not user:
-            log_event(
+            APP.log_manager.log_event(
                 'Attempted password reset for {0}'.format(
                     request.form['email']
                 )
@@ -255,13 +254,13 @@ def password_reset():
 
             db.session.commit()
 
-            log_event(
+            APP.log_manager.log_event(
                 'Started password reset',
                 [],
                 user
             )
 
-            app.email_manager.sendTemplate(
+            APP.email_manager.sendTemplate(
                 request.form['email'],
                 "Confirm Password Reset",
                 "passwordResetConfirm.email",
@@ -294,13 +293,13 @@ def email_confirm():
         user = User.get_by_email(request.form['email'])
 
         if not user:
-            log_event(
+            APP.log_manager.log_event(
                 'Attempted email confirm for {0}'.format(
                     request.form['email']
                 )
             )
 
-            app.email_manager.sendTemplate(
+            APP.email_manager.sendTemplate(
                 request.form['email'],
                 "Attempted Account Access",
                 "emailConfirmFail.email"
@@ -311,13 +310,13 @@ def email_confirm():
 
             db.session.commit()
 
-            log_event(
+            APP.log_manager.log_event(
                 'Requested email confirm',
                 [],
                 user
             )
 
-            app.email_manager.sendTemplate(
+            APP.email_manager.sendTemplate(
                 request.form['email'],
                 "Confirm your Email Address",
                 "emailConfirm.email",
@@ -380,7 +379,7 @@ def reset_password(user_id, secretkey):
             user.secretkeyexpiry = None
             db.session.commit()
 
-            log_event(
+            APP.log_manager.log_event(
                 'Completed password reset',
                 [],
                 user
@@ -409,7 +408,7 @@ def confirm_email(user_id, secretkey):
 
         db.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Confirmed email',
             [],
             user
@@ -440,7 +439,7 @@ def destroy_account(user_id, secretkey):
             db.session.delete(user)
             db.session.commit()
 
-            log_event(
+            APP.log_manager.log_event(
                 'Deleted account with email address {0}'.format(
                     user.email
                 )
@@ -448,7 +447,7 @@ def destroy_account(user_id, secretkey):
 
             flash(u'The account has been deleted.', 'info')
         else:
-            log_event(
+            APP.log_manager.log_event(
                 'Attempted deletion of verified account',
                 [],
                 user
@@ -461,29 +460,29 @@ def destroy_account(user_id, secretkey):
     return redirect(url_for('front.home'))
 
 @FRONT.route('/logout')
-@login_required
+@login.login_required
 def logout():
     if 'actor_id' in session:
-        log_event(
+        APP.log_manager.log_event(
             'Finished impersonating user',
             [],
-            current_user
+            login.current_user
         )
 
         actor = User.get_by_id(session['actor_id'])
 
         if actor:
-            login_user(
+            login.login_user(
                 actor
             )
 
             return redirect(url_for('admin.admin_home'))
 
-    log_event(
+    APP.log_manager.log_event(
         'Logged Out',
         [],
-        current_user
+        login.current_user
     )
 
-    logout_user()
+    login.logout_user()
     return redirect(url_for('front.home'))

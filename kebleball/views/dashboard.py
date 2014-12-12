@@ -1,35 +1,36 @@
 # coding: utf-8
-from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flask.ext.login import login_required, current_user
-
-from kebleball.app import app
-from kebleball.database import db
-from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
-from kebleball.database.announcement import Announcement
-from kebleball.database.user import User
-from kebleball.helpers import generate_key
 from datetime import datetime, timedelta
 
-log = app.log_manager.log_dashboard
-log_event = app.log_manager.log_event
+from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask.ext import login
+
+from kebleball import app
+from kebleball import database as db
+from kebleball.helpers import generate_key
+
+APP = app.APP
+DB = db.DB
+College = db.College
+Affiliation = db.Affiliation
+Announcement = db.Announcement
+User = db.User
 
 DASHBOARD = Blueprint('dashboard', __name__)
 
 @DASHBOARD.route('/dashboard')
-@login_required
+@login.login_required
 def dashboard_home():
     return render_template('dashboard/dashboard_home.html')
 
 @DASHBOARD.route('/dashboard/profile', methods=['GET','POST'])
-@login_required
+@login.login_required
 def profile():
     if request.method == 'POST':
         valid = True
         flashes = []
 
         if (
-            request.form['email'] != current_user.email and
+            request.form['email'] != login.current_user.email and
             User.get_by_email(request.form['email']) is not None
         ):
             flashes.append(u'That email address is already in use. ')
@@ -39,7 +40,7 @@ def profile():
             'oldpassword' in request.form and
             request.form['oldpassword'] != ''
         ):
-            if not current_user.check_password(request.form['oldpassword']):
+            if not login.current_user.check_password(request.form['oldpassword']):
                 flashes.append(u'Current password is not correct')
                 valid = False
 
@@ -109,19 +110,19 @@ def profile():
             for msg in flashes:
                 flash(msg, 'warning')
         else:
-            if request.form['email'] != current_user.email:
-                current_user.newemail = request.form['email']
-                current_user.secretkey = generate_key(64)
-                current_user.secretkeyexpiry = datetime.utcnow() + timedelta(days=7)
+            if request.form['email'] != login.current_user.email:
+                login.current_user.newemail = request.form['email']
+                login.current_user.secretkey = generate_key(64)
+                login.current_user.secretkeyexpiry = datetime.utcnow() + timedelta(days=7)
 
-                app.email_manager.sendTemplate(
+                APP.email_manager.sendTemplate(
                     request.form['email'],
                     "Confirm your Email Address",
                     "emailChangeConfirm.email",
                     confirmurl=url_for(
                         'front.confirm_email',
-                        user_id=current_user.id,
-                        secretkey=current_user.secretkey,
+                        user_id=login.current_user.id,
+                        secretkey=login.current_user.secretkey,
                         _external=True
                     )
                 )
@@ -139,20 +140,20 @@ def profile():
                 'oldpassword' in request.form and
                 request.form['oldpassword'] != ""
             ):
-                current_user.set_password(request.form['password'])
+                login.current_user.set_password(request.form['password'])
 
-            current_user.firstname = request.form['firstname']
-            current_user.surname = request.form['surname']
-            current_user.phone = request.form['phone']
-            current_user.college_id = request.form['college']
-            current_user.update_affiliation(request.form['affiliation'])
+            login.current_user.firstname = request.form['firstname']
+            login.current_user.surname = request.form['surname']
+            login.current_user.phone = request.form['phone']
+            login.current_user.college_id = request.form['college']
+            login.current_user.update_affiliation(request.form['affiliation'])
 
             db.session.commit()
 
-            log_event(
+            APP.log_manager.log_event(
                 'Updated Details',
                 [],
-                current_user
+                login.current_user
             )
 
             flash(
@@ -160,7 +161,7 @@ def profile():
                 'success'
             )
 
-            current_user.maybe_verify_affiliation()
+            login.current_user.maybe_verify_affiliation()
 
     return render_template(
         'dashboard/profile.html',
@@ -169,7 +170,7 @@ def profile():
     )
 
 @DASHBOARD.route('/dashboard/announcement/<int:announcementID>')
-@login_required
+@login.login_required
 def announcement(announcementID):
     announcement = Announcement.get_by_id(announcementID)
 

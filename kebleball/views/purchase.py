@@ -1,24 +1,24 @@
 # coding: utf-8
 from flask import Blueprint, request, render_template, flash, redirect, url_for
-from flask.ext.login import login_required, current_user
+from flask.ext import login
 
-from kebleball.app import app
-from kebleball.database.ticket import Ticket
-from kebleball.database.waiting import Waiting
-from kebleball.database.card_transaction import CardTransaction
-from kebleball.database import db
-from kebleball.helpers.purchase import canBuy, canWait
-from kebleball.helpers.validators import validateVoucher, validateReferrer
+from kebleball import app
+from kebleball import database as db
+from kebleball.helpers import purchase as purchase_help
+from kebleball.helpers import validators
 
-log = app.log_manager.log_purchase
-log_event = app.log_manager.log_event
+APP = app.APP
+DB = db.DB
+Ticket = db.Ticket
+Waiting = db.Waiting
+CardTransaction = db.CardTransaction
 
 PURCHASE = Blueprint('purchase', __name__)
 
 @PURCHASE.route('/purchase', methods=['GET', 'POST'])
-@login_required
+@login.login_required
 def purchase_home():
-    (buying_permitted, tickets_available, can_buy_message) = canBuy(current_user)
+    (buying_permitted, tickets_available, can_buy_message) = purchase_help.canBuy(login.current_user)
 
     if not buying_permitted:
         flash(
@@ -26,7 +26,7 @@ def purchase_home():
             + can_buy_message, 'info'
         )
 
-        (waiting_permitted, _, _) = canWait(current_user)
+        (waiting_permitted, _, _) = purchase_help.canWait(login.current_user)
         if waiting_permitted:
             flash(
                 (
@@ -64,7 +64,7 @@ def purchase_home():
             valid = False
             flashes.append(u'That is not a valid payment method')
         elif (request.form['paymentMethod'] == 'Battels'
-              and not current_user.can_pay_by_battels()):
+              and not login.current_user.can_pay_by_battels()):
             valid = False
             flashes.append(u'You cannot pay by battels')
         elif (
@@ -83,7 +83,7 @@ def purchase_home():
 
         voucher = None
         if 'voucherCode' in request.form and request.form['voucherCode'] != '':
-            (result, response, voucher) = validateVoucher(
+            (result, response, voucher) = validators.validateVoucher(
                 request.form['voucherCode'])
             if not result:
                 valid = False
@@ -92,8 +92,8 @@ def purchase_home():
         referrer = None
         if ('referrerEmail' in request.form
                 and request.form['referrerEmail'] != ''):
-            (result, response, referrer) = validateReferrer(
-                request.form['referrerEmail'], current_user)
+            (result, response, referrer) = validators.validateReferrer(
+                request.form['referrerEmail'], login.current_user)
             if not result:
                 valid = False
                 flashes.append(response['message'] + u' Please clear the referrer field to continue without giving somebody credit.')
@@ -118,12 +118,12 @@ def purchase_home():
 
         tickets = []
 
-        if current_user.gets_discount():
+        if login.current_user.gets_discount():
             tickets.append(
                 Ticket(
-                    current_user,
+                    login.current_user,
                     request.form['paymentMethod'],
-                    current_user.get_base_ticket_price() - app.config['KEBLE_DISCOUNT']
+                    login.current_user.get_base_ticket_price() - APP.config['KEBLE_DISCOUNT']
                 )
             )
             start = 1
@@ -133,9 +133,9 @@ def purchase_home():
         for _ in xrange(start, num_tickets):
             tickets.append(
                 Ticket(
-                    current_user,
+                    login.current_user,
                     request.form['paymentMethod'],
-                    current_user.get_base_ticket_price()
+                    login.current_user.get_base_ticket_price()
                 )
             )
 
@@ -151,7 +151,7 @@ def purchase_home():
                 )
 
         if voucher is not None:
-            (success, tickets, error) = voucher.apply(tickets, current_user)
+            (success, tickets, error) = voucher.apply(tickets, login.current_user)
             if not success:
                 flash('Could not use Voucher - ' + error, 'error')
 
@@ -159,13 +159,13 @@ def purchase_home():
             for ticket in tickets:
                 ticket.set_referrer(referrer)
 
-        db.session.add_all(tickets)
-        db.session.commit()
+        DB.session.add_all(tickets)
+        DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Purchased Tickets',
             tickets,
-            current_user
+            login.current_user
         )
 
         expires = None
@@ -217,9 +217,9 @@ def purchase_home():
         )
 
 @PURCHASE.route('/purchase/wait', methods=['GET', 'POST'])
-@login_required
+@login.login_required
 def wait():
-    (wait_permitted, wait_available, can_wait_message) = canWait(current_user)
+    (wait_permitted, wait_available, can_wait_message) = purchase_help.canWait(login.current_user)
     if not wait_permitted:
         flash(
             (
@@ -250,8 +250,8 @@ def wait():
         referrer = None
         if ('referrerEmail' in request.form
                 and request.form['referrerEmail'] != ''):
-            (result, response, referrer) = validateReferrer(
-                request.form['referrerEmail'], current_user)
+            (result, response, referrer) = validators.validateReferrer(
+                request.form['referrerEmail'], login.current_user)
             if not result:
                 valid = False
                 flashes.append(response['message'] + u' Please clear the referrer field to continue without giving somebody credit.')
@@ -274,21 +274,21 @@ def wait():
                 canWait=wait_available
             )
 
-        db.session.add(
+        DB.session.add(
             Waiting(
-                current_user,
+                login.current_user,
                 num_tickets,
                 referrer
             )
         )
-        db.session.commit()
+        DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Joined waiting list for {0} tickets'.format(
                 num_tickets
             ),
             [],
-            current_user
+            login.current_user
         )
 
         flash(
@@ -309,12 +309,12 @@ def wait():
         )
 
 @PURCHASE.route('/purchase/change-method', methods=['GET', 'POST'])
-@login_required
+@login.login_required
 def change_method():
     if request.method == 'POST':
         tickets = Ticket.query \
             .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == current_user.id) \
+            .filter(Ticket.owner_id == login.current_user.id) \
             .filter(Ticket.paid == False) \
             .all()
 
@@ -343,14 +343,14 @@ def change_method():
         for ticket in tickets:
             ticket.set_payment_method(request.form['paymentMethod'], reason)
 
-        db.session.commit()
+        DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Changed Payment Method to {0}'.format(
                 request.form['paymentMethod']
             ),
             tickets,
-            current_user
+            login.current_user
         )
 
         flash(
@@ -361,12 +361,12 @@ def change_method():
     return render_template('purchase/change_method.html')
 
 @PURCHASE.route('/purchase/card-confirm', methods=['GET', 'POST'])
-@login_required
+@login.login_required
 def card_confirm():
     if request.method == 'POST':
         tickets = Ticket.query \
             .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == current_user.id) \
+            .filter(Ticket.owner_id == login.current_user.id) \
             .filter(Ticket.paid == False) \
             .all()
 
@@ -374,12 +374,12 @@ def card_confirm():
             tickets.remove(None)
 
         transaction = CardTransaction(
-            current_user,
+            login.current_user,
             tickets
         )
 
-        db.session.add(transaction)
-        db.session.commit()
+        DB.session.add(transaction)
+        DB.session.commit()
 
         eway_url = transaction.get_eway_url()
 
@@ -405,9 +405,9 @@ def eway_cancel(id):
     return redirect(url_for('dashboard.dashboard_home'))
 
 @PURCHASE.route('/purchase/battels-confirm', methods=['GET', 'POST'])
-@login_required
+@login.login_required
 def battels_confirm():
-    if not current_user.can_pay_by_battels():
+    if not login.current_user.can_pay_by_battels():
         flash(
             u'You cannot currently pay by battels. Please change the payment '
             u'method on your tickets',
@@ -418,7 +418,7 @@ def battels_confirm():
     if request.method == 'POST':
         tickets = Ticket.query \
             .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == current_user.id) \
+            .filter(Ticket.owner_id == login.current_user.id) \
             .filter(Ticket.paid == False) \
             .all()
 
@@ -426,22 +426,22 @@ def battels_confirm():
             tickets.remove(None)
 
         if (
-                app.config['CURRENT_TERM'] == 'HT' and
+                APP.config['CURRENT_TERM'] == 'HT' and
                 request.form['paymentTerm'] != 'HT'
         ):
             flash(u'Invalid choice of payment term', 'warning')
         else:
-            battels = current_user.battels
+            battels = login.current_user.battels
 
             for ticket in tickets:
                 battels.charge(ticket, request.form['paymentTerm'])
 
-            db.session.commit()
+            DB.session.commit()
 
-            log_event(
+            APP.log_manager.log_event(
                 'Confirmed battels payment',
                 tickets,
-                current_user
+                login.current_user
             )
 
             flash(u'Your battels payment has been confirmed', 'success')
@@ -449,12 +449,12 @@ def battels_confirm():
     return render_template('purchase/battels_confirm.html')
 
 @PURCHASE.route('/purchase/cancel', methods=['GET', 'POST'])
-@login_required
+@login.login_required
 def cancel():
     if request.method == 'POST':
         tickets = Ticket.query \
             .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == current_user.id) \
+            .filter(Ticket.owner_id == login.current_user.id) \
             .all()
 
         while None in tickets:
@@ -469,11 +469,11 @@ def cancel():
         for ticket in tickets:
             if not ticket.paid:
                 ticket.cancelled = True
-                db.session.commit()
+                DB.session.commit()
                 cancelled.append(ticket)
             elif ticket.paymentmethod == 'Free':
                 ticket.cancelled = True
-                db.session.commit()
+                DB.session.commit()
                 cancelled.append(ticket)
             elif ticket.paymentmethod == 'Battels':
                 ticket.battels.cancel(ticket)
@@ -497,7 +497,7 @@ def cancel():
                 cancelled.extend(transaction['tickets'])
                 for ticket in transaction['tickets']:
                     ticket.cancelled = True
-                db.session.commit()
+                DB.session.commit()
             else:
                 refund_failed = True
 
@@ -509,16 +509,16 @@ def cancel():
                     u'later, but if this problem continues to occur, you '
                     u'should contact <a href="{0}">the ticketing officer</a>'
                 ).format(
-                    app.config['TICKETS_EMAIL_LINK']
+                    APP.config['TICKETS_EMAIL_LINK']
                 ),
                 'warning'
             )
 
         if len(cancelled) > 0:
-            log_event(
+            APP.log_manager.log_event(
                 'Cancelled tickets',
                 cancelled,
-                current_user
+                login.current_user
             )
 
             if refund_failed:

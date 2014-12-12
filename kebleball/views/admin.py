@@ -27,9 +27,6 @@ from kebleball.helpers import generate_key
 from kebleball.helpers.login_manager import admin_required
 from kebleball.helpers.statistic_plots import create_plot
 
-log = APP.log_manager.log_admin
-log_event = APP.log_manager.log_event
-
 ADMIN = Blueprint('admin', __name__)
 
 @ADMIN.route('/admin', methods=['GET', 'POST'])
@@ -359,7 +356,7 @@ def impersonate_user(id):
             remember=False
         )
 
-        log_event(
+        APP.log_manager.log_event(
             'Started impersonating user',
             [],
             user
@@ -414,7 +411,7 @@ def give_user(id):
         DB.session.add_all(tickets)
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Gave {0} tickets'.format(
                 num_tickets
             ),
@@ -448,7 +445,7 @@ def note_user(id):
         user.note = request.form['notes']
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Updated notes',
             [],
             user
@@ -476,7 +473,7 @@ def verify_user(id):
         user.verified = True
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Verified email',
             [],
             user
@@ -504,7 +501,7 @@ def demote_user(id):
         user.demote()
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Demoted user',
             [],
             user
@@ -532,7 +529,7 @@ def promote_user(id):
         user.promote()
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Promoted user',
             [],
             user
@@ -559,7 +556,7 @@ def add_manual_battels(id):
     if user:
         user.add_manual_battels()
 
-        log_event(
+        APP.log_manager.log_event(
             'Manually set up battels',
             [],
             user
@@ -585,7 +582,7 @@ def verify_affiliation(id):
     if user:
         user.verify_affiliation()
 
-        log_event(
+        APP.log_manager.log_event(
             'Verified affiliation',
             [],
             user
@@ -601,7 +598,7 @@ def deny_affiliation(id):
     if user:
         user.deny_affiliation()
 
-        log_event(
+        APP.log_manager.log_event(
             'Denied affiliation',
             [],
             user
@@ -680,7 +677,7 @@ def collect_ticket(id):
         ticket.collected = True
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Collected',
             [ticket]
         )
@@ -709,7 +706,7 @@ def note_ticket(id):
         ticket.note = request.form['notes']
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Updated notes',
             [ticket]
         )
@@ -736,7 +733,7 @@ def mark_ticket_paid(id):
         ticket.paid = True
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Marked as paid',
             [ticket]
         )
@@ -783,7 +780,7 @@ def auto_cancel_ticket(id):
         ticket.cancelled = True
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Cancelled and refunded ticket',
             [ticket]
         )
@@ -810,7 +807,7 @@ def cancel_ticket(id):
         ticket.cancelled = True
         DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Marked ticket as cancelled',
             [ticket]
         )

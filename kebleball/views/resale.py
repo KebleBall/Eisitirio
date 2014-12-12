@@ -2,12 +2,13 @@
 from flask import Blueprint, request, render_template, redirect, flash, url_for
 from flask.ext.login import login_required, current_user
 
-from kebleball.app import app
-from kebleball.database import db
-from kebleball.database.user import User
-from kebleball.database.ticket import Ticket
+from kebleball import app
+from kebleball import database as db
 
-LOG = app.log_manager.log_resale
+APP = app.APP
+DB = db.DB
+User = db.User
+Ticket = db.Ticket
 
 RESALE = Blueprint('resale', __name__)
 
@@ -67,7 +68,7 @@ def cancel_resale():
             ticket.reselling_to = None
             ticket.reselling_to_id = None
 
-        db.session.commit()
+        DB.session.commit()
 
         flash(
             u'The tickets have been removed from resale',
@@ -94,7 +95,7 @@ def resale_confirm(resale_from, resale_to, key):
                 u'If the error persists, please contact <a href="{0}" '
                 u'target="_blank">the webmaster</a>.'
             ).format(
-                app.config['WEBSITE_EMAIL_LINK']
+                APP.config['WEBSITE_EMAIL_LINK']
             ),
             'warning'
         )
@@ -119,7 +120,7 @@ def resale_complete(resale_from, resale_to, key):
                 u'If the error persists, please contact <a href="{0}" '
                 u'target="_blank">the webmaster</a>.'
             ).format(
-                app.config['WEBSITE_EMAIL_LINK']
+                APP.config['WEBSITE_EMAIL_LINK']
             ),
             'warning'
         )
@@ -141,7 +142,7 @@ def resale_cancel(resale_from, resale_to, key):
                 u'If the error persists, please contact <a href="{0}" '
                 u'target="_blank">the webmaster</a>.'
             ).format(
-                app.config['WEBSITE_EMAIL_LINK']
+                APP.config['WEBSITE_EMAIL_LINK']
             ),
             'warning'
         )
