@@ -6,16 +6,16 @@ Contains Affiliation class
 Used to denote users' affiliations with their colleges
 """
 
-from kebleball.database import db
+from kebleball.database import DB
 
-class Affiliation(db.Model):
-    id = db.Column(
-        db.Integer(),
+class Affiliation(DB.Model):
+    id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    name = db.Column(
-        db.String(25),
+    name = DB.Column(
+        DB.String(25),
         nullable=False
     )
 

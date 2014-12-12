@@ -6,134 +6,134 @@ Contains Announcement class
 Used to store announcements displayed on site and emailed
 """
 
-from kebleball.app import app
-from kebleball.database import db
+from kebleball.app import APP
+from kebleball.database import DB
 from kebleball.database.user import User
 from email.mime.text import MIMEText
 from datetime import datetime
 
-USER_ANNOUNCE_LINK = db.Table(
+USER_ANNOUNCE_LINK = DB.Table(
     'user_announce_link',
-    db.Model.metadata,
-    db.Column(
+    DB.Model.metadata,
+    DB.Column(
         'user_id',
-        db.Integer,
-        db.ForeignKey('user.id')
+        DB.Integer,
+        DB.ForeignKey('user.id')
     ),
-    db.Column(
+    DB.Column(
         'announcement_id',
-        db.Integer,
-        db.ForeignKey('announcement.id')
+        DB.Integer,
+        DB.ForeignKey('announcement.id')
     )
 )
 
-EMAIL_ANNOUNCE_LINK = db.Table(
+EMAIL_ANNOUNCE_LINK = DB.Table(
     'email_announce_link',
-    db.Model.metadata,
-    db.Column(
+    DB.Model.metadata,
+    DB.Column(
         'user_id',
-        db.Integer,
-        db.ForeignKey('user.id')
+        DB.Integer,
+        DB.ForeignKey('user.id')
     ),
-    db.Column(
+    DB.Column(
         'announcement_id',
-        db.Integer,
-        db.ForeignKey('announcement.id')
+        DB.Integer,
+        DB.ForeignKey('announcement.id')
     )
 )
 
-class Announcement(db.Model):
-    id = db.Column(
-        db.Integer,
+class Announcement(DB.Model):
+    id = DB.Column(
+        DB.Integer,
         primary_key=True,
         nullable=False
     )
-    timestamp = db.Column(
-        db.DateTime(),
+    timestamp = DB.Column(
+        DB.DateTime(),
         nullable=False
     )
-    content = db.Column(
-        db.Text(65536),
+    content = DB.Column(
+        DB.Text(65536),
         nullable=False
     )
-    subject = db.Column(
-        db.Text(256),
+    subject = DB.Column(
+        DB.Text(256),
         nullable=False
     )
-    send_email = db.Column(
-        db.Boolean,
+    send_email = DB.Column(
+        DB.Boolean,
         default=True,
         nullable=False
     )
-    email_sent = db.Column(
-        db.Boolean,
+    email_sent = DB.Column(
+        DB.Boolean,
         default=False,
         nullable=False
     )
 
-    sender_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    sender_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.id'),
         nullable=False
     )
-    sender = db.relationship(
+    sender = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'announcements-sent',
             lazy='dynamic'
         )
     )
 
-    college_id = db.Column(
-        db.Integer,
-        db.ForeignKey('college.id'),
+    college_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('college.id'),
         nullable=True
     )
-    college = db.relationship(
+    college = DB.relationship(
         'College',
-        backref=db.backref(
+        backref=DB.backref(
             'announcements',
             lazy='dynamic'
         )
     )
 
-    affiliation_id = db.Column(
-        db.Integer,
-        db.ForeignKey('affiliation.id'),
+    affiliation_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('affiliation.id'),
         nullable=True
     )
-    affiliation = db.relationship(
+    affiliation = DB.relationship(
         'Affiliation',
-        backref=db.backref(
+        backref=DB.backref(
             'announcements-received',
             lazy='dynamic'
         )
     )
 
-    is_waiting = db.Column(
-        db.Boolean,
+    is_waiting = DB.Column(
+        DB.Boolean,
         nullable=True
     )
-    has_tickets = db.Column(
-        db.Boolean,
+    has_tickets = DB.Column(
+        DB.Boolean,
         nullable=True
     )
-    has_collected = db.Column(
-        db.Boolean,
+    has_collected = DB.Column(
+        DB.Boolean,
         nullable=True
     )
-    has_uncollected = db.Column(
-        db.Boolean,
+    has_uncollected = DB.Column(
+        DB.Boolean,
         nullable=True
     )
 
-    users = db.relationship(
+    users = DB.relationship(
         'User',
         secondary=USER_ANNOUNCE_LINK,
         backref='announcements'
     )
 
-    emails = db.relationship(
+    emails = DB.relationship(
         'User',
         secondary=EMAIL_ANNOUNCE_LINK,
         lazy='dynamic'
@@ -221,13 +221,13 @@ class Announcement(db.Model):
                     msg.replace_header('To', user.email)
                 except KeyError:
                     msg['To'] = user.email
-                app.email_manager.sendMsg(msg)
+                APP.email_manager.sendMsg(msg)
                 self.emails.remove(user)
                 count = count - 1
         finally:
-            db.session.commit()
+            DB.session.commit()
             self.email_sent = (self.emails.count() == 0)
-            db.session.commit()
+            DB.session.commit()
 
         return count
 

@@ -7,11 +7,10 @@ from flask import url_for
 from flask import flash
 from flask.ext import login as flask_login
 
-from kebleball import database as db
+from kebleball.database import DB
 from kebleball import app
 from kebleball.helpers import generate_key
 
-DB = db.DB
 APP = app.APP
 
 TICKET_TRANSACTION_LINK = DB.Table(

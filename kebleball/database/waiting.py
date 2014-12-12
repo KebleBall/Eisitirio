@@ -3,9 +3,7 @@
 
 from datetime import datetime
 
-from kebleball import database as db
-
-DB = db.DB
+from kebleball.database import DB
 
 class Waiting(DB.Model):
     """Model for entries on the waiting list."""

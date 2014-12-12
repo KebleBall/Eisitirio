@@ -6,60 +6,60 @@ Contains Voucher class
 Used to store data about discount vouchers
 """
 
-from kebleball.database import db
+from kebleball.database import DB
 from datetime import datetime, timedelta
 
-class Voucher(db.Model):
-    id = db.Column(
-        db.Integer(),
+class Voucher(DB.Model):
+    id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    code = db.Column(
-        db.String(30),
+    code = DB.Column(
+        DB.String(30),
         nullable=False
     )
-    expires = db.Column(
-        db.DateTime(),
+    expires = DB.Column(
+        DB.DateTime(),
         nullable=True
     )
-    discounttype = db.Column(
-        db.Enum(
+    discounttype = DB.Column(
+        DB.Enum(
             'Fixed Price',
             'Fixed Discount',
             'Percentage Discount'
         ),
         nullable=False
     )
-    discountvalue = db.Column(
-        db.Integer(),
+    discountvalue = DB.Column(
+        DB.Integer(),
         nullable=False
     )
-    appliesto = db.Column(
-        db.Enum(
+    appliesto = DB.Column(
+        DB.Enum(
             'Ticket',
             'Transaction'
         ),
         nullable=False
     )
-    singleuse = db.Column(
-        db.Boolean(),
+    singleuse = DB.Column(
+        DB.Boolean(),
         nullable=False
     )
-    used = db.Column(
-        db.Boolean(),
+    used = DB.Column(
+        DB.Boolean(),
         default=False,
         nullable=True
     )
 
-    used_by_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    used_by_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.id'),
         nullable=True
     )
-    used_by = db.relationship(
+    used_by = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'vouchers_used',
             lazy='dynamic'
         )

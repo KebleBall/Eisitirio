@@ -7,4 +7,4 @@ import flask
 
 APP = flask.Flask(__name__)
 
-app.config.from_pyfile('config/default.py')
+APP.config.from_pyfile('config/default.py')

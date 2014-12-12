@@ -11,8 +11,8 @@ from flask import Blueprint, render_template, request, flash, send_file, redirec
 from StringIO import StringIO
 from sqlalchemy import func
 
-from kebleball.app import app
-from kebleball.database import db
+from kebleball.app import APP
+from kebleball.database import DB
 from kebleball.database.user import User
 from kebleball.database.college import College
 from kebleball.database.affiliation import Affiliation
@@ -27,8 +27,8 @@ from kebleball.helpers import generate_key
 from kebleball.helpers.login_manager import admin_required
 from kebleball.helpers.statistic_plots import create_plot
 
-log = app.log_manager.log_admin
-log_event = app.log_manager.log_event
+log = APP.log_manager.log_admin
+log_event = APP.log_manager.log_event
 
 ADMIN = Blueprint('admin', __name__)
 
@@ -411,8 +411,8 @@ def give_user(id):
             ticket.add_note(note)
             tickets.append(ticket)
 
-        db.session.add_all(tickets)
-        db.session.commit()
+        DB.session.add_all(tickets)
+        DB.session.commit()
 
         log_event(
             'Gave {0} tickets'.format(
@@ -446,7 +446,7 @@ def note_user(id):
 
     if user:
         user.note = request.form['notes']
-        db.session.commit()
+        DB.session.commit()
 
         log_event(
             'Updated notes',
@@ -474,7 +474,7 @@ def verify_user(id):
 
     if user:
         user.verified = True
-        db.session.commit()
+        DB.session.commit()
 
         log_event(
             'Verified email',
@@ -502,7 +502,7 @@ def demote_user(id):
 
     if user:
         user.demote()
-        db.session.commit()
+        DB.session.commit()
 
         log_event(
             'Demoted user',
@@ -530,7 +530,7 @@ def promote_user(id):
 
     if user:
         user.promote()
-        db.session.commit()
+        DB.session.commit()
 
         log_event(
             'Promoted user',
@@ -678,7 +678,7 @@ def collect_ticket(id):
     if ticket:
         ticket.barcode = request.form['barcode']
         ticket.collected = True
-        db.session.commit()
+        DB.session.commit()
 
         log_event(
             'Collected',
@@ -707,7 +707,7 @@ def note_ticket(id):
 
     if ticket:
         ticket.note = request.form['notes']
-        db.session.commit()
+        DB.session.commit()
 
         log_event(
             'Updated notes',
@@ -734,7 +734,7 @@ def mark_ticket_paid(id):
 
     if ticket:
         ticket.paid = True
-        db.session.commit()
+        DB.session.commit()
 
         log_event(
             'Marked as paid',
@@ -781,7 +781,7 @@ def auto_cancel_ticket(id):
                                 or url_for('admin.view_ticket', id=ticket.id))
 
         ticket.cancelled = True
-        db.session.commit()
+        DB.session.commit()
 
         log_event(
             'Cancelled and refunded ticket',
@@ -808,7 +808,7 @@ def cancel_ticket(id):
 
     if ticket:
         ticket.cancelled = True
-        db.session.commit()
+        DB.session.commit()
 
         log_event(
             'Marked ticket as cancelled',
@@ -854,7 +854,7 @@ def validate_ticket():
             )
         else:
             ticket.entered = True
-            db.session.commit()
+            DB.session.commit()
             valid = True
             message = "Permit entry for {0}".format(ticket.name)
 
@@ -938,7 +938,7 @@ def refund_transaction(id):
 @ADMIN.route('/admin/statistics')
 @admin_required
 def statistics():
-    total_value = db.session \
+    total_value = DB.session \
         .query(func.sum(Ticket.price)) \
         .filter(Ticket.cancelled != True) \
         .scalar()
@@ -946,7 +946,7 @@ def statistics():
     if total_value is None:
         total_value = 0
 
-    paid_value = db.session \
+    paid_value = DB.session \
         .query(func.sum(Ticket.price)) \
         .filter(Ticket.paid == True) \
         .filter(Ticket.cancelled != True) \
@@ -955,7 +955,7 @@ def statistics():
     if paid_value is None:
         paid_value = 0
 
-    cancelled_value = db.session \
+    cancelled_value = DB.session \
         .query(func.sum(Ticket.price)) \
         .filter(Ticket.cancelled == True) \
         .scalar()
@@ -963,7 +963,7 @@ def statistics():
     if cancelled_value is None:
         cancelled_value = 0
 
-    payment_method_values = db.session \
+    payment_method_values = DB.session \
         .query(func.sum(Ticket.price), Ticket.paymentmethod) \
         .filter(Ticket.cancelled != True) \
         .group_by(Ticket.paymentmethod) \
@@ -1068,8 +1068,8 @@ def announcements(page=1):
                 has_uncollected
             )
 
-            db.session.add(announcement)
-            db.session.commit()
+            DB.session.add(announcement)
+            DB.session.commit()
 
             flash(
                 u'Announcement created successfully',
@@ -1092,8 +1092,8 @@ def deleteAnnouncement(id):
     announcement = Announcement.get_by_id(id)
 
     if announcement:
-        db.session.delete(announcement)
-        db.session.commit()
+        DB.session.delete(announcement)
+        DB.session.commit()
 
         flash(
             u'Announcement deleted successfully',
@@ -1115,7 +1115,7 @@ def cancelAnnouncementEmails(id):
     if announcement:
         announcement.emails = []
         announcement.send_email = False
-        db.session.commit()
+        DB.session.commit()
 
         flash(
             u'Announcement emails cancelled successfully',
@@ -1203,9 +1203,9 @@ def vouchers(page=1):
                     form['appliesTo'],
                     single_use
                 )
-                db.session.add(voucher)
+                DB.session.add(voucher)
 
-            db.session.commit()
+            DB.session.commit()
 
             flash(
                 u'Voucher(s) created successfully',
@@ -1242,8 +1242,8 @@ def deleteVoucher(id):
     voucher = Voucher.get_by_id(id)
 
     if voucher:
-        db.session.delete(voucher)
-        db.session.commit()
+        DB.session.delete(voucher)
+        DB.session.commit()
         flash(
             u'Voucher deleted successfully',
             'success'
@@ -1262,8 +1262,8 @@ def deleteWaiting(id):
     waiting = Waiting.get_by_id(id)
 
     if waiting:
-        db.session.delete(waiting)
-        db.session.commit()
+        DB.session.delete(waiting)
+        DB.session.commit()
         flash(
             u'Waiting list entry deleted',
             'success'

@@ -13,49 +13,49 @@ import requests
 from flask import url_for, flash
 from flask.ext.login import current_user
 
-from kebleball.app import app
-from kebleball.database import db
+from kebleball.app import APP
+from kebleball.database import DB
 
-class CardTransaction(db.Model):
-    id = db.Column(
-        db.Integer(),
+class CardTransaction(DB.Model):
+    id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    commenced = db.Column(
-        db.DateTime(),
+    commenced = DB.Column(
+        DB.DateTime(),
         nullable=False
     )
-    completed = db.Column(
-        db.DateTime(),
+    completed = DB.Column(
+        DB.DateTime(),
         nullable=True
     )
-    accesscode = db.Column(
-        db.String(200),
+    accesscode = DB.Column(
+        DB.String(200),
         nullable=True
     )
-    resultcode = db.Column(
-        db.String(2),
+    resultcode = DB.Column(
+        DB.String(2),
         nullable=True
     )
-    ewayid = db.Column(
-        db.Integer(),
+    ewayid = DB.Column(
+        DB.Integer(),
         nullable=True
     )
-    refunded = db.Column(
-        db.Integer(),
+    refunded = DB.Column(
+        DB.Integer(),
         nullable=False,
         default=0
     )
 
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    user_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.id'),
         nullable=False
     )
-    user = db.relationship(
+    user = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'transactions',
             lazy='dynamic'
         )
@@ -165,12 +165,12 @@ class CardTransaction(db.Model):
             return 'Unsuccessful'
 
     def send_request(self, endpoint, data=None):
-        url = app.config['EWAY_API_BASE'] + endpoint + '.json'
+        url = APP.config['EWAY_API_BASE'] + endpoint + '.json'
         payload = json.dumps(data)
         headers = {
             "Content-Type": "application/json",
             "Authorization": "Basic {0}".format(
-                app.config['EWAY_API_PASSCODE']
+                APP.config['EWAY_API_PASSCODE']
             )
         }
 
@@ -179,7 +179,7 @@ class CardTransaction(db.Model):
         if r.status_code == 200:
             return (True, r.json())
         else:
-            app.log_manager.log_event(
+            APP.log_manager.log_event(
                 (
                     'Failed request to eWay endpoint {0} returning status {1}'
                 ).format(
@@ -213,7 +213,7 @@ class CardTransaction(db.Model):
             "TransactionType": "Purchase",
             "LogoUrl": "https://www.kebleball.com/assets/building_big.jpg",
             "HeaderText": "Keble Ball {0}".format(
-                app.config['START_TIME'].strftime('%Y')
+                APP.config['START_TIME'].strftime('%Y')
             ),
             "Language": "EN",
             "CustomerReadOnly": True
@@ -223,9 +223,9 @@ class CardTransaction(db.Model):
 
         if success:
             self.accesscode = response['AccessCode']
-            db.session.commit()
+            DB.session.commit()
 
-            app.log_manager.log_event(
+            APP.log_manager.log_event(
                 'Started Card Payment',
                 self.tickets,
                 current_user,
@@ -253,13 +253,13 @@ class CardTransaction(db.Model):
                 self.completed = datetime.utcnow()
                 self.resultcode = response['ResponseCode']
                 self.ewayid = response['TransactionID']
-                db.session.commit()
+                DB.session.commit()
 
                 status = self.get_status()
 
                 if status[0]:
                     if self.resultcode == '10':
-                        app.log_manager.log_event(
+                        APP.log_manager.log_event(
                             (
                                 'Partial eWay payment for transaction {0} '
                                 'with value {1}'
@@ -290,10 +290,10 @@ class CardTransaction(db.Model):
                                 'warning'
                             )
                         else:
-                            app.email_manager.sendTemplate(
+                            APP.email_manager.sendTemplate(
                                 [
-                                    app.config['TREASURER_EMAIL'],
-                                    app.config['TICKETS_EMAIL']
+                                    APP.config['TREASURER_EMAIL'],
+                                    APP.config['TICKETS_EMAIL']
                                 ],
                                 "Partial Ticket Payment",
                                 "partialPayment.email",
@@ -327,9 +327,9 @@ class CardTransaction(db.Model):
                                 transaction=self
                             )
 
-                        db.session.commit()
+                        DB.session.commit()
 
-                        app.log_manager.log_event(
+                        APP.log_manager.log_event(
                             'Completed Card Payment',
                             self.tickets,
                             self.user_id,
@@ -355,7 +355,7 @@ class CardTransaction(db.Model):
                         u'giving reference "Trans{1:05d}" to confirm that '
                         u'payment has not been taken before trying again'
                     ).format(
-                        app.config['TREASURER_EMAIL_LINK'],
+                        APP.config['TREASURER_EMAIL_LINK'],
                         self.id
                     ),
                     'error'
@@ -371,9 +371,9 @@ class CardTransaction(db.Model):
             'info'
         )
 
-        db.session.commit()
+        DB.session.commit()
 
-        app.log_manager.log_event(
+        APP.log_manager.log_event(
             'Cancelled Card Payment',
             self.tickets,
             self.user_id,
@@ -397,9 +397,9 @@ class CardTransaction(db.Model):
             refunded_amount = response['Refund']['TotalAmount']
 
             self.refunded = self.refunded + refunded_amount
-            db.session.commit()
+            DB.session.commit()
 
-            app.log_manager.log_event(
+            APP.log_manager.log_event(
                 'Refunded £{0:.02f}'.format(
                     refunded_amount / 100.0
                 ),
@@ -409,10 +409,10 @@ class CardTransaction(db.Model):
             )
 
             if refunded_amount != amount:
-                app.email_manager.sendTemplate(
+                APP.email_manager.sendTemplate(
                     [
-                        app.config['TREASURER_EMAIL'],
-                        app.config['TICKETS_EMAIL']
+                        APP.config['TREASURER_EMAIL'],
+                        APP.config['TICKETS_EMAIL']
                     ],
                     "Partial Refund",
                     "partialRefund.email",
@@ -431,7 +431,7 @@ class CardTransaction(db.Model):
 
             return True
         else:
-            app.log_manager.log_purchase('warning', str(response))
+            APP.log_manager.log_purchase('warning', str(response))
             return False
 
     @staticmethod

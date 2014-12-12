@@ -35,7 +35,7 @@ Voucher = voucher.Voucher
 Waiting = waiting.Waiting
 
 def initialise_db(prefill=True, clear=False):
-    db.create_all()
+    DB.create_all()
 
     if clear:
         prompt = input("Are you sure you wish to clear the entire database? ")
@@ -53,6 +53,6 @@ def initialise_db(prefill=True, clear=False):
             Waiting.query.delete()
 
     if prefill:
-        db.session.add_all(college.COLLEGES)
-        db.session.add_all(affiliation.AFFILIATIONS)
-        db.session.commit()
+        DB.session.add_all(college.COLLEGES)
+        DB.session.add_all(affiliation.AFFILIATIONS)
+        DB.session.commit()

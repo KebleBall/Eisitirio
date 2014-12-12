@@ -3,7 +3,7 @@ from datetime import datetime
 import random
 import string
 
-from kebleball.app import app
+from kebleball.app import APP
 
 def generate_key(length, choices=None):
     if choices is None:
@@ -16,7 +16,7 @@ def generate_key(length, choices=None):
     return ''.join(random.choice(choices) for x in xrange(length))
 
 def get_boolean_config(key):
-    if isinstance(app.config[key], datetime):
-        return datetime.utcnow() >= app.config[key]
+    if isinstance(APP.config[key], datetime):
+        return datetime.utcnow() >= APP.config[key]
     else:
-        return app.config[key]
+        return APP.config[key]

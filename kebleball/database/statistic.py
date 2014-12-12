@@ -6,33 +6,33 @@ Contains Statistic class
 Used to store historical statistics for displaying graphs
 """
 
-from kebleball.database import db
+from kebleball.database import DB
 from datetime import datetime
 
-class Statistic(db.Model):
-    id = db.Column(
-        db.Integer(),
+class Statistic(DB.Model):
+    id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    timestamp = db.Column(
-        db.DateTime,
+    timestamp = DB.Column(
+        DB.DateTime,
         nullable=False
     )
-    group = db.Column(
-        db.Enum(
+    group = DB.Column(
+        DB.Enum(
             'Colleges',
             'Payments',
             'Sales'
         ),
         nullable=False
     )
-    statistic = db.Column(
-        db.String(25),
+    statistic = DB.Column(
+        DB.String(25),
         nullable=False
     )
-    value = db.Column(
-        db.Integer(),
+    value = DB.Column(
+        DB.Integer(),
         nullable=False
     )
 

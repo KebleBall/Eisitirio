@@ -6,87 +6,87 @@ Contains Log class
 Used to store log entries
 """
 
-from kebleball.database import db
+from kebleball.database import DB
 from kebleball.database.user import User
 from kebleball.database.ticket import Ticket
 from kebleball.database.card_transaction import CardTransaction
 from datetime import datetime
 
-LOG_TICKET_LINK = db.Table(
+LOG_TICKET_LINK = DB.Table(
     'log_ticket_link',
-    db.Model.metadata,
-    db.Column('log_id',
-              db.Integer,
-              db.ForeignKey('log.id')
+    DB.Model.metadata,
+    DB.Column('log_id',
+              DB.Integer,
+              DB.ForeignKey('log.id')
              ),
-    db.Column('ticket_id',
-              db.Integer,
-              db.ForeignKey('ticket.id')
+    DB.Column('ticket_id',
+              DB.Integer,
+              DB.ForeignKey('ticket.id')
              )
 )
 
-class Log(db.Model):
-    id = db.Column(
-        db.Integer(),
+class Log(DB.Model):
+    id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    timestamp = db.Column(
-        db.DateTime,
+    timestamp = DB.Column(
+        DB.DateTime,
         nullable=False
     )
-    ip = db.Column(
-        db.String(45),
+    ip = DB.Column(
+        DB.String(45),
         nullable=False
     )
-    action = db.Column(db.Text())
+    action = DB.Column(DB.Text())
 
-    actor_id = db.Column(
-        db.Integer(),
-        db.ForeignKey('user.id'),
+    actor_id = DB.Column(
+        DB.Integer(),
+        DB.ForeignKey('user.id'),
         nullable=True
     )
-    actor = db.relationship(
+    actor = DB.relationship(
         User,
-        backref=db.backref(
+        backref=DB.backref(
             'actions',
             lazy='dynamic'
         ),
         foreign_keys=[actor_id]
     )
 
-    user_id = db.Column(
-        db.Integer(),
-        db.ForeignKey('user.id'),
+    user_id = DB.Column(
+        DB.Integer(),
+        DB.ForeignKey('user.id'),
         nullable=True
     )
-    user = db.relationship(
+    user = DB.relationship(
         User,
-        backref=db.backref(
+        backref=DB.backref(
             'events',
             lazy='dynamic'
         ),
         foreign_keys=[user_id]
     )
 
-    tickets = db.relationship(
+    tickets = DB.relationship(
         'Ticket',
         secondary=LOG_TICKET_LINK,
-        backref=db.backref(
+        backref=DB.backref(
             'log_entries',
             lazy='dynamic'
         ),
         lazy='dynamic'
     )
 
-    transaction_id = db.Column(
-        db.Integer(),
-        db.ForeignKey('card_transaction.id'),
+    transaction_id = DB.Column(
+        DB.Integer(),
+        DB.ForeignKey('card_transaction.id'),
         nullable=True
     )
-    transaction = db.relationship(
+    transaction = DB.relationship(
         CardTransaction,
-        backref=db.backref(
+        backref=DB.backref(
             'events',
             lazy='dynamic'
         )

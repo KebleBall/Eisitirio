@@ -1,10 +1,9 @@
 # coding: utf-8
 """Model for battels charges for Keble Students."""
 
-from kebleball import database as db
+from kebleball.database import DB
 from kebleball import app
 
-DB = db.DB
 APP = app.APP
 
 class Battels(DB.Model):

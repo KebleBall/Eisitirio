@@ -12,14 +12,11 @@ from flask import url_for
 from flask.ext.bcrypt import Bcrypt
 
 from kebleball import app
-from kebleball import database as db
 from kebleball import helpers
+from kebleball.database import DB
+from kebleball.database import *
 
 APP = app.APP
-DB = db.DB
-Affiliation = db.Affiliation
-Battels = db.Battels
-College = db.College
 
 BCRYPT = Bcrypt(APP)
 
@@ -246,14 +243,14 @@ class User(DB.Model):
     def can_pay_by_battels(self):
         return (
             self.battels is not None and
-            app.config['CURRENT_TERM'] != 'TT'
+            APP.config['CURRENT_TERM'] != 'TT'
         )
 
     def gets_discount(self):
         return (
             self.college.name == "Keble" and
             self.affiliation.name == "Student" and
-            app.config['KEBLE_DISCOUNT'] > 0 and
+            APP.config['KEBLE_DISCOUNT'] > 0 and
             self.tickets.count() == 0
         )
 
@@ -296,7 +293,7 @@ class User(DB.Model):
     def verify_affiliation(self):
         self.affiliation_verified = True
 
-        app.email_manager.sendTemplate(
+        APP.email_manager.sendTemplate(
             self.email,
             "Affiliation Verified - Buy Your Tickets Now!",
             "affiliation_verified.email",
@@ -352,8 +349,8 @@ class User(DB.Model):
                 DB.session.commit()
                 return
 
-            app.email_manager.sendTemplate(
-                app.config['TICKETS_EMAIL'],
+            APP.email_manager.sendTemplate(
+                APP.config['TICKETS_EMAIL'],
                 "Verify Affiliation",
                 "verify_affiliation.email",
                 user=self,
@@ -383,6 +380,6 @@ class User(DB.Model):
                 self.college.name == "Keble" and
                 self.affiliation.name == "Staff/Fellow"
         ):
-            return app.config["KEBLE_STAFF_TICKET_PRICE"]
+            return APP.config["KEBLE_STAFF_TICKET_PRICE"]
         else:
-            return app.config["TICKET_PRICE"]
+            return APP.config["TICKET_PRICE"]

@@ -7,7 +7,7 @@ Used to log events, both for users and for system errors
 """
 
 import logging
-from kebleball.database import db
+from kebleball.database import DB
 from kebleball.database.log import Log
 from flask import session, current_app
 from flask.ext.login import current_user, request, AnonymousUserMixin
@@ -89,5 +89,5 @@ class LogManager(object):
             transaction
         )
 
-        db.session.add(entry)
-        db.session.commit()
+        DB.session.add(entry)
+        DB.session.commit()
