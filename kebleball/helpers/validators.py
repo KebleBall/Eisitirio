@@ -12,7 +12,8 @@ def validateVoucher(code):
             False,
             {
                 'class': 'error',
-                'message': "That voucher code wasn't recognised. Please ensure you have entered it correctly."
+                'message': ("That voucher code wasn't recognised. "
+                            "Please ensure you have entered it correctly.")
             },
             None
         )
@@ -26,7 +27,8 @@ def validateVoucher(code):
                 },
                 None
             )
-        elif voucher.expires is not None and voucher.expires < datetime.utcnow():
+        elif (voucher.expires is not None
+              and voucher.expires < datetime.utcnow()):
             result = (
                 False,
                 {
@@ -94,7 +96,8 @@ def validateReferrer(email, current_user):
                 'class': 'warning',
                 'message': (
                     'No user with that email address was found, have you '
-                    'entered it correctly? The person who referred you must have '
+                    'entered it correctly? '
+                    'The person who referred you must have '
                     'an account before they can be given credit for your order.'
                 )
             },

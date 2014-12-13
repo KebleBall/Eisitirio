@@ -22,7 +22,7 @@ DASHBOARD = Blueprint('dashboard', __name__)
 def dashboard_home():
     return render_template('dashboard/dashboard_home.html')
 
-@DASHBOARD.route('/dashboard/profile', methods=['GET','POST'])
+@DASHBOARD.route('/dashboard/profile', methods=['GET', 'POST'])
 @login.login_required
 def profile():
     if request.method == 'POST':
@@ -30,25 +30,26 @@ def profile():
         flashes = []
 
         if (
-            request.form['email'] != login.current_user.email and
-            User.get_by_email(request.form['email']) is not None
+                request.form['email'] != login.current_user.email and
+                User.get_by_email(request.form['email']) is not None
         ):
             flashes.append(u'That email address is already in use. ')
             valid = False
 
         if (
-            'oldpassword' in request.form and
-            request.form['oldpassword'] != ''
+                'oldpassword' in request.form and
+                request.form['oldpassword'] != ''
         ):
-            if not login.current_user.check_password(request.form['oldpassword']):
+            if not login.current_user.check_password(
+                    request.form['oldpassword']):
                 flashes.append(u'Current password is not correct')
                 valid = False
 
             if (
-                'password' not in request.form or
-                'confirm' not in request.form or
-                request.form['password'] == '' or
-                request.form['password'] != request.form['confirm']
+                    'password' not in request.form or
+                    'confirm' not in request.form or
+                    request.form['password'] == '' or
+                    request.form['password'] != request.form['confirm']
             ):
                 flashes.append(u'New passwords do not match')
                 valid = False
@@ -58,43 +59,43 @@ def profile():
                 valid = False
 
         if (
-            'firstname' not in request.form or
-            request.form['firstname'] == ''
+                'firstname' not in request.form or
+                request.form['firstname'] == ''
         ):
             flashes.append(u'First Name cannot be blank')
             valid = False
 
         if (
-            'surname' not in request.form or
-            request.form['surname'] == ''
+                'surname' not in request.form or
+                request.form['surname'] == ''
         ):
             flashes.append(u'Surname cannot be blank')
             valid = False
 
         if (
-            'email' not in request.form or
-            request.form['email'] == ''
+                'email' not in request.form or
+                request.form['email'] == ''
         ):
             flashes.append(u'Email cannot be blank')
             valid = False
 
         if (
-            'phone' not in request.form or
-            request.form['phone'] == ''
+                'phone' not in request.form or
+                request.form['phone'] == ''
         ):
             flashes.append(u'Phone cannot be blank')
             valid = False
 
         if (
-            'college' not in request.form or
-            request.form['college'] == '---'
+                'college' not in request.form or
+                request.form['college'] == '---'
         ):
             flashes.append(u'Please select a college')
             valid = False
 
         if (
-            'affiliation' not in request.form or
-            request.form['affiliation'] == '---'
+                'affiliation' not in request.form or
+                request.form['affiliation'] == '---'
         ):
             flashes.append(u'Please select an affiliation')
             valid = False
@@ -113,7 +114,8 @@ def profile():
             if request.form['email'] != login.current_user.email:
                 login.current_user.newemail = request.form['email']
                 login.current_user.secretkey = generate_key(64)
-                login.current_user.secretkeyexpiry = datetime.utcnow() + timedelta(days=7)
+                login.current_user.secretkeyexpiry = (
+                    datetime.utcnow() + timedelta(days=7))
 
                 APP.email_manager.sendTemplate(
                     request.form['email'],
@@ -137,8 +139,8 @@ def profile():
                 )
 
             if (
-                'oldpassword' in request.form and
-                request.form['oldpassword'] != ""
+                    'oldpassword' in request.form and
+                    request.form['oldpassword'] != ""
             ):
                 login.current_user.set_password(request.form['password'])
 
@@ -165,8 +167,8 @@ def profile():
 
     return render_template(
         'dashboard/profile.html',
-        colleges = College.query.all(),
-        affiliations = Affiliation.query.all()
+        colleges=College.query.all(),
+        affiliations=Affiliation.query.all()
     )
 
 @DASHBOARD.route('/dashboard/announcement/<int:announcementID>')

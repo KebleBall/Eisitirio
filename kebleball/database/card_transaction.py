@@ -14,7 +14,9 @@ from flask import url_for, flash
 from flask.ext.login import current_user
 
 from kebleball.app import APP
-from kebleball.database import DB
+from kebleball import database as db
+
+DB = db.DB
 
 class CardTransaction(DB.Model):
     id = DB.Column(

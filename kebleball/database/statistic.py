@@ -6,8 +6,10 @@ Contains Statistic class
 Used to store historical statistics for displaying graphs
 """
 
-from kebleball.database import DB
+from kebleball import database as db
 from datetime import datetime
+
+DB = db.DB
 
 class Statistic(DB.Model):
     id = DB.Column(

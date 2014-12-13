@@ -1,7 +1,9 @@
 # coding: utf-8
 """Model for a user's college."""
 
-from kebleball.database import DB
+from kebleball import database as db
+
+DB = db.DB
 
 class College(DB.Model):
     """Model for a user's college."""

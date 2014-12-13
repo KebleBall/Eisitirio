@@ -6,11 +6,14 @@ Contains Announcement class
 Used to store announcements displayed on site and emailed
 """
 
-from kebleball.app import APP
-from kebleball.database import DB
+from kebleball.app import app
+from kebleball.database import db
 from kebleball.database.user import User
 from email.mime.text import MIMEText
 from datetime import datetime
+
+APP = app.APP
+DB = db.DB
 
 USER_ANNOUNCE_LINK = DB.Table(
     'user_announce_link',

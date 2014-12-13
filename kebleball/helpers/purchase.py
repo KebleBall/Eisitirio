@@ -24,7 +24,8 @@ def canBuy(user):
                 False,
                 0,
                 (
-                    "tickets are on limited release to current Keble members and "
+                    "tickets are on limited release "
+                    "to current Keble members and "
                     "Keble graduands only."
                 )
             )
@@ -42,8 +43,10 @@ def canBuy(user):
             False,
             0,
             (
-                'tickets are currently not on sale. Tickets may become available '
-                'for purchase or through the waiting list, please check back at a '
+                'tickets are currently not on sale. '
+                'Tickets may become available '
+                'for purchase or through the waiting list, '
+                'please check back at a '
                 'later date.'
             )
         )
@@ -57,8 +60,8 @@ def canBuy(user):
         )
 
     unpaidTickets = user.tickets \
-        .filter(Ticket.cancelled==False) \
-        .filter(Ticket.paid==False) \
+        .filter(Ticket.cancelled == False) \
+        .filter(Ticket.paid == False) \
         .count()
     if unpaidTickets >= APP.config['MAX_UNPAID_TICKETS']:
         return (
@@ -71,7 +74,7 @@ def canBuy(user):
         )
 
     ticketsOwned = user.tickets \
-        .filter(Ticket.cancelled==False) \
+        .filter(Ticket.cancelled == False) \
         .count()
     if (
             get_boolean_config('TICKETS_ON_SALE') and
@@ -81,7 +84,8 @@ def canBuy(user):
             False,
             0,
             (
-                'you already own too many tickets. Please contact <a href="{0}">the '
+                'you already own too many tickets. '
+                'Please contact <a href="{0}">the '
                 'ticketing officer</a> if you wish to purchase more than {1} '
                 'tickets.'
             ).format(
@@ -144,7 +148,7 @@ def canWait(user):
         )
 
     ticketsOwned = user.tickets \
-        .filter(Ticket.cancelled==False) \
+        .filter(Ticket.cancelled == False) \
         .count()
     if ticketsOwned >= APP.config['MAX_TICKETS']:
         return (

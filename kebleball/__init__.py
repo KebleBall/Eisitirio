@@ -12,11 +12,13 @@ from flask.ext import markdown as flask_markdown
 from jinja2 import Markup
 from werkzeug.exceptions import NotFound
 
+from kebleball import app
 from kebleball import views
 from kebleball.helpers import log_manager
 from kebleball.helpers import login_manager
 from kebleball.helpers import email_manager
-from kebleball.app import APP
+
+APP = app.APP
 
 @APP.before_request
 def check_for_maintenance():

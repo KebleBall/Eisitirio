@@ -11,8 +11,8 @@ from flask import Blueprint, render_template, request, flash, send_file, redirec
 from StringIO import StringIO
 from sqlalchemy import func
 
-from kebleball.app import APP
-from kebleball.database import DB
+from kebleball import app
+from kebleball import database as db
 from kebleball.database.user import User
 from kebleball.database.college import College
 from kebleball.database.affiliation import Affiliation
@@ -27,6 +27,8 @@ from kebleball.helpers import generate_key
 from kebleball.helpers.login_manager import admin_required
 from kebleball.helpers.statistic_plots import create_plot
 
+APP = app.APP
+DB = db.DB
 ADMIN = Blueprint('admin', __name__)
 
 @ADMIN.route('/admin', methods=['GET', 'POST'])

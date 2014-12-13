@@ -3,11 +3,11 @@ from matplotlib import pyplot
 from matplotlib.dates import DayLocator, DateFormatter
 from StringIO import StringIO
 
-def create_plot(plots, xLimMin, xLimMax):
-    fig, ax = pyplot.subplots()
+def create_plot(plots, x_lim_min, x_lim_max):
+    fig, axes = pyplot.subplots()
 
     for label, plot in plots.iteritems():
-        ax.plot_date(
+        axes.plot_date(
             plot['timestamps'],
             plot['datapoints'],
             plot['line'],
@@ -16,15 +16,15 @@ def create_plot(plots, xLimMin, xLimMax):
         )
 
 
-    ax.set_xlim(xLimMin, xLimMax)
-    ax.grid(True, 'major', 'y')
-    legend = ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.xaxis.set_major_locator(DayLocator())
-    ax.xaxis.set_major_formatter(DateFormatter('%a %d %B %Y'))
+    axes.set_xlim(x_lim_min, x_lim_max)
+    axes.grid(True, 'major', 'y')
+    legend = axes.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    axes.spines['top'].set_visible(False)
+    axes.spines['right'].set_visible(False)
+    axes.xaxis.set_major_locator(DayLocator())
+    axes.xaxis.set_major_formatter(DateFormatter('%a %d %B %Y'))
 
-    ax.fmt_xdata = DateFormatter('%Y-%m-%d %H:%M:%S')
+    axes.fmt_xdata = DateFormatter('%Y-%m-%d %H:%M:%S')
     fig.autofmt_xdate()
 
     image = StringIO()

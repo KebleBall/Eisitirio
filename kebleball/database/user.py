@@ -13,9 +13,10 @@ from flask.ext.bcrypt import Bcrypt
 
 from kebleball import app
 from kebleball import helpers
-from kebleball.database import DB
+from kebleball import database as db
 from kebleball.database import *
 
+DB = db.DB
 APP = app.APP
 
 BCRYPT = Bcrypt(APP)
@@ -158,7 +159,7 @@ class User(DB.Model):
             self.id, self.firstname, self.surname)
 
     def check_password(self, candidate):
-        return bcrypt.check_password_hash(self.passhash, candidate)
+        return BCRYPT.check_password_hash(self.passhash, candidate)
 
     def set_password(self, password):
         self.passhash = BCRYPT.generate_password_hash(password)
@@ -366,7 +367,7 @@ class User(DB.Model):
             )
 
     def add_manual_battels(self):
-        self.battels = Battels.query.filter(Battels.email==self.email).first()
+        self.battels = Battels.query.filter(Battels.email == self.email).first()
 
         if not self.battels:
             self.battels = Battels(None, self.email, None, self.firstname,

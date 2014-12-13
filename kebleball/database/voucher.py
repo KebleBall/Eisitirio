@@ -6,8 +6,10 @@ Contains Voucher class
 Used to store data about discount vouchers
 """
 
-from kebleball.database import DB
+from kebleball import database as db
 from datetime import datetime, timedelta
+
+DB = db.DB
 
 class Voucher(DB.Model):
     id = DB.Column(

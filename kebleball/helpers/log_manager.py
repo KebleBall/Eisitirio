@@ -7,10 +7,12 @@ Used to log events, both for users and for system errors
 """
 
 import logging
-from kebleball.database import DB
+from kebleball import database as db
 from kebleball.database.log import Log
 from flask import session, current_app
 from flask.ext.login import current_user, request, AnonymousUserMixin
+
+DB = db.DB
 
 class LogManager(object):
     def __init__(self, app):
@@ -49,15 +51,15 @@ class LogManager(object):
 
         if len(components) == 2:
             if components[1] in [
-                'admin',
-                'ajax',
-                'dashboard',
-                'database',
-                'email',
-                'front',
-                'main',
-                'purchase',
-                'resale',
+                    'admin',
+                    'ajax',
+                    'dashboard',
+                    'database',
+                    'email',
+                    'front',
+                    'main',
+                    'purchase',
+                    'resale',
             ]:
                 return lambda level, message: self.log(
                     components[1],
@@ -66,8 +68,8 @@ class LogManager(object):
                 )
 
         raise AttributeError(
-                    "Logger instance has no attribute '{0}'".format(name)
-                )
+            "Logger instance has no attribute '{0}'".format(name)
+            )
 
     def log_event(self, message, tickets=[], user=None, transaction=None):
         if 'actor_id' in self.session:

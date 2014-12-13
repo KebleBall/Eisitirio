@@ -7,11 +7,12 @@ from flask import url_for
 from flask import flash
 from flask.ext import login as flask_login
 
-from kebleball.database import DB
+from kebleball import database as db
 from kebleball import app
 from kebleball.helpers import generate_key
 
 APP = app.APP
+DB = db.DB
 
 TICKET_TRANSACTION_LINK = DB.Table(
     'ticket_transaction_link',
