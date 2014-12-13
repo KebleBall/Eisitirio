@@ -3,7 +3,7 @@
 
 from datetime import datetime
 
-from kebleball import database as db
+from kebleball.database import db
 
 DB = db.DB
 

@@ -5,15 +5,20 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask.ext import login
 
 from kebleball import app
-from kebleball import database as db
+from kebleball.database import db
+from kebleball.database import college
+from kebleball.database import affiliation
+from kebleball.database import announcement
+from kebleball.database import user
 from kebleball.helpers import generate_key
 
 APP = app.APP
 DB = db.DB
-College = db.College
-Affiliation = db.Affiliation
-Announcement = db.Announcement
-User = db.User
+
+College = college.College
+Affiliation = affiliation.Affiliation
+Announcement = announcement.Announcement
+User = user.User
 
 DASHBOARD = Blueprint('dashboard', __name__)
 

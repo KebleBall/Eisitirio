@@ -3,7 +3,9 @@ from datetime import datetime
 import random
 import string
 
-from kebleball.app import APP
+from kebleball import app
+
+APP = app.APP
 
 def generate_key(length, choices=None):
     if choices is None:

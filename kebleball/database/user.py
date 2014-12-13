@@ -13,8 +13,7 @@ from flask.ext.bcrypt import Bcrypt
 
 from kebleball import app
 from kebleball import helpers
-from kebleball import database as db
-from kebleball.database import *
+from kebleball.database import db
 
 DB = db.DB
 APP = app.APP

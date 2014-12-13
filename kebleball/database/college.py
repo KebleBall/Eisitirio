@@ -1,7 +1,7 @@
 # coding: utf-8
 """Model for a user's college."""
 
-from kebleball import database as db
+from kebleball.database import db
 
 DB = db.DB
 

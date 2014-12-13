@@ -1,13 +1,16 @@
 # coding: utf-8
 
 from kebleball import app
-from kebleball import database as db
+from kebleball.database import ticket
+from kebleball.database import user
+from kebleball.database import waiting
 from kebleball.helpers import get_boolean_config
 
 APP = app.APP
-Ticket = db.Ticket
-User = db.User
-Waiting = db.Waiting
+
+Ticket = ticket.Ticket
+User = user.User
+Waiting = waiting.Waiting
 
 def canBuy(user):
     if get_boolean_config('LIMITED_RELEASE'):

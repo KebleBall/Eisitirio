@@ -13,9 +13,10 @@ import requests
 from flask import url_for, flash
 from flask.ext.login import current_user
 
-from kebleball.app import APP
-from kebleball import database as db
+from kebleball import app
+from kebleball.database import db
 
+APP = app.APP
 DB = db.DB
 
 class CardTransaction(DB.Model):

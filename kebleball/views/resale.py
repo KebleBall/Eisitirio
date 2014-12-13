@@ -3,12 +3,15 @@ from flask import Blueprint, request, render_template, redirect, flash, url_for
 from flask.ext.login import login_required, current_user
 
 from kebleball import app
-from kebleball import database as db
+from kebleball.database import db
+from kebleball.database import user
+from kebleball.database import ticket
 
 APP = app.APP
 DB = db.DB
-User = db.User
-Ticket = db.Ticket
+
+User = user.User
+Ticket = ticket.Ticket
 
 RESALE = Blueprint('resale', __name__)
 

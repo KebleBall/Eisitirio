@@ -6,10 +6,11 @@ from flask import Blueprint, Response, request
 from flask.ext import login
 
 from kebleball.helpers import validators
-from kebleball import database as db
+from kebleball.database import db
+from kebleball.database import ticket
 
 DB = db.DB
-Ticket = db.Ticket
+Ticket = ticket.Ticket
 
 AJAX = Blueprint('ajax', __name__)
 

@@ -7,7 +7,7 @@ from flask import url_for
 from flask import flash
 from flask.ext import login as flask_login
 
-from kebleball import database as db
+from kebleball.database import db
 from kebleball import app
 from kebleball.helpers import generate_key
 

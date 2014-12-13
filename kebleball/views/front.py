@@ -7,13 +7,17 @@ from flask.ext import login
 
 from kebleball import app
 from kebleball.helpers import generate_key
-from kebleball import database as db
+from kebleball.database import db
+from kebleball.database import user
+from kebleball.database import college
+from kebleball.database import affiliation
 
 APP = app.APP
 DB = db.DB
-User = db.User
-College = db.College
-Affiliation = db.Affiliation
+
+User = user.User
+College = college.College
+Affiliation = affiliation.Affiliation
 
 FRONT = Blueprint('front', __name__)
 

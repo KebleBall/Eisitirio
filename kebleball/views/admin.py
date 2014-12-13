@@ -12,23 +12,35 @@ from StringIO import StringIO
 from sqlalchemy import func
 
 from kebleball import app
-from kebleball import database as db
-from kebleball.database.user import User
-from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
-from kebleball.database.announcement import Announcement
-from kebleball.database.ticket import Ticket
-from kebleball.database.log import Log
-from kebleball.database.statistic import Statistic
-from kebleball.database.waiting import Waiting
-from kebleball.database.card_transaction import CardTransaction
-from kebleball.database.voucher import Voucher
+from kebleball.database import db
+from kebleball.database import user
+from kebleball.database import college
+from kebleball.database import affiliation
+from kebleball.database import announcement
+from kebleball.database import ticket
+from kebleball.database import log
+from kebleball.database import statistic
+from kebleball.database import waiting
+from kebleball.database import card_transaction
+from kebleball.database import voucher
 from kebleball.helpers import generate_key
 from kebleball.helpers.login_manager import admin_required
 from kebleball.helpers.statistic_plots import create_plot
 
 APP = app.APP
 DB = db.DB
+
+User = user.User
+College = college.College
+Affiliation = affiliation.Affiliation
+Announcement = announcement.Announcement
+Ticket = ticket.Ticket
+Log = log.Log
+Statistic = statistic.Statistic
+Waiting = waiting.Waiting
+CardTransaction = card_transaction.CardTransaction
+Voucher = voucher.Voucher
+
 ADMIN = Blueprint('admin', __name__)
 
 @ADMIN.route('/admin', methods=['GET', 'POST'])

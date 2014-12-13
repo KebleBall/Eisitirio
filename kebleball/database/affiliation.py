@@ -6,7 +6,7 @@ Contains Affiliation class
 Used to denote users' affiliations with their colleges
 """
 
-from kebleball import database as db
+from kebleball.database import db
 
 DB = db.DB
 

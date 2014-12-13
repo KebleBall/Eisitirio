@@ -1,8 +1,12 @@
 # coding: utf-8
-from kebleball.database.voucher import Voucher
-from kebleball.database.user import User
 
 from datetime import datetime
+
+from kebleball.database import voucher
+from kebleball.database import user
+
+Voucher = voucher.Voucher
+User = user.User
 
 def validateVoucher(code):
     voucher = Voucher.query.filter(Voucher.code==code).first()

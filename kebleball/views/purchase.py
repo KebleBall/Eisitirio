@@ -3,15 +3,19 @@ from flask import Blueprint, request, render_template, flash, redirect, url_for
 from flask.ext import login
 
 from kebleball import app
-from kebleball import database as db
+from kebleball.database import db
+from kebleball.database import ticket
+from kebleball.database import waiting
+from kebleball.database import card_transaction
 from kebleball.helpers import purchase as purchase_help
 from kebleball.helpers import validators
 
 APP = app.APP
 DB = db.DB
-Ticket = db.Ticket
-Waiting = db.Waiting
-CardTransaction = db.CardTransaction
+
+Ticket = ticket.Ticket
+Waiting = waiting.Waiting
+CardTransaction = card_transaction.CardTransaction
 
 PURCHASE = Blueprint('purchase', __name__)
 

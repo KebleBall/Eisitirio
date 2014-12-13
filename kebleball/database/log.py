@@ -6,13 +6,17 @@ Contains Log class
 Used to store log entries
 """
 
-from kebleball import database as db
-from kebleball.database.user import User
-from kebleball.database.ticket import Ticket
-from kebleball.database.card_transaction import CardTransaction
+from kebleball.database import db
+from kebleball.database import user
+from kebleball.database import ticket
+from kebleball.database import card_transaction
 from datetime import datetime
 
 DB = db.DB
+
+User = user.User
+Ticket = ticket.Ticket
+CardTransaction = card_transaction.CardTransaction
 
 LOG_TICKET_LINK = DB.Table(
     'log_ticket_link',

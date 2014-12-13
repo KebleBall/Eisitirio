@@ -7,12 +7,14 @@ Used to log events, both for users and for system errors
 """
 
 import logging
-from kebleball import database as db
-from kebleball.database.log import Log
+from kebleball.database import db
+from kebleball.database import log
 from flask import session, current_app
 from flask.ext.login import current_user, request, AnonymousUserMixin
 
 DB = db.DB
+
+Log = log.Log
 
 class LogManager(object):
     def __init__(self, app):

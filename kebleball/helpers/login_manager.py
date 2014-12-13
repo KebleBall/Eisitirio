@@ -8,7 +8,8 @@ from flask import redirect
 from flask import url_for
 from flask.ext import login as flask_login
 
-from kebleball import database as db
+from kebleball.database import db
+from kebleball.database import user
 
 LOGIN_MANAGER = flask_login.LoginManager()
 LOGIN_MANAGER.login_message_category = 'message info'
@@ -18,7 +19,7 @@ def load_user(user_id):
     if current_app.config['MAINTENANCE_MODE']:
         return LOGIN_MANAGER.anonymous_user
     else:
-        return db.User.get_by_id(user_id)
+        return user.User.get_by_id(user_id)
 
 LOGIN_MANAGER.login_view = "front.home"
 LOGIN_MANAGER.session_protection = "strong"
