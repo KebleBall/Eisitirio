@@ -36,12 +36,12 @@ class Battels(DB.Model):
         DB.String(60),
         nullable=True
     )
-    mt = DB.Column(
+    michaelmas_charge = DB.Column(
         DB.Integer(),
         default=0,
         nullable=False
     )
-    ht = DB.Column(
+    hilary_charge = DB.Column(
         DB.Integer(),
         default=0,
         nullable=False
@@ -74,11 +74,11 @@ class Battels(DB.Model):
     def __getattr__(self, name):
         """Magic method to generate amounts charged in pounds."""
         if name == 'mt_pounds':
-            mt = '{0:03d}'.format(self.mt)
-            return mt[:-2] + '.' + mt[-2:]
+            michaelmas_charge = '{0:03d}'.format(self.michaelmas_charge)
+            return michaelmas_charge[:-2] + '.' + michaelmas_charge[-2:]
         elif name == 'ht_pounds':
-            ht = '{0:03d}'.format(self.ht)
-            return ht[:-2] + '.' + ht[-2:]
+            hilary_charge = '{0:03d}'.format(self.hilary_charge)
+            return hilary_charge[:-2] + '.' + hilary_charge[-2:]
         else:
             raise AttributeError(
                 "Battels instance has no attribute '{0}'".format(name)
@@ -92,12 +92,12 @@ class Battels(DB.Model):
             else:
                 half = (ticket.price / 2)
 
-            self.mt = self.mt + half
-            self.ht = self.ht + (ticket.price - half)
+            self.michaelmas_charge = self.michaelmas_charge + half
+            self.hilary_charge = self.hilary_charge + (ticket.price - half)
         elif term == 'MT':
-            self.mt = self.mt + ticket.price
+            self.michaelmas_charge = self.michaelmas_charge + ticket.price
         elif term == 'HT':
-            self.ht = self.ht + ticket.price
+            self.hilary_charge = self.hilary_charge + ticket.price
         else:
             raise ValueError(
                 "Term '{0}' cannot be charged to battels".format(
@@ -119,14 +119,14 @@ class Battels(DB.Model):
         """Refund a ticket and mark it as cancelled."""
         if APP.config['CURRENT_TERM'] == 'MT':
             if ticket.battels_term == 'MTHT':
-                self.mt = self.mt - (ticket.price / 2)
-                self.ht = self.ht - (ticket.price - (ticket.price / 2))
+                self.michaelmas_charge = self.michaelmas_charge - (ticket.price / 2)
+                self.hilary_charge = self.hilary_charge - (ticket.price - (ticket.price / 2))
             elif ticket.battels_term == 'MT':
-                self.mt = self.mt - ticket.price
+                self.michaelmas_charge = self.michaelmas_charge - ticket.price
             elif ticket.battels_term == 'HT':
-                self.ht = self.ht - ticket.price
+                self.hilary_charge = self.hilary_charge - ticket.price
         elif APP.config['CURRENT_TERM'] == 'HT':
-            self.ht = self.ht - ticket.price
+            self.hilary_charge = self.hilary_charge - ticket.price
         else:
             raise ValueError("Can't refund battels tickets in the current term")
 

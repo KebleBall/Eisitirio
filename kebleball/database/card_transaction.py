@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-card-transaction.py
+card_transaction.py
 
 Contains CardTransaction class
 Used to store data about card payments
@@ -121,7 +121,8 @@ class CardTransaction(DB.Model):
                 '34': (False, 'Suspected Fraud, Retain Card'),
                 '35': (False, 'Card Acceptor, Contact Acquirer, Retain Card'),
                 '36': (False, 'Restricted Card, Retain Card'),
-                '37': (False, 'Contact Acquirer Security Department, Retain Card'),
+                '37': (False,
+                       'Contact Acquirer Security Department, Retain Card'),
                 '38': (False, 'PIN Tries Exceeded, Capture'),
                 '39': (False, 'No Credit Account'),
                 '40': (False, 'Function Not Supported'),
@@ -177,17 +178,17 @@ class CardTransaction(DB.Model):
             )
         }
 
-        r = requests.post(url, data=payload, headers=headers)
+        request = requests.post(url, data=payload, headers=headers)
 
-        if r.status_code == 200:
-            return (True, r.json())
+        if request.status_code == 200:
+            return (True, request.json())
         else:
             APP.log_manager.log_event(
                 (
                     'Failed request to eWay endpoint {0} returning status {1}'
                 ).format(
                     endpoint,
-                    r.status_code
+                    request.status_code
                 ),
                 [],
                 None,
@@ -275,7 +276,8 @@ class CardTransaction(DB.Model):
                             self
                         )
 
-                        refund_success = self.process_refund(response['TotalAmount'])
+                        refund_success = self.process_refund(
+                            response['TotalAmount'])
 
                         if refund_success:
                             flash(

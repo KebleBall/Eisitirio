@@ -90,7 +90,7 @@ def server_error(code, error):
     )
     return render_template('500.html'), code
 
-@APP.errorhandler(Exception)
+#@APP.errorhandler(Exception)
 @APP.errorhandler(500)
 def error_500(error):
     """Display a 500 error page."""

@@ -29,7 +29,8 @@ class Affiliation(DB.Model):
 
     @staticmethod
     def get_by_id(id):
-        affiliation = Affiliation.query.filter(Affiliation.id == int(id)).first()
+        affiliation = Affiliation.query.filter(
+            Affiliation.id == int(id)).first()
 
         if not affiliation:
             return None

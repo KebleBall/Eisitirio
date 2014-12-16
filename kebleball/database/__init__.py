@@ -20,35 +20,23 @@ from kebleball.database import waiting
 
 DB = db.DB
 
-Affiliation = affiliation.Affiliation
-Announcement = announcement.Announcement
-Battels = battels.Battels
-CardTransaction = card_transaction.CardTransaction
-College = college.College
-Log = log.Log
-Statistic = statistic.Statistic
-Ticket = ticket.Ticket
-User = user.User
-Voucher = voucher.Voucher
-Waiting = waiting.Waiting
-
 def initialise_db(prefill=True, clear=False):
     DB.create_all()
 
     if clear:
         prompt = input("Are you sure you wish to clear the entire database? ")
         if prompt.lower() in ["yes", "y"]:
-            Affiliation.query.delete()
-            Announcement.query.delete()
-            Battels.query.delete()
-            CardTransaction.query.delete()
-            College.query.delete()
-            Log.query.delete()
-            Statistic.query.delete()
-            Ticket.query.delete()
-            User.query.delete()
-            Voucher.query.delete()
-            Waiting.query.delete()
+            affiliation.Affiliation.query.delete()
+            announcement.Announcement.query.delete()
+            battels.Battels.query.delete()
+            card_transaction.CardTransaction.query.delete()
+            college.College.query.delete()
+            log.Log.query.delete()
+            statistic.Statistic.query.delete()
+            ticket.Ticket.query.delete()
+            user.User.query.delete()
+            voucher.Voucher.query.delete()
+            waiting.Waiting.query.delete()
 
     if prefill:
         DB.session.add_all(college.COLLEGES)
