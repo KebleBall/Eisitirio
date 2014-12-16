@@ -245,7 +245,7 @@ class User(db.Model):
             self.college.name == "Keble" and
             self.affiliation.name == "Student" and
             app.config['KEBLE_DISCOUNT'] > 0 and
-            self.tickets.count() == 0
+            self.tickets.filter_by(cancelled=False).count() == 0
         )
 
     def is_verified(self):
