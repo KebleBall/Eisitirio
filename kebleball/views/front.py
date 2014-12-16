@@ -187,8 +187,8 @@ def register():
         request.form['affiliation']
     )
 
-    db.session.add(user)
-    db.session.commit()
+    DB.session.add(user)
+    DB.session.commit()
 
     APP.log_manager.log_event(
         'Registered',
@@ -256,7 +256,7 @@ def password_reset():
                 timedelta(minutes=30)
             )
 
-            db.session.commit()
+            DB.session.commit()
 
             APP.log_manager.log_event(
                 'Started password reset',
@@ -312,7 +312,7 @@ def email_confirm():
             user.secretkey = generate_key(64)
             user.secretkeyexpiry = None
 
-            db.session.commit()
+            DB.session.commit()
 
             APP.log_manager.log_event(
                 'Requested email confirm',
@@ -360,7 +360,7 @@ def reset_password(user_id, secretkey):
     if user is None or user.secretkey != secretkey:
         user.secretkey = None
         user.secretkeyexpiry = None
-        db.session.commit()
+        DB.session.commit()
         flash(u'Could not complete password reset. Please try again', 'error')
         return redirect(url_for('front.home'))
 
@@ -368,7 +368,7 @@ def reset_password(user_id, secretkey):
         if request.form['password'] != request.form['confirm']:
             user.secretkey = generate_key(64)
             user.secretkeyexpiry = datetime.utcnow() + timedelta(minutes=5)
-            db.session.commit()
+            DB.session.commit()
             flash(u'Passwords do not match, please try again', 'warning')
             return redirect(
                 url_for(
@@ -381,7 +381,7 @@ def reset_password(user_id, secretkey):
             user.set_password(request.form['password'])
             user.secretkey = None
             user.secretkeyexpiry = None
-            db.session.commit()
+            DB.session.commit()
 
             APP.log_manager.log_event(
                 'Completed password reset',
@@ -410,7 +410,7 @@ def confirm_email(user_id, secretkey):
             user.email = user.newemail
             user.newemail = None
 
-        db.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Confirmed email',
@@ -440,8 +440,8 @@ def destroy_account(user_id, secretkey):
                 )
                 entry.user = None
 
-            db.session.delete(user)
-            db.session.commit()
+            DB.session.delete(user)
+            DB.session.commit()
 
             APP.log_manager.log_event(
                 'Deleted account with email address {0}'.format(
