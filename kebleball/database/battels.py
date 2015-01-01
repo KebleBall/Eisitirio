@@ -36,12 +36,12 @@ class Battels(DB.Model):
         DB.String(60),
         nullable=True
     )
-    mt = DB.Column(
+    michaelmas_charge = DB.Column(
         DB.Integer(),
         default=0,
         nullable=False
     )
-    ht = DB.Column(
+    hilary_charge = DB.Column(
         DB.Integer(),
         default=0,
         nullable=False

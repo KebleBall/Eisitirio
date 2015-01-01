@@ -5,8 +5,6 @@ user.py
 Contains User class
 """
 
-import re
-
 from flask import flash
 from flask import url_for
 from flask.ext.bcrypt import Bcrypt
@@ -15,10 +13,12 @@ from kebleball import app
 from kebleball import helpers
 from kebleball.database import db
 from kebleball.database import battels
+from kebleball.database import affiliation
 
 DB = db.DB
 APP = app.APP
 Battels = battels.Battels
+Affiliation = affiliation.Affiliation
 
 BCRYPT = Bcrypt(APP)
 
