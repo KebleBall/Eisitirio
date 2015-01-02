@@ -245,6 +245,7 @@ class User(db.Model):
             self.college.name == "Keble" and
             self.affiliation.name == "Student" and
             app.config['KEBLE_DISCOUNT'] > 0 and
+            not get_boolean_config('TICKETS_ON_SALE') and
             self.tickets.filter_by(cancelled=False).count() == 0
         )
 
@@ -372,7 +373,8 @@ class User(db.Model):
     def get_base_ticket_price(self):
         if (
                 self.college.name == "Keble" and
-                self.affiliation.name == "Staff/Fellow"
+                self.affiliation.name == "Staff/Fellow" and
+                not get_boolean_config('TICKETS_ON_SALE')
         ):
             return app.config["KEBLE_STAFF_TICKET_PRICE"]
         else:
