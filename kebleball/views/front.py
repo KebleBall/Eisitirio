@@ -26,8 +26,11 @@ def home():
         form={}
     )
 
-@front.route('/login', methods=['POST'])
+@front.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method != 'POST':
+        return redirect(url_for('router'))
+
     user = User.get_by_email(request.form['email'])
 
     if not user or not user.checkPassword(request.form['password']):
@@ -78,8 +81,11 @@ def login():
     flash(u'Logged in successfully.', 'success')
     return redirect(request.form.get('next', False) or url_for("dashboard.dashboardHome"))
 
-@front.route('/register', methods=['POST'])
+@front.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method != 'POST':
+        return redirect(url_for('router'))
+
     valid = True
     flashes = []
 
