@@ -198,15 +198,9 @@ def purchaseHome():
                 'info'
             )
 
-            return redirect(url_for('dashboard.dashboardHome'))
-            if request.form['paymentMethod'] == 'Card':
-                return redirect(url_for('purchase.cardConfirm'))
-            elif request.form['paymentMethod'] == 'Battels':
-                return redirect(url_for('purchase.battelsConfirm'))
-            else:
-                return redirect(url_for('purchase.cashChequeConfirm'))
-        else:
-            return redirect(url_for('dashboard.dashboardHome'))
+
+        flash(u'Please set names for these tickets before payment', 'info')
+        return redirect(url_for('dashboard.dashboardHome'))
     else:
         return render_template(
             'purchase/purchaseHome.html',
@@ -380,11 +374,6 @@ def cardConfirm():
 
         if ewayURL is not None:
             return redirect(ewayURL)
-
-    if current_user.has_unnamed_tickets():
-        flash(u'It is necessary to name tickets before paying for them'
-              u'. Please go to the dashboard to name your other tickets',
-              'warning')
 
     return render_template('purchase/cardConfirm.html')
 

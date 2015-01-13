@@ -19,8 +19,6 @@ dashboard = Blueprint('dashboard', __name__)
 @dashboard.route('/dashboard')
 @login_required
 def dashboardHome():
-    if current_user.has_unnamed_tickets():
-        flash(u'Tickets must be named before purchase', 'warning')
     return render_template('dashboard/dashboardHome.html')
 
 @dashboard.route('/dashboard/profile', methods=['GET','POST'])
