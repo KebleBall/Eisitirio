@@ -165,6 +165,9 @@ class User(db.Model):
     def hasTickets(self):
         return len([x for x in self.tickets if not x.cancelled]) > 0
 
+    def has_unnamed_tickets(self):
+        return len([x for x in self.tickets if x.name is None]) > 0
+
     def hasUncollectedTickets(self):
         return len([x for x in self.tickets if not x.cancelled and not x.collected]) > 0
 
