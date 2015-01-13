@@ -17,7 +17,6 @@ from kebleball.database.affiliation import Affiliation
 from kebleball.database.battels import Battels
 from kebleball.database.college import College
 from kebleball.helpers import generate_key
-from kebleball.helpers import get_boolean_config
 
 bcrypt = Bcrypt(app)
 
@@ -245,7 +244,7 @@ class User(db.Model):
             self.college.name == "Keble" and
             self.affiliation.name == "Student" and
             app.config['KEBLE_DISCOUNT'] > 0 and
-            not get_boolean_config('TICKETS_ON_SALE') and
+            not app.config['TICKETS_ON_SALE'] and
             self.tickets.filter_by(cancelled=False).count() == 0
         )
 
@@ -326,7 +325,7 @@ class User(db.Model):
     def maybe_verify_affiliation(self):
         if (
                 self.affiliation_verified is None and
-                not get_boolean_config('TICKETS_ON_SALE')
+                not app.config['TICKETS_ON_SALE']
         ):
             if (
                     self.college.name != "Keble" or
@@ -374,7 +373,7 @@ class User(db.Model):
         if (
                 self.college.name == "Keble" and
                 self.affiliation.name == "Staff/Fellow" and
-                not get_boolean_config('TICKETS_ON_SALE')
+                not app.config['TICKETS_ON_SALE']
         ):
             return app.config["KEBLE_STAFF_TICKET_PRICE"]
         else:

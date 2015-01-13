@@ -4,46 +4,46 @@ from kebleball.app import app
 from kebleball.database.ticket import Ticket
 from kebleball.database.user import User
 from kebleball.database.waiting import Waiting
-from kebleball.helpers import get_boolean_config
 
 def canBuy(user):
-    if get_boolean_config('LIMITED_RELEASE'):
-        if not (
-                user.college.name == "Keble" and
-                user.affiliation.name in [
-                    "Student",
-                    "Graduand",
-                    "Staff/Fellow",
-                    "Foreign Exchange Student",
-                ]
-        ):
+    if not app.config['TICKETS_ON_SALE']:
+        if app.config['LIMITED_RELEASE']:
+            if not (
+                    user.college.name == "Keble" and
+                    user.affiliation.name in [
+                        "Student",
+                        "Graduand",
+                        "Staff/Fellow",
+                        "Foreign Exchange Student",
+                    ]
+            ):
+                return (
+                    False,
+                    0,
+                    (
+                        "tickets are on limited release to current Keble members and "
+                        "Keble graduands only."
+                    )
+                )
+            elif not user.affiliation_verified:
+                return (
+                    False,
+                    0,
+                    (
+                        "your affiliation has not been verified yet. You will be "
+                        "informed by email when you are able to purchase tickets."
+                    )
+                )
+        else:
             return (
                 False,
                 0,
                 (
-                    "tickets are on limited release to current Keble members and "
-                    "Keble graduands only."
+                    'tickets are currently not on sale. Tickets may become available '
+                    'for purchase or through the waiting list, please check back at a '
+                    'later date.'
                 )
             )
-        elif not user.affiliation_verified:
-            return (
-                False,
-                0,
-                (
-                    "your affiliation has not been verified yet. You will be "
-                    "informed by email when you are able to purchase tickets."
-                )
-            )
-    elif not get_boolean_config('TICKETS_ON_SALE'):
-        return (
-            False,
-            0,
-            (
-                'tickets are currently not on sale. Tickets may become available '
-                'for purchase or through the waiting list, please check back at a '
-                'later date.'
-            )
-        )
 
     # Don't allow people to buy tickets unless waiting list is empty
     if Waiting.query.count() > 0:
@@ -71,7 +71,7 @@ def canBuy(user):
         .filter(Ticket.cancelled==False) \
         .count()
     if (
-            get_boolean_config('TICKETS_ON_SALE') and
+            app.config['TICKETS_ON_SALE'] and
             ticketsOwned >= app.config['MAX_TICKETS']
     ):
         return (
@@ -87,7 +87,7 @@ def canBuy(user):
             )
         )
     elif (
-            get_boolean_config('LIMITED_RELEASE') and
+            app.config['LIMITED_RELEASE'] and
             ticketsOwned >= app.config['LIMITED_RELEASE_MAX_TICKETS']
     ):
         return (
@@ -114,9 +114,9 @@ def canBuy(user):
             )
         )
 
-    if get_boolean_config('TICKETS_ON_SALE'):
+    if app.config['TICKETS_ON_SALE']:
         max_tickets = app.config['MAX_TICKETS']
-    elif get_boolean_config('LIMITED_RELEASE'):
+    elif app.config['LIMITED_RELEASE']:
         max_tickets = app.config['LIMITED_RELEASE_MAX_TICKETS']
 
     return (
@@ -131,7 +131,7 @@ def canBuy(user):
     )
 
 def canWait(user):
-    waitingOpen = get_boolean_config('WAITING_OPEN')
+    waitingOpen = app.config['WAITING_OPEN']
 
     if not waitingOpen:
         return (
