@@ -11,7 +11,7 @@ timed_config.augment_config(app)
 # Put here so that it updates config before loginManager.login_user gets called
 @app.before_request
 def check_for_maintenance():
-    if os.path.exists('/var/www/flask_kebleball/.maintenance'):
+    if os.path.exists(app.config['MAINTENANCE_FILE_PATH']):
         app.config['MAINTENANCE_MODE'] = True
         if (
             'maintenance' not in request.path and
