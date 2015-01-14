@@ -188,9 +188,10 @@ def purchaseHome():
         if totalValue > 0:
             flash(
                 (
-                    u'Follow the instructions below to complete payment for '
-                    u'these tickets (and any others you have reserved but '
-                    u'not paid for). You must complete payment for these '
+                    u'You must set a name on your tickets before they '
+                    u'can be paid for. Please set names on your tickets '
+                    u'and then click the "Complete Payment" button. '
+                    u'You must complete payment for these '
                     u'tickets by {0}'
                 ).format(
                     expires.strftime('%H:%M %d/%m/%Y')
@@ -198,8 +199,8 @@ def purchaseHome():
                 'info'
             )
 
-
-        flash(u'Please set names for these tickets before payment', 'info')
+        else:
+            flash(u'Please set names for these tickets before collection', 'info')
         return redirect(url_for('dashboard.dashboardHome'))
     else:
         return render_template(
