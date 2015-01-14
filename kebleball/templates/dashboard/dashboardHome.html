@@ -40,13 +40,15 @@
                                         Pending resale confirmation
                                     {% endif %}
                                 {% elif ticket.paid -%}
-                                    {% if ticket.payment_method == 'Free' -%}
+                                    {% if ticket.name == None -%}
+                                        Awaiting name.
+                                    {% elif ticket.payment_method == 'Free' -%}
                                         Free Ticket.
                                     {% else -%}
                                         Paid for by {{ ticket.paymentmethod }}.
                                     {% endif %}
                                 {% else -%}
-                                    Awaiting {% if ticket.paymentmethod %}{{ ticket.paymentmethod }} {% endif %} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                    Awaiting <span id="ticket_payment_message-{{ ticket.id }}" {% if ticket.name == None %}style="display: none;"{% endif %}>{% if ticket.paymentmethod != None %}{{ ticket.paymentmethod }} {% endif %} payment</span><span id="ticket_name_message-{{ ticket.id }}" {% if ticket.name != None %}style="display: none;"{% endif %}>name</span>. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                 {% endif %}
                             </td>
                             <td>
@@ -55,11 +57,11 @@
                                         {% if ticket.paymentmethod != None %}
                                             <a href="{{ url_for('purchase.changeMethod') }}" class="button tiny">Change Payment Method</a>
                                             {% if ticket.paymentmethod == 'Card' %}
-                                                <a href="{{ url_for('purchase.cardConfirm') }}" class="button tiny">Complete Payment</a>
+                                                <a href="{{ url_for('purchase.cardConfirm') }}" id="complete_ticket_payment-{{ ticket.id }}" class="button tiny" {% if ticket.name == None %}style="display: none;"{% endif %}>Complete Payment</a>
                                             {% elif ticket.paymentmethod == 'Battels' %}
-                                                <a href="{{ url_for('purchase.battelsConfirm') }}" class="button tiny">Complete Payment</a>
+                                                <a href="{{ url_for('purchase.battelsConfirm') }}" id="complete_ticket_payment-{{ ticket.id }}" class="button tiny" {% if ticket.name == None %}style="display: none;"{% endif %}>Complete Payment</a>
                                             {% else %}
-                                                <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}" class="button tiny">Contact treasurer</a>
+                                                <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}" id="complete_ticket_payment-{{ ticket.id }}" class="button tiny" {% if ticket.name == None %}style="display: none;"{% endif %}>Contact treasurer</a>
                                             {% endif %}
                                         {% else %}
                                             <a href="{{ url_for('purchase.changeMethod') }}" class="button tiny">Choose Payment Method</a>
@@ -136,6 +138,9 @@
                             if (data) {
                                 ticketName.html(nameInput.val())
                                 nameInput.attr('value',nameInput.val())
+                                $('#complete_ticket_payment-'+id).css('display', '');
+                                $('#ticket_payment_message-'+id).css('display', '');
+                                $('#ticket_name_message-'+id).css('display', 'none');
                             } else {
                                 if (ticketName.html() == 'Not Set') {
                                     nameInput.attr('value','')
