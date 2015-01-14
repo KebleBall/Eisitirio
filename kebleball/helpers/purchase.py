@@ -57,6 +57,7 @@ def canBuy(user):
         .filter(Ticket.cancelled==False) \
         .filter(Ticket.paid==False) \
         .count()
+
     if unpaidTickets >= app.config['MAX_UNPAID_TICKETS']:
         return (
             False,
@@ -70,39 +71,36 @@ def canBuy(user):
     ticketsOwned = user.tickets \
         .filter(Ticket.cancelled==False) \
         .count()
-    if (
-            app.config['TICKETS_ON_SALE'] and
-            ticketsOwned >= app.config['MAX_TICKETS']
-    ):
-        return (
-            False,
-            0,
-            (
-                'you already own too many tickets. Please contact <a href="{0}">the '
-                'ticketing officer</a> if you wish to purchase more than {1} '
-                'tickets.'
-            ).format(
-                app.config['TICKETS_EMAIL_LINK'],
-                app.config['MAX_TICKETS']
-            )
-        )
-    elif (
-            app.config['LIMITED_RELEASE'] and
-            ticketsOwned >= app.config['LIMITED_RELEASE_MAX_TICKETS']
-    ):
-        return (
-            False,
-            0,
-            (
-                'you already own {0} tickets. During pre-release, only {0} '
-                'tickets may be bought per person.'
-            ).format(
-                app.config['LIMITED_RELEASE_MAX_TICKETS']
-            )
-        )
 
+    if app.config['TICKETS_ON_SALE']:
+        if ticketsOwned >= app.config['MAX_TICKETS']:
+            return (
+                False,
+                0,
+                (
+                    'you already own too many tickets. Please contact <a href="{0}">the '
+                    'ticketing officer</a> if you wish to purchase more than {1} '
+                    'tickets.'
+                ).format(
+                    app.config['TICKETS_EMAIL_LINK'],
+                    app.config['MAX_TICKETS']
+                )
+            )
+    elif app.config['LIMITED_RELEASE']:
+        if ticketsOwned >= app.config['LIMITED_RELEASE_MAX_TICKETS']:
+            return (
+                False,
+                0,
+                (
+                    'you already own {0} tickets. During pre-release, only {0} '
+                    'tickets may be bought per person.'
+                ).format(
+                    app.config['LIMITED_RELEASE_MAX_TICKETS']
+                )
+            )
 
     ticketsAvailable = app.config['TICKETS_AVAILABLE'] - Ticket.count()
+
     if ticketsAvailable <= 0:
         return (
             False,
