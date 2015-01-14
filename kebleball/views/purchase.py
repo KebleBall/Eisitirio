@@ -188,24 +188,19 @@ def purchaseHome():
         if totalValue > 0:
             flash(
                 (
-                    u'Follow the instructions below to complete payment for '
-                    u'these tickets (and any others you have reserved but '
-                    u'not paid for). You must complete payment for these '
-                    u'tickets by {0}'
+                    u'You must set a name on your tickets before they can be '
+                    u'paid for. Please set names on your tickets and then '
+                    u'click the "Complete Payment" button. You must complete '
+                    u'payment for these tickets by {0}'
                 ).format(
                     expires.strftime('%H:%M %d/%m/%Y')
                 ),
                 'info'
             )
 
-            if request.form['paymentMethod'] == 'Card':
-                return redirect(url_for('purchase.cardConfirm'))
-            elif request.form['paymentMethod'] == 'Battels':
-                return redirect(url_for('purchase.battelsConfirm'))
-            else:
-                return redirect(url_for('purchase.cashChequeConfirm'))
         else:
-            return redirect(url_for('dashboard.dashboardHome'))
+            flash(u'Please set names for these tickets before collection', 'info')
+        return redirect(url_for('dashboard.dashboardHome'))
     else:
         return render_template(
             'purchase/purchaseHome.html',

@@ -44,6 +44,8 @@
                                             {% else -%}
                                                 Pending resale confirmation
                                             {% endif %}
+                                        {% elif ticket.name == None -%}
+                                            Awaiting Name. {% if ticket.expires != None %}Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}{% endif %}
                                         {% elif ticket.paid -%}
                                             {% if ticket.payment_method == 'Free' -%}
                                                 Free Ticket.
