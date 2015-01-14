@@ -188,11 +188,10 @@ def purchaseHome():
         if totalValue > 0:
             flash(
                 (
-                    u'You must set a name on your tickets before they '
-                    u'can be paid for. Please set names on your tickets '
-                    u'and then click the "Complete Payment" button. '
-                    u'You must complete payment for these '
-                    u'tickets by {0}'
+                    u'You must set a name on your tickets before they can be '
+                    u'paid for. Please set names on your tickets and then '
+                    u'click the "Complete Payment" button. You must complete '
+                    u'payment for these tickets by {0}'
                 ).format(
                     expires.strftime('%H:%M %d/%m/%Y')
                 ),
