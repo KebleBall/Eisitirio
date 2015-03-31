@@ -21,10 +21,22 @@ from kebleball.database import waiting
 DB = db.DB
 
 def initialise_db(prefill=True, clear=False):
+    """Prepare the database for use.
+
+    Creates all the database tables, optionally clears existing data and loads
+    constant data. Intended to be run interactively.
+
+    Args:
+        prefill: (bool) whether to add constant data (colleges/affiliations)
+        clear: (bool) whether to remove all existing data from tables
+    """
     DB.create_all()
 
     if clear:
-        prompt = input("Are you sure you wish to clear the entire database? ")
+        prompt = raw_input(
+            "Are you sure you wish to clear the entire database? "
+        )
+
         if prompt.lower() in ["yes", "y"]:
             affiliation.Affiliation.query.delete()
             announcement.Announcement.query.delete()

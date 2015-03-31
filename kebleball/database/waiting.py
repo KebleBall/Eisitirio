@@ -76,6 +76,7 @@ class Waiting(DB.Model):
 
     @staticmethod
     def get_by_id(id):
+        """Get a waiting object by its database ID."""
         waiting = Waiting.query.filter(Waiting.id == int(id)).first()
 
         if not waiting:

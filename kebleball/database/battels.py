@@ -119,8 +119,18 @@ class Battels(DB.Model):
         """Refund a ticket and mark it as cancelled."""
         if APP.config['CURRENT_TERM'] == 'MT':
             if ticket.battels_term == 'MTHT':
-                self.michaelmas_charge = self.michaelmas_charge - (ticket.price / 2)
-                self.hilary_charge = self.hilary_charge - (ticket.price - (ticket.price / 2))
+                self.michaelmas_charge = (
+                    self.michaelmas_charge -
+                    (ticket.price / 2)
+                )
+
+                self.hilary_charge = (
+                    self.hilary_charge -
+                    (
+                        ticket.price -
+                        (ticket.price / 2)
+                    )
+                )
             elif ticket.battels_term == 'MT':
                 self.michaelmas_charge = self.michaelmas_charge - ticket.price
             elif ticket.battels_term == 'HT':
