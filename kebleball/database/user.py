@@ -17,14 +17,12 @@ from kebleball.database import affiliation
 
 DB = db.DB
 APP = app.APP
-Battels = battels.Battels
-Affiliation = affiliation.Affiliation
 
 BCRYPT = Bcrypt(APP)
 
 class User(DB.Model):
     """Database model for users."""
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer,
         primary_key=True,
         nullable=False
@@ -88,7 +86,7 @@ class User(DB.Model):
 
     college_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('college.id'),
+        DB.ForeignKey('college.object_id'),
         nullable=False
     )
     college = DB.relationship(
@@ -101,7 +99,7 @@ class User(DB.Model):
 
     affiliation_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('affiliation.id'),
+        DB.ForeignKey('affiliation.object_id'),
         nullable=False
     )
     affiliation = DB.relationship(
@@ -114,7 +112,7 @@ class User(DB.Model):
 
     battels_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('battels.id'),
+        DB.ForeignKey('battels.object_id'),
         nullable=True
     )
     battels = DB.relationship(
@@ -144,21 +142,23 @@ class User(DB.Model):
         self.role = 'User'
         self.affiliation_verified = None
 
-        if hasattr(college, 'id'):
-            self.college_id = college.id
+        if hasattr(college, 'object_id'):
+            self.college_id = college.object_id
         else:
             self.college_id = college
 
-        if hasattr(affiliation, 'id'):
-            self.affiliation_id = affiliation.id
+        if hasattr(affiliation, 'object_id'):
+            self.affiliation_id = affiliation.object_id
         else:
             self.affiliation_id = affiliation
 
-        self.battels = Battels.query.filter(Battels.email == email).first()
+        self.battels = battels.Battels.query.filter(
+            battels.Battels.email == email
+        ).first()
 
     def __repr__(self):
         return "<User {0}: {1} {2}>".format(
-            self.id, self.firstname, self.surname)
+            self.object_id, self.firstname, self.surname)
 
     def check_password(self, candidate):
         """Check if a password matches the hash stored for the user.
@@ -373,12 +373,12 @@ class User(DB.Model):
         and is a defined class method which returns a unique identifier for the
         user, in this case their database ID.
         """
-        return unicode(self.id)
+        return unicode(self.object_id)
 
     @staticmethod
-    def get_by_id(id):
+    def get_by_id(object_id):
         """Get a user object by its database ID."""
-        user = User.query.filter(User.id == int(id)).first()
+        user = User.query.filter(User.object_id == int(object_id)).first()
 
         if not user:
             return None
@@ -429,7 +429,7 @@ class User(DB.Model):
 
         DB.session.commit()
 
-    def update_affiliation(self, affiliation):
+    def update_affiliation(self, new_affiliation):
         """Change the users affiliation.
 
         In order to maintain the verification of users' affiliations, when we
@@ -438,12 +438,11 @@ class User(DB.Model):
         """
         old_affiliation = self.affiliation
 
-        if hasattr(affiliation, 'id'):
-            self.affiliation_id = affiliation.id
-            new_affiliation = affiliation
+        if hasattr(affiliation, 'object_id'):
+            self.affiliation_id = affiliation.object_id
         else:
-            self.affiliation_id = affiliation
-            new_affiliation = Affiliation.get_by_id(affiliation)
+            self.affiliation_id = new_affiliation
+            new_affiliation = affiliation.Affiliation.get_by_id(new_affiliation)
 
         if (
                 old_affiliation != new_affiliation and
@@ -505,11 +504,13 @@ class User(DB.Model):
         If we don't have a battels account automatically matched to the user,
         the admin can manually create one for them.
         """
-        self.battels = Battels.query.filter(Battels.email == self.email).first()
+        self.battels = battels.Battels.query.filter(
+            battels.Battels.email == self.email
+        ).first()
 
         if not self.battels:
-            self.battels = Battels(None, self.email, None, self.firstname,
-                                   self.surname, True)
+            self.battels = battels.Battels(None, self.email, None,
+                                           self.firstname, self.surname, True)
             DB.session.add(self.battels)
 
         DB.session.commit()

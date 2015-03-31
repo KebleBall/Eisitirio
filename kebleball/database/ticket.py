@@ -20,18 +20,18 @@ TICKET_TRANSACTION_LINK = DB.Table(
     DB.Column(
         'ticket_id',
         DB.Integer,
-        DB.ForeignKey('ticket.id')
+        DB.ForeignKey('ticket.object_id')
     ),
     DB.Column(
         'transaction_id',
         DB.Integer,
-        DB.ForeignKey('card_transaction.id')
+        DB.ForeignKey('card_transaction.object_id')
     )
 )
 
 class Ticket(DB.Model):
     """Model for tickets."""
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
         nullable=False
@@ -107,7 +107,7 @@ class Ticket(DB.Model):
 
     owner_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('user.id'),
+        DB.ForeignKey('user.object_id'),
         nullable=False
     )
     owner = DB.relationship(
@@ -122,7 +122,7 @@ class Ticket(DB.Model):
 
     reselling_to_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('user.id'),
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
     reselling_to = DB.relationship(
@@ -136,7 +136,7 @@ class Ticket(DB.Model):
 
     referrer_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('user.id'),
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
     referrer = DB.relationship(
@@ -160,7 +160,7 @@ class Ticket(DB.Model):
 
     card_transaction_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('card_transaction.id'),
+        DB.ForeignKey('card_transaction.object_id'),
         nullable=True
     )
     card_transaction = DB.relationship(
@@ -171,7 +171,7 @@ class Ticket(DB.Model):
     battels_term = DB.Column(DB.String(4), nullable=True)
     battels_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('battels.id'),
+        DB.ForeignKey('battels.object_id'),
         nullable=True
     )
     battels = DB.relationship(
@@ -184,8 +184,8 @@ class Ticket(DB.Model):
     )
 
     def __init__(self, owner, paymentmethod, price):
-        if hasattr(owner, 'id'):
-            self.owner_id = owner.id
+        if hasattr(owner, 'object_id'):
+            self.owner_id = owner.object_id
         else:
             self.owner_id = owner
 
@@ -206,7 +206,7 @@ class Ticket(DB.Model):
 
     def __repr__(self):
         return '<Ticket {0} owned by {1} ({2})>'.format(
-            self.id,
+            self.object_id,
             self.owner.fullname,
             self.owner_id
         )
@@ -250,14 +250,14 @@ class Ticket(DB.Model):
         self.expires = None
 
         if 'transaction' in kwargs:
-            if hasattr(kwargs['transaction'], 'id'):
-                self.card_transaction_id = kwargs['transaction'].id
+            if hasattr(kwargs['transaction'], 'object_id'):
+                self.card_transaction_id = kwargs['transaction'].object_id
             else:
                 self.card_transaction_id = kwargs['transaction']
 
         if 'battels' in kwargs:
-            if hasattr(kwargs['battels'], 'id'):
-                self.battels_id = kwargs['battels'].id
+            if hasattr(kwargs['battels'], 'object_id'):
+                self.battels_id = kwargs['battels'].object_id
             else:
                 self.battels_id = kwargs['battels']
 
@@ -276,8 +276,8 @@ class Ticket(DB.Model):
 
     def set_referrer(self, referrer):
         """Set who referred the user to buy this ticket."""
-        if hasattr(referrer, 'id'):
-            self.referrer_id = referrer.id
+        if hasattr(referrer, 'object_id'):
+            self.referrer_id = referrer.object_id
         else:
             self.referrer_id = referrer
 
@@ -285,16 +285,16 @@ class Ticket(DB.Model):
     def start_resale(tickets, reselling_to):
         """Start the resale process for tickets."""
         if len(tickets) > 0:
-            if hasattr(reselling_to, 'id'):
-                id = reselling_to.id
+            if hasattr(reselling_to, 'object_id'):
+                object_id = reselling_to.object_id
             else:
-                id = reselling_to
+                object_id = reselling_to
                 reselling_to = DB.User.get_by_id(reselling_to)
 
             resalekey = generate_key(32)
 
             for ticket in tickets:
-                ticket.reselling_to_id = id
+                ticket.reselling_to_id = object_id
                 ticket.resalekey = resalekey
                 ticket.resaleconfirmed = False
 
@@ -312,15 +312,15 @@ class Ticket(DB.Model):
                 "confirmResale.email",
                 confirmurl=url_for(
                     'resale.resale_confirm',
-                    resale_from=flask_login.current_user.id,
-                    resale_to=id,
+                    resale_from=flask_login.current_user.object_id,
+                    resale_to=object_id,
                     key=resalekey,
                     _external=True
                 ),
                 cancelurl=url_for(
                     'resale.resale_cancel',
-                    resale_from=flask_login.current_user.id,
-                    resale_to=id,
+                    resale_from=flask_login.current_user.object_id,
+                    resale_to=object_id,
                     key=resalekey,
                     _external=True
                 ),
@@ -431,15 +431,15 @@ class Ticket(DB.Model):
                 resale_to=resale_to,
                 completeurl=url_for(
                     'resale.resale_complete',
-                    resale_from=resale_from.id,
-                    resale_to=resale_to.id,
+                    resale_from=resale_from.object_id,
+                    resale_to=resale_to.object_id,
                     key=resalekey,
                     _external=True
                 ),
                 cancelurl=url_for(
                     'resale.resale_cancel',
-                    resale_from=resale_from.id,
-                    resale_to=resale_to.id,
+                    resale_from=resale_from.object_id,
+                    resale_to=resale_to.object_id,
                     key=resalekey,
                     _external=True
                 ),
@@ -477,9 +477,9 @@ class Ticket(DB.Model):
             for ticket in tickets:
                 ticket.add_note(
                     'Resold by {0}/{1} to {2}/{3}'.format(
-                        ticket.owner.id,
+                        ticket.owner.object_id,
                         ticket.owner.fullname,
-                        ticket.reselling_to.id,
+                        ticket.reselling_to.object_id,
                         ticket.reselling_to.fullname
                     )
                 )
@@ -562,9 +562,9 @@ class Ticket(DB.Model):
         return Ticket.query.filter(Ticket.cancelled == False).count()
 
     @staticmethod
-    def get_by_id(id):
+    def get_by_id(object_id):
         """Get a ticket object by its database ID."""
-        ticket = Ticket.query.filter(Ticket.id == int(id)).first()
+        ticket = Ticket.query.filter(Ticket.object_id == int(object_id)).first()
 
         if not ticket:
             return None

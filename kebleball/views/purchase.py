@@ -311,8 +311,8 @@ def wait():
 def change_method():
     if request.method == 'POST':
         tickets = Ticket.query \
-            .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == login.current_user.id) \
+            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
+            .filter(Ticket.owner_id == login.current_user.object_id) \
             .filter(Ticket.paid == False) \
             .all()
 
@@ -363,8 +363,8 @@ def change_method():
 def card_confirm():
     if request.method == 'POST':
         tickets = Ticket.query \
-            .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == login.current_user.id) \
+            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
+            .filter(Ticket.owner_id == login.current_user.object_id) \
             .filter(Ticket.paid == False) \
             .all()
 
@@ -386,17 +386,17 @@ def card_confirm():
 
     return render_template('purchase/card_confirm.html')
 
-@PURCHASE.route('/purchase/eway-success/<int:id>')
-def eway_success(id):
-    transaction = CardTransaction.get_by_id(id)
+@PURCHASE.route('/purchase/eway-success/<int:object_id>')
+def eway_success(object_id):
+    transaction = CardTransaction.get_by_id(object_id)
 
     transaction.process_eway_payment()
 
     return redirect(url_for('dashboard.dashboard_home'))
 
-@PURCHASE.route('/purchase/eway-cancel/<int:id>')
-def eway_cancel(id):
-    transaction = CardTransaction.get_by_id(id)
+@PURCHASE.route('/purchase/eway-cancel/<int:object_id>')
+def eway_cancel(object_id):
+    transaction = CardTransaction.get_by_id(object_id)
 
     transaction.cancel_eway_payment()
 
@@ -415,8 +415,8 @@ def battels_confirm():
 
     if request.method == 'POST':
         tickets = Ticket.query \
-            .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == login.current_user.id) \
+            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
+            .filter(Ticket.owner_id == login.current_user.object_id) \
             .filter(Ticket.paid == False) \
             .all()
 
@@ -451,8 +451,8 @@ def battels_confirm():
 def cancel():
     if request.method == 'POST':
         tickets = Ticket.query \
-            .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == login.current_user.id) \
+            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
+            .filter(Ticket.owner_id == login.current_user.object_id) \
             .all()
 
         while None in tickets:

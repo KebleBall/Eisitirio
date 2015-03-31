@@ -208,13 +208,13 @@ def register():
         "emailConfirm.email",
         confirmurl=url_for(
             'front.confirm_email',
-            user_id=user.id,
+            user_id=user.object_id,
             secretkey=user.secretkey,
             _external=True
         ),
         destroyurl=url_for(
             'front.destroy_account',
-            user_id=user.id,
+            user_id=user.object_id,
             secretkey=user.secretkey,
             _external=True
         )
@@ -276,7 +276,7 @@ def password_reset():
                 "passwordResetConfirm.email",
                 confirmurl=url_for(
                     'front.reset_password',
-                    user_id=user.id,
+                    user_id=user.object_id,
                     secretkey=user.secretkey,
                     _external=True
                 )
@@ -332,13 +332,13 @@ def email_confirm():
                 "emailConfirm.email",
                 confirmurl=url_for(
                     'front.confirm_email',
-                    user_id=user.id,
+                    user_id=user.object_id,
                     secretkey=user.secretkey,
                     _external=True
                 ),
                 destroyurl=url_for(
                     'front.destroy_account',
-                    user_id=user.id,
+                    user_id=user.object_id,
                     secretkey=user.secretkey,
                     _external=True
                 )
@@ -379,7 +379,7 @@ def reset_password(user_id, secretkey):
             return redirect(
                 url_for(
                     'front.reset_password',
-                    user_id=user.id,
+                    user_id=user.object_id,
                     secretkey=user.secretkey
                 )
             )

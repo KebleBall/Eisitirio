@@ -11,7 +11,7 @@ from kebleball.database import db
 DB = db.DB
 
 class Affiliation(DB.Model):
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
         nullable=False
@@ -25,12 +25,13 @@ class Affiliation(DB.Model):
         self.name = name
 
     def __repr__(self):
-        return "<Affiliation {0}: {1}>".format(self.id, self.name)
+        return "<Affiliation {0}: {1}>".format(self.object_id, self.name)
 
     @staticmethod
-    def get_by_id(id):
+    def get_by_id(object_id):
         affiliation = Affiliation.query.filter(
-            Affiliation.id == int(id)).first()
+            Affiliation.object_id == int(object_id)
+        ).first()
 
         if not affiliation:
             return None

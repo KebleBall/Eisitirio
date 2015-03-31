@@ -102,10 +102,10 @@
                                     <option value="---" disabled="disabled" selected="selected">---</option>
                                 {% endif %}
                                 {% for college in colleges %}
-                                    {% if form['college'] and form['college']|int(-1) == college.id %}
-                                        <option value="{{ college.id }}" selected="selected">{{ college.name }}</option>
+                                    {% if form['college'] and form['college']|int(-1) == college.object_id %}
+                                        <option value="{{ college.object_id }}" selected="selected">{{ college.name }}</option>
                                     {% else %}
-                                        <option value="{{ college.id }}">{{ college.name }}</option>
+                                        <option value="{{ college.object_id }}">{{ college.name }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -121,10 +121,10 @@
                                     <option value="---" disabled="disabled" selected="selected">---</option>
                                 {% endif %}
                                 {% for affiliation in affiliations %}
-                                    {% if form['affiliation'] and form['affiliation']|int(-1) == affiliation.id %}
-                                        <option value="{{ affiliation.id }}" selected="selected">{{ affiliation.name }}</option>
+                                    {% if form['affiliation'] and form['affiliation']|int(-1) == affiliation.object_id %}
+                                        <option value="{{ affiliation.object_id }}" selected="selected">{{ affiliation.name }}</option>
                                     {% else %}
-                                        <option value="{{ affiliation.id }}">{{ affiliation.name }}</option>
+                                        <option value="{{ affiliation.object_id }}">{{ affiliation.name }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>

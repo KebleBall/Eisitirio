@@ -41,9 +41,9 @@ def ajaxValidateResaleEmail():
 
     return Response(json.dumps(response), mimetype="text/json")
 
-@AJAX.route('/ajax/change/ticket/<int:id>/name', methods=['POST'])
-def ajaxChangeTicketName(id):
-    ticket = Ticket.get_by_id(id)
+@AJAX.route('/ajax/change/ticket/<int:object_id>/name', methods=['POST'])
+def ajaxChangeTicketName(object_id):
+    ticket = Ticket.get_by_id(object_id)
 
     if ticket and request.form['name'] != '':
         ticket.name = request.form['name']

@@ -1,7 +1,7 @@
 <!-- admin/view_log.html -->
 {% extends 'layout.html' %}
 
-{% block title %}{% if not log %}No Log Entry Found{% else %}View Log Entry - #{{ '%05d' % log.id }}{% endif %}{% endblock %}
+{% block title %}{% if not log %}No Log Entry Found{% else %}View Log Entry - #{{ '%05d' % log.object_id }}{% endif %}{% endblock %}
 
 {% block content %}
     <section id="view_log" class="columns">
@@ -34,8 +34,8 @@
                     </thead>
                     <tbody>
                         {% for ticket in log.tickets %}
-                            <tr id="ticket-{{ ticket.id }}">
-                                <td>#{{ '%05d' % ticket.id }}</td>
+                            <tr id="ticket-{{ ticket.object_id }}">
+                                <td>#{{ '%05d' % ticket.object_id }}</td>
                                 <td>
                                     {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
                                 </td>
@@ -61,7 +61,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('admin.view_ticket', id=ticket.id) }}" class="button tiny">View</a>
+                                    <a href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
                                 </td>
                             </tr>
                         {% endfor %}

@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 DB = db.DB
 
 class Voucher(DB.Model):
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
         nullable=False
@@ -56,7 +56,7 @@ class Voucher(DB.Model):
 
     used_by_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('user.id'),
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
     used_by = DB.relationship(
@@ -105,7 +105,7 @@ class Voucher(DB.Model):
             self.expires = expires
 
     def __repr__(self):
-        return '<Voucher: {0}/{1}>'.format(self.id, self.code)
+        return '<Voucher: {0}/{1}>'.format(self.object_id, self.code)
 
     @staticmethod
     def get_by_code(code):
@@ -120,8 +120,8 @@ class Voucher(DB.Model):
 
         self.used = True
         if self.singleuse:
-            if hasattr(user, 'id'):
-                self.used_by_id = user.id
+            if hasattr(user, 'object_id'):
+                self.used_by_id = user.object_id
             else:
                 self.used_by_id = user
 
@@ -139,13 +139,17 @@ class Voucher(DB.Model):
         else:
             ticket.set_price(ticket.price * (100 - self.discountvalue) / 100)
 
-        ticket.add_note('Used voucher {0}/{1}'.format(self.id, self.code))
+        ticket.add_note(
+            'Used voucher {0}/{1}'.format(self.object_id, self.code)
+        )
 
         return ticket
 
     @staticmethod
-    def get_by_id(id):
-        voucher = Voucher.query.filter(Voucher.id == int(id)).first()
+    def get_by_id(object_id):
+        voucher = Voucher.query.filter(
+            Voucher.object_id == int(object_id)
+        ).first()
 
         if not voucher:
             return None

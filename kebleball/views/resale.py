@@ -20,8 +20,8 @@ RESALE = Blueprint('resale', __name__)
 def resale_home():
     if request.method == 'POST':
         tickets = Ticket.query \
-            .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == current_user.id) \
+            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
+            .filter(Ticket.owner_id == current_user.object_id) \
             .filter(Ticket.paid == True) \
             .all()
 
@@ -57,8 +57,8 @@ def resale_home():
 def cancel_resale():
     if request.method == 'POST':
         tickets = Ticket.query \
-            .filter(Ticket.id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == current_user.id) \
+            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
+            .filter(Ticket.owner_id == current_user.object_id) \
             .filter(Ticket.paid == True) \
             .all()
 

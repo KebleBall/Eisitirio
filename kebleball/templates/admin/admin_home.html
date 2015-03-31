@@ -39,10 +39,10 @@
                                     <option value="Any" selected="selected">Any</option>
                                 {% endif %}
                                 {% for college in colleges %}
-                                    {% if form['userCollege'] and form['userCollege']|int(-1) == college.id %}
-                                        <option value="{{ college.id }}" selected="selected">{{ college.name }}</option>
+                                    {% if form['userCollege'] and form['userCollege']|int(-1) == college.object_id %}
+                                        <option value="{{ college.object_id }}" selected="selected">{{ college.name }}</option>
                                     {% else %}
-                                        <option value="{{ college.id }}">{{ college.name }}</option>
+                                        <option value="{{ college.object_id }}">{{ college.name }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -58,10 +58,10 @@
                                     <option value="Any" selected="selected">Any</option>
                                 {% endif %}
                                 {% for affiliation in affiliations %}
-                                    {% if form['userAffiliation'] and form['userAffiliation']|int(-1) == affiliation.id %}
-                                        <option value="{{ affiliation.id }}" selected="selected">{{ affiliation.name }}</option>
+                                    {% if form['userAffiliation'] and form['userAffiliation']|int(-1) == affiliation.object_id %}
+                                        <option value="{{ affiliation.object_id }}" selected="selected">{{ affiliation.name }}</option>
                                     {% else %}
-                                        <option value="{{ affiliation.id }}">{{ affiliation.name }}</option>
+                                        <option value="{{ affiliation.object_id }}">{{ affiliation.name }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -261,11 +261,11 @@
                 </thead>
                 <tbody>
                     {% for user in results.items %}
-                        <tr id="user-{{ user.id }}">
-                            <td>#{{ '%05d' % user.id }}</td>
+                        <tr id="user-{{ user.object_id }}">
+                            <td>#{{ '%05d' % user.object_id }}</td>
                             <td>{{ user.fullname }}</td>
                             <td>{{ user.email }}</td>
-                            <td><a class="button small" href="{{ url_for('admin.view_user', id=user.id) }}">View User</a></td>
+                            <td><a class="button small" href="{{ url_for('admin.view_user', id=user.object_id) }}">View User</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -283,8 +283,8 @@
                 </thead>
                 <tbody>
                     {% for ticket in results.items %}
-                        <tr id="ticket-{{ ticket.id }}">
-                            <td>#{{ '%05d' % ticket.id }}</td>
+                        <tr id="ticket-{{ ticket.object_id }}">
+                            <td>#{{ '%05d' % ticket.object_id }}</td>
                             <td>{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</td>
                             <td>
                                 {% if ticket.cancelled -%}
@@ -307,7 +307,7 @@
                                     Awaiting {{ ticket.paymentmethod }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                 {% endif %}
                             </td>
-                            <td><a class="button small" href="{{ url_for('admin.view_ticket', id=ticket.id) }}">View Ticket</a></td>
+                            <td><a class="button small" href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}">View Ticket</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -327,13 +327,13 @@
                 </thead>
                 <tbody>
                     {% for log in results.items %}
-                        <tr id="log-{{ log.id }}">
+                        <tr id="log-{{ log.object_id }}">
                             <td>{{ log.timestamp.strftime('%c') }}</td>
                             <td>{{ log.ip }}</td>
                             <td>{{ log.action }}</td>
                             <td>{{ log.actor.fullname }}</td>
                             <td>{{ log.user.fullname }}</td>
-                            <td><a class="button small" href="{{ url_for('admin.view_log', id=log.id) }}">View Log Entry</a></td>
+                            <td><a class="button small" href="{{ url_for('admin.view_log', id=log.object_id) }}">View Log Entry</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

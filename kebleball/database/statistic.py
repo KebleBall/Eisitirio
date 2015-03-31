@@ -12,7 +12,7 @@ from datetime import datetime
 DB = db.DB
 
 class Statistic(DB.Model):
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
         nullable=False
@@ -58,8 +58,10 @@ class Statistic(DB.Model):
         )
 
     @staticmethod
-    def get_by_id(id):
-        statistic = Statistic.query.filter(Statistic.id == int(id)).first()
+    def get_by_id(object_id):
+        statistic = Statistic.query.filter(
+            Statistic.object_id == int(object_id)
+        ).first()
 
         if not statistic:
             return None

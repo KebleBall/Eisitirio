@@ -123,7 +123,7 @@ def admin_home(page=1):
                 request.form['ticketNumber'] != ''
         ):
             ticket_query = ticket_query.filter(
-                Ticket.id == request.form['ticketNumber'])
+                Ticket.object_id == request.form['ticketNumber'])
             has_ticket_filter = True
 
         if (
@@ -308,13 +308,13 @@ def admin_home(page=1):
         category=category
     )
 
-@ADMIN.route('/admin/user/<int:id>/view')
-@ADMIN.route('/admin/user/<int:id>/view/page/selfactions/<int:self_actions_page>')
-@ADMIN.route('/admin/user/<int:id>/view/page/actions/<int:actions_page>')
-@ADMIN.route('/admin/user/<int:id>/view/page/events/<int:events_page>')
+@ADMIN.route('/admin/user/<int:object_id>/view')
+@ADMIN.route('/admin/user/<int:object_id>/view/page/selfactions/<int:self_actions_page>')
+@ADMIN.route('/admin/user/<int:object_id>/view/page/actions/<int:actions_page>')
+@ADMIN.route('/admin/user/<int:object_id>/view/page/events/<int:events_page>')
 @admin_required
-def view_user(id, self_actions_page=1, actions_page=1, events_page=1):
-    user = User.get_by_id(id)
+def view_user(object_id, self_actions_page=1, actions_page=1, events_page=1):
+    user = User.get_by_id(object_id)
 
     if user:
         self_actions = user.actions \
@@ -357,13 +357,13 @@ def view_user(id, self_actions_page=1, actions_page=1, events_page=1):
         events_page=events_page
     )
 
-@ADMIN.route('/admin/user/<int:id>/impersonate')
+@ADMIN.route('/admin/user/<int:object_id>/impersonate')
 @admin_required
-def impersonate_user(id):
-    user = User.get_by_id(id)
+def impersonate_user(object_id):
+    user = User.get_by_id(object_id)
 
     if user:
-        session['actor_id'] = current_user.id
+        session['actor_id'] = current_user.object_id
 
         login_user(
             user,
@@ -384,13 +384,13 @@ def impersonate_user(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/user/<int:id>/give', methods=['GET', 'POST'])
+@ADMIN.route('/admin/user/<int:object_id>/give', methods=['GET', 'POST'])
 @admin_required
-def give_user(id):
+def give_user(object_id):
     if request.method != 'POST':
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-    user = User.get_by_id(id)
+    user = User.get_by_id(object_id)
 
     if user:
         price = (
@@ -405,12 +405,12 @@ def give_user(id):
         ):
             note = 'Given by {0} (#{1}) for no reason.'.format(
                 current_user.fullname,
-                current_user.id
+                current_user.object_id
             )
         else:
             note = 'Given by {0} (#{1}) with reason: {2}.'.format(
                 current_user.fullname,
-                current_user.id,
+                current_user.object_id,
                 request.form['giveReason']
             )
 
@@ -445,7 +445,7 @@ def give_user(id):
         )
 
         return redirect(request.referrer
-                        or url_for('admin.view_user', id=user.id))
+                        or url_for('admin.view_user', object_id=user.object_id))
     else:
         flash(
             u'Could not find user, could not give tickets.',
@@ -453,13 +453,13 @@ def give_user(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/user/<int:id>/note', methods=['GET', 'POST'])
+@ADMIN.route('/admin/user/<int:object_id>/note', methods=['GET', 'POST'])
 @admin_required
-def note_user(id):
+def note_user(object_id):
     if request.method != 'POST':
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-    user = User.get_by_id(id)
+    user = User.get_by_id(object_id)
 
     if user:
         user.note = request.form['notes']
@@ -476,7 +476,7 @@ def note_user(id):
             'success'
         )
         return redirect(request.referrer
-                        or url_for('admin.view_user', id=user.id))
+                        or url_for('admin.view_user', object_id=user.object_id))
     else:
         flash(
             u'Could not find user, could not set notes.',
@@ -484,10 +484,10 @@ def note_user(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/user/<int:id>/verify')
+@ADMIN.route('/admin/user/<int:object_id>/verify')
 @admin_required
-def verify_user(id):
-    user = User.get_by_id(id)
+def verify_user(object_id):
+    user = User.get_by_id(object_id)
 
     if user:
         user.verified = True
@@ -504,7 +504,7 @@ def verify_user(id):
             'success'
         )
         return redirect(request.referrer
-                        or url_for('admin.view_user', id=user.id))
+                        or url_for('admin.view_user', object_id=user.object_id))
     else:
         flash(
             u'Could not find user, could not verify.',
@@ -512,10 +512,10 @@ def verify_user(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/user/<int:id>/demote')
+@ADMIN.route('/admin/user/<int:object_id>/demote')
 @admin_required
-def demote_user(id):
-    user = User.get_by_id(id)
+def demote_user(object_id):
+    user = User.get_by_id(object_id)
 
     if user:
         user.demote()
@@ -532,7 +532,7 @@ def demote_user(id):
             'success'
         )
         return redirect(request.referrer
-                        or url_for('admin.view_user', id=user.id))
+                        or url_for('admin.view_user', object_id=user.object_id))
     else:
         flash(
             u'Could not find user, could not demote.',
@@ -540,10 +540,10 @@ def demote_user(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/user/<int:id>/promote')
+@ADMIN.route('/admin/user/<int:object_id>/promote')
 @admin_required
-def promote_user(id):
-    user = User.get_by_id(id)
+def promote_user(object_id):
+    user = User.get_by_id(object_id)
 
     if user:
         user.promote()
@@ -560,7 +560,7 @@ def promote_user(id):
             'success'
         )
         return redirect(request.referrer
-                        or url_for('admin.view_user', id=user.id))
+                        or url_for('admin.view_user', object_id=user.object_id))
     else:
         flash(
             u'Could not find user, could not promote.',
@@ -568,10 +568,10 @@ def promote_user(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/user/<int:id>/add_manual_battels')
+@ADMIN.route('/admin/user/<int:object_id>/add_manual_battels')
 @admin_required
-def add_manual_battels(id):
-    user = User.get_by_id(id)
+def add_manual_battels(object_id):
+    user = User.get_by_id(object_id)
 
     if user:
         user.add_manual_battels()
@@ -586,7 +586,7 @@ def add_manual_battels(id):
             u'Battels set up for user.',
             'success'
         )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
+        return redirect(request.referrer or url_for('admin.viewUser', object_id=user.object_id))
     else:
         flash(
             u'Could not find user, could not manually set up battels.',
@@ -594,10 +594,10 @@ def add_manual_battels(id):
         )
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-@ADMIN.route('/admin/user/<int:id>/verify_affiliation')
+@ADMIN.route('/admin/user/<int:object_id>/verify_affiliation')
 @admin_required
-def verify_affiliation(id):
-    user = User.get_by_id(id)
+def verify_affiliation(object_id):
+    user = User.get_by_id(object_id)
 
     if user:
         user.verify_affiliation()
@@ -610,10 +610,10 @@ def verify_affiliation(id):
 
     return redirect(url_for('admin.verify_affiliations'))
 
-@ADMIN.route('/admin/user/<int:id>/deny_affiliation')
+@ADMIN.route('/admin/user/<int:object_id>/deny_affiliation')
 @admin_required
-def deny_affiliation(id):
-    user = User.get_by_id(id)
+def deny_affiliation(object_id):
+    user = User.get_by_id(object_id)
 
     if user:
         user.deny_affiliation()
@@ -637,10 +637,10 @@ def verify_affiliations():
 
     return render_template('admin/verify_affiliations.html', users=users)
 
-@ADMIN.route('/admin/user/<int:id>/collect', methods=['GET', 'POST'])
+@ADMIN.route('/admin/user/<int:object_id>/collect', methods=['GET', 'POST'])
 @admin_required
-def collect_tickets(id):
-    user = User.get_by_id(id)
+def collect_tickets(object_id):
+    user = User.get_by_id(object_id)
 
     if user:
         return render_template(
@@ -654,11 +654,11 @@ def collect_tickets(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/ticket/<int:id>/view')
-@ADMIN.route('/admin/ticket/<int:id>/view/page/<int:events_page>')
+@ADMIN.route('/admin/ticket/<int:object_id>/view')
+@ADMIN.route('/admin/ticket/<int:object_id>/view/page/<int:events_page>')
 @admin_required
-def view_ticket(id, events_page=1):
-    ticket = Ticket.get_by_id(id)
+def view_ticket(object_id, events_page=1):
+    ticket = Ticket.get_by_id(object_id)
 
     if ticket:
         events = ticket.log_entries \
@@ -677,9 +677,9 @@ def view_ticket(id, events_page=1):
         events_page=events_page
     )
 
-@ADMIN.route('/admin/ticket/<int:id>/collect', methods=['GET', 'POST'])
+@ADMIN.route('/admin/ticket/<int:object_id>/collect', methods=['GET', 'POST'])
 @admin_required
-def collect_ticket(id):
+def collect_ticket(object_id):
     if request.method != 'POST':
         return redirect(request.referrer or url_for('admin.adminHome'))
 
@@ -694,7 +694,7 @@ def collect_ticket(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-    ticket = Ticket.get_by_id(id)
+    ticket = Ticket.get_by_id(object_id)
 
     if ticket:
         ticket.barcode = request.form['barcode']
@@ -713,7 +713,7 @@ def collect_ticket(id):
             'success'
         )
         return redirect(request.referrer
-                        or url_for('admin.collect_tickets', id=ticket.owner_id))
+                        or url_for('admin.collect_tickets', object_id=ticket.owner_id))
     else:
         flash(
             u'Could not find ticket, could mark as collected.',
@@ -721,13 +721,13 @@ def collect_ticket(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/ticket/<int:id>/note', methods=['GET', 'POST'])
+@ADMIN.route('/admin/ticket/<int:object_id>/note', methods=['GET', 'POST'])
 @admin_required
-def note_ticket(id):
+def note_ticket(object_id):
     if request.method != 'POST':
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-    ticket = Ticket.get_by_id(id)
+    ticket = Ticket.get_by_id(object_id)
 
     if ticket:
         ticket.note = request.form['notes']
@@ -743,7 +743,7 @@ def note_ticket(id):
             'success'
         )
         return redirect(request.referrer
-                        or url_for('admin.view_ticket', id=ticket.id))
+                        or url_for('admin.view_ticket', object_id=ticket.object_id))
     else:
         flash(
             u'Could not find ticket, could not set notes.',
@@ -751,10 +751,10 @@ def note_ticket(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/ticket/<int:id>/markpaid')
+@ADMIN.route('/admin/ticket/<int:object_id>/markpaid')
 @admin_required
-def mark_ticket_paid(id):
-    ticket = Ticket.get_by_id(id)
+def mark_ticket_paid(object_id):
+    ticket = Ticket.get_by_id(object_id)
 
     if ticket:
         ticket.paid = True
@@ -770,7 +770,7 @@ def mark_ticket_paid(id):
             'success'
         )
         return redirect(request.referrer
-                        or url_for('admin.view_ticket', id=ticket.id))
+                        or url_for('admin.view_ticket', object_id=ticket.object_id))
     else:
         flash(
             u'Could not find ticket, could not mark as paid.',
@@ -778,10 +778,10 @@ def mark_ticket_paid(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/ticket/<int:id>/autocancel')
+@ADMIN.route('/admin/ticket/<int:object_id>/autocancel')
 @admin_required
-def auto_cancel_ticket(id):
-    ticket = Ticket.get_by_id(id)
+def auto_cancel_ticket(object_id):
+    ticket = Ticket.get_by_id(object_id)
 
     if ticket:
         if not ticket.can_be_cancelled_automatically():
@@ -790,7 +790,7 @@ def auto_cancel_ticket(id):
                 'warning'
             )
             return redirect(request.referrer
-                            or url_for('admin.view_ticket', id=ticket.id))
+                            or url_for('admin.view_ticket', object_id=ticket.object_id))
 
         if ticket.paymentmethod == 'Battels':
             ticket.battels.cancel(ticket)
@@ -802,7 +802,7 @@ def auto_cancel_ticket(id):
                     'warning'
                 )
                 return redirect(request.referrer
-                                or url_for('admin.view_ticket', id=ticket.id))
+                                or url_for('admin.view_ticket', object_id=ticket.object_id))
 
         ticket.cancelled = True
         DB.session.commit()
@@ -817,7 +817,7 @@ def auto_cancel_ticket(id):
             'success'
         )
         return redirect(request.referrer
-                        or url_for('admin.view_ticket', id=ticket.id))
+                        or url_for('admin.view_ticket', object_id=ticket.object_id))
     else:
         flash(
             u'Could not find ticket, could not cancel.',
@@ -825,10 +825,10 @@ def auto_cancel_ticket(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/ticket/<int:id>/cancel')
+@ADMIN.route('/admin/ticket/<int:object_id>/cancel')
 @admin_required
-def cancel_ticket(id):
-    ticket = Ticket.get_by_id(id)
+def cancel_ticket(object_id):
+    ticket = Ticket.get_by_id(object_id)
 
     if ticket:
         ticket.cancelled = True
@@ -844,7 +844,7 @@ def cancel_ticket(id):
             'success'
         )
         return redirect(request.referrer
-                        or url_for('admin.view_ticket', id=ticket.id))
+                        or url_for('admin.view_ticket', object_id=ticket.object_id))
     else:
         flash(
             u'Could not find ticket, could not cancel.',
@@ -888,21 +888,21 @@ def validate_ticket():
         message=message
     )
 
-@ADMIN.route('/admin/log/<int:id>/view')
+@ADMIN.route('/admin/log/<int:object_id>/view')
 @admin_required
-def view_log(id):
-    log = Log.get_by_id(id)
+def view_log(object_id):
+    log = Log.get_by_id(object_id)
 
     return render_template(
         'admin/view_log.html',
         log=log
     )
 
-@ADMIN.route('/admin/transaction/<int:id>/view')
-@ADMIN.route('/admin/transaction/<int:id>/view/page/<int:events_page>')
+@ADMIN.route('/admin/transaction/<int:object_id>/view')
+@ADMIN.route('/admin/transaction/<int:object_id>/view/page/<int:events_page>')
 @admin_required
-def view_transaction(id, events_page=1):
-    transaction = CardTransaction.get_by_id(id)
+def view_transaction(object_id, events_page=1):
+    transaction = CardTransaction.get_by_id(object_id)
 
     if transaction:
         events = transaction.events \
@@ -921,13 +921,13 @@ def view_transaction(id, events_page=1):
         events_page=events_page
     )
 
-@ADMIN.route('/admin/transaction/<int:id>/refund', methods=['GET', 'POST'])
+@ADMIN.route('/admin/transaction/<int:object_id>/refund', methods=['GET', 'POST'])
 @admin_required
-def refund_transaction(id):
+def refund_transaction(object_id):
     if request.method != 'POST':
         return redirect(request.referrer or url_for('admin.adminHome'))
 
-    transaction = CardTransaction.get_by_id(id)
+    transaction = CardTransaction.get_by_id(object_id)
 
     if transaction:
         amount = (int(request.form['refundAmountPounds'])
@@ -939,7 +939,7 @@ def refund_transaction(id):
                 'warning'
             )
             return redirect(request.referrer
-                            or url_for('admin.view_transaction', id=transaction.id))
+                            or url_for('admin.view_transaction', object_id=transaction.object_id))
 
         result = transaction.process_refund(amount)
 
@@ -954,7 +954,7 @@ def refund_transaction(id):
                 'success'
             )
         return redirect(request.referrer
-                        or url_for('admin.view_transaction', id=transaction.id))
+                        or url_for('admin.view_transaction', object_id=transaction.object_id))
     else:
         flash(
             u'Could not find transaction, could not cancel.',
@@ -1113,10 +1113,10 @@ def announcements(page=1):
         form=form
     )
 
-@ADMIN.route('/admin/announcement/<int:id>/delete')
+@ADMIN.route('/admin/announcement/<int:object_id>/delete')
 @admin_required
-def deleteAnnouncement(id):
-    announcement = Announcement.get_by_id(id)
+def deleteAnnouncement(object_id):
+    announcement = Announcement.get_by_id(object_id)
 
     if announcement:
         DB.session.delete(announcement)
@@ -1134,10 +1134,10 @@ def deleteAnnouncement(id):
 
     return redirect(request.referrer or url_for('admin.announcements'))
 
-@ADMIN.route('/admin/announcement/<int:id>/cancel')
+@ADMIN.route('/admin/announcement/<int:object_id>/cancel')
 @admin_required
-def cancelAnnouncementEmails(id):
-    announcement = Announcement.get_by_id(id)
+def cancelAnnouncementEmails(object_id):
+    announcement = Announcement.get_by_id(object_id)
 
     if announcement:
         announcement.emails = []
@@ -1263,10 +1263,10 @@ def vouchers(page=1):
         vouchers=vouchers
     )
 
-@ADMIN.route('/admin/voucher/<int:id>/delete')
+@ADMIN.route('/admin/voucher/<int:object_id>/delete')
 @admin_required
-def deleteVoucher(id):
-    voucher = Voucher.get_by_id(id)
+def deleteVoucher(object_id):
+    voucher = Voucher.get_by_id(object_id)
 
     if voucher:
         DB.session.delete(voucher)
@@ -1283,10 +1283,10 @@ def deleteVoucher(id):
 
     return redirect(request.referrer or url_for('admin.vouchers'))
 
-@ADMIN.route('/admin/waiting/<int:id>/delete')
+@ADMIN.route('/admin/waiting/<int:object_id>/delete')
 @admin_required
-def deleteWaiting(id):
-    waiting = Waiting.get_by_id(id)
+def deleteWaiting(object_id):
+    waiting = Waiting.get_by_id(object_id)
 
     if waiting:
         DB.session.delete(waiting)

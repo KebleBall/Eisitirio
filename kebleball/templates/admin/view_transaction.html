@@ -1,7 +1,7 @@
 <!-- admin/view_transaction.html -->
 {% extends 'layout.html' %}
 
-{% block title %}{% if not transaction %}No Transaction Found{% else %}View Transaction - #{{ '%05d' % transaction.id }}{% endif %}{% endblock %}
+{% block title %}{% if not transaction %}No Transaction Found{% else %}View Transaction - #{{ '%05d' % transaction.object_id }}{% endif %}{% endblock %}
 
 {% block content %}
     <section id="view_transaction" class="columns">
@@ -29,7 +29,7 @@
             <h4>Actions</h4>
             <ul>
                 {% if transaction.get_status()[0] %}
-                    <li><form action="{{ url_for('admin.refund_transaction', id=transaction.id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refundAmountPounds" min="0" step="1" />.<input type="number" name="refundAmountPence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
+                    <li><form action="{{ url_for('admin.refund_transaction', id=transaction.object_id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refundAmountPounds" min="0" step="1" />.<input type="number" name="refundAmountPence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
                 {% endif %}
             </ul>
             <h4>Transaction's Tickets</h4>
@@ -45,8 +45,8 @@
                     </thead>
                     <tbody>
                         {% for ticket in transaction.tickets %}
-                            <tr id="ticket-{{ ticket.id }}">
-                                <td>#{{ '%05d' % ticket.id }}</td>
+                            <tr id="ticket-{{ ticket.object_id }}">
+                                <td>#{{ '%05d' % ticket.object_id }}</td>
                                 <td>
                                     {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
                                 </td>
@@ -72,7 +72,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('admin.view_ticket', id=ticket.id) }}" class="button tiny">View</a>
+                                    <a href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -97,20 +97,20 @@
                     <tbody>
                         {% for log in events.items %}
                             <tr>
-                                <td>{{ '%05d' % log.id }}</td>
+                                <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
                                 <td><a href="{{ url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
                                 <td>{{ log.action }}</td>
-                                <td><a href="{{ url_for('admin.view_log', id=log.id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% if events.has_prev %}
-                    <a href="{{ url_for('admin.view_transaction', id=transaction.id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin.view_transaction', id=transaction.object_id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
                 {% endif %}
                 {% if events.has_next %}
-                    <a href="{{ url_for('admin.view_transaction', id=transaction.id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin.view_transaction', id=transaction.object_id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events recorded.</p>

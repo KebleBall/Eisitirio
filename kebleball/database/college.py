@@ -7,7 +7,7 @@ DB = db.DB
 
 class College(DB.Model):
     """Model for a user's college."""
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
         nullable=False
@@ -22,12 +22,12 @@ class College(DB.Model):
         self.name = name
 
     def __repr__(self):
-        return "<College {0}: {1}>".format(self.id, self.name)
+        return "<College {0}: {1}>".format(self.object_id, self.name)
 
     @staticmethod
-    def get_by_id(id):
+    def get_by_id(object_id):
         """Get a college object by its ID."""
-        college = College.query.filter(College.id == int(id)).first()
+        college = College.query.filter(College.object_id == int(object_id)).first()
 
         if not college:
             return None

@@ -9,7 +9,7 @@ APP = app.APP
 
 class Battels(DB.Model):
     """Model for battels charges for Keble Students."""
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
         nullable=False
@@ -69,7 +69,7 @@ class Battels(DB.Model):
         self.manual = manual
 
     def __repr__(self):
-        return "<Battels {0}: {1}>".format(self.id, self.battelsid)
+        return "<Battels {0}: {1}>".format(self.object_id, self.battelsid)
 
     def __getattr__(self, name):
         """Magic method to generate amounts charged in pounds."""
@@ -144,9 +144,11 @@ class Battels(DB.Model):
         DB.session.commit()
 
     @staticmethod
-    def get_by_id(id):
+    def get_by_id(object_id):
         """Get a battels object by its database ID."""
-        battels = Battels.query.filter(Battels.id == int(id)).first()
+        battels = Battels.query.filter(
+            Battels.object_id == int(object_id)
+        ).first()
 
         if not battels:
             return None

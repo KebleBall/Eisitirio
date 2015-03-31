@@ -21,7 +21,7 @@ DB = db.DB
 
 class CardTransaction(DB.Model):
     """Model for information about Card Transactions performed via eWay."""
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
         nullable=False
@@ -54,7 +54,7 @@ class CardTransaction(DB.Model):
 
     user_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('user.id'),
+        DB.ForeignKey('user.object_id'),
         nullable=False
     )
     user = DB.relationship(
@@ -66,8 +66,8 @@ class CardTransaction(DB.Model):
     )
 
     def __init__(self, user, tickets):
-        if hasattr(user, 'id'):
-            self.user_id = user.id
+        if hasattr(user, 'object_id'):
+            self.user_id = user.object_id
         else:
             self.user_id = user
 
@@ -83,7 +83,7 @@ class CardTransaction(DB.Model):
 
         return '<{0} CardTransaction: {1}, {2}'.format(
             status_str,
-            self.id,
+            self.object_id,
             status[1]
         )
 
@@ -234,20 +234,20 @@ class CardTransaction(DB.Model):
         """
         data = {
             "Customer": {
-                "Reference": "U{0:05d}".format(self.user.id),
+                "Reference": "U{0:05d}".format(self.user.object_id),
                 "FirstName": self.user.firstname,
                 "LastName": self.user.surname,
                 "Email": self.user.email
             },
             "Payment": {
                 "TotalAmount": self.get_value(),
-                "InvoiceReference": "Trans{0:05d}".format(self.id),
+                "InvoiceReference": "Trans{0:05d}".format(self.object_id),
                 "CurrencyCode": "GBP"
             },
             "RedirectUrl": url_for("purchase.eway_success",
-                                   id=self.id, _external=True),
+                                   object_id=self.object_id, _external=True),
             "CancelUrl": url_for("purchase.eway_cancel",
-                                 id=self.id, _external=True),
+                                 object_id=self.object_id, _external=True),
             "Method": "ProcessPayment",
             "TransactionType": "Purchase",
             "LogoUrl": "https://www.kebleball.com/assets/building_big.jpg",
@@ -310,7 +310,7 @@ class CardTransaction(DB.Model):
                                 'Partial eWay payment for transaction {0} '
                                 'with value {1}'
                             ).format(
-                                self.id,
+                                self.object_id,
                                 response['TotalAmount']
                             ),
                             self.tickets,
@@ -369,7 +369,7 @@ class CardTransaction(DB.Model):
                             ticket.mark_as_paid(
                                 'Card',
                                 'Card Transaction {0}'.format(
-                                    self.id
+                                    self.object_id
                                 ),
                                 transaction=self
                             )
@@ -403,7 +403,7 @@ class CardTransaction(DB.Model):
                         u'payment has not been taken before trying again'
                     ).format(
                         APP.config['TREASURER_EMAIL_LINK'],
-                        self.id
+                        self.object_id
                     ),
                     'error'
                 )
@@ -494,10 +494,10 @@ class CardTransaction(DB.Model):
             return False
 
     @staticmethod
-    def get_by_id(id):
+    def get_by_id(object_id):
         """Get a card transaction object by its database ID."""
         transaction = CardTransaction.query.filter(
-            CardTransaction.id == int(id)).first()
+            CardTransaction.object_id == int(object_id)).first()
 
         if not transaction:
             return None

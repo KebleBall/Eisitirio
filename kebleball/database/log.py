@@ -23,16 +23,16 @@ LOG_TICKET_LINK = DB.Table(
     DB.Model.metadata,
     DB.Column('log_id',
               DB.Integer,
-              DB.ForeignKey('log.id')
+              DB.ForeignKey('log.object_id')
              ),
     DB.Column('ticket_id',
               DB.Integer,
-              DB.ForeignKey('ticket.id')
+              DB.ForeignKey('ticket.object_id')
              )
 )
 
 class Log(DB.Model):
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
         nullable=False
@@ -49,7 +49,7 @@ class Log(DB.Model):
 
     actor_id = DB.Column(
         DB.Integer(),
-        DB.ForeignKey('user.id'),
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
     actor = DB.relationship(
@@ -63,7 +63,7 @@ class Log(DB.Model):
 
     user_id = DB.Column(
         DB.Integer(),
-        DB.ForeignKey('user.id'),
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
     user = DB.relationship(
@@ -87,7 +87,7 @@ class Log(DB.Model):
 
     transaction_id = DB.Column(
         DB.Integer(),
-        DB.ForeignKey('card_transaction.id'),
+        DB.ForeignKey('card_transaction.object_id'),
         nullable=True
     )
     transaction = DB.relationship(
@@ -98,35 +98,37 @@ class Log(DB.Model):
         )
     )
 
-    def __init__(self, ip, action, actor, user, tickets=[], transaction=None):
+    def __init__(self, ip, action, actor, user, tickets=None, transaction=None):
+        if tickets is None:
+            tickets = []
         self.timestamp = datetime.utcnow()
         self.ip = ip
         self.action = action
 
-        if hasattr(actor, 'id'):
-            self.actor_id = actor.id
+        if hasattr(actor, 'object_id'):
+            self.actor_id = actor.object_id
         else:
             self.actor_id = actor
 
-        if hasattr(user, 'id'):
-            self.user_id = user.id
+        if hasattr(user, 'object_id'):
+            self.user_id = user.object_id
         else:
             self.user_id = user
 
         for ticket in tickets:
-            if hasattr(ticket, 'id'):
+            if hasattr(ticket, 'object_id'):
                 self.tickets.append(ticket)
             else:
                 self.tickets.append(Ticket.get_by_id(ticket))
 
-        if hasattr(transaction, 'id'):
-            self.transaction_id = transaction.id
+        if hasattr(transaction, 'object_id'):
+            self.transaction_id = transaction.object_id
         else:
             self.transaction_id = transaction
 
     def __repr__(self):
         return '<Log {0}: {1}>'.format(
-            self.id,
+            self.object_id,
             self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)')
         )
 
@@ -150,15 +152,15 @@ class Log(DB.Model):
                     ", in relation "
                     "to transaction {0}"
                 ).format(
-                    self.transaction.id
+                    self.transaction.object_id
                 )
             ),
             self.message
         )
 
     @staticmethod
-    def get_by_id(id):
-        log = Log.query.filter(Log.id == int(id)).first()
+    def get_by_id(object_id):
+        log = Log.query.filter(Log.object_id == int(object_id)).first()
 
         if not log:
             return None

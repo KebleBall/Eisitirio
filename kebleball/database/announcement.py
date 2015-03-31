@@ -22,12 +22,12 @@ USER_ANNOUNCE_LINK = DB.Table(
     DB.Column(
         'user_id',
         DB.Integer,
-        DB.ForeignKey('user.id')
+        DB.ForeignKey('user.object_id')
     ),
     DB.Column(
         'announcement_id',
         DB.Integer,
-        DB.ForeignKey('announcement.id')
+        DB.ForeignKey('announcement.object_id')
     )
 )
 
@@ -37,17 +37,17 @@ EMAIL_ANNOUNCE_LINK = DB.Table(
     DB.Column(
         'user_id',
         DB.Integer,
-        DB.ForeignKey('user.id')
+        DB.ForeignKey('user.object_id')
     ),
     DB.Column(
         'announcement_id',
         DB.Integer,
-        DB.ForeignKey('announcement.id')
+        DB.ForeignKey('announcement.object_id')
     )
 )
 
 class Announcement(DB.Model):
-    id = DB.Column(
+    object_id = DB.Column(
         DB.Integer,
         primary_key=True,
         nullable=False
@@ -77,7 +77,7 @@ class Announcement(DB.Model):
 
     sender_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('user.id'),
+        DB.ForeignKey('user.object_id'),
         nullable=False
     )
     sender = DB.relationship(
@@ -90,7 +90,7 @@ class Announcement(DB.Model):
 
     college_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('college.id'),
+        DB.ForeignKey('college.object_id'),
         nullable=True
     )
     college = DB.relationship(
@@ -103,7 +103,7 @@ class Announcement(DB.Model):
 
     affiliation_id = DB.Column(
         DB.Integer,
-        DB.ForeignKey('affiliation.id'),
+        DB.ForeignKey('affiliation.object_id'),
         nullable=True
     )
     affiliation = DB.relationship(
@@ -163,18 +163,18 @@ class Announcement(DB.Model):
         self.has_collected = has_collected
         self.has_uncollected = has_uncollected
 
-        if hasattr(sender, 'id'):
-            self.sender_id = sender.id
+        if hasattr(sender, 'object_id'):
+            self.sender_id = sender.object_id
         else:
             self.sender_id = sender
 
-        if hasattr(college, 'id'):
-            self.college_id = college.id
+        if hasattr(college, 'object_id'):
+            self.college_id = college.object_id
         else:
             self.college_id = college
 
-        if hasattr(affiliation, 'id'):
-            self.affiliation_id = affiliation.id
+        if hasattr(affiliation, 'object_id'):
+            self.affiliation_id = affiliation.object_id
         else:
             self.affiliation_id = affiliation
 
@@ -210,7 +210,7 @@ class Announcement(DB.Model):
                     self.emails.append(user)
 
     def __repr__(self):
-        return "<Announcement {0}: {1}>".format(self.id, self.subject)
+        return "<Announcement {0}: {1}>".format(self.object_id, self.subject)
 
     def send_emails(self, count):
         try:
@@ -236,9 +236,10 @@ class Announcement(DB.Model):
         return count
 
     @staticmethod
-    def get_by_id(id):
+    def get_by_id(object_id):
         announcement = Announcement.query.filter(
-            Announcement.id == int(id)).first()
+            Announcement.object_id == int(object_id)
+        ).first()
 
         if not announcement:
             return None

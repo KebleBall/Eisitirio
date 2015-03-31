@@ -1,7 +1,7 @@
 <!-- admin/view_ticket.html -->
 {% extends 'layout.html' %}
 
-{% block title %}{% if not ticket %}No Ticket Found{% else %}View Ticket - #{{ '%05d' % ticket.id }}{% endif %}{% endblock %}
+{% block title %}{% if not ticket %}No Ticket Found{% else %}View Ticket - #{{ '%05d' % ticket.object_id }}{% endif %}{% endblock %}
 
 {% block content %}
     <section id="view_ticket" class="columns">
@@ -25,7 +25,7 @@
             {% endif %}
             {% if ticket.battels_id != None %}
                 <p><strong>Battels term</strong>: {{ ticket.battels_term }}</p>
-                <p><strong>Battels ID</strong>: <a href="{{ url_for('admin.view_user', id=ticket.battels.user.id) }}">{{ ticket.battels.battelsid }}</a></p>
+                <p><strong>Battels ID</strong>: <a href="{{ url_for('admin.view_user', id=ticket.battels.user.object_id) }}">{{ ticket.battels.battelsid }}</a></p>
             {% endif %}
             {% if ticket.reselling_to_id != None %}
                 <p><strong>Reselling to</strong>: <a href="{{ url_for('admin.view_user', id=ticket.reselling_to_id) }}">{{ ticket.reselling_to.fullname }}</a></p>
@@ -39,7 +39,7 @@
                 <li>Ticket <strong>has{% if not ticket.resold %} not{% endif %}</strong> been resold.</li>
             </ul>
             <h4>Ticket Notes</h4>
-            <form action="{{ url_for('admin.note_ticket', id=ticket.id) }}" method="post">
+            <form action="{{ url_for('admin.note_ticket', id=ticket.object_id) }}" method="post">
                 <textarea name="notes">{% if ticket.note %}{{ ticket.note }}{% endif %}</textarea>
                 <input type="submit" class="button tiny" value="Update" />
             </form>
@@ -47,12 +47,12 @@
             <ul>
                 {% if not ticket.cancelled %}
                     {% if ticket.can_be_cancelled_automatically() %}
-                        <li><a href="{{ url_for('admin.auto_cancel_ticket', id=ticket.id) }}" class="button tiny">Refund &amp; Cancel</a></li>
+                        <li><a href="{{ url_for('admin.auto_cancel_ticket', id=ticket.object_id) }}" class="button tiny">Refund &amp; Cancel</a></li>
                     {% endif %}
-                    <li><a href="{{ url_for('admin.cancel_ticket', id=ticket.id) }}" class="button tiny">Cancel</a><span class="small">N.B. This does not process any refund on the ticket</span></li>
+                    <li><a href="{{ url_for('admin.cancel_ticket', id=ticket.object_id) }}" class="button tiny">Cancel</a><span class="small">N.B. This does not process any refund on the ticket</span></li>
                 {% endif %}
                 {% if not ticket.paid %}
-                    <li><a href="{{ url_for('admin.mark_ticket_paid', id=ticket.id) }}" class="button tiny">Mark as Paid</a></li>
+                    <li><a href="{{ url_for('admin.mark_ticket_paid', id=ticket.object_id) }}" class="button tiny">Mark as Paid</a></li>
                 {% endif %}
             </ul>
             <h4>Ticket's Card Transactions</h4>
@@ -70,11 +70,11 @@
                     <tbody>
                         {% for transaction in ticket.transactions %}
                             <tr>
-                                <td>{{ '%05d' % transaction.id }}</td>
+                                <td>{{ '%05d' % transaction.object_id }}</td>
                                 <td>{{ transaction.commenced.strftime('%c') }}</td>
                                 <td>{{ transaction.get_success() }}</td>
                                 <td>{{ transaction.get_status()[1] }}</td>
-                                <td><a href="{{ url_for('admin.view_transaction', id=transaction.id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_transaction', id=transaction.object_id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -98,20 +98,20 @@
                     <tbody>
                         {% for log in events.items %}
                             <tr>
-                                <td>{{ '%05d' % log.id }}</td>
+                                <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
                                 <td><a href="{{ url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
                                 <td>{{ log.action }}</td>
-                                <td><a href="{{ url_for('admin.view_log', id=log.id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% if events.has_prev %}
-                    <a href="{{ url_for('admin.view_ticket', id=ticket.id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin.view_ticket', id=ticket.object_id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
                 {% endif %}
                 {% if events.has_next %}
-                    <a href="{{ url_for('admin.view_ticket', id=ticket.id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin.view_ticket', id=ticket.object_id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events recorded.</p>
