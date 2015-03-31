@@ -384,9 +384,12 @@ def impersonate_user(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/user/<int:id>/give', methods=['POST'])
+@ADMIN.route('/admin/user/<int:id>/give', methods=['GET', 'POST'])
 @admin_required
 def give_user(id):
+    if request.method != 'POST':
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
     user = User.get_by_id(id)
 
     if user:
@@ -450,9 +453,12 @@ def give_user(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/user/<int:id>/note', methods=['POST'])
+@ADMIN.route('/admin/user/<int:id>/note', methods=['GET', 'POST'])
 @admin_required
 def note_user(id):
+    if request.method != 'POST':
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
     user = User.get_by_id(id)
 
     if user:
@@ -671,11 +677,15 @@ def view_ticket(id, events_page=1):
         events_page=events_page
     )
 
-@ADMIN.route('/admin/ticket/<int:id>/collect', methods=['POST'])
+@ADMIN.route('/admin/ticket/<int:id>/collect', methods=['GET', 'POST'])
 @admin_required
 def collect_ticket(id):
+    if request.method != 'POST':
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
     existing = Ticket.query.filter(
-        Ticket.barcode == request.form['barcode']).count()
+        Ticket.barcode == request.form['barcode']
+    ).count()
 
     if existing > 0:
         flash(
@@ -711,9 +721,12 @@ def collect_ticket(id):
         )
         return redirect(request.referrer or url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/ticket/<int:id>/note', methods=['POST'])
+@ADMIN.route('/admin/ticket/<int:id>/note', methods=['GET', 'POST'])
 @admin_required
 def note_ticket(id):
+    if request.method != 'POST':
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
     ticket = Ticket.get_by_id(id)
 
     if ticket:
@@ -908,9 +921,12 @@ def view_transaction(id, events_page=1):
         events_page=events_page
     )
 
-@ADMIN.route('/admin/transaction/<int:id>/refund', methods=['POST'])
+@ADMIN.route('/admin/transaction/<int:id>/refund', methods=['GET', 'POST'])
 @admin_required
 def refund_transaction(id):
+    if request.method != 'POST':
+        return redirect(request.referrer or url_for('admin.adminHome'))
+
     transaction = CardTransaction.get_by_id(id)
 
     if transaction:

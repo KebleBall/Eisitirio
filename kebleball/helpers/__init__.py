@@ -17,8 +17,3 @@ def generate_key(length, choices=None):
 
     return ''.join(random.choice(choices) for x in xrange(length))
 
-def get_boolean_config(key):
-    if isinstance(APP.config[key], datetime):
-        return datetime.utcnow() >= APP.config[key]
-    else:
-        return APP.config[key]

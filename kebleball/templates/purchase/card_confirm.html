@@ -7,6 +7,7 @@
     <section id="card_confirm" class="columns">
         <p><strong>IMPORTANT</strong>: Once you have pressed the "Pay Now" button after entering your card details on our payment gateway, and have reached a page with a button reading "Finalize Payment", your card has been charged. You must then return to our site by pressing the "Finalize Payment" button, so that we are made aware that the payment is completed. If you have reached this page, but your tickets still show as unpaid on our system, please <strong>DO NOT</strong> attempt payment again, but instead contact <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a> for assistance.</p>
         <h3>Your Tickets</h3>
+	    <p>Only tickets with names are shown here. If you have unnamed tickets, you will need to set the names on the dashboard before you can pay for them.</p>
         {% if current_user.has_unpaid_tickets('Card') %}
             <form action="{{ url_for('purchase.card_confirm') }}" method="post">
                 <table id="ticketsTable">
@@ -19,7 +20,7 @@
                     </thead>
                     <tbody>
                         {% for ticket in current_user.tickets %}
-                            {% if ticket.paymentmethod == 'Card' and not ticket.paid and not ticket.cancelled %}
+                            {% if ticket.paymentmethod == 'Card' and not ticket.paid and not ticket.cancelled and ticket.name != None %}
                                 <tr id="ticket-{{ ticket.id }}">
                                     <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.id }}" value="{{ ticket.id }}" {% if tickets and ticket.id in tickets %}checked="checked" {% endif %}/></td>
                                     <td><label for="ticketSelect-{{ ticket.id }}">#{{ '%05d' % ticket.id }}</label></td>

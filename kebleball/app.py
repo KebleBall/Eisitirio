@@ -5,6 +5,6 @@ Initialises the application object, and loads the appropriate config into it.
 """
 import flask
 
-APP = flask.Flask(__name__)
+APP = flask.Flask('kebleball')
 
 APP.config.from_pyfile('config/default.py')

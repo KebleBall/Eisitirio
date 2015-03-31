@@ -17,8 +17,11 @@ from kebleball import views
 from kebleball.helpers import log_manager
 from kebleball.helpers import login_manager
 from kebleball.helpers import email_manager
+from kebleball.helpers import timed_config
 
 APP = app.APP
+
+timed_config.augment_config(APP)
 
 @APP.before_request
 def check_for_maintenance():
