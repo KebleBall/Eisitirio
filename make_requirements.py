@@ -10,16 +10,17 @@ need directly
 import subprocess
 
 def main():
+    """Run the script."""
     major_packages = []
 
-    with open('requirements-unversioned.txt') as fh:
-        for line in fh:
+    with open('requirements-unversioned.txt') as file_handle:
+        for line in file_handle:
             major_packages.append(line.strip())
 
-    with open('requirements.txt', 'w') as fh:
+    with open('requirements.txt', 'w') as file_handle:
         for line in subprocess.check_output(['pip', 'freeze']).split('\n'):
             if line.split('==')[0] in major_packages:
-                fh.write(line + '\n')
+                file_handle.write(line + '\n')
 
 if __name__ == '__main__':
     main()

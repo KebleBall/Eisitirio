@@ -114,8 +114,8 @@ def register():
         valid = False
 
     if (
-            'firstname' not in request.form or
-            request.form['firstname'] == ''
+            'forenames' not in request.form or
+            request.form['forenames'] == ''
     ):
         flashes.append(u'First Name cannot be blank')
         valid = False
@@ -186,7 +186,7 @@ def register():
     user = User(
         request.form['email'],
         request.form['password'],
-        request.form['firstname'],
+        request.form['forenames'],
         request.form['surname'],
         request.form['phone'],
         request.form['college'],
@@ -209,13 +209,13 @@ def register():
         confirmurl=url_for(
             'front.confirm_email',
             user_id=user.object_id,
-            secretkey=user.secretkey,
+            secret_key=user.secret_key,
             _external=True
         ),
         destroyurl=url_for(
             'front.destroy_account',
             user_id=user.object_id,
-            secretkey=user.secretkey,
+            secret_key=user.secret_key,
             _external=True
         )
     )
@@ -256,8 +256,8 @@ def password_reset():
                 "passwordResetFail.email"
             )
         else:
-            user.secretkey = generate_key(64)
-            user.secretkeyexpiry = (
+            user.secret_key = generate_key(64)
+            user.secret_key_expiry = (
                 datetime.utcnow() +
                 timedelta(minutes=30)
             )
@@ -277,7 +277,7 @@ def password_reset():
                 confirmurl=url_for(
                     'front.reset_password',
                     user_id=user.object_id,
-                    secretkey=user.secretkey,
+                    secret_key=user.secret_key,
                     _external=True
                 )
             )
@@ -315,8 +315,8 @@ def email_confirm():
                 "emailConfirmFail.email"
             )
         else:
-            user.secretkey = generate_key(64)
-            user.secretkeyexpiry = None
+            user.secret_key = generate_key(64)
+            user.secret_key_expiry = None
 
             DB.session.commit()
 
@@ -333,13 +333,13 @@ def email_confirm():
                 confirmurl=url_for(
                     'front.confirm_email',
                     user_id=user.object_id,
-                    secretkey=user.secretkey,
+                    secret_key=user.secret_key,
                     _external=True
                 ),
                 destroyurl=url_for(
                     'front.destroy_account',
                     user_id=user.object_id,
-                    secretkey=user.secretkey,
+                    secret_key=user.secret_key,
                     _external=True
                 )
             )
@@ -359,34 +359,34 @@ def email_confirm():
     else:
         return render_template('front/email_confirm.html')
 
-@FRONT.route('/resetpassword/<int:user_id>/<secretkey>', methods=['GET', 'POST'])
-def reset_password(user_id, secretkey):
+@FRONT.route('/resetpassword/<int:user_id>/<secret_key>', methods=['GET', 'POST'])
+def reset_password(user_id, secret_key):
     user = User.get_by_id(user_id)
 
-    if user is None or user.secretkey != secretkey:
-        user.secretkey = None
-        user.secretkeyexpiry = None
+    if user is None or user.secret_key != secret_key:
+        user.secret_key = None
+        user.secret_key_expiry = None
         DB.session.commit()
         flash(u'Could not complete password reset. Please try again', 'error')
         return redirect(url_for('front.home'))
 
     if request.method == 'POST':
         if request.form['password'] != request.form['confirm']:
-            user.secretkey = generate_key(64)
-            user.secretkeyexpiry = datetime.utcnow() + timedelta(minutes=5)
+            user.secret_key = generate_key(64)
+            user.secret_key_expiry = datetime.utcnow() + timedelta(minutes=5)
             DB.session.commit()
             flash(u'Passwords do not match, please try again', 'warning')
             return redirect(
                 url_for(
                     'front.reset_password',
                     user_id=user.object_id,
-                    secretkey=user.secretkey
+                    secret_key=user.secret_key
                 )
             )
         else:
             user.set_password(request.form['password'])
-            user.secretkey = None
-            user.secretkeyexpiry = None
+            user.secret_key = None
+            user.secret_key_expiry = None
             DB.session.commit()
 
             APP.log_manager.log_event(
@@ -401,20 +401,20 @@ def reset_password(user_id, secretkey):
         return render_template(
             'front/reset_password.html',
             user_id=user_id,
-            secretkey=secretkey
+            secret_key=secret_key
         )
 
-@FRONT.route('/confirmemail/<int:user_id>/<secretkey>')
-def confirm_email(user_id, secretkey):
+@FRONT.route('/confirmemail/<int:user_id>/<secret_key>')
+def confirm_email(user_id, secret_key):
     user = User.get_by_id(user_id)
 
-    if user is not None and user.secretkey == secretkey:
-        user.secretkey = None
+    if user is not None and user.secret_key == secret_key:
+        user.secret_key = None
         user.verified = True
 
-        if user.newemail is not None:
-            user.email = user.newemail
-            user.newemail = None
+        if user.new_email is not None:
+            user.email = user.new_email
+            user.new_email = None
 
         DB.session.commit()
 
@@ -431,11 +431,11 @@ def confirm_email(user_id, secretkey):
 
     return redirect(url_for('front.home'))
 
-@FRONT.route('/destroyaccount/<int:user_id>/<secretkey>')
-def destroy_account(user_id, secretkey):
+@FRONT.route('/destroyaccount/<int:user_id>/<secret_key>')
+def destroy_account(user_id, secret_key):
     user = User.get_by_id(user_id)
 
-    if user is not None and user.secretkey == secretkey:
+    if user is not None and user.secret_key == secret_key:
         if not user.is_verified():
             for entry in user.events:
                 entry.action = (

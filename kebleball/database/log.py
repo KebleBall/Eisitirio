@@ -5,18 +5,11 @@ log.py
 Contains Log class
 Used to store log entries
 """
+import datetime
 
 from kebleball.database import db
-from kebleball.database import user
-from kebleball.database import ticket
-from kebleball.database import card_transaction
-from datetime import datetime
 
 DB = db.DB
-
-User = user.User
-Ticket = ticket.Ticket
-CardTransaction = card_transaction.CardTransaction
 
 LOG_TICKET_LINK = DB.Table(
     'log_ticket_link',
@@ -32,6 +25,7 @@ LOG_TICKET_LINK = DB.Table(
 )
 
 class Log(DB.Model):
+    """Model for log entries persisted to the database."""
     object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
@@ -41,7 +35,7 @@ class Log(DB.Model):
         DB.DateTime,
         nullable=False
     )
-    ip = DB.Column(
+    ip_address = DB.Column(
         DB.String(45),
         nullable=False
     )
@@ -53,7 +47,7 @@ class Log(DB.Model):
         nullable=True
     )
     actor = DB.relationship(
-        User,
+        'User',
         backref=DB.backref(
             'actions',
             lazy='dynamic'
@@ -67,7 +61,7 @@ class Log(DB.Model):
         nullable=True
     )
     user = DB.relationship(
-        User,
+        'User',
         backref=DB.backref(
             'events',
             lazy='dynamic'
@@ -91,18 +85,19 @@ class Log(DB.Model):
         nullable=True
     )
     transaction = DB.relationship(
-        CardTransaction,
+        'CardTransaction',
         backref=DB.backref(
             'events',
             lazy='dynamic'
         )
     )
 
-    def __init__(self, ip, action, actor, user, tickets=None, transaction=None):
+    def __init__(self, ip_address, action, actor, user, tickets=None,
+                 transaction=None):
         if tickets is None:
             tickets = []
-        self.timestamp = datetime.utcnow()
-        self.ip = ip
+        self.timestamp = datetime.datetime.utcnow()
+        self.ip_address = ip_address
         self.action = action
 
         if hasattr(actor, 'object_id'):
@@ -119,7 +114,7 @@ class Log(DB.Model):
             if hasattr(ticket, 'object_id'):
                 self.tickets.append(ticket)
             else:
-                self.tickets.append(Ticket.get_by_id(ticket))
+                self.tickets.append(ticket.Ticket.get_by_id(ticket))
 
         if hasattr(transaction, 'object_id'):
             self.transaction_id = transaction.object_id
@@ -133,12 +128,11 @@ class Log(DB.Model):
         )
 
     def display(self):
-        return '{0}: {1} {2} acting as {3} {4}{5}{6} - {7}'.format(
+        """Neatly render all the information contained in a log entry."""
+        return '{0}: {1} acting as {2} {3}{4} - {5}'.format(
             self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)'),
-            self.actor.firstname,
-            self.actor.surname,
-            self.user.firstname,
-            self.user.surname,
+            self.actor.full_name,
+            self.user.full_name,
             (
                 "" if self.ticket is None else (
                     ", in relation "
@@ -160,6 +154,7 @@ class Log(DB.Model):
 
     @staticmethod
     def get_by_id(object_id):
+        """Get a Log object by its database ID."""
         log = Log.query.filter(Log.object_id == int(object_id)).first()
 
         if not log:

@@ -11,6 +11,7 @@ from kebleball.database import db
 DB = db.DB
 
 class Affiliation(DB.Model):
+    """Model for representing a users affiliation to their college."""
     object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
@@ -29,6 +30,7 @@ class Affiliation(DB.Model):
 
     @staticmethod
     def get_by_id(object_id):
+        """Get and Affiliation object by its database ID."""
         affiliation = Affiliation.query.filter(
             Affiliation.object_id == int(object_id)
         ).first()

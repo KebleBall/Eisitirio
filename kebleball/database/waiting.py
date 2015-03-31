@@ -14,11 +14,11 @@ class Waiting(DB.Model):
         primary_key=True,
         nullable=False
     )
-    waitingsince = DB.Column(
+    waiting_since = DB.Column(
         DB.DateTime(),
         nullable=False
     )
-    waitingfor = DB.Column(
+    waiting_for = DB.Column(
         DB.Integer(),
         nullable=False
     )
@@ -51,7 +51,7 @@ class Waiting(DB.Model):
         foreign_keys=[referrer_id]
     )
 
-    def __init__(self, user, waitingfor, referrer=None):
+    def __init__(self, user, waiting_for, referrer=None):
         if hasattr(user, 'object_id'):
             self.user_id = user.object_id
         else:
@@ -62,16 +62,15 @@ class Waiting(DB.Model):
         else:
             self.referrer_id = referrer
 
-        self.waitingfor = waitingfor
+        self.waiting_for = waiting_for
 
-        self.waitingsince = datetime.utcnow()
+        self.waiting_since = datetime.utcnow()
 
     def __repr__(self):
-        return '<Waiting: {0} {1} for {2} ticket{3}>'.format(
-            self.user.firstname,
-            self.user.surname,
-            self.waitingfor,
-            '' if self.waitingfor == 1 else 's'
+        return '<Waiting: {0} for {1} ticket{2}>'.format(
+            self.user.full_name,
+            self.waiting_for,
+            '' if self.waiting_for == 1 else 's'
         )
 
     @staticmethod

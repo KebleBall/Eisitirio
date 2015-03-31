@@ -66,7 +66,7 @@ def cancel_resale():
             if not ticket:
                 continue
 
-            ticket.resalekey = None
+            ticket.resale_key = None
             ticket.resaleconfirmed = None
             ticket.reselling_to = None
             ticket.reselling_to_id = None

@@ -12,6 +12,7 @@ from datetime import datetime
 DB = db.DB
 
 class Statistic(DB.Model):
+    """Model for representing a statistic in a timeseries."""
     object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
@@ -59,6 +60,7 @@ class Statistic(DB.Model):
 
     @staticmethod
     def get_by_id(object_id):
+        """Get a Statistic object by its database ID."""
         statistic = Statistic.query.filter(
             Statistic.object_id == int(object_id)
         ).first()

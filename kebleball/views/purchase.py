@@ -1,4 +1,6 @@
 # coding: utf-8
+"""Views related to the purcahse process."""
+
 from flask import Blueprint, request, render_template, flash, redirect, url_for
 from flask.ext import login
 
@@ -13,16 +15,16 @@ from kebleball.helpers import validators
 APP = app.APP
 DB = db.DB
 
-Ticket = ticket.Ticket
-Waiting = waiting.Waiting
-CardTransaction = card_transaction.CardTransaction
-
 PURCHASE = Blueprint('purchase', __name__)
 
 @PURCHASE.route('/purchase', methods=['GET', 'POST'])
 @login.login_required
 def purchase_home():
-    (buying_permitted, tickets_available, can_buy_message) = purchase_help.canBuy(login.current_user)
+    (
+        buying_permitted,
+        tickets_available,
+        can_buy_message
+    ) = purchase_help.canBuy(login.current_user)
 
     if not buying_permitted:
         flash(
@@ -91,7 +93,12 @@ def purchase_home():
                 request.form['voucherCode'])
             if not result:
                 valid = False
-                flashes.append(response['message'] + u' Please clear the discount code field to continue without using a voucher.')
+                flashes.append(
+                    (
+                        u'{} Please clear the discount code field to continue '
+                        u'without using a voucher.'
+                    ).format(response['message'])
+                )
 
         referrer = None
         if ('referrerEmail' in request.form
@@ -100,7 +107,12 @@ def purchase_home():
                 request.form['referrerEmail'], login.current_user)
             if not result:
                 valid = False
-                flashes.append(response['message'] + u' Please clear the referrer field to continue without giving somebody credit.')
+                flashes.append(
+                    (
+                        u'{} Please clear the referrer field to continue '
+                        u'without giving somebody credit.'
+                    ).format(response['message'])
+                )
 
         if not valid:
             flash(
@@ -124,10 +136,13 @@ def purchase_home():
 
         if login.current_user.gets_discount():
             tickets.append(
-                Ticket(
+                ticket.Ticket(
                     login.current_user,
                     request.form['paymentMethod'],
-                    login.current_user.get_base_ticket_price() - APP.config['KEBLE_DISCOUNT']
+                    (
+                        login.current_user.get_base_ticket_price() -
+                        APP.config['KEBLE_DISCOUNT']
+                    )
                 )
             )
             start = 1
@@ -136,7 +151,7 @@ def purchase_home():
 
         for _ in xrange(start, num_tickets):
             tickets.append(
-                Ticket(
+                ticket.Ticket(
                     login.current_user,
                     request.form['paymentMethod'],
                     login.current_user.get_base_ticket_price()
@@ -155,7 +170,8 @@ def purchase_home():
                 )
 
         if voucher is not None:
-            (success, tickets, error) = voucher.apply(tickets, login.current_user)
+            (success, tickets, error) = voucher.apply(tickets,
+                                                      login.current_user)
             if not success:
                 flash('Could not use Voucher - ' + error, 'error')
 
@@ -206,7 +222,8 @@ def purchase_home():
                 'info'
             )
         else:
-            flash(u'Please set names for these tickets before collection', 'info')
+            flash(u'Please set names for these tickets before collection',
+                  u'info')
         return redirect(url_for('dashboard.dashboardHome'))
     else:
         return render_template(
@@ -217,7 +234,12 @@ def purchase_home():
 @PURCHASE.route('/purchase/wait', methods=['GET', 'POST'])
 @login.login_required
 def wait():
-    (wait_permitted, wait_available, can_wait_message) = purchase_help.canWait(login.current_user)
+    (
+        wait_permitted,
+        wait_available,
+        can_wait_message
+    ) = purchase_help.canWait(login.current_user)
+
     if not wait_permitted:
         flash(
             (
@@ -252,7 +274,12 @@ def wait():
                 request.form['referrerEmail'], login.current_user)
             if not result:
                 valid = False
-                flashes.append(response['message'] + u' Please clear the referrer field to continue without giving somebody credit.')
+                flashes.append(
+                    (
+                        u'{} Please clear the referrer field to continue '
+                        u'without giving somebody credit.'
+                    ).format(response['message'])
+                )
 
         if not valid:
             flash(
@@ -273,7 +300,7 @@ def wait():
             )
 
         DB.session.add(
-            Waiting(
+            waiting.Waiting(
                 login.current_user,
                 num_tickets,
                 referrer
@@ -310,11 +337,13 @@ def wait():
 @login.login_required
 def change_method():
     if request.method == 'POST':
-        tickets = Ticket.query \
-            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == login.current_user.object_id) \
-            .filter(Ticket.paid == False) \
-            .all()
+        tickets = ticket.Ticket.query.filter(
+            ticket.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        ).filter(
+            ticket.Ticket.owner_id == login.current_user.object_id
+        ).filter(
+            ticket.Ticket.paid == False
+        ).all()
 
         while None in tickets:
             tickets.remove(None)
@@ -328,7 +357,8 @@ def change_method():
                     request.form['paymentReason'] == ''
                 )
         ):
-            flash(u'You must give a reason for paying by cash or cheque.', 'error')
+            flash(u'You must give a reason for paying by cash or cheque.',
+                  u'error')
             return render_template(
                 'purchase/change_method.html',
                 tickets=request.form.getlist('tickets[]')
@@ -352,7 +382,10 @@ def change_method():
         )
 
         flash(
-            u'The payment method on the selected tickets has been changed successfully',
+            (
+                u'The payment method on the selected tickets has been changed '
+                u'successfully'
+            ),
             'success'
         )
 
@@ -362,16 +395,18 @@ def change_method():
 @login.login_required
 def card_confirm():
     if request.method == 'POST':
-        tickets = Ticket.query \
-            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == login.current_user.object_id) \
-            .filter(Ticket.paid == False) \
-            .all()
+        tickets = ticket.Ticket.query.filter(
+            ticket.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        ).filter(
+            ticket.Ticket.owner_id == login.current_user.object_id
+        ).filter(
+            ticket.Ticket.paid == False
+        ).all()
 
         while None in tickets:
             tickets.remove(None)
 
-        transaction = CardTransaction(
+        transaction = card_transaction.CardTransaction(
             login.current_user,
             tickets
         )
@@ -388,7 +423,7 @@ def card_confirm():
 
 @PURCHASE.route('/purchase/eway-success/<int:object_id>')
 def eway_success(object_id):
-    transaction = CardTransaction.get_by_id(object_id)
+    transaction = card_transaction.CardTransaction.get_by_id(object_id)
 
     transaction.process_eway_payment()
 
@@ -396,7 +431,7 @@ def eway_success(object_id):
 
 @PURCHASE.route('/purchase/eway-cancel/<int:object_id>')
 def eway_cancel(object_id):
-    transaction = CardTransaction.get_by_id(object_id)
+    transaction = card_transaction.CardTransaction.get_by_id(object_id)
 
     transaction.cancel_eway_payment()
 
@@ -414,11 +449,13 @@ def battels_confirm():
         return redirect(url_for('purchase.change_method'))
 
     if request.method == 'POST':
-        tickets = Ticket.query \
-            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == login.current_user.object_id) \
-            .filter(Ticket.paid == False) \
-            .all()
+        tickets = ticket.Ticket.query.filter(
+            ticket.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        ).filter(
+            ticket.Ticket.owner_id == login.current_user.object_id
+        ).filter(
+            ticket.Ticket.paid == False
+        ).all()
 
         while None in tickets:
             tickets.remove(None)
@@ -450,10 +487,11 @@ def battels_confirm():
 @login.login_required
 def cancel():
     if request.method == 'POST':
-        tickets = Ticket.query \
-            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == login.current_user.object_id) \
-            .all()
+        tickets = ticket.Ticket.query.filter(
+            ticket.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        ).filter(
+            ticket.Ticket.owner_id == login.current_user.object_id
+        ).all()
 
         while None in tickets:
             tickets.remove(None)
@@ -469,14 +507,14 @@ def cancel():
                 ticket.cancelled = True
                 DB.session.commit()
                 cancelled.append(ticket)
-            elif ticket.paymentmethod == 'Free':
+            elif ticket.payment_method == 'Free':
                 ticket.cancelled = True
                 DB.session.commit()
                 cancelled.append(ticket)
-            elif ticket.paymentmethod == 'Battels':
+            elif ticket.payment_method == 'Battels':
                 ticket.battels.cancel(ticket)
                 cancelled.append(ticket)
-            elif ticket.paymentmethod == 'Card':
+            elif ticket.payment_method == 'Card':
                 if ticket.card_transaction_id in card_transactions:
                     card_transactions[ticket.card_transaction_id]['tickets'] \
                         .append(ticket)

@@ -263,7 +263,7 @@
                     {% for user in results.items %}
                         <tr id="user-{{ user.object_id }}">
                             <td>#{{ '%05d' % user.object_id }}</td>
-                            <td>{{ user.fullname }}</td>
+                            <td>{{ user.full_name }}</td>
                             <td>{{ user.email }}</td>
                             <td><a class="button small" href="{{ url_for('admin.view_user', id=user.object_id) }}">View User</a></td>
                         </tr>
@@ -291,7 +291,7 @@
                                     Cancelled.
                                 {% elif ticket.collected -%}
                                     Collected as {{ ticket.barcode }}.
-                                {% elif ticket.resalekey != None -%}
+                                {% elif ticket.resale_key != None -%}
                                     {% if ticket.resaleconfirmed -%}
                                         Pending resale completion
                                     {% else -%}
@@ -301,10 +301,10 @@
                                     {% if ticket.payment_method == 'Free' -%}
                                         Free Ticket.
                                     {% else -%}
-                                        Paid for by {{ ticket.paymentmethod }}.
+                                        Paid for by {{ ticket.payment_method }}.
                                     {% endif %}
                                 {% else -%}
-                                    Awaiting {{ ticket.paymentmethod }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                    Awaiting {{ ticket.payment_method }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                 {% endif %}
                             </td>
                             <td><a class="button small" href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}">View Ticket</a></td>
@@ -331,8 +331,8 @@
                             <td>{{ log.timestamp.strftime('%c') }}</td>
                             <td>{{ log.ip }}</td>
                             <td>{{ log.action }}</td>
-                            <td>{{ log.actor.fullname }}</td>
-                            <td>{{ log.user.fullname }}</td>
+                            <td>{{ log.actor.full_name }}</td>
+                            <td>{{ log.user.full_name }}</td>
                             <td><a class="button small" href="{{ url_for('admin.view_log', id=log.object_id) }}">View Log Entry</a></td>
                         </tr>
                     {% endfor %}

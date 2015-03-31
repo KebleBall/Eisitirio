@@ -14,7 +14,6 @@ from datetime import datetime
 
 APP = app.APP
 DB = db.DB
-User = user.User
 
 USER_ANNOUNCE_LINK = DB.Table(
     'user_announce_link',
@@ -47,6 +46,7 @@ EMAIL_ANNOUNCE_LINK = DB.Table(
 )
 
 class Announcement(DB.Model):
+    """Model for an announcement sent to registered users."""
     object_id = DB.Column(
         DB.Integer,
         primary_key=True,
@@ -178,13 +178,15 @@ class Announcement(DB.Model):
         else:
             self.affiliation_id = affiliation
 
-        query = User.query
+        query = user.User.query
 
         if self.college_id is not None:
-            query = query.filter(User.college_id == self.college_id)
+            query = query.filter(user.User.college_id == self.college_id)
 
         if self.affiliation_id is not None:
-            query = query.filter(User.affiliation_id == self.affiliation_id)
+            query = query.filter(
+                user.User.affiliation_id == self.affiliation_id
+            )
 
         for user in query.all():
             if (
@@ -213,6 +215,18 @@ class Announcement(DB.Model):
         return "<Announcement {0}: {1}>".format(self.object_id, self.subject)
 
     def send_emails(self, count):
+        """Send the announcement as an email to a limited number of recipients.
+
+        Used for batch sending, renders the text of the announcement into an
+        email and sends it to users who match the criteria.
+
+        Args:
+            count: (int) Maximum number of emails to send
+
+        Returns:
+            (int) How much of the original limit is remaining (i.e. |count|
+            minus the nuber of emails sent)
+        """
         try:
             msg = MIMEText(self.content)
             msg['Subject'] = self.subject
@@ -237,6 +251,7 @@ class Announcement(DB.Model):
 
     @staticmethod
     def get_by_id(object_id):
+        """Get an Announcement object by its database ID."""
         announcement = Announcement.query.filter(
             Announcement.object_id == int(object_id)
         ).first()

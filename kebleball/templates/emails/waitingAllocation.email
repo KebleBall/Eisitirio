@@ -1,4 +1,4 @@
-Hi {{ user.firstname }},
+Hi {{ user.forenames }},
 
 You have been allocated {{ num_tickets }} ticket{% if num_tickets != 1 %}s{% endif %} for Keble Ball as you were on the waiting list. If you were waiting for more tickets, these may be allocated to you at a later date.
 

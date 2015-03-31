@@ -67,7 +67,7 @@ def admin_home(page=1):
                 request.form['userName'] != ''
         ):
             user_query = user_query.filter(
-                User.fullname.like('%' + request.form['userName'] + '%'))
+                User.full_name.like('%' + request.form['userName'] + '%'))
             has_user_filter = True
 
         if (
@@ -164,7 +164,7 @@ def admin_home(page=1):
                 request.form['ticketMethod'] != 'Any'
         ):
             ticket_query = ticket_query.filter(
-                Ticket.paymentmethod == request.form['ticketMethod'])
+                Ticket.payment_method == request.form['ticketMethod'])
             has_ticket_filter = True
 
         if (
@@ -404,12 +404,12 @@ def give_user(object_id):
                 request.form['giveReason'] == ''
         ):
             note = 'Given by {0} (#{1}) for no reason.'.format(
-                current_user.fullname,
+                current_user.full_name,
                 current_user.object_id
             )
         else:
             note = 'Given by {0} (#{1}) with reason: {2}.'.format(
-                current_user.fullname,
+                current_user.full_name,
                 current_user.object_id,
                 request.form['giveReason']
             )
@@ -438,7 +438,7 @@ def give_user(object_id):
 
         flash(
             u'Gave {0} {1} tickets'.format(
-                user.firstname,
+                user.forenames,
                 num_tickets
             ),
             'success'
@@ -792,9 +792,9 @@ def auto_cancel_ticket(object_id):
             return redirect(request.referrer
                             or url_for('admin.view_ticket', object_id=ticket.object_id))
 
-        if ticket.paymentmethod == 'Battels':
+        if ticket.payment_method == 'Battels':
             ticket.battels.cancel(ticket)
-        elif ticket.paymentmethod == 'Card':
+        elif ticket.payment_method == 'Card':
             refund_result = ticket.card_transaction.process_refund(ticket.price)
             if not refund_result:
                 flash(
@@ -874,7 +874,7 @@ def validate_ticket():
                 "entry. Check ID against {0} (owned by {1})"
             ).format(
                 ticket.name,
-                ticket.owner.fullname
+                ticket.owner.full_name
             )
         else:
             ticket.entered = True
@@ -991,9 +991,9 @@ def statistics():
         cancelled_value = 0
 
     payment_method_values = DB.session \
-        .query(func.sum(Ticket.price), Ticket.paymentmethod) \
+        .query(func.sum(Ticket.price), Ticket.payment_method) \
         .filter(Ticket.cancelled != True) \
-        .group_by(Ticket.paymentmethod) \
+        .group_by(Ticket.payment_method) \
         .all()
 
     return render_template(

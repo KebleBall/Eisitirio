@@ -82,7 +82,7 @@ def allocate_waiting():
     tickets_available = APP.config['TICKETS_AVAILABLE'] - DB.Ticket.count()
 
     for wait in DB.Waiting.query.order_by(DB.Waiting.waitingsince).all():
-        if wait.waitingfor > tickets_available:
+        if wait.waiting_for > tickets_available:
             break
 
         tickets = []
@@ -102,7 +102,7 @@ def allocate_waiting():
         else:
             start = 0
 
-        for _ in xrange(start, wait.waitingfor):
+        for _ in xrange(start, wait.waiting_for):
             tickets.append(
                 DB.Ticket(
                     wait.user,
@@ -129,7 +129,7 @@ def allocate_waiting():
 
         DB.session.commit()
 
-        tickets_available -= wait.waitingfor
+        tickets_available -= wait.waiting_for
 
 def cancel_expired_tickets(now):
     """Cancel all tickets which have not been paid for in the given time."""
@@ -150,13 +150,13 @@ def cancel_expired_tickets(now):
 def remove_expired_secret_keys(now):
     """Remove expired secret keys for password resets."""
     expired = DB.User.query \
-        .filter(DB.User.secretkeyexpiry != None) \
-        .filter(DB.User.secretkeyexpiry < now) \
+        .filter(DB.User.secret_key_expiry != None) \
+        .filter(DB.User.secret_key_expiry < now) \
         .all()
 
     for user in expired:
-        user.secretkeyexpiry = None
-        user.secretkey = None
+        user.secret_key_expiry = None
+        user.secret_key = None
 
     DB.session.commit()
 
@@ -195,7 +195,7 @@ def generate_sales_statistics():
             maybe_int(
                 DB.session.query(
                     func.sum(
-                        DB.Waiting.waitingfor
+                        DB.Waiting.waiting_for
                     )
                 ).scalar()
             ),
@@ -218,12 +218,12 @@ def generate_payment_statistics():
             'Payments',
             str(method[0]),
             DB.Ticket.query \
-                .filter(DB.Ticket.paymentmethod == method[0]) \
+                .filter(DB.Ticket.payment_method == method[0]) \
                 .filter(DB.Ticket.paid == True) \
                 .count()
         ) for method in DB.session.query(
             distinct(
-                DB.Ticket.paymentmethod
+                DB.Ticket.payment_method
             )
         ).all()
     )

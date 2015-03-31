@@ -66,7 +66,7 @@ class Ticket(DB.Model):
         default=False,
         nullable=False
     )
-    paymentmethod = DB.Column(
+    payment_method = DB.Column(
         DB.Enum(
             'Battels',
             'Card',
@@ -76,7 +76,7 @@ class Ticket(DB.Model):
         ),
         nullable=True
     )
-    paymentreference = DB.Column(
+    payment_reference = DB.Column(
         DB.String(50),
         nullable=True
     )
@@ -96,7 +96,7 @@ class Ticket(DB.Model):
         DB.DateTime(),
         nullable=True
     )
-    resalekey = DB.Column(
+    resale_key = DB.Column(
         DB.String(32),
         nullable=True
     )
@@ -183,13 +183,13 @@ class Ticket(DB.Model):
         foreign_keys=[battels_id]
     )
 
-    def __init__(self, owner, paymentmethod, price):
+    def __init__(self, owner, payment_method, price):
         if hasattr(owner, 'object_id'):
             self.owner_id = owner.object_id
         else:
             self.owner_id = owner
 
-        self.paymentmethod = paymentmethod
+        self.payment_method = payment_method
         self.set_price(price)
 
         self.expires = datetime.utcnow() + app.config['TICKET_EXPIRY_TIME']
@@ -207,7 +207,7 @@ class Ticket(DB.Model):
     def __repr__(self):
         return '<Ticket {0} owned by {1} ({2})>'.format(
             self.object_id,
-            self.owner.fullname,
+            self.owner.full_name,
             self.owner_id
         )
 
@@ -229,7 +229,7 @@ class Ticket(DB.Model):
                 reason
             )
 
-        self.paymentmethod = method
+        self.payment_method = method
 
     def mark_as_paid(self, method, reference, **kwargs):
         """Mark the ticket as paid."""
@@ -245,8 +245,8 @@ class Ticket(DB.Model):
             )
 
         self.paid = True
-        self.paymentmethod = method
-        self.paymentreference = reference
+        self.payment_method = method
+        self.payment_reference = reference
         self.expires = None
 
         if 'transaction' in kwargs:
@@ -291,11 +291,11 @@ class Ticket(DB.Model):
                 object_id = reselling_to
                 reselling_to = DB.User.get_by_id(reselling_to)
 
-            resalekey = generate_key(32)
+            resale_key = generate_key(32)
 
             for ticket in tickets:
                 ticket.reselling_to_id = object_id
-                ticket.resalekey = resalekey
+                ticket.resale_key = resale_key
                 ticket.resaleconfirmed = False
 
             DB.session.commit()
@@ -314,14 +314,14 @@ class Ticket(DB.Model):
                     'resale.resale_confirm',
                     resale_from=flask_login.current_user.object_id,
                     resale_to=object_id,
-                    key=resalekey,
+                    key=resale_key,
                     _external=True
                 ),
                 cancelurl=url_for(
                     'resale.resale_cancel',
                     resale_from=flask_login.current_user.object_id,
                     resale_to=object_id,
-                    key=resalekey,
+                    key=resale_key,
                     _external=True
                 ),
                 num_tickets=len(tickets),
@@ -338,7 +338,7 @@ class Ticket(DB.Model):
         tickets = Ticket.query \
             .filter(Ticket.owner_id == resale_from) \
             .filter(Ticket.reselling_to_id == resale_to) \
-            .filter(Ticket.resalekey == key) \
+            .filter(Ticket.resale_key == key) \
             .all()
 
         if len(tickets) > 0:
@@ -358,7 +358,7 @@ class Ticket(DB.Model):
             for ticket in tickets:
                 ticket.reselling_to = None
                 ticket.reselling_to_id = None
-                ticket.resalekey = None
+                ticket.resale_key = None
                 ticket.resaleconfirmed = None
 
             DB.session.commit()
@@ -397,13 +397,13 @@ class Ticket(DB.Model):
         tickets = Ticket.query \
             .filter(Ticket.owner_id == resale_from) \
             .filter(Ticket.reselling_to_id == resale_to) \
-            .filter(Ticket.resalekey == key) \
+            .filter(Ticket.resale_key == key) \
             .all()
 
         if len(tickets) > 0:
             resale_from = tickets[0].owner
             resale_to = tickets[0].reselling_to
-            resalekey = generate_key(32)
+            resale_key = generate_key(32)
 
             if flask_login.current_user != resale_to:
                 flash(
@@ -413,7 +413,7 @@ class Ticket(DB.Model):
                 return False
 
             for ticket in tickets:
-                ticket.resalekey = resalekey
+                ticket.resale_key = resale_key
                 ticket.resaleconfirmed = True
 
             DB.session.commit()
@@ -433,14 +433,14 @@ class Ticket(DB.Model):
                     'resale.resale_complete',
                     resale_from=resale_from.object_id,
                     resale_to=resale_to.object_id,
-                    key=resalekey,
+                    key=resale_key,
                     _external=True
                 ),
                 cancelurl=url_for(
                     'resale.resale_cancel',
                     resale_from=resale_from.object_id,
                     resale_to=resale_to.object_id,
-                    key=resalekey,
+                    key=resale_key,
                     _external=True
                 ),
                 num_tickets=len(tickets)
@@ -460,7 +460,7 @@ class Ticket(DB.Model):
         tickets = Ticket.query \
             .filter(Ticket.owner_id == resale_from) \
             .filter(Ticket.reselling_to_id == resale_to) \
-            .filter(Ticket.resalekey == key) \
+            .filter(Ticket.resale_key == key) \
             .filter(Ticket.resaleconfirmed == True) \
             .all()
 
@@ -478,15 +478,15 @@ class Ticket(DB.Model):
                 ticket.add_note(
                     'Resold by {0}/{1} to {2}/{3}'.format(
                         ticket.owner.object_id,
-                        ticket.owner.fullname,
+                        ticket.owner.full_name,
                         ticket.reselling_to.object_id,
-                        ticket.reselling_to.fullname
+                        ticket.reselling_to.full_name
                     )
                 )
                 ticket.owner = ticket.reselling_to
                 ticket.reselling_to_id = None
                 ticket.reselling_to = None
-                ticket.resalekey = None
+                ticket.resale_key = None
                 ticket.name = None
                 ticket.resold = True
 
@@ -510,21 +510,21 @@ class Ticket(DB.Model):
             return False
         elif self.collected:
             return False
-        elif self.resalekey is not None:
+        elif self.resale_key is not None:
             return False
         elif self.resold:
             return False
         elif not self.paid:
             return True
-        elif self.paymentmethod == 'Card':
+        elif self.payment_method == 'Card':
             return True
-        elif self.paymentmethod == 'Battels':
+        elif self.payment_method == 'Battels':
             return (
                 app.config['CURRENT_TERM'] != 'TT' and
                 self.battels is not None and
                 self.battels == self.owner.battels
             )
-        elif self.paymentmethod == 'Free':
+        elif self.payment_method == 'Free':
             return True
         else:
             return False
@@ -544,7 +544,7 @@ class Ticket(DB.Model):
             self.paid and
             not self.collected and
             not self.cancelled and
-            self.resalekey == None and
+            self.resale_key == None and
             not app.config['LOCKDOWN_MODE']
         )
 

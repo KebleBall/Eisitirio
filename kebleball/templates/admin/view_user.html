@@ -1,7 +1,7 @@
 <!-- admin/view_user.html -->
 {% extends 'layout.html' %}
 
-{% block title %}{% if not user %}No User Found{% else %}View User - {{ user.fullname }}{% endif %}{% endblock %}
+{% block title %}{% if not user %}No User Found{% else %}View User - {{ user.full_name }}{% endif %}{% endblock %}
 
 {% block content %}
     <section id="view_user" class="columns">
@@ -9,7 +9,7 @@
             <p>No user was found with that ID.</p>
         {% else %}
             <h4>User Details</h4>
-            <p><strong>First Name(s)</strong>: {{ user.firstname }}</p>
+            <p><strong>First Name(s)</strong>: {{ user.forenames }}</p>
             <p><strong>Last Name(s)</strong>: {{ user.surname }}</p>
             <p><strong>Email</strong>: {{ user.email }}</p>
             <p><strong>Phone</strong>: {{ user.phone }}</p>
@@ -91,7 +91,7 @@
                                         Cancelled.
                                     {% elif ticket.collected -%}
                                         Collected as {{ ticket.barcode }}.
-                                    {% elif ticket.resalekey != None -%}
+                                    {% elif ticket.resale_key != None -%}
                                         {% if ticket.resaleconfirmed -%}
                                             Pending resale completion
                                         {% else -%}
@@ -101,10 +101,10 @@
                                         {% if ticket.payment_method == 'Free' -%}
                                             Free Ticket.
                                         {% else -%}
-                                            Paid for by {{ ticket.paymentmethod }}.
+                                            Paid for by {{ ticket.payment_method }}.
                                         {% endif %}
                                     {% else -%}
-                                        Awaiting {% if ticket.paymentmethod %}{{ ticket.paymentmethod }} {% endif %}payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                        Awaiting {% if ticket.payment_method %}{{ ticket.payment_method }} {% endif %}payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                     {% endif %}
                                 </td>
                                 <td>
@@ -130,8 +130,8 @@
                     <tbody>
                         {% for waiting in user.waiting %}
                             <tr>
-                                <td>{{ waiting.waitingfor }}</td>
-                                <td>{{ waiting.waitingsince.strftime('%c') }}</td>
+                                <td>{{ waiting.waiting_for }}</td>
+                                <td>{{ waiting.waiting_since.strftime('%c') }}</td>
                                 <td><a href="{{ url_for('admin.deleteWaiting', id=waiting.object_id) }}" class="button tiny">Remove</a></td>
                             </tr>
                         {% endfor %}
@@ -158,7 +158,7 @@
                                 <td>
                                     {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
                                 </td>
-                                <td>{{ ticket.owner.fullname }}</td>
+                                <td>{{ ticket.owner.full_name }}</td>
                                 <td>
                                     <a href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
                                 </td>
@@ -186,7 +186,7 @@
                         {% for transaction in user.transactions %}
                             <tr>
                                 <td>{{ '%05d' % transaction.object_id }}</td>
-                                <td>{% if transaction.ewayid != None %}{{ transaction.ewayid }}{% else %}N/A{% endif %}
+                                <td>{% if transaction.eway_id != None %}{{ transaction.eway_id }}{% else %}N/A{% endif %}
                                 <td>{{ transaction.commenced.strftime('%c') }}</td>
                                 <td>{{ transaction.get_success() }}</td>
                                 <td>{{ transaction.get_status()[1] }}</td>
@@ -248,7 +248,7 @@
                             <tr>
                                 <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
+                                <td><a href="url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
                                 <td>{{ log.action }}</td>
                                 <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>
@@ -282,7 +282,7 @@
                             <tr>
                                 <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="url_for('admin.view_user', id=log.user_id) }}">{{ log.user.fullname }}</a></td>
+                                <td><a href="url_for('admin.view_user', id=log.user_id) }}">{{ log.user.full_name }}</a></td>
                                 <td>{{ log.action }}</td>
                                 <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>

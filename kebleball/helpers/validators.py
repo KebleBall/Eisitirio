@@ -22,7 +22,7 @@ def validateVoucher(code):
             None
         )
     else:
-        if voucher.singleuse and voucher.used:
+        if voucher.single_use and voucher.used:
             result = (
                 False,
                 {
@@ -42,20 +42,20 @@ def validateVoucher(code):
                 None
             )
         else:
-            if voucher.discounttype == 'Fixed Price':
+            if voucher.discount_type == 'Fixed Price':
                 message = "This voucher gives a fixed price of &pound;{0:.2f} for ".format(
-                    (voucher.discountvalue / 100.0)
+                    (voucher.discount_value / 100.0)
                 )
-            elif voucher.discounttype == 'Fixed Discount':
+            elif voucher.discount_type == 'Fixed Discount':
                 message = "This voucher gives a fixed &pound;{0:.2f} discount off ".format(
-                    (voucher.discountvalue / 100.0)
+                    (voucher.discount_value / 100.0)
                 )
             else:
                 message = "This voucher gives a {0:d}% discount off ".format(
-                    voucher.discountvalue
+                    voucher.discount_value
                 )
 
-            if voucher.appliesto == "Ticket":
+            if voucher.applies_to == "Ticket":
                 message = message + "one ticket."
             else:
                 message = message + "all tickets purchased in one transaction."
@@ -89,7 +89,7 @@ def validateReferrer(email, current_user):
                 True,
                 {
                     'class': 'success',
-                    'message': '{0} will be credited for your order.'.format(user.firstname)
+                    'message': '{0} will be credited for your order.'.format(user.forenames)
                 },
                 user
             )
@@ -128,7 +128,7 @@ def validateResaleEmail(email, current_user):
                 True,
                 {
                     'class': 'success',
-                    'message': '{0} will receive an email to confirm the resale.'.format(user.firstname)
+                    'message': '{0} will receive an email to confirm the resale.'.format(user.forenames)
                 },
                 None
             )

@@ -33,7 +33,7 @@
                                     Cancelled.
                                 {% elif ticket.collected -%}
                                     Collected as {{ ticket.barcode }}.
-                                {% elif ticket.resalekey != None -%}
+                                {% elif ticket.resale_key != None -%}
                                     {% if ticket.resaleconfirmed -%}
                                         Pending resale completion
                                     {% else -%}
@@ -45,20 +45,20 @@
                                     {% elif ticket.payment_method == 'Free' -%}
                                         Free Ticket.
                                     {% else -%}
-                                        Paid for by {{ ticket.paymentmethod }}.
+                                        Paid for by {{ ticket.payment_method }}.
                                     {% endif %}
                                 {% else -%}
-                                    Awaiting <span id="ticket_payment_message-{{ ticket.object_id }}" {% if ticket.name == None %}style="display: none;"{% endif %}>{% if ticket.paymentmethod != None %}{{ ticket.paymentmethod }} {% endif %} payment</span><span id="ticket_name_message-{{ ticket.object_id }}" {% if ticket.name != None %}style="display: none;"{% endif %}>name</span>. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                    Awaiting <span id="ticket_payment_message-{{ ticket.object_id }}" {% if ticket.name == None %}style="display: none;"{% endif %}>{% if ticket.payment_method != None %}{{ ticket.payment_method }} {% endif %} payment</span><span id="ticket_name_message-{{ ticket.object_id }}" {% if ticket.name != None %}style="display: none;"{% endif %}>name</span>. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                 {% endif %}
                             </td>
                             <td>
                                 {% if not (ticket.cancelled or ticket.collected) %}
                                     {% if not ticket.paid %}
-                                        {% if ticket.paymentmethod != None %}
+                                        {% if ticket.payment_method != None %}
                                             <a href="{{ url_for('purchase.change_method') }}" class="button tiny">Change Payment Method</a>
-                                            {% if ticket.paymentmethod == 'Card' %}
+                                            {% if ticket.payment_method == 'Card' %}
                                                 <a href="{{ url_for('purchase.card_confirm') }}" id="complete_ticket_payment-{{ ticket.object_id }}" class="button tiny" {% if ticket.name == None %}style="display: none;"{% endif %}>Complete Payment</a>
-                                            {% elif ticket.paymentmethod == 'Battels' %}
+                                            {% elif ticket.payment_method == 'Battels' %}
                                                 <a href="{{ url_for('purchase.battels_confirm') }}" id="complete_ticket_payment-{{ ticket.object_id }}" class="button tiny" {% if ticket.name == None %}style="display: none;"{% endif %}>Complete Payment</a>
                                             {% else %}
                                                 <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}" id="complete_ticket_payment-{{ ticket.object_id }}" class="button tiny" {% if ticket.name == None %}style="display: none;"{% endif %}>Contact treasurer</a>
@@ -66,7 +66,7 @@
                                         {% else %}
                                             <a href="{{ url_for('purchase.change_method') }}" class="button tiny">Choose Payment Method</a>
                                         {% endif %}
-                                    {% elif ticket.resalekey != None %}
+                                    {% elif ticket.resale_key != None %}
                                         <a href="{{ url_for('resale.cancel_resale') }}" class="button tiny">Cancel Resale</a>
                                     {% else %}
                                         <a href="{{ url_for('resale.resale_home') }}" class="button tiny">Resell</a>
@@ -109,7 +109,7 @@
             <p>The following tickets have been marked as being referred by you.</p>
             <ul id="referralsList">
                 {% for ticket in current_user.referrals %}
-                    <li>#{{ '%05d' % ticket.object_id }}, owned by {{ ticket.owner.firstname }} {{ ticket.owner.surname }}</li>
+                    <li>#{{ '%05d' % ticket.object_id }}, owned by {{ ticket.owner.full_name }}</li>
                 {% endfor %}
             </ul>
         {% else %}

@@ -58,8 +58,8 @@
                 <form action="{{ url_for('front.register') }}" method="post">
                     <div class="row">
                         <div class="large-12 columns">
-                            <label for="register-firstname">First Name(s)</label>
-                            <input type="text" name="firstname" id="register-firstname"{% if form['firstname'] %} value="{{ form['firstname'] }}"{% endif %} />
+                            <label for="register-forenames">Forename(s)</label>
+                            <input type="text" name="forenames" id="register-forenames"{% if form['forenames'] %} value="{{ form['forenames'] }}"{% endif %} />
                         </div>
                     </div>
                     <div class="row">

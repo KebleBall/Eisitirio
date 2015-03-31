@@ -146,14 +146,14 @@
                         <tr>
                             <td>{{ voucher.code }}</td>
                             <td>
-                                {{ voucher.discounttype }}:
-                                {% if voucher.discounttype == 'Percentage Discount' %}
-                                    {{ voucher.discountvalue }}%
+                                {{ voucher.discount_type }}:
+                                {% if voucher.discount_type == 'Percentage Discount' %}
+                                    {{ voucher.discount_value }}%
                                 {% else %}
-                                    &pound;{{ '%.02f' % (voucher.discountvalue / 100) }}
+                                    &pound;{{ '%.02f' % (voucher.discount_value / 100) }}
                                 {% endif %}
                             </td>
-                            <td>{{ voucher.appliesto }}</td>
+                            <td>{{ voucher.applies_to }}</td>
                             <td>
                                 {% if voucher.expires != None %}
                                     {{ voucher.expires.strftime('%c') }}
@@ -161,11 +161,11 @@
                                     Never
                                 {% endif %}
                             </td>
-                            <td>{% if voucher.singleuse %}Yes{% else %}No{% endif %}</td>
+                            <td>{% if voucher.single_use %}Yes{% else %}No{% endif %}</td>
                             <td>{% if voucher.used %}Yes{% else %}No{% endif %}</td>
                             <td>
                                 {% if voucher.used_by_id != None %}
-                                    <a href="{{ url_for('admin.view_user', id=voucher.used_by_id) }}">{{ voucher.used_by.fullname }}</a>
+                                    <a href="{{ url_for('admin.view_user', id=voucher.used_by_id) }}">{{ voucher.used_by.full_name }}</a>
                                 {% else %}
                                     N/A
                                 {% endif %}

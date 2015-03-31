@@ -34,15 +34,15 @@ class CardTransaction(DB.Model):
         DB.DateTime(),
         nullable=True
     )
-    accesscode = DB.Column(
+    access_code = DB.Column(
         DB.String(200),
         nullable=True
     )
-    resultcode = DB.Column(
+    result_code = DB.Column(
         DB.String(2),
         nullable=True
     )
-    ewayid = DB.Column(
+    eway_id = DB.Column(
         DB.Integer(),
         nullable=True
     )
@@ -166,7 +166,7 @@ class CardTransaction(DB.Model):
                 '94': (False, 'Duplicate Transaction'),
                 '96': (False, 'System Error'),
                 'CX': (False, 'Customer Cancelled Transaction')
-            }[self.resultcode]
+            }[self.result_code]
         except KeyError as err:
             return (False, 'Unknown response: {0}'.format(err.args[0]))
 
@@ -235,7 +235,7 @@ class CardTransaction(DB.Model):
         data = {
             "Customer": {
                 "Reference": "U{0:05d}".format(self.user.object_id),
-                "FirstName": self.user.firstname,
+                "FirstName": self.user.forenames,
                 "LastName": self.user.surname,
                 "Email": self.user.email
             },
@@ -261,7 +261,7 @@ class CardTransaction(DB.Model):
         (success, response) = self._send_request('CreateAccessCodeShared', data)
 
         if success:
-            self.accesscode = response['AccessCode']
+            self.access_code = response['AccessCode']
             DB.session.commit()
 
             APP.log_manager.log_event(
@@ -290,21 +290,22 @@ class CardTransaction(DB.Model):
         the persisted state of this transaction object and related ticket
         objects
         """
-        if self.accesscode is not None:
-            data = {'AccessCode': self.accesscode}
+        if self.access_code is not None:
+            data = {'AccessCode': self.access_code}
 
-            (success, response) = self._send_request('GetAccessCodeResult', data)
+            (success, response) = self._send_request('GetAccessCodeResult',
+                                                     data)
 
             if success:
                 self.completed = datetime.utcnow()
-                self.resultcode = response['ResponseCode']
-                self.ewayid = response['TransactionID']
+                self.result_code = response['ResponseCode']
+                self.eway_id = response['TransactionID']
                 DB.session.commit()
 
                 status = self.get_status()
 
                 if status[0]:
-                    if self.resultcode == '10':
+                    if self.result_code == '10':
                         APP.log_manager.log_event(
                             (
                                 'Partial eWay payment for transaction {0} '
@@ -412,7 +413,7 @@ class CardTransaction(DB.Model):
     def cancel_eway_payment(self):
         """Mark the payment as cancelled."""
         self.completed = datetime.utcnow()
-        self.resultcode = 'CX'
+        self.result_code = 'CX'
 
         flash(
             'Your payment has been cancelled; you have not been charged.',
@@ -443,7 +444,7 @@ class CardTransaction(DB.Model):
         data = {
             "Refund": {
                 "TotalAmount": amount,
-                "TransactionID": self.ewayid
+                "TransactionID": self.eway_id
             }
         }
 

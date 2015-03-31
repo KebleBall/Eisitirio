@@ -32,16 +32,16 @@ class User(DB.Model):
         unique=True,
         nullable=False
     )
-    newemail = DB.Column(
+    new_email = DB.Column(
         DB.String(120),
         unique=True,
         nullable=True
     )
-    passhash = DB.Column(
+    password_hash = DB.Column(
         DB.BINARY(60),
         nullable=False
     )
-    firstname = DB.Column(
+    forenames = DB.Column(
         DB.String(120),
         nullable=False
     )
@@ -49,16 +49,16 @@ class User(DB.Model):
         DB.String(120),
         nullable=False
     )
-    fullname = DB.column_property(firstname + " " + surname)
+    full_name = DB.column_property(forenames + " " + surname)
     phone = DB.Column(
         DB.String(20),
         nullable=False
     )
-    secretkey = DB.Column(
+    secret_key = DB.Column(
         DB.String(64),
         nullable=True
     )
-    secretkeyexpiry = DB.Column(
+    secret_key_expiry = DB.Column(
         DB.DateTime(),
         nullable=True
     )
@@ -129,14 +129,14 @@ class User(DB.Model):
         nullable=True
     )
 
-    def __init__(self, email, password, firstname,
+    def __init__(self, email, password, forenames,
                  surname, phone, college, affiliation):
         self.email = email
         self.set_password(password)
-        self.firstname = firstname
+        self.forenames = forenames
         self.surname = surname
         self.phone = phone
-        self.secretkey = helpers.generate_key(64)
+        self.secret_key = helpers.generate_key(64)
         self.verified = False
         self.deleted = False
         self.role = 'User'
@@ -158,7 +158,7 @@ class User(DB.Model):
 
     def __repr__(self):
         return "<User {0}: {1} {2}>".format(
-            self.object_id, self.firstname, self.surname)
+            self.object_id, self.forenames, self.surname)
 
     def check_password(self, candidate):
         """Check if a password matches the hash stored for the user.
@@ -171,7 +171,7 @@ class User(DB.Model):
         Returns:
             (bool) whether the candidate password matches the stored hash
         """
-        return BCRYPT.check_password_hash(self.passhash, candidate)
+        return BCRYPT.check_password_hash(self.password_hash, candidate)
 
     def set_password(self, password):
         """Set the password for the user.
@@ -181,7 +181,7 @@ class User(DB.Model):
         Args:
             password: (str) new password for the user.
         """
-        self.passhash = BCRYPT.generate_password_hash(password)
+        self.password_hash = BCRYPT.generate_password_hash(password)
 
     def has_tickets(self):
         """Does the user have any tickets?"""
@@ -201,12 +201,12 @@ class User(DB.Model):
     def has_unresold_tickets(self):
         """Has the user got any tickets they can resell?"""
         return len([x for x in self.tickets
-                    if not x.cancelled and x.resalekey is None]) > 0
+                    if not x.cancelled and x.resale_key is None]) > 0
 
     def is_reselling_tickets(self):
         """Is the user currently in the process of reslling tickets?"""
         return len([x for x in self.tickets
-                    if x.resalekey is not None]) > 0
+                    if x.resale_key is not None]) > 0
 
     def has_unpaid_tickets(self, method=None):
         """Does the user have any unpaid tickets?
@@ -234,7 +234,7 @@ class User(DB.Model):
             return len(
                 [
                     x for x in self.tickets if (
-                        x.paymentmethod == method and
+                        x.payment_method == method and
                         not x.paid and
                         not x.cancelled
                     )
@@ -267,7 +267,7 @@ class User(DB.Model):
             return len(
                 [
                     x for x in self.tickets if (
-                        x.paymentmethod == method and
+                        x.payment_method == method and
                         x.paid and
                         not x.cancelled
                     )
@@ -292,7 +292,7 @@ class User(DB.Model):
 
     def waiting_for(self):
         """How many tickets is the user waiting for?"""
-        return sum([x.waitingfor for x in self.waiting])
+        return sum([x.waiting_for for x in self.waiting])
 
     def can_pay_by_battels(self):
         """Is the user able to pay by battels?
@@ -346,7 +346,7 @@ class User(DB.Model):
         """
         return self.is_verified() and not self.is_deleted()
 
-    def is_authenticated(self):
+    def is_authenticated(self):  # pylint: disable=no-self-use
         """Is the user authenticated?
 
         This method is specifically for the use of the Flask-Login extension,
@@ -356,7 +356,7 @@ class User(DB.Model):
         """
         return True
 
-    def is_anonymous(self):
+    def is_anonymous(self):  # pylint: disable=no-self-use
         """Is the user anonymous?
 
         This method is specifically for the use of the Flask-Login extension,
@@ -510,7 +510,7 @@ class User(DB.Model):
 
         if not self.battels:
             self.battels = battels.Battels(None, self.email, None,
-                                           self.firstname, self.surname, True)
+                                           self.forenames, self.surname, True)
             DB.session.add(self.battels)
 
         DB.session.commit()

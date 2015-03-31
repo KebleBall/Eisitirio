@@ -11,14 +11,14 @@
             <h4>Ticket Details</h4>
             <p><strong>Price</strong>: &pound;{{ '%.2f' % (ticket.price / 100.0) }}</p>
             <p><strong>Name on ticket</strong>: {{ ticket.name }}</p>
-            <p><strong>Owner</strong>: <a href="{{ url_for('admin.view_user', id=ticket.owner_id) }}">{{ ticket.owner.fullname }}</a></p>
+            <p><strong>Owner</strong>: <a href="{{ url_for('admin.view_user', id=ticket.owner_id) }}">{{ ticket.owner.full_name }}</a></p>
             {% if ticket.collected %}
                 <p><strong>Collected as</strong>: {{ ticket.barcode }}</p>
             {% endif %}
-            <p><strong>Payment method</strong>: {{ ticket.paymentmethod }}</p>
-            <p><strong>Payment reference</strong>: {{ ticket.paymentreference }}</p>
+            <p><strong>Payment method</strong>: {{ ticket.payment_method }}</p>
+            <p><strong>Payment reference</strong>: {{ ticket.payment_reference }}</p>
             {% if ticket.referrer_id != None %}
-                <p><strong>Referrer</strong>: <a href="{{ url_for('admin.view_user', id=ticket.referrer_id) }}">{{ ticket.referrer.fullname }}</a></p>
+                <p><strong>Referrer</strong>: <a href="{{ url_for('admin.view_user', id=ticket.referrer_id) }}">{{ ticket.referrer.full_name }}</a></p>
             {% endif %}
             {% if ticket.card_transaction_id != None %}
                 <p><strong>Payment Transaction</strong>: <a href="{{ url_for('admin.view_transaction', id=ticket.card_transaction_id) }}">#{{ '%05d' % ticket.card_transaction_id }}</a></p>
@@ -28,7 +28,7 @@
                 <p><strong>Battels ID</strong>: <a href="{{ url_for('admin.view_user', id=ticket.battels.user.object_id) }}">{{ ticket.battels.battelsid }}</a></p>
             {% endif %}
             {% if ticket.reselling_to_id != None %}
-                <p><strong>Reselling to</strong>: <a href="{{ url_for('admin.view_user', id=ticket.reselling_to_id) }}">{{ ticket.reselling_to.fullname }}</a></p>
+                <p><strong>Reselling to</strong>: <a href="{{ url_for('admin.view_user', id=ticket.reselling_to_id) }}">{{ ticket.reselling_to.full_name }}</a></p>
             {% endif %}
             <h4>Ticket Status</h4>
             <ul>
@@ -100,7 +100,7 @@
                             <tr>
                                 <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="{{ url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.fullname }}</a></td>
+                                <td><a href="{{ url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
                                 <td>{{ log.action }}</td>
                                 <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>

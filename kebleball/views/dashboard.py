@@ -64,8 +64,8 @@ def profile():
                 valid = False
 
         if (
-                'firstname' not in request.form or
-                request.form['firstname'] == ''
+                'forenames' not in request.form or
+                request.form['forenames'] == ''
         ):
             flashes.append(u'First Name cannot be blank')
             valid = False
@@ -117,9 +117,9 @@ def profile():
                 flash(msg, 'warning')
         else:
             if request.form['email'] != login.current_user.email:
-                login.current_user.newemail = request.form['email']
-                login.current_user.secretkey = generate_key(64)
-                login.current_user.secretkeyexpiry = (
+                login.current_user.new_email = request.form['email']
+                login.current_user.secret_key = generate_key(64)
+                login.current_user.secret_key_expiry = (
                     datetime.utcnow() + timedelta(days=7))
 
                 APP.email_manager.sendTemplate(
@@ -129,7 +129,7 @@ def profile():
                     confirmurl=url_for(
                         'front.confirm_email',
                         user_id=login.current_user.object_id,
-                        secretkey=login.current_user.secretkey,
+                        secret_key=login.current_user.secret_key,
                         _external=True
                     )
                 )
@@ -149,7 +149,7 @@ def profile():
             ):
                 login.current_user.set_password(request.form['password'])
 
-            login.current_user.firstname = request.form['firstname']
+            login.current_user.forenames = request.form['forenames']
             login.current_user.surname = request.form['surname']
             login.current_user.phone = request.form['phone']
             login.current_user.college_id = request.form['college']

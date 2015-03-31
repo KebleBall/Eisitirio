@@ -38,7 +38,7 @@
                                             Cancelled.
                                         {% elif ticket.collected -%}
                                             Collected as {{ ticket.barcode }}.
-                                        {% elif ticket.resalekey != None -%}
+                                        {% elif ticket.resale_key != None -%}
                                             {% if ticket.resaleconfirmed -%}
                                                 Pending resale completion
                                             {% else -%}
@@ -50,10 +50,10 @@
                                             {% if ticket.payment_method == 'Free' -%}
                                                 Free Ticket.
                                             {% else -%}
-                                                Paid for by {{ ticket.paymentmethod }}.
+                                                Paid for by {{ ticket.payment_method }}.
                                             {% endif %}
                                         {% else -%}
-                                            Awaiting {{ ticket.paymentmethod }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                            Awaiting {{ ticket.payment_method }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                         {% endif %}
                                     </label>
                                 </td>

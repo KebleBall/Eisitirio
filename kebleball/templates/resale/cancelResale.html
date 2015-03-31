@@ -20,12 +20,12 @@
                     </thead>
                     <tbody>
                         {% for ticket in current_user.tickets %}
-                            {% if ticket.resalekey != None %}
+                            {% if ticket.resale_key != None %}
                                 <tr id="ticket-{{ ticket.object_id }}">
                                     <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
                                     <td><label for="ticketSelect-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
                                     <td><label for="ticketSelect-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
-                                    <td><label for="ticketSelect-{{ ticket.object_id }}">{{ ticket.reselling_to.firstname }} {{ ticket.reselling_to.surname }}</label></td>
+                                    <td><label for="ticketSelect-{{ ticket.object_id }}">{{ ticket.reselling_to.full_name }}</label></td>
                                 </tr>
                             {% endif %}
                         {% endfor %}

@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 DB = db.DB
 
 class Voucher(DB.Model):
+    """Model for a discount voucher."""
     object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
@@ -25,7 +26,7 @@ class Voucher(DB.Model):
         DB.DateTime(),
         nullable=True
     )
-    discounttype = DB.Column(
+    discount_type = DB.Column(
         DB.Enum(
             'Fixed Price',
             'Fixed Discount',
@@ -33,18 +34,18 @@ class Voucher(DB.Model):
         ),
         nullable=False
     )
-    discountvalue = DB.Column(
+    discount_value = DB.Column(
         DB.Integer(),
         nullable=False
     )
-    appliesto = DB.Column(
+    applies_to = DB.Column(
         DB.Enum(
             'Ticket',
             'Transaction'
         ),
         nullable=False
     )
-    singleuse = DB.Column(
+    single_use = DB.Column(
         DB.Boolean(),
         nullable=False
     )
@@ -71,33 +72,33 @@ class Voucher(DB.Model):
             self,
             code,
             expires,
-            discounttype,
-            discountvalue,
-            appliesto,
-            singleuse
+            discount_type,
+            discount_value,
+            applies_to,
+            single_use
     ):
-        if discounttype not in [
+        if discount_type not in [
                 'Fixed Price',
                 'Fixed Discount',
                 'Percentage Discount'
         ]:
             raise ValueError(
-                '{0} is not a valid discount type'.format(discounttype)
+                '{0} is not a valid discount type'.format(discount_type)
             )
 
-        if appliesto not in [
+        if applies_to not in [
                 'Ticket',
                 'Transaction'
         ]:
             raise ValueError(
-                '{0} is not a valid application'.format(appliesto)
+                '{0} is not a valid application'.format(applies_to)
             )
 
         self.code = code
-        self.discounttype = discounttype
-        self.discountvalue = discountvalue
-        self.appliesto = appliesto
-        self.singleuse = singleuse
+        self.discount_type = discount_type
+        self.discount_value = discount_value
+        self.applies_to = applies_to
+        self.single_use = single_use
 
         if isinstance(expires, timedelta):
             self.expires = datetime.utcnow() + expires
@@ -108,45 +109,8 @@ class Voucher(DB.Model):
         return '<Voucher: {0}/{1}>'.format(self.object_id, self.code)
 
     @staticmethod
-    def get_by_code(code):
-        return Voucher.query().filter_by(Voucher.code == code).first()
-
-    def apply(self, tickets, user):
-        if self.singleuse and self.used:
-            return (False, tickets, 'Voucher has already been used.')
-
-        if self.expires is not None and self.expires < datetime.utcnow():
-            return (False, tickets, 'Voucher has expired.')
-
-        self.used = True
-        if self.singleuse:
-            if hasattr(user, 'object_id'):
-                self.used_by_id = user.object_id
-            else:
-                self.used_by_id = user
-
-        if self.appliesto == 'Ticket':
-            tickets[0] = self.apply_to_ticket(tickets[0])
-            return (True, tickets, None)
-        else:
-            return (True, [self.apply_to_ticket(t) for t in tickets], None)
-
-    def apply_to_ticket(self, ticket):
-        if self.discounttype == 'Fixed Price':
-            ticket.set_price(self.discountvalue)
-        elif self.discounttype == 'Fixed Discount':
-            ticket.set_price(ticket.price - self.discountvalue)
-        else:
-            ticket.set_price(ticket.price * (100 - self.discountvalue) / 100)
-
-        ticket.add_note(
-            'Used voucher {0}/{1}'.format(self.object_id, self.code)
-        )
-
-        return ticket
-
-    @staticmethod
     def get_by_id(object_id):
+        """Get an Announcement object by its database ID."""
         voucher = Voucher.query.filter(
             Voucher.object_id == int(object_id)
         ).first()
@@ -155,3 +119,66 @@ class Voucher(DB.Model):
             return None
 
         return voucher
+
+    @staticmethod
+    def get_by_code(code):
+        """Get an Announcement object by a voucher code."""
+        return Voucher.query().filter_by(Voucher.code == code).first()
+
+    def apply(self, tickets, user):
+        """Apply the voucher to a set of tickets.
+
+        Checks if the voucher can be used, and applies its discount to the
+        tickets.
+
+        Args:
+            tickets: (list(Ticket)) list of tickets to apply the voucher to
+            user: (User) user who is using the voucher
+
+        Returns:
+            (bool, list(tickets), str/None) whether the voucher was applied, the
+            mutated tickets, and an error message
+        """
+        if self.single_use and self.used:
+            return (False, tickets, 'Voucher has already been used.')
+
+        if self.expires is not None and self.expires < datetime.utcnow():
+            return (False, tickets, 'Voucher has expired.')
+
+        self.used = True
+        if self.single_use:
+            if hasattr(user, 'object_id'):
+                self.used_by_id = user.object_id
+            else:
+                self.used_by_id = user
+
+        if self.applies_to == 'Ticket':
+            tickets[0] = self.apply_to_ticket(tickets[0])
+            return (True, tickets, None)
+        else:
+            return (True, [self.apply_to_ticket(t) for t in tickets], None)
+
+    def apply_to_ticket(self, ticket):
+        """Apply the voucher to a single ticket.
+
+        Recalculates the price of the ticket, and notes on the ticket that a
+        voucher was used
+
+        Args:
+            ticket: (Ticket) the ticket to apply the voucher to
+
+        Returns:
+            (ticket) the mutated ticket
+        """
+        if self.discount_type == 'Fixed Price':
+            ticket.set_price(self.discount_value)
+        elif self.discount_type == 'Fixed Discount':
+            ticket.set_price(ticket.price - self.discount_value)
+        else:
+            ticket.set_price(ticket.price * (100 - self.discount_value) / 100)
+
+        ticket.add_note(
+            'Used voucher {0}/{1}'.format(self.object_id, self.code)
+        )
+
+        return ticket

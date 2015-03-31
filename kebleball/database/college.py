@@ -27,7 +27,9 @@ class College(DB.Model):
     @staticmethod
     def get_by_id(object_id):
         """Get a college object by its ID."""
-        college = College.query.filter(College.object_id == int(object_id)).first()
+        college = College.query.filter(
+            College.object_id == int(object_id)
+        ).first()
 
         if not college:
             return None
