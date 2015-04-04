@@ -1,34 +1,50 @@
 # coding: utf-8
+"""Views related to reselling tickets to other users."""
+
 from flask import Blueprint, request, render_template, redirect, flash, url_for
 from flask.ext.login import login_required, current_user
 
 from kebleball import app
 from kebleball.database import db
-from kebleball.database import user
-from kebleball.database import ticket
+from kebleball.database import models
 
 APP = app.APP
 DB = db.DB
-
-User = user.User
-Ticket = ticket.Ticket
 
 RESALE = Blueprint('resale', __name__)
 
 @RESALE.route('/resale', methods=['GET', 'POST'])
 @login_required
 def resale_home():
+    """Start the resale process.
+
+    Presents the user with a list of their tickets (which must have been paid
+    for) with checkboxes, allowing them to select tickets and sell them to
+    another user. The resale process involves 4 steps:
+        1. The sender selects which tickets they want to resell, and enters the
+            email address of the recipient
+        2. The recipient receives an email containing a link which they must
+            click to confirm they want the tickets, and a link to say they don't
+        3. The sender receives an email saying the recipient does want the
+            tickets, and that they should collect payment from them. This email
+            contains a link to click when the payment is completed, and a link
+            to cancel the process
+        4. Once the sender has been paid, they click the link to confirm this,
+            and the tickets are transferred to the recipient's account
+    """
     if request.method == 'POST':
-        tickets = Ticket.query \
-            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == current_user.object_id) \
-            .filter(Ticket.paid == True) \
-            .all()
+        tickets = models.Ticket.query.filter(
+            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        ).filter(
+            models.Ticket.owner_id == current_user.object_id
+        ).filter(
+            models.Ticket.paid == True
+        ).all()
 
         while None in tickets:
             tickets.remove(None)
 
-        resale_to = User.get_by_email(request.form['resaleEmail'])
+        resale_to = models.User.get_by_email(request.form['resaleEmail'])
 
         if not resale_to:
             flash(
@@ -43,7 +59,7 @@ def resale_home():
             )
             return render_template('resale/resaleHome.html')
 
-        Ticket.start_resale(tickets, resale_to)
+        models.Ticket.start_resale(tickets, resale_to)
 
         flash(
             u'The resale process has been started',
@@ -55,12 +71,19 @@ def resale_home():
 @RESALE.route('/resale/cancel', methods=['GET', 'POST'])
 @login_required
 def cancel_resale():
+    """Allow a user to cancel the resale of tickets they own.
+
+    Presents the user with a list of tickets they are reselling, and allows them
+    to cancel the resale process for any of them.
+    """
     if request.method == 'POST':
-        tickets = Ticket.query \
-            .filter(Ticket.object_id.in_(request.form.getlist('tickets[]'))) \
-            .filter(Ticket.owner_id == current_user.object_id) \
-            .filter(Ticket.paid == True) \
-            .all()
+        tickets = models.Ticket.query.filter(
+            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        ).filter(
+            models.Ticket.owner_id == current_user.object_id
+        ).filter(
+            models.Ticket.paid == True
+        ).all()
 
         for ticket in tickets:
             if not ticket:
@@ -83,7 +106,12 @@ def cancel_resale():
 @RESALE.route('/resale/confirm/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
 def resale_confirm(resale_from, resale_to, key):
-    if Ticket.confirm_resale(resale_from, resale_to, key):
+    """Confirm the resale process.
+
+    Linked to in the confirmation email, completes step 2 above and starts step
+    3.
+    """
+    if models.Ticket.confirm_resale(resale_from, resale_to, key):
         flash(
             (
                 u'The resale arrangement has been confirmed. '
@@ -108,7 +136,11 @@ def resale_confirm(resale_from, resale_to, key):
 @RESALE.route('/resale/complete/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
 def resale_complete(resale_from, resale_to, key):
-    if Ticket.complete_resale(resale_from, resale_to, key):
+    """Complete the resale process.
+
+    Linked to in the completion email, completes step 3 above and starts step 4.
+    """
+    if models.Ticket.complete_resale(resale_from, resale_to, key):
         flash(
             (
                 u'The resale arrangement has been completed, and the tickets '
@@ -133,7 +165,12 @@ def resale_complete(resale_from, resale_to, key):
 @RESALE.route('/resale/cancel/<int:resale_from>/<int:resale_to>/<key>')
 @login_required
 def resale_cancel(resale_from, resale_to, key):
-    if Ticket.cancel_resale(resale_from, resale_to, key):
+    """Cancel the resale process.
+
+    Linked to in both the confirmation and completion emails, cancels the resale
+    process.
+    """
+    if models.Ticket.cancel_resale(resale_from, resale_to, key):
         flash(
             u'The resale arrangement has been cancelled.',
             'info'
