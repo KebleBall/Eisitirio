@@ -7,9 +7,11 @@ from flask.ext.bcrypt import Bcrypt
 
 from kebleball import app
 from kebleball import helpers
-from kebleball.database import db
-from kebleball.database import battels
 from kebleball.database import affiliation
+from kebleball.database import battels
+from kebleball.database import db
+from kebleball.database import ticket
+from kebleball.database import waiting
 
 DB = db.DB
 APP = app.APP
@@ -520,3 +522,196 @@ class User(DB.Model):
             return APP.config["KEBLE_STAFF_TICKET_PRICE"]
         else:
             return APP.config["TICKET_PRICE"]
+
+    def can_buy(self):
+        """Can the user purchase tickets?
+
+        Performs the necessary logic to determine if the user is permitted to
+        purchase tickets.
+
+        Returns:
+            (bool, int, str/None) triple of whether the user can purchase
+            tickets, how many tickets the user can purchase, and an error
+            message if the user cannot purchase tickets.
+        """
+        if not APP.config['TICKETS_ON_SALE']:
+            if APP.config['LIMITED_RELEASE']:
+                if not (
+                        self.college.name == "Keble" and
+                        self.affiliation.name in [
+                            "Student",
+                            "Graduand",
+                            "Staff/Fellow",
+                            "Foreign Exchange Student",
+                        ]
+                ):
+                    return (
+                        False,
+                        0,
+                        (
+                            "tickets are on limited release to current Keble "
+                            "members and Keble graduands only."
+                        )
+                    )
+                elif not self.affiliation_verified:
+                    return (
+                        False,
+                        0,
+                        (
+                            "your affiliation has not been verified yet. You "
+                            "will be informed by email when you are able to "
+                            "purchase tickets."
+                        )
+                    )
+            else:
+                return (
+                    False,
+                    0,
+                    (
+                        'tickets are currently not on sale. Tickets may become '
+                        'available for purchase or through the waiting list, '
+                        'please check back at a later date.'
+                    )
+                )
+
+        # Don't allow people to buy tickets unless waiting list is empty
+        if waiting.Waiting.query.count() > 0:
+            return (
+                False,
+                0,
+                'there are currently people waiting for tickets.'
+            )
+
+        unpaid_tickets = self.tickets \
+            .filter(ticket.Ticket.cancelled == False) \
+            .filter(ticket.Ticket.paid == False) \
+            .count()
+
+        if unpaid_tickets >= APP.config['MAX_UNPAID_TICKETS']:
+            return (
+                False,
+                0,
+                (
+                    'you have too many unpaid tickets. Please pay '
+                    'for your tickets before reserving any more.'
+                )
+            )
+
+        tickets_owned = self.tickets \
+            .filter(ticket.Ticket.cancelled == False) \
+            .count()
+
+        if APP.config['TICKETS_ON_SALE']:
+            if tickets_owned >= app.config['MAX_TICKETS']:
+                return (
+                    False,
+                    0,
+                    (
+                        'you already own too many tickets. Please contact '
+                        '<a href="{0}">the ticketing officer</a> if you wish '
+                        'to purchase more than {1} tickets.'
+                    ).format(
+                        APP.config['TICKETS_EMAIL_LINK'],
+                        APP.config['MAX_TICKETS']
+                    )
+                )
+        elif APP.config['LIMITED_RELEASE']:
+            if tickets_owned >= APP.config['LIMITED_RELEASE_MAX_TICKETS']:
+                return (
+                    False,
+                    0,
+                    (
+                        'you already own {0} tickets. During pre-release, only '
+                        '{0} tickets may be bought per person.'
+                    ).format(
+                        APP.config['LIMITED_RELEASE_MAX_TICKETS']
+                    )
+                )
+
+        tickets_available = (APP.config['TICKETS_AVAILABLE'] -
+                             ticket.Ticket.count())
+
+        if tickets_available <= 0:
+            return (
+                False,
+                0,
+                (
+                    'there are no tickets currently available. Tickets may '
+                    'become available for purchase or through the waiting '
+                    'list, please check back at a later date.'
+                )
+            )
+
+        if APP.config['TICKETS_ON_SALE']:
+            max_tickets = APP.config['MAX_TICKETS']
+        elif APP.config['LIMITED_RELEASE']:
+            max_tickets = APP.config['LIMITED_RELEASE_MAX_TICKETS']
+
+        return (
+            True,
+            min(
+                tickets_available,
+                APP.config['MAX_TICKETS_PER_TRANSACTION'],
+                max_tickets - tickets_owned,
+                APP.config['MAX_UNPAID_TICKETS'] - unpaid_tickets
+            ),
+            None
+        )
+
+    def can_wait(self):
+        """Can the user join the waiting list?
+
+        Performs the necessary logic to determine if the user is permitted to
+        join the waiting list for tickets
+
+        Returns:
+            (bool, int, str/None) triple of whether the user can join the
+            waiting list, how many tickets the user can wait for, and an error
+            message if the user cannot join the waiting list.
+        """
+        waiting_open = app.config['WAITING_OPEN']
+
+        if not waiting_open:
+            return (
+                False,
+                0,
+                'the waiting list is currently closed.'
+            )
+
+        tickets_owned = self.tickets \
+            .filter(ticket.Ticket.cancelled == False) \
+            .count()
+        if tickets_owned >= APP.config['MAX_TICKETS']:
+            return (
+                False,
+                0,
+                (
+                    'you have too many tickets. Please contact<a href="{0}"> '
+                    'the ticketing officer</a> if you wish to purchase more '
+                    'than {1} tickets.'
+                ).format(
+                    APP.config['TICKETS_EMAIL_LINK'],
+                    APP.config['MAX_TICKETS']
+                )
+            )
+
+        waiting_for = self.waiting_for()
+        if waiting_for >= APP.config['MAX_TICKETS_WAITING']:
+            return (
+                False,
+                0,
+                (
+                    'you are already waiting for too many tickets. Please '
+                    'rejoin the waiting list once you have been allocated the '
+                    'tickets you are currently waiting for.'
+                )
+            )
+
+        return (
+            True,
+            min(
+                APP.config['MAX_TICKETS_WAITING'] - waiting_for,
+                APP.config['MAX_TICKETS'] - tickets_owned
+            ),
+            None
+        )

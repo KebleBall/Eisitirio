@@ -1,15 +1,12 @@
 # coding: utf-8
-"""Views related to the purcahse process."""
+"""Views related to the purchase process."""
 
 from flask import Blueprint, request, render_template, flash, redirect, url_for
 from flask.ext import login
 
 from kebleball import app
 from kebleball.database import db
-from kebleball.database import ticket
-from kebleball.database import waiting
-from kebleball.database import card_transaction
-from kebleball.helpers import purchase as purchase_help
+from kebleball.database import models
 from kebleball.helpers import validators
 
 APP = app.APP
@@ -20,11 +17,15 @@ PURCHASE = Blueprint('purchase', __name__)
 @PURCHASE.route('/purchase', methods=['GET', 'POST'])
 @login.login_required
 def purchase_home():
+    """First step of the purchasing flow.
+
+    Checks if the user can purchase tickets, and processes the purchase form.
+    """
     (
         buying_permitted,
         tickets_available,
         can_buy_message
-    ) = purchase_help.canBuy(login.current_user)
+    ) = login.current_user.can_buy()
 
     if not buying_permitted:
         flash(
@@ -32,7 +33,7 @@ def purchase_home():
             + can_buy_message, 'info'
         )
 
-        (waiting_permitted, _, _) = purchase_help.canWait(login.current_user)
+        (waiting_permitted, _, _) = login.current_user.canWait()
         if waiting_permitted:
             flash(
                 (
@@ -136,7 +137,7 @@ def purchase_home():
 
         if login.current_user.gets_discount():
             tickets.append(
-                ticket.Ticket(
+                models.Ticket(
                     login.current_user,
                     request.form['paymentMethod'],
                     (
@@ -151,7 +152,7 @@ def purchase_home():
 
         for _ in xrange(start, num_tickets):
             tickets.append(
-                ticket.Ticket(
+                models.Ticket(
                     login.current_user,
                     request.form['paymentMethod'],
                     login.current_user.get_base_ticket_price()
@@ -234,11 +235,16 @@ def purchase_home():
 @PURCHASE.route('/purchase/wait', methods=['GET', 'POST'])
 @login.login_required
 def wait():
+    """Handles joining the waiting list.
+
+    Checks if the user can join the waiting list, and processes the form to
+    create the requisite waiting list entry.
+    """
     (
         wait_permitted,
         wait_available,
         can_wait_message
-    ) = purchase_help.canWait(login.current_user)
+    ) = login.current_user.canWait()
 
     if not wait_permitted:
         flash(
@@ -300,7 +306,7 @@ def wait():
             )
 
         DB.session.add(
-            waiting.Waiting(
+            models.Waiting(
                 login.current_user,
                 num_tickets,
                 referrer
@@ -336,13 +342,17 @@ def wait():
 @PURCHASE.route('/purchase/change-method', methods=['GET', 'POST'])
 @login.login_required
 def change_method():
+    """Change the payment method for one or more tickets.
+
+    Displays a list of unpaid tickets with checkboxes, and processes the form.
+    """
     if request.method == 'POST':
-        tickets = ticket.Ticket.query.filter(
-            ticket.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        tickets = models.Ticket.query.filter(
+            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
         ).filter(
-            ticket.Ticket.owner_id == login.current_user.object_id
+            models.Ticket.owner_id == login.current_user.object_id
         ).filter(
-            ticket.Ticket.paid == False
+            models.Ticket.paid == False
         ).all()
 
         while None in tickets:
@@ -394,19 +404,25 @@ def change_method():
 @PURCHASE.route('/purchase/card-confirm', methods=['GET', 'POST'])
 @login.login_required
 def card_confirm():
+    """Complete a card payment.
+
+    Presents a list of tickets due for card payment, and processes the form to
+    create a CardTransaction object and redirect the user to the payment
+    gateway.
+    """
     if request.method == 'POST':
-        tickets = ticket.Ticket.query.filter(
-            ticket.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        tickets = models.Ticket.query.filter(
+            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
         ).filter(
-            ticket.Ticket.owner_id == login.current_user.object_id
+            models.Ticket.owner_id == login.current_user.object_id
         ).filter(
-            ticket.Ticket.paid == False
+            models.Ticket.paid == False
         ).all()
 
         while None in tickets:
             tickets.remove(None)
 
-        transaction = card_transaction.CardTransaction(
+        transaction = models.CardTransaction(
             login.current_user,
             tickets
         )
@@ -423,7 +439,16 @@ def card_confirm():
 
 @PURCHASE.route('/purchase/eway-success/<int:object_id>')
 def eway_success(object_id):
-    transaction = card_transaction.CardTransaction.get_by_id(object_id)
+    """Callback from a successful eWay transaction.
+
+    The user is redirected back to this page from the payment gateway once the
+    transaction has been completed successfully (not necessarily implying that
+    the payment was completed successfully).
+
+    Has the transaction object process the result of the transaction, and
+    redirects to the dashboard.
+    """
+    transaction = models.CardTransaction.get_by_id(object_id)
 
     transaction.process_eway_payment()
 
@@ -431,7 +456,14 @@ def eway_success(object_id):
 
 @PURCHASE.route('/purchase/eway-cancel/<int:object_id>')
 def eway_cancel(object_id):
-    transaction = card_transaction.CardTransaction.get_by_id(object_id)
+    """Callback from a cancelled eWay transaction.
+
+    The user is redirected back to this page from the payment gateway if they
+    cancel the transaction.
+
+    Marks the transaction as cancelled and redirects to the dashboard.
+    """
+    transaction = models.CardTransaction.get_by_id(object_id)
 
     transaction.cancel_eway_payment()
 
@@ -440,6 +472,12 @@ def eway_cancel(object_id):
 @PURCHASE.route('/purchase/battels-confirm', methods=['GET', 'POST'])
 @login.login_required
 def battels_confirm():
+    """Complete a card payment.
+
+    Presents a list of tickets due for battels payment and presents an option of
+    which term to charge the tickets to. Upon submission processes the form to
+    add the charge to users battels account.
+    """
     if not login.current_user.can_pay_by_battels():
         flash(
             u'You cannot currently pay by battels. Please change the payment '
@@ -449,12 +487,12 @@ def battels_confirm():
         return redirect(url_for('purchase.change_method'))
 
     if request.method == 'POST':
-        tickets = ticket.Ticket.query.filter(
-            ticket.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        tickets = models.Ticket.query.filter(
+            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
         ).filter(
-            ticket.Ticket.owner_id == login.current_user.object_id
+            models.Ticket.owner_id == login.current_user.object_id
         ).filter(
-            ticket.Ticket.paid == False
+            models.Ticket.paid == False
         ).all()
 
         while None in tickets:
@@ -486,11 +524,16 @@ def battels_confirm():
 @PURCHASE.route('/purchase/cancel', methods=['GET', 'POST'])
 @login.login_required
 def cancel():
+    """Cancel tickets.
+
+    Presents the user with a list of tickets, and upon form submission cancels
+    the selected tickets, giving refunds as appropriate.
+    """
     if request.method == 'POST':
-        tickets = ticket.Ticket.query.filter(
-            ticket.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+        tickets = models.Ticket.query.filter(
+            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
         ).filter(
-            ticket.Ticket.owner_id == login.current_user.object_id
+            models.Ticket.owner_id == login.current_user.object_id
         ).all()
 
         while None in tickets:
