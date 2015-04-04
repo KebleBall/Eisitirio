@@ -180,7 +180,7 @@
         voucherCode.on("blur", function() {
             if (voucherCode.val() != '') {
                 jQuery.ajax(
-                    '{{ url_for('ajax.ajaxValidateVoucher', _external=True) }}',
+                    '{{ url_for('ajax.validate_voucher', _external=True) }}',
                     {
                         'data': {
                             'code': voucherCode.val()
@@ -212,7 +212,7 @@
         referrerEmail.on("blur", function() {
             if (referrerEmail.val() != '') {
                 jQuery.ajax(
-                    '{{ url_for('ajax.ajaxValidateReferrer', _external=True) }}',
+                    '{{ url_for('ajax.validate_referrer', _external=True) }}',
                     {
                         'data': {
                             'email': referrerEmail.val()

@@ -1,4 +1,5 @@
 # coding: utf-8
+"""Views for performing tasks via AJAX requests."""
 
 import json
 
@@ -7,16 +8,19 @@ from flask.ext import login
 
 from kebleball.helpers import validators
 from kebleball.database import db
-from kebleball.database import ticket
+from kebleball.database import models
 
 DB = db.DB
-Ticket = ticket.Ticket
 
 AJAX = Blueprint('ajax', __name__)
 
 @AJAX.route('/ajax/validate/voucher', methods=['POST'])
-def ajaxValidateVoucher():
-    (result, response, voucher) = validators.validateVoucher(request.form['code'])
+def validate_voucher():
+    """Validate a discount voucher.
+
+    Check the voucher exists and that it can be used.
+    """
+    (_, response, _) = validators.validateVoucher(request.form['code'])
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
@@ -24,8 +28,13 @@ def ajaxValidateVoucher():
     return Response(json.dumps(response), mimetype="text/json")
 
 @AJAX.route('/ajax/validate/referrer', methods=['POST'])
-def ajaxValidateReferrer():
-    (result, response, referrer) = validators.validateReferrer(request.form['email'], login.current_user)
+def validate_referrer():
+    """Validate a referrer for purchasing tickets.
+
+    Check the the referenced user has an account on the system.
+    """
+    (_, response, _) = validators.validateReferrer(request.form['email'],
+                                                   login.current_user)
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
@@ -33,8 +42,13 @@ def ajaxValidateReferrer():
     return Response(json.dumps(response), mimetype="text/json")
 
 @AJAX.route('/ajax/validate/resale-email', methods=['POST'])
-def ajaxValidateResaleEmail():
-    (result, response, buyer) = validators.validateResaleEmail(request.form['email'], login.current_user)
+def validate_resale_email():
+    """Validate a user for reselling tickets.
+
+    Check the the referenced user has an account on the system.
+    """
+    (_, response, _) = validators.validateResaleEmail(request.form['email'],
+                                                      login.current_user)
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
@@ -42,8 +56,9 @@ def ajaxValidateResaleEmail():
     return Response(json.dumps(response), mimetype="text/json")
 
 @AJAX.route('/ajax/change/ticket/<int:object_id>/name', methods=['POST'])
-def ajaxChangeTicketName(object_id):
-    ticket = Ticket.get_by_id(object_id)
+def change_ticket_name(object_id):
+    """Change the name on a ticket."""
+    ticket = models.Ticket.get_by_id(object_id)
 
     if ticket and request.form['name'] != '':
         ticket.name = request.form['name']

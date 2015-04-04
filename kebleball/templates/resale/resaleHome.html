@@ -57,7 +57,7 @@
         resaleEmail.on("blur", function() {
             if (resaleEmail.val() != '') {
                 jQuery.ajax(
-                    '{{ url_for('ajax.ajaxValidateResaleEmail', _external=True) }}',
+                    '{{ url_for('ajax.validate_resale_email', _external=True) }}',
                     {
                         'data': {
                             'email': resaleEmail.val()

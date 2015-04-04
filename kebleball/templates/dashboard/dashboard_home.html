@@ -120,7 +120,7 @@
 
 {% block javascripts %}
     <script type="text/javascript">
-    var nameChangeURL = '{{ url_for('ajax.ajaxChangeTicketName', id=123456789, _external=True) }}'
+    var nameChangeURL = '{{ url_for('ajax.change_ticket_name', id=123456789, _external=True) }}'
 
         function changeTicketName(id, formSubmit) {
             if (formSubmit) {
