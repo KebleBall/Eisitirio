@@ -1,10 +1,5 @@
 # coding: utf-8
-"""
-card_transaction.py
-
-Contains CardTransaction class
-Used to store data about card payments
-"""
+"""Database model for information about Card Transactions performed via eWay."""
 
 from datetime import datetime
 import json

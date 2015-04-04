@@ -1,5 +1,5 @@
 # coding: utf-8
-"""Model for a user's college."""
+"""Database model for a user's college."""
 
 from kebleball.database import db
 

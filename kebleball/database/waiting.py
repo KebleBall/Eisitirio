@@ -1,5 +1,5 @@
 # coding: utf-8
-"""Model for entries on the waiting list."""
+"""Database model for entries on the waiting list."""
 
 from datetime import datetime
 

@@ -1,10 +1,5 @@
 # coding: utf-8
-"""
-voucher.py
-
-Contains Voucher class
-Used to store data about discount vouchers
-"""
+"""Database model for a discount voucher."""
 
 from kebleball.database import db
 from datetime import datetime, timedelta

@@ -1,10 +1,5 @@
 # coding: utf-8
-"""
-statistic.py
-
-Contains Statistic class
-Used to store historical statistics for displaying graphs
-"""
+"""Database model for representing a statistic in a timeseries."""
 
 from kebleball.database import db
 from datetime import datetime

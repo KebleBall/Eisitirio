@@ -1,5 +1,5 @@
 # coding: utf-8
-"""Model for tickets."""
+"""Database model for tickets."""
 
 from datetime import datetime
 

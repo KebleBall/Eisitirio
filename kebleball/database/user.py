@@ -1,9 +1,5 @@
 # coding: utf-8
-"""
-user.py
-
-Contains User class
-"""
+"""Database model for users."""
 
 from flask import flash
 from flask import url_for
@@ -21,7 +17,7 @@ APP = app.APP
 BCRYPT = Bcrypt(APP)
 
 class User(DB.Model):
-    """Database model for users."""
+    """Model for users."""
     object_id = DB.Column(
         DB.Integer,
         primary_key=True,
@@ -130,27 +126,21 @@ class User(DB.Model):
     )
 
     def __init__(self, email, password, forenames,
-                 surname, phone, college, affiliation):
+                 surname, phone, college_id, affiliation_id):
         self.email = email
-        self.set_password(password)
         self.forenames = forenames
         self.surname = surname
         self.phone = phone
+        self.college_id = college_id
+        self.affiliation_id = affiliation_id
+
+        self.set_password(password)
+
         self.secret_key = helpers.generate_key(64)
         self.verified = False
         self.deleted = False
         self.role = 'User'
         self.affiliation_verified = None
-
-        if hasattr(college, 'object_id'):
-            self.college_id = college.object_id
-        else:
-            self.college_id = college
-
-        if hasattr(affiliation, 'object_id'):
-            self.affiliation_id = affiliation.object_id
-        else:
-            self.affiliation_id = affiliation
 
         self.battels = battels.Battels.query.filter(
             battels.Battels.email == email

@@ -1,10 +1,6 @@
 # coding: utf-8
-"""
-log.py
+"""Database model for log entries persisted to the database."""
 
-Contains Log class
-Used to store log entries
-"""
 import datetime
 
 from kebleball.database import db

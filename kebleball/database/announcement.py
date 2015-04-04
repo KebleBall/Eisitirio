@@ -1,10 +1,5 @@
 # coding: utf-8
-"""
-announcement.py
-
-Contains Announcement class
-Used to store announcements displayed on site and emailed
-"""
+"""Database model for an announcement sent to registered users."""
 
 from kebleball import app
 from kebleball.database import db
@@ -146,10 +141,10 @@ class Announcement(DB.Model):
     def __init__(self,
                  subject,
                  content,
-                 sender,
+                 sender_id,
                  send_email,
-                 college=None,
-                 affiliation=None,
+                 college_id=None,
+                 affiliation_id=None,
                  has_tickets=None,
                  is_waiting=None,
                  has_collected=None,
@@ -157,59 +152,51 @@ class Announcement(DB.Model):
         self.timestamp = datetime.utcnow()
         self.subject = subject
         self.content = content
+        self.sender_id = sender_id
         self.send_email = send_email
+        self.college_id = college_id
+        self.affiliation_id = affiliation_id
         self.has_tickets = has_tickets
         self.is_waiting = is_waiting
         self.has_collected = has_collected
         self.has_uncollected = has_uncollected
 
-        if hasattr(sender, 'object_id'):
-            self.sender_id = sender.object_id
-        else:
-            self.sender_id = sender
-
-        if hasattr(college, 'object_id'):
-            self.college_id = college.object_id
-        else:
-            self.college_id = college
-
-        if hasattr(affiliation, 'object_id'):
-            self.affiliation_id = affiliation.object_id
-        else:
-            self.affiliation_id = affiliation
-
-        query = user.User.query
+        recipient_query = user.User.query
 
         if self.college_id is not None:
-            query = query.filter(user.User.college_id == self.college_id)
+            recipient_query = recipient_query.filter(
+                user.User.college_id == self.college_id
+            )
 
         if self.affiliation_id is not None:
-            query = query.filter(
+            recipient_query = recipient_query.filter(
                 user.User.affiliation_id == self.affiliation_id
             )
 
-        for user in query.all():
+        for recipient in recipient_query.all():
             if (
                     (
                         self.has_tickets is None or
-                        user.has_tickets() == self.has_tickets
+                        recipient.has_tickets() == self.has_tickets
                     ) and
                     (
                         self.is_waiting is None or
-                        user.is_waiting() == self.is_waiting
+                        recipient.is_waiting() == self.is_waiting
                     ) and
                     (
                         self.has_collected is None or
-                        user.has_collected_tickets() == self.has_collected
+                        recipient.has_collected_tickets() == self.has_collected
                     ) and
                     (
-                        self.has_uncollected is None or
-                        user.has_uncollected_tickets() == self.has_uncollected
+                        self.has_uncollected is None or (
+                            recipient.has_uncollected_tickets() ==
+                            self.has_uncollected
+                        )
                     )
             ):
-                self.users.append(user)
+                self.users.append(recipient)
                 if send_email:
-                    self.emails.append(user)
+                    self.emails.append(recipient)
 
     def __repr__(self):
         return "<Announcement {0}: {1}>".format(self.object_id, self.subject)
@@ -232,15 +219,15 @@ class Announcement(DB.Model):
             msg['Subject'] = self.subject
             msg['From'] = self.sender.email
 
-            for user in self.emails:
+            for recipient in self.emails:
                 if count <= 0:
                     break
                 try:
-                    msg.replace_header('To', user.email)
+                    msg.replace_header('To', recipient.email)
                 except KeyError:
-                    msg['To'] = user.email
+                    msg['To'] = recipient.email
                 APP.email_manager.sendMsg(msg)
-                self.emails.remove(user)
+                self.emails.remove(recipient)
                 count = count - 1
         finally:
             DB.session.commit()

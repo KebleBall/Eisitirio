@@ -1,10 +1,5 @@
 # coding: utf-8
-"""
-affiliation.py
-
-Contains Affiliation class
-Used to denote users' affiliations with their colleges
-"""
+"""Database model for representing a users affiliation to their college."""
 
 from kebleball.database import db
 

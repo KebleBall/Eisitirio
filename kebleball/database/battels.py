@@ -1,5 +1,5 @@
 # coding: utf-8
-"""Model for battels charges for Keble Students."""
+"""Database model for battels charges for Keble Students."""
 
 from kebleball.database import db
 from kebleball import app
