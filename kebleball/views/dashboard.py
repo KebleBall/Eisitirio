@@ -1,4 +1,6 @@
 # coding: utf-8
+"""Views for the users dashboard."""
+
 from datetime import datetime, timedelta
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
@@ -6,37 +8,37 @@ from flask.ext import login
 
 from kebleball import app
 from kebleball.database import db
-from kebleball.database import college
-from kebleball.database import affiliation
-from kebleball.database import announcement
-from kebleball.database import user
+from kebleball.database import models
 from kebleball.helpers import generate_key
 
 APP = app.APP
 DB = db.DB
-
-College = college.College
-Affiliation = affiliation.Affiliation
-Announcement = announcement.Announcement
-User = user.User
 
 DASHBOARD = Blueprint('dashboard', __name__)
 
 @DASHBOARD.route('/dashboard')
 @login.login_required
 def dashboard_home():
+    """Display the users dashboard.
+
+    Does nothing special.
+    """
     return render_template('dashboard/dashboard_home.html')
 
 @DASHBOARD.route('/dashboard/profile', methods=['GET', 'POST'])
 @login.login_required
 def profile():
+    """Allow the user to edit their personal details.
+
+    Displays a form and processes it to update the users details.
+    """
     if request.method == 'POST':
         valid = True
         flashes = []
 
         if (
                 request.form['email'] != login.current_user.email and
-                User.get_by_email(request.form['email']) is not None
+                models.User.get_by_email(request.form['email']) is not None
         ):
             flashes.append(u'That email address is already in use. ')
             valid = False
@@ -172,19 +174,24 @@ def profile():
 
     return render_template(
         'dashboard/profile.html',
-        colleges=College.query.all(),
-        affiliations=Affiliation.query.all()
+        colleges=models.College.query.all(),
+        affiliations=models.Affiliation.query.all()
     )
 
-@DASHBOARD.route('/dashboard/announcement/<int:announcementID>')
+@DASHBOARD.route('/dashboard/announcement/<int:announcement_id>')
 @login.login_required
-def announcement(announcementID):
-    announcement = Announcement.get_by_id(announcementID)
+def display_announcement(announcement_id):
+    """Display an announcement.
+
+    The dashboard shows a condensed listing of announcements, this view allows
+    the user to see an announcement in full.
+    """
+    announcement = models.Announcement.get_by_id(announcement_id)
 
     if not announcement:
         flash(
             u'Announcement {0} not found'.format(
-                announcementID
+                announcement_id
             ),
             'warning'
         )

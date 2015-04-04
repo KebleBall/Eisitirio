@@ -95,7 +95,7 @@
                         <article class="announcement">
                             <h5>{{ announcement.subject }}</h5>
                             {{ announcement.content | truncate(250) | markdown }}
-                            <a href="{{ url_for('dashboard.announcement', announcementID=announcement.object_id) }}" class="read-more">Read More</a>
+                            <a href="{{ url_for('dashboard.display_announcement', announcementID=announcement.object_id) }}" class="read-more">Read More</a>
                         </article>
                     </li>
                 {% endfor %}
