@@ -1,4 +1,4 @@
-<!-- admin/validate_ticket.html -->
+<!-- admin_tickets/validate_ticket.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Validate Ticket{% endblock %}
@@ -11,7 +11,7 @@
                 <p>{{ message }}</p>
             </div>
         {% endif %}
-        <form action="{{ url_for('admin.validate_ticket') }}" method="post">
+        <form action="{{ url_for('admin_tickets.validate_ticket') }}" method="post">
             <div class="row">
                 <div class="large-8 columns large-centered">
                     <label for="barcode">Ticket Barcode</label>

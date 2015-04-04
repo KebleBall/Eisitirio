@@ -1,4 +1,4 @@
-<!-- admin/collect_tickets.html -->
+<!-- admin_users/collect_tickets.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Ticket Collection{% endblock %}
@@ -23,7 +23,7 @@
                             <td><label for="ticketBarcode-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
                             <td><label for="ticketBarcode-{{ ticket.object_id }}">{{ ticket.name }}</label></td>
                             <td>
-                                <form action="{{ url_for('admin.collect_ticket', id=ticket.object_id) }}" method="post">
+                                <form action="{{ url_for('admin_tickets.collect_ticket', id=ticket.object_id) }}" method="post">
                                     <input type="text" name="barcode" id="ticketBarcode-{{ ticket.object_id }}" />
                                     <input type="submit" class="button tiny" value="Collect Ticket" />
                                 </form>

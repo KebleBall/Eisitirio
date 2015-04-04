@@ -186,9 +186,9 @@
                             </td>
                             <td>
                                 <a href="{{ url_for('dashboard.announcement', announcementID=announcement.object_id) }}" class="button tiny">View</a>
-                                <a href="{{ url_for('admin.deleteAnnouncement', id=announcement.object_id) }}" class="button tiny">Delete</a>
+                                <a href="{{ url_for('admin.delete_announcement', id=announcement.object_id) }}" class="button tiny">Delete</a>
                                 {% if announcement.send_email and not announcement.email_sent %}
-                                    <a href="{{ url_for('admin.cancelAnnouncementEmails', id=announcement.object_id) }}" class="button tiny">Cancel Emails</a>
+                                    <a href="{{ url_for('admin.cancel_announcement_emails', id=announcement.object_id) }}" class="button tiny">Cancel Emails</a>
                                 {% endif %}
                             </td>
                         </tr>

@@ -9,7 +9,7 @@
             <p>No transaction was found with that ID.</p>
         {% else %}
             <h4>Transaction Details</h4>
-            <p><strong>User</strong>: <a href="{{ url_for('admin.view_user', id=transaction.user_id) }}">{{ transaction.user.full_name }}</a></p>
+            <p><strong>User</strong>: <a href="{{ url_for('admin_users.view_user', id=transaction.user_id) }}">{{ transaction.user.full_name }}</a></p>
             <p><strong>Total Value</strong>: &pound;{{ '%.2f' % (transaction.get_value() / 100.0) }}</p>
             <p><strong>Commenced</strong>: {{ transaction.commenced.strftime('%c') }}</p>
             {% if transaction.completed != null %}
@@ -72,7 +72,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
+                                    <a href="{{ url_for('admin_tickets.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -99,7 +99,7 @@
                             <tr>
                                 <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="{{ url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
+                                <td><a href="{{ url_for('admin_users.view_user', id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
                                 <td>{{ log.action }}</td>
                                 <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>

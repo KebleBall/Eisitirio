@@ -265,7 +265,7 @@
                             <td>#{{ '%05d' % user.object_id }}</td>
                             <td>{{ user.full_name }}</td>
                             <td>{{ user.email }}</td>
-                            <td><a class="button small" href="{{ url_for('admin.view_user', id=user.object_id) }}">View User</a></td>
+                            <td><a class="button small" href="{{ url_for('admin_users.view_user', id=user.object_id) }}">View User</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -307,7 +307,7 @@
                                     Awaiting {{ ticket.payment_method }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                 {% endif %}
                             </td>
-                            <td><a class="button small" href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}">View Ticket</a></td>
+                            <td><a class="button small" href="{{ url_for('admin_tickets.view_ticket', id=ticket.object_id) }}">View Ticket</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

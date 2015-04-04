@@ -1,4 +1,4 @@
-<!-- admin/verify_affiliations.html -->
+<!-- admin_users/verify_affiliations.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Verify Affiliations{% endblock %}
@@ -22,8 +22,8 @@
                         <td><a href="{{ url_for('admin.viewUser', id=user.object_id) }}">{{ user.full_name }}</a></td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.affiliation.name }}</td>
-                        <td><a href="{{ url_for('admin.verify_affiliation', id=user.object_id) }}" class="button tiny">Verify Affiliation</a></td>
-                        <td><a href="{{ url_for('admin.deny_affiliation', id=user.object_id) }}" class="button tiny">Deny Affiliation</a></td>
+                        <td><a href="{{ url_for('admin_users.verify_affiliation', id=user.object_id) }}" class="button tiny">Verify Affiliation</a></td>
+                        <td><a href="{{ url_for('admin_users.deny_affiliation', id=user.object_id) }}" class="button tiny">Deny Affiliation</a></td>
                     </tr>
                 {% endfor %}
             </tbody>

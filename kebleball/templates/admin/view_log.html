@@ -13,10 +13,10 @@
             <p><strong>IP Address</strong>: {{ log.ip }}</p>
             <p><strong>Message</strong>: {{ log.action }}</p>
             {% if log.user_id != None %}
-                <p><strong>User</strong>: <a href="{{ url_for('admin.view_user', id=log.user_id) }}">{{ log.user.full_name }}</a></p>
+                <p><strong>User</strong>: <a href="{{ url_for('admin_users.view_user', id=log.user_id) }}">{{ log.user.full_name }}</a></p>
             {% endif %}
             {% if log.actor_id != log.user_id and log.actor_id != None %}
-                <p><strong>Actor</strong>: <a href="{{ url_for('admin.view_user', id=log.actor_id) }}">{{ log.actor.full_name }}</a></p>
+                <p><strong>Actor</strong>: <a href="{{ url_for('admin_users.view_user', id=log.actor_id) }}">{{ log.actor.full_name }}</a></p>
             {% endif %}
             {% if log.transaction_id != None %}
                 <p><strong>Transaction</strong>: <a href="{{ url_for('admin.view_transaction', id=log.transaction_id) }}">#{{ '%05d' % log.transaction_id }}</a></p>
@@ -61,7 +61,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
+                                    <a href="{{ url_for('admin_tickets.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
                                 </td>
                             </tr>
                         {% endfor %}

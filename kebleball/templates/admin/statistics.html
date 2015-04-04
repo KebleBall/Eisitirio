@@ -7,18 +7,18 @@
     <section id="admin_home" class="columns">
         <h4>Sales (<a href="{{ url_for('admin.data', group='sales') }}" target="_blank">Raw Data</a>)</h4>
         <p class="small">Click on graph to view full size</p>
-        <a href="{{ url_for('admin.graphSales') }}" target="_blank">
-            <img src="{{ url_for('admin.graphSales') }}" />
+        <a href="{{ url_for('admin.graph_sales') }}" target="_blank">
+            <img src="{{ url_for('admin.graph_sales') }}" />
         </a>
         <h4>Payments (<a href="{{ url_for('admin.data', group='payments') }}" target="_blank">Raw Data</a>)</h4>
         <p class="small">Click on graph to view full size</p>
-        <a href="{{ url_for('admin.graphPayments') }}" target="_blank">
-            <img src="{{ url_for('admin.graphPayments') }}" />
+        <a href="{{ url_for('admin.graph_payments') }}" target="_blank">
+            <img src="{{ url_for('admin.graph_payments') }}" />
         </a>
         <h4>Colleges (<a href="{{ url_for('admin.data', group='colleges') }}" target="_blank">Raw Data</a>)</h4>
         <p class="small">Click on graph to view full size</p>
-        <a href="{{ url_for('admin.graphColleges') }}" target="_blank">
-            <img src="{{ url_for('admin.graphColleges') }}" />
+        <a href="{{ url_for('admin.graph_colleges') }}" target="_blank">
+            <img src="{{ url_for('admin.graph_colleges') }}" />
         </a>
         <h4>Revenue Report</h4>
         <p>Total Value of Tickets Sold: &pound;{{ '%.2f' % (total_value / 100) }}</p>

@@ -479,7 +479,7 @@ class User(DB.Model):
                 "Verify Affiliation",
                 "verify_affiliation.email",
                 user=self,
-                url=url_for('admin.verify_affiliations', _external=True)
+                url=url_for('admin_users.verify_affiliations', _external=True)
             )
             flash(
                 (

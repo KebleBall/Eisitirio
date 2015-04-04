@@ -49,6 +49,7 @@ flask_markdown.Markdown(APP)
 LOG = APP.log_manager.log_main
 
 APP.register_blueprint(views.ADMIN)
+APP.register_blueprint(views.ADMIN_USERS)
 APP.register_blueprint(views.AJAX)
 APP.register_blueprint(views.DASHBOARD)
 APP.register_blueprint(views.FRONT)
