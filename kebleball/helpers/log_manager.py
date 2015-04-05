@@ -1,22 +1,22 @@
 # coding: utf-8
-"""
-log_manager.py
-
-Contains Logger class
-Used to log events, both for users and for system errors
-"""
+"""Helper class to log events, both for users actions and for system errors."""
 
 import logging
-from kebleball.database import db
-from kebleball.database import log
-from flask import session, current_app
+
+from flask import session
 from flask.ext.login import current_user, request, AnonymousUserMixin
+
+from kebleball.database import db
+from kebleball.database import models
 
 DB = db.DB
 
-Log = log.Log
-
 class LogManager(object):
+    """Helper to log events, both for users actions and for system errors.
+
+    Provides passthroughs to various loggers written to disk, plus a separate
+    logging method for logging user actions to the database.
+    """
     def __init__(self, app):
         app.log_manager = self
 
@@ -73,7 +73,19 @@ class LogManager(object):
             "Logger instance has no attribute '{0}'".format(name)
             )
 
-    def log_event(self, message, tickets=[], user=None, transaction=None):
+    def log_event(self, message, tickets=None, user=None, transaction=None):
+        """Log a user action to the database.
+
+        Creates a log entry in the database which can be found through the admin
+        interface.
+
+        Args:
+            message: (str) The message to be logged
+            tickets: (list(models.Ticket) or None) tickets the action affected
+            user: (models.User or None) user this action affected
+            transaction: (models.CardTransaction or None) transaction this
+                action affected
+        """
         if 'actor_id' in self.session:
             actor = self.session['actor_id']
         elif not current_user.is_anonymous():
@@ -84,7 +96,10 @@ class LogManager(object):
         if isinstance(user, AnonymousUserMixin):
             user = None
 
-        entry = Log(
+        if tickets is None:
+            tickets = []
+
+        entry = models.Log(
             request.remote_addr,
             message,
             actor,
