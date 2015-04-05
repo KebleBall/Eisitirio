@@ -47,7 +47,7 @@ class User(DB.Model):
         DB.String(120),
         nullable=False
     )
-    full_name = DB.column_property(forenames + " " + surname)
+    full_name = DB.column_property(forenames + ' ' + surname)
     phone = DB.Column(
         DB.String(20),
         nullable=False
@@ -149,7 +149,7 @@ class User(DB.Model):
         ).first()
 
     def __repr__(self):
-        return "<User {0}: {1} {2}>".format(
+        return '<User {0}: {1} {2}>'.format(
             self.object_id, self.forenames, self.surname)
 
     def check_password(self, candidate):
@@ -310,8 +310,8 @@ class User(DB.Model):
         purchases during the limited release.
         """
         return (
-            self.college.name == "Keble" and
-            self.affiliation.name == "Student" and
+            self.college.name == 'Keble' and
+            self.affiliation.name == 'Student' and
             APP.config['KEBLE_DISCOUNT'] > 0 and
             not APP.config['TICKETS_ON_SALE'] and
             self.tickets.filter_by(cancelled=False).count() == 0
@@ -401,8 +401,8 @@ class User(DB.Model):
 
         APP.email_manager.send_template(
             self.email,
-            "Affiliation Verified - Buy Your Tickets Now!",
-            "affiliation_verified.email",
+            'Affiliation Verified - Buy Your Tickets Now!',
+            'affiliation_verified.email',
             url=url_for('purchase.purchaseHome', _external=True)
         )
 
@@ -438,11 +438,11 @@ class User(DB.Model):
 
         if (
                 old_affiliation != new_affiliation and
-                self.college.name == "Keble" and
+                self.college.name == 'Keble' and
                 new_affiliation.name not in [
-                    "Other",
-                    "None",
-                    "Graduate/Alumnus"
+                    'Other',
+                    'None',
+                    'Graduate/Alumnus'
                 ]
         ):
             self.affiliation_verified = None
@@ -459,14 +459,14 @@ class User(DB.Model):
                 not APP.config['TICKETS_ON_SALE']
         ):
             if (
-                    self.college.name != "Keble" or
+                    self.college.name != 'Keble' or
                     self.affiliation.name in [
-                        "Other",
-                        "None",
-                        "Graduate/Alumnus"
+                        'Other',
+                        'None',
+                        'Graduate/Alumnus'
                     ] or
                     (
-                        self.affiliation.name == "Student" and
+                        self.affiliation.name == 'Student' and
                         self.battels_id is not None
                     )
             ):
@@ -476,8 +476,8 @@ class User(DB.Model):
 
             APP.email_manager.send_template(
                 APP.config['TICKETS_EMAIL'],
-                "Verify Affiliation",
-                "verify_affiliation.email",
+                'Verify Affiliation',
+                'verify_affiliation.email',
                 user=self,
                 url=url_for('admin_users.verify_affiliations', _external=True)
             )
@@ -515,13 +515,13 @@ class User(DB.Model):
         a staff member/fellow or not, and return the appropriate ticket price
         from the config"""
         if (
-                self.college.name == "Keble" and
-                self.affiliation.name == "Staff/Fellow" and
+                self.college.name == 'Keble' and
+                self.affiliation.name == 'Staff/Fellow' and
                 not app.config['TICKETS_ON_SALE']
         ):
-            return APP.config["KEBLE_STAFF_TICKET_PRICE"]
+            return APP.config['KEBLE_STAFF_TICKET_PRICE']
         else:
-            return APP.config["TICKET_PRICE"]
+            return APP.config['TICKET_PRICE']
 
     def can_buy(self):
         """Can the user purchase tickets?
@@ -537,20 +537,20 @@ class User(DB.Model):
         if not APP.config['TICKETS_ON_SALE']:
             if APP.config['LIMITED_RELEASE']:
                 if not (
-                        self.college.name == "Keble" and
+                        self.college.name == 'Keble' and
                         self.affiliation.name in [
-                            "Student",
-                            "Graduand",
-                            "Staff/Fellow",
-                            "Foreign Exchange Student",
+                            'Student',
+                            'Graduand',
+                            'Staff/Fellow',
+                            'Foreign Exchange Student',
                         ]
                 ):
                     return (
                         False,
                         0,
                         (
-                            "tickets are on limited release to current Keble "
-                            "members and Keble graduands only."
+                            'tickets are on limited release to current Keble '
+                            'members and Keble graduands only.'
                         )
                     )
                 elif not self.affiliation_verified:
@@ -558,9 +558,9 @@ class User(DB.Model):
                         False,
                         0,
                         (
-                            "your affiliation has not been verified yet. You "
-                            "will be informed by email when you are able to "
-                            "purchase tickets."
+                            'your affiliation has not been verified yet. You '
+                            'will be informed by email when you are able to '
+                            'purchase tickets.'
                         )
                     )
             else:
@@ -608,8 +608,8 @@ class User(DB.Model):
                     0,
                     (
                         'you already own too many tickets. Please contact '
-                        '<a href="{0}">the ticketing officer</a> if you wish '
-                        'to purchase more than {1} tickets.'
+                        '<a href="{0}">the ticketing officer</a> if you '
+                        'wish to purchase more than {1} tickets.'
                     ).format(
                         APP.config['TICKETS_EMAIL_LINK'],
                         APP.config['MAX_TICKETS']

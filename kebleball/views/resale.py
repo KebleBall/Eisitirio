@@ -54,7 +54,7 @@ def resale_home():
             return render_template('resale/resaleHome.html')
         elif resale_to == current_user:
             flash(
-                u"You can't resell tickets to yourself",
+                u'You can\'t resell tickets to yourself',
                 'info'
             )
             return render_template('resale/resaleHome.html')

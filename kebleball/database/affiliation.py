@@ -21,7 +21,7 @@ class Affiliation(DB.Model):
         self.name = name
 
     def __repr__(self):
-        return "<Affiliation {0}: {1}>".format(self.object_id, self.name)
+        return '<Affiliation {0}: {1}>'.format(self.object_id, self.name)
 
     @staticmethod
     def get_by_id(object_id):

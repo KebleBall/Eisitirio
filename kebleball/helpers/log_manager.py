@@ -23,9 +23,9 @@ class LogManager(object):
         logging.basicConfig(
             level=app.config['LOG_LEVEL'],
             format=(
-                "[%(name)s/%(levelname)s] "
-                "%(asctime)s - "
-                "%(message)s"
+                '[%(name)s/%(levelname)s] '
+                '%(asctime)s - '
+                '%(message)s'
             ),
             datefmt='%Y-%m-%d %H:%M:%S'
         )
@@ -70,8 +70,8 @@ class LogManager(object):
                 )
 
         raise AttributeError(
-            "Logger instance has no attribute '{0}'".format(name)
-            )
+            'LogManager instance has no attribute "{0}"'.format(name)
+        )
 
     def log_event(self, message, tickets=None, user=None, transaction=None):
         """Log a user action to the database.

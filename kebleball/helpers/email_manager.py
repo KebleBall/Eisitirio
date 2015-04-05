@@ -105,7 +105,7 @@ class EmailManager(object):
             'utf-8'
         )
 
-        message['Subject'] = ("[Keble Ball] - " + subject)
+        message['Subject'] = ('[Keble Ball] - ' + subject)
         message['From'] = email_from
         if isinstance(to, list):
             for email in to:

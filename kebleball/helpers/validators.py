@@ -25,8 +25,8 @@ def validate_voucher(code):
             False,
             {
                 'class': 'error',
-                'message': ("That voucher code wasn't recognised. "
-                            "Please ensure you have entered it correctly.")
+                'message': ('That voucher code wasn\'t recognised. '
+                            'Please ensure you have entered it correctly.')
             },
             None
         )
@@ -36,7 +36,7 @@ def validate_voucher(code):
                 False,
                 {
                     'class': 'error',
-                    'message': "That voucher code has already been used."
+                    'message': 'That voucher code has already been used.'
                 },
                 None
             )
@@ -46,7 +46,7 @@ def validate_voucher(code):
                 False,
                 {
                     'class': 'error',
-                    'message': "That voucher code has expired."
+                    'message': 'That voucher code has expired.'
                 },
                 None
             )
@@ -64,14 +64,14 @@ def validate_voucher(code):
                     (voucher.discount_value / 100.0)
                 )
             else:
-                message = "This voucher gives a {0:d}% discount off ".format(
+                message = 'This voucher gives a {0:d}% discount off '.format(
                     voucher.discount_value
                 )
 
-            if voucher.applies_to == "Ticket":
-                message = message + "one ticket."
+            if voucher.applies_to == 'Ticket':
+                message = message + 'one ticket.'
             else:
-                message = message + "all tickets purchased in one transaction."
+                message = message + 'all tickets purchased in one transaction.'
 
             result = (
                 True,
@@ -107,7 +107,7 @@ def validate_referrer(email, current_user):
                 False,
                 {
                     'class': 'error',
-                    'message': "You can't credit yourself for your own order!"
+                    'message': 'You can\'t credit yourself for your own order!'
                 },
                 None
             )

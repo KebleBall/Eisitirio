@@ -130,17 +130,15 @@ class Log(DB.Model):
             self.actor.full_name,
             self.user.full_name,
             (
-                "" if self.ticket is None else (
-                    ", in relation "
-                    "to {0} tickets"
+                '' if self.ticket is None else (
+                    ', in relation to {0} tickets'
                 ).format(
                     self.tickets.count()
                 )
             ),
             (
-                "" if self.transaction is None else (
-                    ", in relation "
-                    "to transaction {0}"
+                '' if self.transaction is None else (
+                    ', in relation to transaction {0}'
                 ).format(
                     self.transaction.object_id
                 )

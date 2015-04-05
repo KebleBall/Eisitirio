@@ -565,7 +565,7 @@ def announcements(page=1):
             DB.flask.session.commit()
 
             flask.flash(
-                u'models.Announcement created successfully',
+                u'Announcement created successfully',
                 'success'
             )
 
@@ -720,7 +720,7 @@ def vouchers(page=1):
             DB.flask.session.commit()
 
             flask.flash(
-                u'models.Voucher(s) created successfully',
+                u'Voucher(s) created successfully',
                 'success'
             )
 
@@ -846,4 +846,4 @@ def data(group):
         )
 
     csvdata.seek(0)
-    return flask.send_file(csvdata, mimetype="text/csv", cache_timeout=900)
+    return flask.send_file(csvdata, mimetype='text/csv', cache_timeout=900)

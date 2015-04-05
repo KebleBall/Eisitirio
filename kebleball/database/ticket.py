@@ -201,7 +201,7 @@ class Ticket(DB.Model):
             return price[:-2] + '.' + price[-2:]
         else:
             raise AttributeError(
-                "Ticket instance has no attribute '{0}'".format(name)
+                'Ticket instance has no attribute "{0}"'.format(name)
             )
 
     def __repr__(self):
@@ -308,8 +308,8 @@ class Ticket(DB.Model):
 
             app.email_manager.send_template(
                 reselling_to.email,
-                "Confirm Ticket Resale",
-                "confirmResale.email",
+                'Confirm Ticket Resale',
+                'confirmResale.email',
                 confirmurl=url_for(
                     'resale.resale_confirm',
                     resale_from=flask_login.current_user.object_id,
@@ -371,15 +371,15 @@ class Ticket(DB.Model):
 
             app.email_manager.send_template(
                 resale_from.email,
-                "Ticket Resale Cancelled",
-                "ownerCancelResale.email",
+                'Ticket Resale Cancelled',
+                'ownerCancelResale.email',
                 resale_to=resale_to
             )
 
             app.email_manager.send_template(
                 resale_to.email,
-                "Ticket Resale Cancelled",
-                "buyerCancelResale.email",
+                'Ticket Resale Cancelled',
+                'buyerCancelResale.email',
                 resale_from=resale_from
             )
 
@@ -426,8 +426,8 @@ class Ticket(DB.Model):
 
             app.email_manager.send_template(
                 resale_from.email,
-                "Complete Ticket Resale",
-                "completeResale.email",
+                'Complete Ticket Resale',
+                'completeResale.email',
                 resale_to=resale_to,
                 completeurl=url_for(
                     'resale.resale_complete',

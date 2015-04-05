@@ -47,9 +47,9 @@ def augment_config(app):
     old_getitem = app.config.__getitem__
 
     app.config.__class__ = type(
-        "Config",
+        'Config',
         (config.Config,),
-        {"__getitem__": (lambda self, k: parse_until(old_getitem(k)))}
+        {'__getitem__': (lambda self, k: parse_until(old_getitem(k)))}
     )
 
     old_get = app.config.get

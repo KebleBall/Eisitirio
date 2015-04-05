@@ -19,10 +19,10 @@ def initialise_db(prefill=True, clear=False):
 
     if clear:
         prompt = raw_input(
-            "Are you sure you wish to clear the entire database? "
+            'Are you sure you wish to clear the entire database? '
         )
 
-        if prompt.lower() in ["yes", "y"]:
+        if prompt.lower() in ['yes', 'y']:
             models.Affiliation.query.delete()
             models.Announcement.query.delete()
             models.Battels.query.delete()

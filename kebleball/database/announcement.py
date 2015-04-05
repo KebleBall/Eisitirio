@@ -199,7 +199,7 @@ class Announcement(DB.Model):
                     self.emails.append(recipient)
 
     def __repr__(self):
-        return "<Announcement {0}: {1}>".format(self.object_id, self.subject)
+        return '<Announcement {0}: {1}>'.format(self.object_id, self.subject)
 
     def send_emails(self, count):
         """Send the announcement as an email to a limited number of recipients.

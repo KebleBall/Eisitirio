@@ -239,7 +239,7 @@ def verify_user(object_id):
         )
 
         flask.flash(
-            u'models.User marked as verified.',
+            u'User marked as verified.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -270,7 +270,7 @@ def demote_user(object_id):
         )
 
         flask.flash(
-            u'models.User demoted.',
+            u'User demoted.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -301,7 +301,7 @@ def promote_user(object_id):
         )
 
         flask.flash(
-            u'models.User promoted.',
+            u'User promoted.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -389,7 +389,7 @@ def deny_affiliation(object_id):
 
     return flask.redirect(flask.url_for('admin_users.verify_affiliations'))
 
-@ADMIN_USERS.route("/admin/verify_affiliations")
+@ADMIN_USERS.route('/admin/verify_affiliations')
 @admin_required
 def verify_affiliations():
     """Allow an admin to verify many users' affiliations.
@@ -398,7 +398,7 @@ def verify_affiliations():
     verifying with buttons for each to verify/deny the affiliation.
     """
     users = models.User.query.filter(
-        models.User.college.has(name="Keble")
+        models.User.college.has(name='Keble')
     ).filter(
         models.User.affiliation_verified == None
     ).all()

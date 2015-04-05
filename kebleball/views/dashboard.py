@@ -126,8 +126,8 @@ def profile():
 
                 APP.email_manager.send_template(
                     request.form['email'],
-                    "Confirm your Email Address",
-                    "emailChangeConfirm.email",
+                    'Confirm your Email Address',
+                    'emailChangeConfirm.email',
                     confirmurl=url_for(
                         'front.confirm_email',
                         user_id=login.current_user.object_id,
@@ -147,7 +147,7 @@ def profile():
 
             if (
                     'oldpassword' in request.form and
-                    request.form['oldpassword'] != ""
+                    request.form['oldpassword'] != ''
             ):
                 login.current_user.set_password(request.form['password'])
 

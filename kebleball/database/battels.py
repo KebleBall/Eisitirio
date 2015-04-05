@@ -69,7 +69,7 @@ class Battels(DB.Model):
         self.manual = manual
 
     def __repr__(self):
-        return "<Battels {0}: {1}>".format(self.object_id, self.battelsid)
+        return '<Battels {0}: {1}>'.format(self.object_id, self.battelsid)
 
     def __getattr__(self, name):
         """Magic method to generate amounts charged in pounds."""
@@ -81,7 +81,7 @@ class Battels(DB.Model):
             return hilary_charge[:-2] + '.' + hilary_charge[-2:]
         else:
             raise AttributeError(
-                "Battels instance has no attribute '{0}'".format(name)
+                'Battels instance has no attribute "{0}"'.format(name)
             )
 
     def charge(self, ticket, term, wholepounds=False):
@@ -100,7 +100,7 @@ class Battels(DB.Model):
             self.hilary_charge = self.hilary_charge + ticket.price
         else:
             raise ValueError(
-                "Term '{0}' cannot be charged to battels".format(
+                'Term "{0}" cannot be charged to battels'.format(
                     term
                 )
             )
@@ -138,7 +138,9 @@ class Battels(DB.Model):
         elif APP.config['CURRENT_TERM'] == 'HT':
             self.hilary_charge = self.hilary_charge - ticket.price
         else:
-            raise ValueError("Can't refund battels tickets in the current term")
+            raise ValueError(
+                'Can\'t refund battels tickets in the current term'
+            )
 
         ticket.cancelled = True
         DB.session.commit()

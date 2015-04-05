@@ -193,8 +193,8 @@ class CardTransaction(DB.Model):
         url = APP.config['EWAY_API_BASE'] + endpoint + '.json'
         payload = json.dumps(data)
         headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Basic {0}".format(
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic {0}'.format(
                 APP.config['EWAY_API_PASSCODE']
             )
         }
@@ -228,29 +228,29 @@ class CardTransaction(DB.Model):
             (str) What URL the user should be redirected to to carry out payment
         """
         data = {
-            "Customer": {
-                "Reference": "U{0:05d}".format(self.user.object_id),
-                "FirstName": self.user.forenames,
-                "LastName": self.user.surname,
-                "Email": self.user.email
+            'Customer': {
+                'Reference': 'U{0:05d}'.format(self.user.object_id),
+                'FirstName': self.user.forenames,
+                'LastName': self.user.surname,
+                'Email': self.user.email
             },
-            "Payment": {
-                "TotalAmount": self.get_value(),
-                "InvoiceReference": "Trans{0:05d}".format(self.object_id),
-                "CurrencyCode": "GBP"
+            'Payment': {
+                'TotalAmount': self.get_value(),
+                'InvoiceReference': 'Trans{0:05d}'.format(self.object_id),
+                'CurrencyCode': 'GBP'
             },
-            "RedirectUrl": url_for("purchase.eway_success",
+            'RedirectUrl': url_for('purchase.eway_success',
                                    object_id=self.object_id, _external=True),
-            "CancelUrl": url_for("purchase.eway_cancel",
+            'CancelUrl': url_for('purchase.eway_cancel',
                                  object_id=self.object_id, _external=True),
-            "Method": "ProcessPayment",
-            "TransactionType": "Purchase",
-            "LogoUrl": "https://www.kebleball.com/assets/building_big.jpg",
-            "HeaderText": "Keble Ball {0}".format(
+            'Method': 'ProcessPayment',
+            'TransactionType': 'Purchase',
+            'LogoUrl': 'https://www.kebleball.com/assets/building_big.jpg',
+            'HeaderText': 'Keble Ball {0}'.format(
                 APP.config['START_TIME'].strftime('%Y')
             ),
-            "Language": "EN",
-            "CustomerReadOnly": True
+            'Language': 'EN',
+            'CustomerReadOnly': True
         }
 
         (success, response) = self._send_request('CreateAccessCodeShared', data)
@@ -338,8 +338,8 @@ class CardTransaction(DB.Model):
                                     APP.config['TREASURER_EMAIL'],
                                     APP.config['TICKETS_EMAIL']
                                 ],
-                                "Partial Ticket Payment",
-                                "partialPayment.email",
+                                'Partial Ticket Payment',
+                                'partialPayment.email',
                                 transaction=self,
                                 ewayresponse=response
                             )
@@ -395,7 +395,7 @@ class CardTransaction(DB.Model):
                     (
                         u'There is a problem with our payment provider, '
                         u'please contact <a href="{0}">the treasurer</a> '
-                        u'giving reference "Trans{1:05d}" to confirm that '
+                        u'giving reference \'Trans{1:05d}\' to confirm that '
                         u'payment has not been taken before trying again'
                     ).format(
                         APP.config['TREASURER_EMAIL_LINK'],
@@ -437,9 +437,9 @@ class CardTransaction(DB.Model):
             (bool) whether the refund was successful
         """
         data = {
-            "Refund": {
-                "TotalAmount": amount,
-                "TransactionID": self.eway_id
+            'Refund': {
+                'TotalAmount': amount,
+                'TransactionID': self.eway_id
             }
         }
 
@@ -469,8 +469,8 @@ class CardTransaction(DB.Model):
                         APP.config['TREASURER_EMAIL'],
                         APP.config['TICKETS_EMAIL']
                     ],
-                    "Partial Refund",
-                    "partialRefund.email",
+                    'Partial Refund',
+                    'partialRefund.email',
                     transaction=self,
                     ewayresponse=response
                 )

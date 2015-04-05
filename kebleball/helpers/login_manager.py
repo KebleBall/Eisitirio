@@ -26,8 +26,8 @@ def load_user(user_id):
     else:
         return models.User.get_by_id(user_id)
 
-LOGIN_MANAGER.login_view = "front.home"
-LOGIN_MANAGER.session_protection = "strong"
+LOGIN_MANAGER.login_view = 'front.home'
+LOGIN_MANAGER.session_protection = 'strong'
 
 def admin_required(func):
     """View decorator to enforce admin privileges for the view.

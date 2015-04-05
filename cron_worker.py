@@ -12,7 +12,7 @@ from sqlalchemy import func
 from sqlalchemy import distinct
 
 from kebleball import app
-from kebleball import database as db
+from kebleball.database import db
 from kebleball.helpers import email_manager
 
 APP = app.APP
@@ -28,7 +28,7 @@ def file_lock(lock_file):
         ).format(lock_file)
         sys.exit(-1)
     else:
-        open(lock_file, 'w').write("1")
+        open(lock_file, 'w').write('1')
         try:
             yield
         finally:

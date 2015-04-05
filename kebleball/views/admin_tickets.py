@@ -148,7 +148,7 @@ def mark_ticket_paid(object_id):
         )
 
         flask.flash(
-            u'models.Ticket successfully marked as paid.',
+            u'Ticket successfully marked as paid.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -204,7 +204,7 @@ def auto_cancel_ticket(object_id):
         )
 
         flask.flash(
-            u'models.Ticket cancelled successfully.',
+            u'Ticket cancelled successfully.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -234,7 +234,7 @@ def cancel_ticket(object_id):
         )
 
         flask.flash(
-            u'models.Ticket cancelled successfully.',
+            u'Ticket cancelled successfully.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -266,13 +266,13 @@ def validate_ticket():
 
         if not ticket:
             valid = False
-            message = "No such ticket with barcode {0}".format(
+            message = 'No such ticket with barcode {0}'.format(
                 flask.request.form['barcode'])
         elif ticket.entered:
             valid = False
             message = (
-                "models.Ticket has already been used for "
-                "entry. Check ID against {0} (owned by {1})"
+                'Ticket has already been used for '
+                'entry. Check ID against {0} (owned by {1})'
             ).format(
                 ticket.name,
                 ticket.owner.full_name
@@ -281,7 +281,7 @@ def validate_ticket():
             ticket.entered = True
             DB.flask.session.commit()
             valid = True
-            message = "Permit entry for {0}".format(ticket.name)
+            message = 'Permit entry for {0}'.format(ticket.name)
 
     return flask.render_template(
         'admin_tickets/validate_ticket.html',

@@ -10,11 +10,11 @@ from matplotlib.dates import DayLocator, DateFormatter
 
 from kebleball.database import models
 
-COLORS = "rgbcmyk"
-POINTS = "^os*+xDH"
-STYLES = [c + p + "-" for p in POINTS for c in COLORS]
+COLORS = 'rgbcmyk'
+POINTS = '^os*+xDH'
+STYLES = [c + p + '-' for p in POINTS for c in COLORS]
 
-_PlotDescriptor = collections.namedtuple("PlotDescriptor",
+_PlotDescriptor = collections.namedtuple('PlotDescriptor',
                                          ['timestamps', 'datapoints',
                                           'line_style', 'label',
                                           'current_value'])
@@ -123,11 +123,11 @@ def render_plot(plots, x_lim_min, x_lim_max):
     image = StringIO()
     pyplot.savefig(
         image,
-        format="png",
+        format='png',
         bbox_extra_artists=(legend,),
         bbox_inches='tight',
         facecolor='white'
     )
 
     image.seek(0)
-    return send_file(image, mimetype="image/png", cache_timeout=900)
+    return send_file(image, mimetype='image/png', cache_timeout=900)

@@ -25,7 +25,7 @@ def validate_voucher():
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
 
-    return Response(json.dumps(response), mimetype="text/json")
+    return Response(json.dumps(response), mimetype='text/json')
 
 @AJAX.route('/ajax/validate/referrer', methods=['POST'])
 def validate_referrer():
@@ -39,7 +39,7 @@ def validate_referrer():
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
 
-    return Response(json.dumps(response), mimetype="text/json")
+    return Response(json.dumps(response), mimetype='text/json')
 
 @AJAX.route('/ajax/validate/resale-email', methods=['POST'])
 def validate_resale_email():
@@ -53,7 +53,7 @@ def validate_resale_email():
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
 
-    return Response(json.dumps(response), mimetype="text/json")
+    return Response(json.dumps(response), mimetype='text/json')
 
 @AJAX.route('/ajax/change/ticket/<int:object_id>/name', methods=['POST'])
 def change_ticket_name(object_id):
@@ -64,6 +64,6 @@ def change_ticket_name(object_id):
         ticket.name = request.form['name']
 
         DB.session.commit()
-        return Response(json.dumps(True), mimetype="text/json")
+        return Response(json.dumps(True), mimetype='text/json')
     else:
-        return Response(json.dumps(False), mimetype="text/json")
+        return Response(json.dumps(False), mimetype='text/json')

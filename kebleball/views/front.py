@@ -87,7 +87,7 @@ def do_login():
 
     flask.flash(u'Logged in successfully.', 'success')
     return flask.redirect(flask.request.form.get('next', False) or
-                          flask.url_for("dashboard.dashboard_home"))
+                          flask.url_for('dashboard.dashboard_home'))
 
 @FRONT.route('/register', methods=['GET', 'POST'])
 def register():
@@ -212,8 +212,8 @@ def register():
 
     APP.email_manager.send_template(
         flask.request.form['email'],
-        "Confirm your Email Address",
-        "emailConfirm.email",
+        'Confirm your Email Address',
+        'emailConfirm.email',
         confirmurl=flask.url_for(
             'front.confirm_email',
             user_id=user.object_id,
@@ -301,8 +301,8 @@ def email_confirm():
 
             APP.email_manager.send_template(
                 flask.request.form['email'],
-                "Attempted Account Access",
-                "emailConfirmFail.email"
+                'Attempted Account Access',
+                'emailConfirmFail.email'
             )
         else:
             user.secret_key = generate_key(64)
@@ -318,8 +318,8 @@ def email_confirm():
 
             APP.email_manager.send_template(
                 flask.request.form['email'],
-                "Confirm your Email Address",
-                "emailConfirm.email",
+                'Confirm your Email Address',
+                'emailConfirm.email',
                 confirmurl=flask.url_for(
                     'front.confirm_email',
                     user_id=user.object_id,
@@ -373,8 +373,8 @@ def password_reset():
 
             app.email_manager.send_template(
                 flask.request.form['email'],
-                "Attempted Account Access",
-                "passwordResetFail.email"
+                'Attempted Account Access',
+                'passwordResetFail.email'
             )
         else:
             user.secret_key = generate_key(64)
@@ -393,8 +393,8 @@ def password_reset():
 
             APP.email_manager.send_template(
                 flask.request.form['email'],
-                "Confirm Password Reset",
-                "passwordResetConfirm.email",
+                'Confirm Password Reset',
+                'passwordResetConfirm.email',
                 confirmurl=flask.url_for(
                     'front.reset_password',
                     user_id=user.object_id,
@@ -500,7 +500,7 @@ def destroy_account(user_id, secret_key):
             for entry in user.events:
                 entry.action = (
                     entry.action +
-                    " (destroyed user with email address {0})".format(
+                    ' (destroyed user with email address {0})'.format(
                         user.email
                     )
                 )
