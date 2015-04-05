@@ -1,6 +1,8 @@
 # coding: utf-8
 """Views related to administrative tasks performed on tickets."""
 
+from __future__ import unicode_literals
+
 import flask
 
 from kebleball import app
@@ -58,7 +60,7 @@ def collect_ticket(object_id):
 
     if existing > 0:
         flask.flash(
-            u'Barcode has already been used for a ticket.',
+            'Barcode has already been used for a ticket.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -77,7 +79,7 @@ def collect_ticket(object_id):
         )
 
         flask.flash(
-            u'Ticket marked as collected with barcode number {0}.'.format(
+            'Ticket marked as collected with barcode number {0}.'.format(
                 flask.request.form['barcode']
             ),
             'success'
@@ -87,7 +89,7 @@ def collect_ticket(object_id):
                                             object_id=ticket.owner_id))
     else:
         flask.flash(
-            u'Could not find ticket, could mark as collected.',
+            'Could not find ticket, could mark as collected.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -114,7 +116,7 @@ def note_ticket(object_id):
         )
 
         flask.flash(
-            u'Notes set successfully.',
+            'Notes set successfully.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -122,7 +124,7 @@ def note_ticket(object_id):
                                             object_id=ticket.object_id))
     else:
         flask.flash(
-            u'Could not find ticket, could not set notes.',
+            'Could not find ticket, could not set notes.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -148,7 +150,7 @@ def mark_ticket_paid(object_id):
         )
 
         flask.flash(
-            u'Ticket successfully marked as paid.',
+            'Ticket successfully marked as paid.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -156,7 +158,7 @@ def mark_ticket_paid(object_id):
                                             object_id=ticket.object_id))
     else:
         flask.flash(
-            u'Could not find ticket, could not mark as paid.',
+            'Could not find ticket, could not mark as paid.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -175,7 +177,7 @@ def auto_cancel_ticket(object_id):
     if ticket:
         if not ticket.can_be_cancelled_automatically():
             flask.flash(
-                u'Could not automatically cancel ticket.',
+                'Could not automatically cancel ticket.',
                 'warning'
             )
             return flask.redirect(flask.request.referrer or
@@ -188,7 +190,7 @@ def auto_cancel_ticket(object_id):
             refund_result = ticket.card_transaction.process_refund(ticket.price)
             if not refund_result:
                 flask.flash(
-                    u'Could not process card refund.',
+                    'Could not process card refund.',
                     'warning'
                 )
                 return flask.redirect(flask.request.referrer or
@@ -204,7 +206,7 @@ def auto_cancel_ticket(object_id):
         )
 
         flask.flash(
-            u'Ticket cancelled successfully.',
+            'Ticket cancelled successfully.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -212,7 +214,7 @@ def auto_cancel_ticket(object_id):
                                             object_id=ticket.object_id))
     else:
         flask.flash(
-            u'Could not find ticket, could not cancel.',
+            'Could not find ticket, could not cancel.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -234,7 +236,7 @@ def cancel_ticket(object_id):
         )
 
         flask.flash(
-            u'Ticket cancelled successfully.',
+            'Ticket cancelled successfully.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -242,7 +244,7 @@ def cancel_ticket(object_id):
                                             object_id=ticket.object_id))
     else:
         flask.flash(
-            u'Could not find ticket, could not cancel.',
+            'Could not find ticket, could not cancel.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or

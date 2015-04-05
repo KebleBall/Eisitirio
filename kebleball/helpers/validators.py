@@ -1,6 +1,8 @@
 # coding: utf-8
 """Helper functions used to validate user input."""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from kebleball.database import models

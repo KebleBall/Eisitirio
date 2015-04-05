@@ -1,6 +1,8 @@
 # coding: utf-8
 """Helper class to log events, both for users actions and for system errors."""
 
+from __future__ import unicode_literals
+
 import logging
 
 from flask import session

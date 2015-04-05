@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for representing a statistic in a timeseries."""
 
+from __future__ import unicode_literals
+
 from kebleball.database import db
 from datetime import datetime
 
@@ -26,7 +28,7 @@ class Statistic(DB.Model):
         nullable=False
     )
     statistic = DB.Column(
-        DB.String(25),
+        DB.Unicode(25),
         nullable=False
     )
     value = DB.Column(

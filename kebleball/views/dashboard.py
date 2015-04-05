@@ -1,6 +1,8 @@
 # coding: utf-8
 """Views for the users dashboard."""
 
+from __future__ import unicode_literals
+
 from datetime import datetime, timedelta
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
@@ -40,7 +42,7 @@ def profile():
                 request.form['email'] != login.current_user.email and
                 models.User.get_by_email(request.form['email']) is not None
         ):
-            flashes.append(u'That email address is already in use. ')
+            flashes.append('That email address is already in use. ')
             valid = False
 
         if (
@@ -49,7 +51,7 @@ def profile():
         ):
             if not login.current_user.check_password(
                     request.form['oldpassword']):
-                flashes.append(u'Current password is not correct')
+                flashes.append('Current password is not correct')
                 valid = False
 
             if (
@@ -58,60 +60,60 @@ def profile():
                     request.form['password'] == '' or
                     request.form['password'] != request.form['confirm']
             ):
-                flashes.append(u'New passwords do not match')
+                flashes.append('New passwords do not match')
                 valid = False
 
             if len(request.form['password']) < 8:
-                flashes.append(u'Password must be at least 8 characters long')
+                flashes.append('Password must be at least 8 characters long')
                 valid = False
 
         if (
                 'forenames' not in request.form or
                 request.form['forenames'] == ''
         ):
-            flashes.append(u'First Name cannot be blank')
+            flashes.append('First Name cannot be blank')
             valid = False
 
         if (
                 'surname' not in request.form or
                 request.form['surname'] == ''
         ):
-            flashes.append(u'Surname cannot be blank')
+            flashes.append('Surname cannot be blank')
             valid = False
 
         if (
                 'email' not in request.form or
                 request.form['email'] == ''
         ):
-            flashes.append(u'Email cannot be blank')
+            flashes.append('Email cannot be blank')
             valid = False
 
         if (
                 'phone' not in request.form or
                 request.form['phone'] == ''
         ):
-            flashes.append(u'Phone cannot be blank')
+            flashes.append('Phone cannot be blank')
             valid = False
 
         if (
                 'college' not in request.form or
                 request.form['college'] == '---'
         ):
-            flashes.append(u'Please select a college')
+            flashes.append('Please select a college')
             valid = False
 
         if (
                 'affiliation' not in request.form or
                 request.form['affiliation'] == '---'
         ):
-            flashes.append(u'Please select an affiliation')
+            flashes.append('Please select an affiliation')
             valid = False
 
         if not valid:
             flash(
                 (
-                    u'There were errors in your provided details. Please fix '
-                    u'these and try again'
+                    'There were errors in your provided details. Please fix '
+                    'these and try again'
                 ),
                 'error'
             )
@@ -138,9 +140,9 @@ def profile():
 
                 flash(
                     (
-                        u'You must confirm your new email address to make '
-                        u'sure that we can contact you if necessary. Please '
-                        u'check your email for further instructions.'
+                        'You must confirm your new email address to make '
+                        'sure that we can contact you if necessary. Please '
+                        'check your email for further instructions.'
                     ),
                     'info'
                 )
@@ -166,7 +168,7 @@ def profile():
             )
 
             flash(
-                u'Your details have been updated',
+                'Your details have been updated',
                 'success'
             )
 
@@ -190,7 +192,7 @@ def display_announcement(announcement_id):
 
     if not announcement:
         flash(
-            u'Announcement {0} not found'.format(
+            'Announcement {0} not found'.format(
                 announcement_id
             ),
             'warning'

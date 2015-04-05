@@ -1,6 +1,8 @@
 # coding: utf-8
 """Set up flask.ext.login for our own purposes."""
 
+from __future__ import unicode_literals
+
 from functools import wraps
 
 from flask import current_app
@@ -45,7 +47,7 @@ def admin_required(func):
             return current_app.login_manager.unauthorized()
         elif not login.current_user.is_admin():
             flash(
-                u'You are not permitted to perform that action',
+                'You are not permitted to perform that action',
                 'error'
             )
 

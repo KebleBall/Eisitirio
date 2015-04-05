@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for a discount voucher."""
 
+from __future__ import unicode_literals
+
 from kebleball.database import db
 from datetime import datetime, timedelta
 
@@ -14,7 +16,7 @@ class Voucher(DB.Model):
         nullable=False
     )
     code = DB.Column(
-        DB.String(30),
+        DB.Unicode(30),
         nullable=False
     )
     expires = DB.Column(

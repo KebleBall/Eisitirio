@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for tickets."""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from flask import url_for
@@ -52,7 +54,7 @@ class Ticket(DB.Model):
         nullable=False
     )
     barcode = DB.Column(
-        DB.String(20),
+        DB.Unicode(20),
         unique=True,
         nullable=True
     )
@@ -77,7 +79,7 @@ class Ticket(DB.Model):
         nullable=True
     )
     payment_reference = DB.Column(
-        DB.String(50),
+        DB.Unicode(50),
         nullable=True
     )
     price = DB.Column(
@@ -85,11 +87,11 @@ class Ticket(DB.Model):
         nullable=False
     )
     name = DB.Column(
-        DB.String(120),
+        DB.Unicode(120),
         nullable=True
     )
     note = DB.Column(
-        DB.Text(),
+        DB.UnicodeText(),
         nullable=True
     )
     expires = DB.Column(
@@ -97,7 +99,7 @@ class Ticket(DB.Model):
         nullable=True
     )
     resale_key = DB.Column(
-        DB.String(32),
+        DB.Unicode(32),
         nullable=True
     )
     resaleconfirmed = DB.Column(
@@ -115,7 +117,7 @@ class Ticket(DB.Model):
         backref=DB.backref(
             'tickets',
             lazy='dynamic',
-            order_by='Ticket.cancelled'
+            order_by=b'Ticket.cancelled'
         ),
         foreign_keys=[owner_id]
     )
@@ -168,7 +170,7 @@ class Ticket(DB.Model):
         foreign_keys=[card_transaction_id]
     )
 
-    battels_term = DB.Column(DB.String(4), nullable=True)
+    battels_term = DB.Column(DB.Unicode(4), nullable=True)
     battels_id = DB.Column(
         DB.Integer,
         DB.ForeignKey('battels.object_id'),
@@ -350,7 +352,7 @@ class Ticket(DB.Model):
                     flask_login.current_user == resale_from
             ):
                 flash(
-                    u'You are not authorised to perform this action',
+                    'You are not authorised to perform this action',
                     'error'
                 )
                 return False
@@ -407,7 +409,7 @@ class Ticket(DB.Model):
 
             if flask_login.current_user != resale_to:
                 flash(
-                    u'You are not authorised to perform this action',
+                    'You are not authorised to perform this action',
                     'error'
                 )
                 return False
@@ -469,7 +471,7 @@ class Ticket(DB.Model):
 
             if flask_login.current_user != resale_from:
                 flash(
-                    u'You are not authorised to perform this action',
+                    'You are not authorised to perform this action',
                     'error'
                 )
                 return False

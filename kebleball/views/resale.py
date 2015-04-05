@@ -1,6 +1,8 @@
 # coding: utf-8
 """Views related to reselling tickets to other users."""
 
+from __future__ import unicode_literals
+
 from flask import Blueprint, request, render_template, redirect, flash, url_for
 from flask.ext.login import login_required, current_user
 
@@ -48,13 +50,13 @@ def resale_home():
 
         if not resale_to:
             flash(
-                u'No user with that email exists'
+                'No user with that email exists'
                 'error'
             )
             return render_template('resale/resaleHome.html')
         elif resale_to == current_user:
             flash(
-                u'You can\'t resell tickets to yourself',
+                'You can\'t resell tickets to yourself',
                 'info'
             )
             return render_template('resale/resaleHome.html')
@@ -62,7 +64,7 @@ def resale_home():
         models.Ticket.start_resale(tickets, resale_to)
 
         flash(
-            u'The resale process has been started',
+            'The resale process has been started',
             'info'
         )
 
@@ -97,7 +99,7 @@ def cancel_resale():
         DB.session.commit()
 
         flash(
-            u'The tickets have been removed from resale',
+            'The tickets have been removed from resale',
             'success'
         )
 
@@ -114,17 +116,17 @@ def resale_confirm(resale_from, resale_to, key):
     if models.Ticket.confirm_resale(resale_from, resale_to, key):
         flash(
             (
-                u'The resale arrangement has been confirmed. '
-                u'You must now arrange payment'
+                'The resale arrangement has been confirmed. '
+                'You must now arrange payment'
             ),
             'info'
         )
     else:
         flash(
             (
-                u'An error occurred, and the resale could not be confirmed. '
-                u'If the error persists, please contact <a href="{0}" '
-                u'target="_blank">the webmaster</a>.'
+                'An error occurred, and the resale could not be confirmed. '
+                'If the error persists, please contact <a href="{0}" '
+                'target="_blank">the webmaster</a>.'
             ).format(
                 APP.config['WEBSITE_EMAIL_LINK']
             ),
@@ -143,17 +145,17 @@ def resale_complete(resale_from, resale_to, key):
     if models.Ticket.complete_resale(resale_from, resale_to, key):
         flash(
             (
-                u'The resale arrangement has been completed, and the tickets '
-                u'have been transferred.'
+                'The resale arrangement has been completed, and the tickets '
+                'have been transferred.'
             ),
             'success'
         )
     else:
         flash(
             (
-                u'An error occurred, and the resale could not be completed. '
-                u'If the error persists, please contact <a href="{0}" '
-                u'target="_blank">the webmaster</a>.'
+                'An error occurred, and the resale could not be completed. '
+                'If the error persists, please contact <a href="{0}" '
+                'target="_blank">the webmaster</a>.'
             ).format(
                 APP.config['WEBSITE_EMAIL_LINK']
             ),
@@ -172,15 +174,15 @@ def resale_cancel(resale_from, resale_to, key):
     """
     if models.Ticket.cancel_resale(resale_from, resale_to, key):
         flash(
-            u'The resale arrangement has been cancelled.',
+            'The resale arrangement has been cancelled.',
             'info'
         )
     else:
         flash(
             (
-                u'An error occurred, and the resale could not be cancelled. '
-                u'If the error persists, please contact <a href="{0}" '
-                u'target="_blank">the webmaster</a>.'
+                'An error occurred, and the resale could not be cancelled. '
+                'If the error persists, please contact <a href="{0}" '
+                'target="_blank">the webmaster</a>.'
             ).format(
                 APP.config['WEBSITE_EMAIL_LINK']
             ),

@@ -1,6 +1,8 @@
 # coding: utf-8
 """Views for performing tasks via AJAX requests."""
 
+from __future__ import unicode_literals
+
 import json
 
 from flask import Blueprint, Response, request

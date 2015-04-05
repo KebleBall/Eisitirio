@@ -1,6 +1,8 @@
 # coding: utf-8
 """Views related to the purchase process."""
 
+from __future__ import unicode_literals
+
 from flask import Blueprint, request, render_template, flash, redirect, url_for
 from flask.ext import login
 
@@ -29,7 +31,7 @@ def purchase_home():
 
     if not buying_permitted:
         flash(
-            u'You cannot currently purchase tickets, because '
+            'You cannot currently purchase tickets, because '
             + can_buy_message, 'info'
         )
 
@@ -37,8 +39,8 @@ def purchase_home():
         if waiting_permitted:
             flash(
                 (
-                    u'Please join the waiting list, and you will be allocated '
-                    u'tickets as they become available'
+                    'Please join the waiting list, and you will be allocated '
+                    'tickets as they become available'
                 ),
                 'info'
             )
@@ -54,14 +56,14 @@ def purchase_home():
 
         if num_tickets > tickets_available:
             valid = False
-            flashes.append(u'You cannot buy that many tickets')
+            flashes.append('You cannot buy that many tickets')
         elif num_tickets < 1:
             valid = False
-            flashes.append(u'You must purchase at least 1 ticket')
+            flashes.append('You must purchase at least 1 ticket')
 
         if 'paymentMethod' not in request.form:
             valid = False
-            flashes.append(u'You must select a payment method')
+            flashes.append('You must select a payment method')
         elif request.form['paymentMethod'] not in [
                 'Cash',
                 'Card',
@@ -69,11 +71,11 @@ def purchase_home():
                 'Battels'
         ]:
             valid = False
-            flashes.append(u'That is not a valid payment method')
+            flashes.append('That is not a valid payment method')
         elif (request.form['paymentMethod'] == 'Battels'
               and not login.current_user.can_pay_by_battels()):
             valid = False
-            flashes.append(u'You cannot pay by battels')
+            flashes.append('You cannot pay by battels')
         elif (
                 request.form['paymentMethod'] == 'Cash' or
                 request.form['paymentMethod'] == 'Cheque'
@@ -82,11 +84,11 @@ def purchase_home():
             request.form['paymentReason'] == ''
         ):
             valid = False
-            flashes.append(u'You must give a reason for paying by cash/cheque.')
+            flashes.append('You must give a reason for paying by cash/cheque.')
 
         if 'acceptTerms' not in request.form:
             valid = False
-            flashes.append(u'You must accept the Terms and Conditions')
+            flashes.append('You must accept the Terms and Conditions')
 
         voucher = None
         if 'voucherCode' in request.form and request.form['voucherCode'] != '':
@@ -96,8 +98,8 @@ def purchase_home():
                 valid = False
                 flashes.append(
                     (
-                        u'{} Please clear the discount code field to continue '
-                        u'without using a voucher.'
+                        '{} Please clear the discount code field to continue '
+                        'without using a voucher.'
                     ).format(response['message'])
                 )
 
@@ -110,16 +112,16 @@ def purchase_home():
                 valid = False
                 flashes.append(
                     (
-                        u'{} Please clear the referrer field to continue '
-                        u'without giving somebody credit.'
+                        '{} Please clear the referrer field to continue '
+                        'without giving somebody credit.'
                     ).format(response['message'])
                 )
 
         if not valid:
             flash(
                 (
-                    u'There were errors in your order. Please fix '
-                    u'these and try again'
+                    'There were errors in your order. Please fix '
+                    'these and try again'
                 ),
                 'error'
             )
@@ -201,8 +203,8 @@ def purchase_home():
 
         flash(
             (
-                u'{0} tickets have been reserved for you at a total cost of '
-                u'&pound;{1:.2f}.'
+                '{0} tickets have been reserved for you at a total cost of '
+                '&pound;{1:.2f}.'
             ).format(
                 num_tickets,
                 total_value / 100.0
@@ -213,18 +215,18 @@ def purchase_home():
         if total_value > 0:
             flash(
                 (
-                    u'You must set a name on your tickets before they can be '
-                    u'paid for. Please set names on your tickets and then '
-                    u'click the "Complete Payment" button. You must complete '
-                    u'payment for these tickets by {0}'
+                    'You must set a name on your tickets before they can be '
+                    'paid for. Please set names on your tickets and then '
+                    'click the "Complete Payment" button. You must complete '
+                    'payment for these tickets by {0}'
                 ).format(
                     expires.strftime('%H:%M %d/%m/%Y')
                 ),
                 'info'
             )
         else:
-            flash(u'Please set names for these tickets before collection',
-                  u'info')
+            flash('Please set names for these tickets before collection',
+                  'info')
         return redirect(url_for('dashboard.dashboardHome'))
     else:
         return render_template(
@@ -249,7 +251,7 @@ def wait():
     if not wait_permitted:
         flash(
             (
-                u'You cannot join the waiting list at this time because ' +
+                'You cannot join the waiting list at this time because ' +
                 can_wait_message
             ),
             'info'
@@ -264,14 +266,14 @@ def wait():
 
         if num_tickets > wait_available:
             valid = False
-            flashes.append(u'You cannot wait for that many tickets')
+            flashes.append('You cannot wait for that many tickets')
         elif num_tickets < 1:
             valid = False
-            flashes.append(u'You must wait for at least 1 ticket')
+            flashes.append('You must wait for at least 1 ticket')
 
         if 'acceptTerms' not in request.form:
             valid = False
-            flashes.append(u'You must accept the Terms and Conditions')
+            flashes.append('You must accept the Terms and Conditions')
 
         referrer = None
         if ('referrerEmail' in request.form
@@ -282,16 +284,16 @@ def wait():
                 valid = False
                 flashes.append(
                     (
-                        u'{} Please clear the referrer field to continue '
-                        u'without giving somebody credit.'
+                        '{} Please clear the referrer field to continue '
+                        'without giving somebody credit.'
                     ).format(response['message'])
                 )
 
         if not valid:
             flash(
                 (
-                    u'There were errors in your order. Please fix '
-                    u'these and try again'
+                    'There were errors in your order. Please fix '
+                    'these and try again'
                 ),
                 'error'
             )
@@ -324,7 +326,7 @@ def wait():
 
         flash(
             (
-                u'You have been added to the waiting list for {0} ticket{1}.'
+                'You have been added to the waiting list for {0} ticket{1}.'
             ).format(
                 num_tickets,
                 '' if num_tickets == 1 else 's'
@@ -367,8 +369,8 @@ def change_method():
                     request.form['paymentReason'] == ''
                 )
         ):
-            flash(u'You must give a reason for paying by cash or cheque.',
-                  u'error')
+            flash('You must give a reason for paying by cash or cheque.',
+                  'error')
             return render_template(
                 'purchase/change_method.html',
                 tickets=request.form.getlist('tickets[]')
@@ -393,8 +395,8 @@ def change_method():
 
         flash(
             (
-                u'The payment method on the selected tickets has been changed '
-                u'successfully'
+                'The payment method on the selected tickets has been changed '
+                'successfully'
             ),
             'success'
         )
@@ -480,8 +482,8 @@ def battels_confirm():
     """
     if not login.current_user.can_pay_by_battels():
         flash(
-            u'You cannot currently pay by battels. Please change the payment '
-            u'method on your tickets',
+            'You cannot currently pay by battels. Please change the payment '
+            'method on your tickets',
             'warning'
         )
         return redirect(url_for('purchase.change_method'))
@@ -502,7 +504,7 @@ def battels_confirm():
                 APP.config['CURRENT_TERM'] == 'HT' and
                 request.form['paymentTerm'] != 'HT'
         ):
-            flash(u'Invalid choice of payment term', 'warning')
+            flash('Invalid choice of payment term', 'warning')
         else:
             battels = login.current_user.battels
 
@@ -517,7 +519,7 @@ def battels_confirm():
                 login.current_user
             )
 
-            flash(u'Your battels payment has been confirmed', 'success')
+            flash('Your battels payment has been confirmed', 'success')
 
     return render_template('purchase/battels_confirm.html')
 
@@ -583,10 +585,10 @@ def cancel():
         if refund_failed:
             flash(
                 (
-                    u'Some of your tickets could not be automatically '
-                    u'refunded, and so were not cancelled. You can try again '
-                    u'later, but if this problem continues to occur, you '
-                    u'should contact <a href="{0}">the ticketing officer</a>'
+                    'Some of your tickets could not be automatically '
+                    'refunded, and so were not cancelled. You can try again '
+                    'later, but if this problem continues to occur, you '
+                    'should contact <a href="{0}">the ticketing officer</a>'
                 ).format(
                     APP.config['TICKETS_EMAIL_LINK']
                 ),
@@ -603,14 +605,14 @@ def cancel():
             if refund_failed:
                 flash(
                     (
-                        u'Some of the tickets you selected have been '
-                        u'cancelled. See other messages for details.'
+                        'Some of the tickets you selected have been '
+                        'cancelled. See other messages for details.'
                     ),
                     'info'
                 )
             else:
                 flash(
-                    u'All of the tickets you selected have been cancelled.',
+                    'All of the tickets you selected have been cancelled.',
                     'info'
                 )
 

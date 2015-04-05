@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for an announcement sent to registered users."""
 
+from __future__ import unicode_literals
+
 from kebleball import app
 from kebleball.database import db
 from kebleball.database import user
@@ -52,11 +54,11 @@ class Announcement(DB.Model):
         nullable=False
     )
     content = DB.Column(
-        DB.Text(65536),
+        DB.UnicodeText(65536),
         nullable=False
     )
     subject = DB.Column(
-        DB.Text(256),
+        DB.UnicodeText(256),
         nullable=False
     )
     send_email = DB.Column(

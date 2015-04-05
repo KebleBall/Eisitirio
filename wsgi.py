@@ -1,6 +1,8 @@
 # coding: utf-8
 """WSGI wrapper for the Keble Ball Ticketing System."""
 
+from __future__ import unicode_literals
+
 import os
 import site
 import sys

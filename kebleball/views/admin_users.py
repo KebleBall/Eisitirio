@@ -1,6 +1,7 @@
 # coding: utf-8
 """Views related to administrative tasks performed on users."""
 
+from __future__ import unicode_literals
 
 from flask.ext.login import current_user, login_user
 import flask
@@ -100,7 +101,7 @@ def impersonate_user(object_id):
         return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
         flask.flash(
-            u'Could not find user, could not impersonate.',
+            'Could not find user, could not impersonate.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -164,7 +165,7 @@ def give_user(object_id):
         )
 
         flask.flash(
-            u'Gave {0} {1} tickets'.format(
+            'Gave {0} {1} tickets'.format(
                 user.forenames,
                 num_tickets
             ),
@@ -176,7 +177,7 @@ def give_user(object_id):
                                             object_id=user.object_id))
     else:
         flask.flash(
-            u'Could not find user, could not give tickets.',
+            'Could not find user, could not give tickets.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -203,7 +204,7 @@ def note_user(object_id):
         )
 
         flask.flash(
-            u'Notes set successfully.',
+            'Notes set successfully.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -211,7 +212,7 @@ def note_user(object_id):
                                             object_id=user.object_id))
     else:
         flask.flash(
-            u'Could not find user, could not set notes.',
+            'Could not find user, could not set notes.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -239,7 +240,7 @@ def verify_user(object_id):
         )
 
         flask.flash(
-            u'User marked as verified.',
+            'User marked as verified.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -247,7 +248,7 @@ def verify_user(object_id):
                                             object_id=user.object_id))
     else:
         flask.flash(
-            u'Could not find user, could not verify.',
+            'Could not find user, could not verify.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -270,7 +271,7 @@ def demote_user(object_id):
         )
 
         flask.flash(
-            u'User demoted.',
+            'User demoted.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -278,7 +279,7 @@ def demote_user(object_id):
                                             object_id=user.object_id))
     else:
         flask.flash(
-            u'Could not find user, could not demote.',
+            'Could not find user, could not demote.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -301,7 +302,7 @@ def promote_user(object_id):
         )
 
         flask.flash(
-            u'User promoted.',
+            'User promoted.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -309,7 +310,7 @@ def promote_user(object_id):
                                             object_id=user.object_id))
     else:
         flask.flash(
-            u'Could not find user, could not promote.',
+            'Could not find user, could not promote.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -337,7 +338,7 @@ def add_manual_battels(object_id):
         )
 
         flask.flash(
-            u'Battels set up for user.',
+            'Battels set up for user.',
             'success'
         )
         return flask.redirect(flask.request.referrer or
@@ -345,7 +346,7 @@ def add_manual_battels(object_id):
                                             object_id=user.object_id))
     else:
         flask.flash(
-            u'Could not find user, could not manually set up battels.',
+            'Could not find user, could not manually set up battels.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -425,7 +426,7 @@ def collect_tickets(object_id):
         )
     else:
         flask.flash(
-            u'Could not find user, could not process ticket collection.',
+            'Could not find user, could not process ticket collection.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or

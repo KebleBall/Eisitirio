@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for users."""
 
+from __future__ import unicode_literals
+
 from flask import flash
 from flask import url_for
 from flask.ext.bcrypt import Bcrypt
@@ -26,12 +28,12 @@ class User(DB.Model):
         nullable=False
     )
     email = DB.Column(
-        DB.String(120),
+        DB.Unicode(120),
         unique=True,
         nullable=False
     )
     new_email = DB.Column(
-        DB.String(120),
+        DB.Unicode(120),
         unique=True,
         nullable=True
     )
@@ -40,20 +42,20 @@ class User(DB.Model):
         nullable=False
     )
     forenames = DB.Column(
-        DB.String(120),
+        DB.Unicode(120),
         nullable=False
     )
     surname = DB.Column(
-        DB.String(120),
+        DB.Unicode(120),
         nullable=False
     )
     full_name = DB.column_property(forenames + ' ' + surname)
     phone = DB.Column(
-        DB.String(20),
+        DB.Unicode(20),
         nullable=False
     )
     secret_key = DB.Column(
-        DB.String(64),
+        DB.Unicode(64),
         nullable=True
     )
     secret_key_expiry = DB.Column(
@@ -71,7 +73,7 @@ class User(DB.Model):
         nullable=False
     )
     note = DB.Column(
-        DB.Text,
+        DB.UnicodeText,
         nullable=True
     )
     role = DB.Column(
@@ -483,11 +485,11 @@ class User(DB.Model):
             )
             flash(
                 (
-                    u'Your affiliation must be verified before you will be '
-                    u'able to purchase tickets. You will receive an email when '
-                    u'your status has been verified.'
+                    'Your affiliation must be verified before you will be '
+                    'able to purchase tickets. You will receive an email when '
+                    'your status has been verified.'
                 ),
-                u'info'
+                'info'
             )
 
     def add_manual_battels(self):

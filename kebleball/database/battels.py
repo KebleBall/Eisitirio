@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for battels charges for Keble Students."""
 
+from __future__ import unicode_literals
+
 from kebleball.database import db
 from kebleball import app
 
@@ -15,25 +17,25 @@ class Battels(DB.Model):
         nullable=False
     )
     battelsid = DB.Column(
-        DB.String(6),
+        DB.Unicode(6),
         unique=True,
         nullable=True
     )
     email = DB.Column(
-        DB.String(120),
+        DB.Unicode(120),
         unique=True,
         nullable=True
     )
     title = DB.Column(
-        DB.String(10),
+        DB.Unicode(10),
         nullable=True
     )
     surname = DB.Column(
-        DB.String(60),
+        DB.Unicode(60),
         nullable=True
     )
     forenames = DB.Column(
-        DB.String(60),
+        DB.Unicode(60),
         nullable=True
     )
     michaelmas_charge = DB.Column(

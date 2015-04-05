@@ -2,6 +2,8 @@
 # coding: utf-8
 """Executable to run the Keble Ball Ticketing System with profiling."""
 
+from __future__ import unicode_literals
+
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
 import kebleball

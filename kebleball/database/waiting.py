@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for entries on the waiting list."""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from kebleball.database import db

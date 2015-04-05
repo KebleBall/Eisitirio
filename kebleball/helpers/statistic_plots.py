@@ -1,6 +1,8 @@
 # coding: utf-8
 """Helper function for drawing a graph and displaying it as a view."""
 
+from __future__ import unicode_literals
+
 import collections
 from StringIO import StringIO
 

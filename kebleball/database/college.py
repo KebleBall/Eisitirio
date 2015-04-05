@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for a user's college."""
 
+from __future__ import unicode_literals
+
 from kebleball.database import db
 
 DB = db.DB
@@ -13,7 +15,7 @@ class College(DB.Model):
         nullable=False
     )
     name = DB.Column(
-        DB.String(50),
+        DB.Unicode(50),
         unique=True,
         nullable=False
     )

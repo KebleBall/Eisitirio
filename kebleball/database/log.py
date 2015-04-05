@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for log entries persisted to the database."""
 
+from __future__ import unicode_literals
+
 import datetime
 
 from kebleball.database import db
@@ -32,10 +34,10 @@ class Log(DB.Model):
         nullable=False
     )
     ip_address = DB.Column(
-        DB.String(45),
+        DB.Unicode(45),
         nullable=False
     )
-    action = DB.Column(DB.Text())
+    action = DB.Column(DB.UnicodeText())
 
     actor_id = DB.Column(
         DB.Integer(),

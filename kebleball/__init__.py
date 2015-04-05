@@ -1,6 +1,8 @@
 # coding: utf-8
 """Body of the system to glue all the components together."""
 
+from __future__ import unicode_literals
+
 import os
 
 from flask import redirect

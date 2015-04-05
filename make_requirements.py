@@ -7,6 +7,8 @@ packages in requirements-unversioned.txt - these being the packages which we
 need directly
 """
 
+from __future__ import unicode_literals
+
 import subprocess
 
 def main():

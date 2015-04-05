@@ -1,6 +1,8 @@
 # coding: utf-8
 """Helper to aid with sending emails."""
 
+from __future__ import unicode_literals
+
 from email.mime.text import MIMEText
 import atexit
 import smtplib

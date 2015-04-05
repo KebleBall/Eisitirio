@@ -1,6 +1,8 @@
 # coding: utf-8
 """Database model for information about Card Transactions performed via eWay."""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 import json
 import requests
@@ -30,11 +32,11 @@ class CardTransaction(DB.Model):
         nullable=True
     )
     access_code = DB.Column(
-        DB.String(200),
+        DB.Unicode(200),
         nullable=True
     )
     result_code = DB.Column(
-        DB.String(2),
+        DB.Unicode(2),
         nullable=True
     )
     eway_id = DB.Column(
@@ -270,8 +272,8 @@ class CardTransaction(DB.Model):
         else:
             flash(
                 (
-                    u'There is a problem with our payment provider, please '
-                    u'try again later'
+                    'There is a problem with our payment provider, please '
+                    'try again later'
                 ),
                 'error'
             )
@@ -320,15 +322,15 @@ class CardTransaction(DB.Model):
                         if refund_success:
                             flash(
                                 (
-                                    u'Your card payment was only authorised '
-                                    u'for a partial amount, and has '
-                                    u'subsequently been automatically '
-                                    u'reversed. Please check that you have '
-                                    u'enough available funds in your account, '
-                                    u'and then attempt payment again. If in '
-                                    u'doubt, pay for your tickets one-by-one '
-                                    u'to limit the value of the individual '
-                                    u'transactions.'
+                                    'Your card payment was only authorised '
+                                    'for a partial amount, and has '
+                                    'subsequently been automatically '
+                                    'reversed. Please check that you have '
+                                    'enough available funds in your account, '
+                                    'and then attempt payment again. If in '
+                                    'doubt, pay for your tickets one-by-one '
+                                    'to limit the value of the individual '
+                                    'transactions.'
                                 ),
                                 'warning'
                             )
@@ -345,18 +347,18 @@ class CardTransaction(DB.Model):
                             )
                             flash(
                                 (
-                                    u'Your card payment was only approved for '
-                                    u'a partial amount. An email has been '
-                                    u'sent to Keble Ball staff, and the '
-                                    u'partial payment will be reversed. After '
-                                    u'this, you will be contacted via email, '
-                                    u'and you should then reattempt payment. '
-                                    u'Please check that you have enough '
-                                    u'available funds in your account to '
-                                    u'complete payment for the full amount, '
-                                    u'and that you have no transaction '
-                                    u'limits. If in doubt, please pay for '
-                                    u'your tickets one-by-one.'
+                                    'Your card payment was only approved for '
+                                    'a partial amount. An email has been '
+                                    'sent to Keble Ball staff, and the '
+                                    'partial payment will be reversed. After '
+                                    'this, you will be contacted via email, '
+                                    'and you should then reattempt payment. '
+                                    'Please check that you have enough '
+                                    'available funds in your account to '
+                                    'complete payment for the full amount, '
+                                    'and that you have no transaction '
+                                    'limits. If in doubt, please pay for '
+                                    'your tickets one-by-one.'
                                 ),
                                 'warning'
                             )
@@ -393,10 +395,10 @@ class CardTransaction(DB.Model):
             else:
                 flash(
                     (
-                        u'There is a problem with our payment provider, '
-                        u'please contact <a href="{0}">the treasurer</a> '
-                        u'giving reference \'Trans{1:05d}\' to confirm that '
-                        u'payment has not been taken before trying again'
+                        'There is a problem with our payment provider, '
+                        'please contact <a href="{0}">the treasurer</a> '
+                        'giving reference \'Trans{1:05d}\' to confirm that '
+                        'payment has not been taken before trying again'
                     ).format(
                         APP.config['TREASURER_EMAIL_LINK'],
                         self.object_id
@@ -476,10 +478,10 @@ class CardTransaction(DB.Model):
                 )
                 flash(
                     (
-                        u'Your card refund was only approved for '
-                        u'a partial amount. An email has been '
-                        u'sent to Keble Ball staff, and the '
-                        u'refund will be manually completed.'
+                        'Your card refund was only approved for '
+                        'a partial amount. An email has been '
+                        'sent to Keble Ball staff, and the '
+                        'refund will be manually completed.'
                     ),
                     'warning'
                 )

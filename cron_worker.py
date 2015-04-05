@@ -2,6 +2,8 @@
 # coding: utf-8
 """Worker to run repeated tasks on a schedule."""
 
+from __future__ import unicode_literals
+
 import os
 import sys
 from datetime import datetime

@@ -2,6 +2,8 @@
 # coding: utf-8
 """Executable to run the Keble Ball Ticketing System in production mode."""
 
+from __future__ import unicode_literals
+
 import kebleball
 
 APP = kebleball.APP

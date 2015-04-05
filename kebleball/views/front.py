@@ -1,6 +1,8 @@
 # coding: utf-8
 """Views related to users who aren't logged in."""
 
+from __future__ import unicode_literals
+
 from datetime import datetime, timedelta
 
 import flask
@@ -54,8 +56,8 @@ def do_login():
             )
 
         flask.flash(
-            u'Could not complete log in. Invalid email or password.',
-            u'error'
+            'Could not complete log in. Invalid email or password.',
+            'error'
         )
         return flask.redirect(flask.url_for('front.home'))
 
@@ -66,7 +68,7 @@ def do_login():
             user
         )
         flask.flash(
-            u'Could not complete log in. Email address is not confirmed.',
+            'Could not complete log in. Email address is not confirmed.',
             'warning'
         )
         return flask.redirect(flask.url_for('front.home'))
@@ -85,7 +87,7 @@ def do_login():
         user
     )
 
-    flask.flash(u'Logged in successfully.', 'success')
+    flask.flash('Logged in successfully.', 'success')
     return flask.redirect(flask.request.form.get('next', False) or
                           flask.url_for('dashboard.dashboard_home'))
 
@@ -105,9 +107,9 @@ def register():
     if models.User.get_by_email(flask.request.form['email']) is not None:
         flask.flash(
             (
-                u'That email address already has an associated account. '
-                u'Use the links below to verify your email or reset your '
-                u'password.'
+                'That email address already has an associated account. '
+                'Use the links below to verify your email or reset your '
+                'password.'
             ),
             'error'
         )
@@ -118,66 +120,66 @@ def register():
             'confirm' not in flask.request.form or
             flask.request.form['password'] != flask.request.form['confirm']
     ):
-        flask.flashes.append(u'Passwords do not match')
+        flask.flashes.append('Passwords do not match')
         valid = False
 
     if (
             'forenames' not in flask.request.form or
             flask.request.form['forenames'] == ''
     ):
-        flask.flashes.append(u'First Name cannot be blank')
+        flask.flashes.append('First Name cannot be blank')
         valid = False
 
     if (
             'surname' not in flask.request.form or
             flask.request.form['surname'] == ''
     ):
-        flask.flashes.append(u'Surname cannot be blank')
+        flask.flashes.append('Surname cannot be blank')
         valid = False
 
     if (
             'email' not in flask.request.form or
             flask.request.form['email'] == ''
     ):
-        flask.flashes.append(u'Email cannot be blank')
+        flask.flashes.append('Email cannot be blank')
         valid = False
 
     if (
             'password' not in flask.request.form or
             flask.request.form['password'] == ''
     ):
-        flask.flashes.append(u'Password cannot be blank')
+        flask.flashes.append('Password cannot be blank')
         valid = False
     elif len(flask.request.form['password']) < 8:
-        flask.flashes.append(u'Password must be at least 8 characters long')
+        flask.flashes.append('Password must be at least 8 characters long')
         valid = False
 
     if (
             'phone' not in flask.request.form or
             flask.request.form['phone'] == ''
     ):
-        flask.flashes.append(u'Phone cannot be blank')
+        flask.flashes.append('Phone cannot be blank')
         valid = False
 
     if (
             'college' not in flask.request.form or
             flask.request.form['college'] == '---'
     ):
-        flask.flashes.append(u'Please select a college')
+        flask.flashes.append('Please select a college')
         valid = False
 
     if (
             'affiliation' not in flask.request.form or
             flask.request.form['affiliation'] == '---'
     ):
-        flask.flashes.append(u'Please select an affiliation')
+        flask.flashes.append('Please select an affiliation')
         valid = False
 
     if not valid:
         flask.flash(
             (
-                u'There were errors in your provided details. Please fix '
-                u'these and try again'
+                'There were errors in your provided details. Please fix '
+                'these and try again'
             ),
             'error'
         )
@@ -228,12 +230,12 @@ def register():
         )
     )
 
-    flask.flash(u'Your user account has been registered', 'success')
+    flask.flash('Your user account has been registered', 'success')
     flask.flash(
         (
-            u'Before you can log in, you must confirm your email address. '
-            u'Please check your email for further instructions. If the message '
-            u'does not arrive, please check your spam/junk mail folder.'
+            'Before you can log in, you must confirm your email address. '
+            'Please check your email for further instructions. If the message '
+            'does not arrive, please check your spam/junk mail folder.'
         ),
         'info'
     )
@@ -269,13 +271,13 @@ def confirm_email(user_id, secret_key):
             user
         )
 
-        flask.flash(u'Your email address has been verified. You can now log in',
-                    u'info')
+        flask.flash('Your email address has been verified. You can now log in',
+                    'info')
     else:
         flask.flash(
             (
-                u'Could not confirm email address. Check that you have used '
-                u'the correct link'
+                'Could not confirm email address. Check that you have used '
+                'the correct link'
             ),
             'warning'
         )
@@ -336,9 +338,9 @@ def email_confirm():
 
         flask.flash(
             (
-                u'An email has been sent to {0} with detailing what to do '
-                u'next. Please check your email (including your spam folder) '
-                u'and follow the instructions given'
+                'An email has been sent to {0} with detailing what to do '
+                'next. Please check your email (including your spam folder) '
+                'and follow the instructions given'
             ).format(
                 flask.request.form['email']
             ),
@@ -405,9 +407,9 @@ def password_reset():
 
         flask.flash(
             (
-                u'An email has been sent to {0} with detailing what to do '
-                u'next. Please check your email (including your spam folder) '
-                u'and follow the instructions given'
+                'An email has been sent to {0} with detailing what to do '
+                'next. Please check your email (including your spam folder) '
+                'and follow the instructions given'
             ).format(
                 flask.request.form['email']
             ),
@@ -435,8 +437,8 @@ def reset_password(user_id, secret_key):
 
         DB.flask.session.commit()
 
-        flask.flash(u'Could not complete password reset. Please try again',
-                    u'error')
+        flask.flash('Could not complete password reset. Please try again',
+                    'error')
 
         return flask.redirect(flask.url_for('front.home'))
 
@@ -447,7 +449,7 @@ def reset_password(user_id, secret_key):
 
             DB.flask.session.commit()
 
-            flask.flash(u'Passwords do not match, please try again', 'warning')
+            flask.flash('Passwords do not match, please try again', 'warning')
 
             return flask.redirect(
                 flask.url_for(
@@ -470,8 +472,8 @@ def reset_password(user_id, secret_key):
                 user
             )
 
-            flask.flash(u'Your password has been reset, please log in.',
-                        u'success')
+            flask.flash('Your password has been reset, please log in.',
+                        'success')
 
             return flask.redirect(flask.url_for('front.home'))
     else:
@@ -515,7 +517,7 @@ def destroy_account(user_id, secret_key):
                 )
             )
 
-            flask.flash(u'The account has been deleted.', 'info')
+            flask.flash('The account has been deleted.', 'info')
         else:
             APP.log_manager.log_event(
                 'Attempted deletion of verified account',
@@ -523,12 +525,12 @@ def destroy_account(user_id, secret_key):
                 user
             )
 
-            flask.flash(u'Could not delete user account.', 'warning')
+            flask.flash('Could not delete user account.', 'warning')
     else:
         flask.flash(
             (
-                u'Could not delete user account. Check that you have used the '
-                u'correct link'
+                'Could not delete user account. Check that you have used the '
+                'correct link'
             ),
             'warning'
         )

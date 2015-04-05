@@ -1,6 +1,8 @@
 # coding: utf-8
 """Views related to administrative tasks."""
 
+from __future__ import unicode_literals
+
 import csv
 import re
 from dateutil.parser import parse
@@ -380,7 +382,7 @@ def refund_transaction(object_id):
 
         if amount > (transaction.get_value() - transaction.refunded):
             flask.flash(
-                u'Cannot refund more than has been charged.',
+                'Cannot refund more than has been charged.',
                 'warning'
             )
             return flask.redirect(
@@ -393,12 +395,12 @@ def refund_transaction(object_id):
 
         if not result:
             flask.flash(
-                u'Could not process refund.',
+                'Could not process refund.',
                 'warning'
             )
         else:
             flask.flash(
-                u'Refund processed successfully.',
+                'Refund processed successfully.',
                 'success'
             )
         return flask.redirect(flask.request.referrer or
@@ -406,7 +408,7 @@ def refund_transaction(object_id):
                                             object_id=transaction.object_id))
     else:
         flask.flash(
-            u'Could not find transaction, could not cancel.',
+            'Could not find transaction, could not cancel.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -477,14 +479,14 @@ def announcements(page=1):
 
         if 'subject' not in form or form['subject'] == '':
             flask.flash(
-                u'Subject must not be blank',
+                'Subject must not be blank',
                 'warning'
             )
             success = False
 
         if 'message' not in form or form['message'] == '':
             flask.flash(
-                u'Message must not be blank',
+                'Message must not be blank',
                 'warning'
             )
             success = False
@@ -493,8 +495,8 @@ def announcements(page=1):
             if 'collected' in form and form['collected'] == 'yes':
                 flask.flash(
                     (
-                        u'A person cannot have no tickets and have collected '
-                        u'tickets'
+                        'A person cannot have no tickets and have collected '
+                        'tickets'
                     ),
                     'warning'
                 )
@@ -502,8 +504,8 @@ def announcements(page=1):
             if 'uncollected' in form and form['uncollected'] == 'yes':
                 flask.flash(
                     (
-                        u'A person cannot have no tickets and have uncollected '
-                        u'tickets'
+                        'A person cannot have no tickets and have uncollected '
+                        'tickets'
                     ),
                     'warning'
                 )
@@ -565,7 +567,7 @@ def announcements(page=1):
             DB.flask.session.commit()
 
             flask.flash(
-                u'Announcement created successfully',
+                'Announcement created successfully',
                 'success'
             )
 
@@ -594,12 +596,12 @@ def delete_announcement(object_id):
         DB.flask.session.commit()
 
         flask.flash(
-            u'Announcement deleted successfully',
+            'Announcement deleted successfully',
             'success'
         )
     else:
         flask.flash(
-            u'Could not find announcement, could not delete',
+            'Could not find announcement, could not delete',
             'warning'
         )
 
@@ -622,12 +624,12 @@ def cancel_announcement_emails(object_id):
         DB.flask.session.commit()
 
         flask.flash(
-            u'Announcement emails cancelled successfully',
+            'Announcement emails cancelled successfully',
             'success'
         )
     else:
         flask.flash(
-            u'Could not find announcement, could not cancel emails',
+            'Could not find announcement, could not cancel emails',
             'warning'
         )
 
@@ -656,20 +658,20 @@ def vouchers(page=1):
                 expires = parse(form['expires'])
                 if expires < datetime.utcnow():
                     flask.flash(
-                        u'Expiry date cannot be in the past',
+                        'Expiry date cannot be in the past',
                         'warning'
                     )
                     success = False
             except (KeyError, ValueError) as _:
                 flask.flash(
-                    u'Could not parse expiry date',
+                    'Could not parse expiry date',
                     'warning'
                 )
                 success = False
 
         if 'voucherType' not in form or form['voucherType'] == '':
             flask.flash(
-                u'You must select a discout type',
+                'You must select a discout type',
                 'warning'
             )
             success = False
@@ -683,7 +685,7 @@ def vouchers(page=1):
             value = int(form['fixedDiscount'])
             if value > 100:
                 flask.flash(
-                    u'Cannot give greater than 100% discount',
+                    'Cannot give greater than 100% discount',
                     'warning'
                 )
                 success = False
@@ -691,8 +693,8 @@ def vouchers(page=1):
         if not re.match('[a-zA-Z0-9]+', form['voucherPrefix']):
             flask.flash(
                 (
-                    u'Voucher prefix must be non-empty and contain only '
-                    u'letters and numbers'
+                    'Voucher prefix must be non-empty and contain only '
+                    'letters and numbers'
                 ),
                 'warning'
             )
@@ -720,7 +722,7 @@ def vouchers(page=1):
             DB.flask.session.commit()
 
             flask.flash(
-                u'Voucher(s) created successfully',
+                'Voucher(s) created successfully',
                 'success'
             )
 
@@ -758,12 +760,12 @@ def delete_voucher(object_id):
         DB.flask.session.delete(voucher)
         DB.flask.session.commit()
         flask.flash(
-            u'Voucher deleted successfully',
+            'Voucher deleted successfully',
             'success'
         )
     else:
         flask.flash(
-            u'Could not find voucher to delete',
+            'Could not find voucher to delete',
             'warning'
         )
 
@@ -780,12 +782,12 @@ def delete_waiting(object_id):
         DB.flask.session.delete(waiting)
         DB.flask.session.commit()
         flask.flash(
-            u'Waiting list entry deleted',
+            'Waiting list entry deleted',
             'success'
         )
     else:
         flask.flash(
-            u'Waiting list entry not found, could not delete.',
+            'Waiting list entry not found, could not delete.',
             'error'
         )
 

@@ -9,6 +9,8 @@ Also includes helper functions for augmenting a flask.config.Config object to
 automatically deal with Until objects
 """
 
+from __future__ import unicode_literals
+
 import datetime
 
 from flask import config
@@ -47,7 +49,7 @@ def augment_config(app):
     old_getitem = app.config.__getitem__
 
     app.config.__class__ = type(
-        'Config',
+        b'Config',
         (config.Config,),
         {'__getitem__': (lambda self, k: parse_until(old_getitem(k)))}
     )
