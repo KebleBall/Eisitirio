@@ -16,7 +16,7 @@ from kebleball.database import db
 from kebleball.database import models
 from kebleball.helpers import generate_key
 from kebleball.helpers.login_manager import admin_required
-from kebleball.helpers.statistic_plots import create_plot
+from kebleball.helpers import statistic_plots
 
 APP = app.APP
 DB = db.DB
@@ -800,35 +800,7 @@ def graph_sales():
     Shows statistics for number of tickets Available, Ordered, Paid, Collected,
     and Cancelled, plus the length of the waiting list.
     """
-    sales_statistics = models.Statistic.query \
-        .filter(models.Statistic.group == 'Sales') \
-        .order_by(models.Statistic.timestamp) \
-        .all()
-
-    statistic_keys = [
-        ('Available', 'g-'),
-        ('Ordered', 'b-'),
-        ('Paid', 'r-'),
-        ('Cancelled', 'y-'),
-        ('Collected', 'c-'),
-        ('Waiting', 'm-')
-    ]
-
-    plots = {
-        key: {
-            'timestamps': [],
-            'datapoints': [],
-            'line': line,
-            'currentValue': 0
-        } for (key, line) in statistic_keys
-    }
-
-    for statistic in sales_statistics:
-        plots[statistic.statistic]['timestamps'].append(statistic.timestamp)
-        plots[statistic.statistic]['datapoints'].append(statistic.value)
-        plots[statistic.statistic]['currentValue'] = statistic.value
-
-    return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
+    return statistic_plots.create_plot('Sales')
 
 @ADMIN.route('/admin/graphs/colleges')
 @admin_required
@@ -837,75 +809,7 @@ def graph_colleges():
 
     Shows how many users are registered from each college.
     """
-    college_statistics = models.Statistic.query \
-        .filter(models.Statistic.group == 'models.Colleges') \
-        .order_by(models.Statistic.timestamp) \
-        .all()
-
-    statistic_keys = [
-        ("All Souls", "r^-"),
-        ("Balliol", "g^-"),
-        ("Blackfriars", "b^-"),
-        ("Brasenose", "c^-"),
-        ("Campion Hall", "m^-"),
-        ("Christ Church", "y^-"),
-        ("Corpus Christi", "ro-"),
-        ("Exeter", "go-"),
-        ("Green Templeton", "bo-"),
-        ("Harris Manchester", "co-"),
-        ("Hertford", "mo-"),
-        ("Jesus", "yo-"),
-        ("Keble", "rs-"),
-        ("Kellogg", "gs-"),
-        ("Lady Margaret Hall", "bs-"),
-        ("Linacre", "cs-"),
-        ("Lincoln", "ms-"),
-        ("Magdelen", "ys-"),
-        ("Mansfield", "r*-"),
-        ("Merton", "g*-"),
-        ("New", "b*-"),
-        ("Nuffield", "c*-"),
-        ("Oriel", "m*-"),
-        ("Pembroke", "y*-"),
-        ("Queen's", "r+-"),
-        ("Regent's Park", "g+-"),
-        ("Somerville", "b+-"),
-        ("St Anne's", "c+-"),
-        ("St Antony's", "m+-"),
-        ("St Benet's Hall", "y+-"),
-        ("St Catherine's", "rx-"),
-        ("St Cross", "gx-"),
-        ("St Edmund Hall", "bx-"),
-        ("St Hilda's", "cx-"),
-        ("St Hugh's", "mx-"),
-        ("St John's", "yx-"),
-        ("St Peter's", "rD-"),
-        ("St Stephen's House", "gD-"),
-        ("Trinity", "bD-"),
-        ("University", "cD-"),
-        ("Wadham", "mD-"),
-        ("Wolfson", "yD-"),
-        ("Worcester", "rH-"),
-        ("Wycliffe Hall", "gH-"),
-        ("Other", "bH-"),
-        ("None", "cH-")
-    ]
-
-    plots = {
-        key: {
-            'timestamps': [],
-            'datapoints': [],
-            'line': line,
-            'currentValue': 0
-        } for (key, line) in statistic_keys
-    }
-
-    for statistic in college_statistics:
-        plots[statistic.statistic]['timestamps'].append(statistic.timestamp)
-        plots[statistic.statistic]['datapoints'].append(statistic.value)
-        plots[statistic.statistic]['currentValue'] = statistic.value
-
-    return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
+    return statistic_plots.create_plot('Colleges')
 
 @ADMIN.route('/admin/graphs/payments')
 @admin_required
@@ -914,34 +818,7 @@ def graph_payments():
 
     Shows how many tickets have been paid for by each payment method.
     """
-    payment_statistics = models.Statistic.query \
-        .filter(models.Statistic.group == 'Payments') \
-        .order_by(models.Statistic.timestamp) \
-        .all()
-
-    statistic_keys = [
-        ('Battels', 'g-'),
-        ('Card', 'b-'),
-        ('Cash', 'r-'),
-        ('Cheque', 'y-'),
-        ('Free', 'c-')
-    ]
-
-    plots = {
-        key: {
-            'timestamps': [],
-            'datapoints': [],
-            'line': line,
-            'currentValue': 0
-        } for (key, line) in statistic_keys
-    }
-
-    for statistic in payment_statistics:
-        plots[statistic.statistic]['timestamps'].append(statistic.timestamp)
-        plots[statistic.statistic]['datapoints'].append(statistic.value)
-        plots[statistic.statistic]['currentValue'] = statistic.value
-
-    return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
+    return statistic_plots.create_plot('Payments')
 
 @ADMIN.route('/admin/data/<group>')
 @admin_required
