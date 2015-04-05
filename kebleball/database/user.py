@@ -399,7 +399,7 @@ class User(DB.Model):
         """
         self.affiliation_verified = True
 
-        APP.email_manager.sendTemplate(
+        APP.email_manager.send_template(
             self.email,
             "Affiliation Verified - Buy Your Tickets Now!",
             "affiliation_verified.email",
@@ -474,7 +474,7 @@ class User(DB.Model):
                 DB.session.commit()
                 return
 
-            APP.email_manager.sendTemplate(
+            APP.email_manager.send_template(
                 APP.config['TICKETS_EMAIL'],
                 "Verify Affiliation",
                 "verify_affiliation.email",

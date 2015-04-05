@@ -333,7 +333,7 @@ class CardTransaction(DB.Model):
                                 'warning'
                             )
                         else:
-                            APP.email_manager.sendTemplate(
+                            APP.email_manager.send_template(
                                 [
                                     APP.config['TREASURER_EMAIL'],
                                     APP.config['TICKETS_EMAIL']
@@ -464,7 +464,7 @@ class CardTransaction(DB.Model):
             )
 
             if refunded_amount != amount:
-                APP.email_manager.sendTemplate(
+                APP.email_manager.send_template(
                     [
                         APP.config['TREASURER_EMAIL'],
                         APP.config['TICKETS_EMAIL']

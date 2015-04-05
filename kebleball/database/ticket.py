@@ -306,7 +306,7 @@ class Ticket(DB.Model):
                 flask_login.current_user
             )
 
-            app.email_manager.sendTemplate(
+            app.email_manager.send_template(
                 reselling_to.email,
                 "Confirm Ticket Resale",
                 "confirmResale.email",
@@ -369,14 +369,14 @@ class Ticket(DB.Model):
                 flask_login.current_user
             )
 
-            app.email_manager.sendTemplate(
+            app.email_manager.send_template(
                 resale_from.email,
                 "Ticket Resale Cancelled",
                 "ownerCancelResale.email",
                 resale_to=resale_to
             )
 
-            app.email_manager.sendTemplate(
+            app.email_manager.send_template(
                 resale_to.email,
                 "Ticket Resale Cancelled",
                 "buyerCancelResale.email",
@@ -424,7 +424,7 @@ class Ticket(DB.Model):
                 flask_login.current_user
             )
 
-            app.email_manager.sendTemplate(
+            app.email_manager.send_template(
                 resale_from.email,
                 "Complete Ticket Resale",
                 "completeResale.email",

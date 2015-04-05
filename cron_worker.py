@@ -118,7 +118,7 @@ def allocate_waiting():
         DB.session.add_all(tickets)
         DB.session.delete(wait)
 
-        APP.email_manager.sendTemplate(
+        APP.email_manager.send_template(
             wait.user.email,
             'You have been allocated tickets',
             'waitingAllocation.email',
@@ -262,7 +262,7 @@ def send_3_day_warnings(now, difference):
         .all()
 
     for ticket in tickets:
-        APP.email_manager.sendTemplate(
+        APP.email_manager.send_template(
             ticket.owner.email,
             'Tickets Expiring',
             'ticketsExpiring3days.email',
@@ -289,7 +289,7 @@ def send_1_day_warnings(now, difference):
         .all()
 
     for ticket in tickets:
-        APP.email_manager.sendTemplate(
+        APP.email_manager.send_template(
             ticket.owner.email,
             'Final Warning: Tickets Expiring',
             'ticketsExpiring1day.email',

@@ -210,7 +210,7 @@ def register():
         user
     )
 
-    APP.email_manager.sendTemplate(
+    APP.email_manager.send_template(
         flask.request.form['email'],
         "Confirm your Email Address",
         "emailConfirm.email",
@@ -299,7 +299,7 @@ def email_confirm():
                 )
             )
 
-            APP.email_manager.sendTemplate(
+            APP.email_manager.send_template(
                 flask.request.form['email'],
                 "Attempted Account Access",
                 "emailConfirmFail.email"
@@ -316,7 +316,7 @@ def email_confirm():
                 user
             )
 
-            APP.email_manager.sendTemplate(
+            APP.email_manager.send_template(
                 flask.request.form['email'],
                 "Confirm your Email Address",
                 "emailConfirm.email",
@@ -371,7 +371,7 @@ def password_reset():
                 )
             )
 
-            app.email_manager.sendTemplate(
+            app.email_manager.send_template(
                 flask.request.form['email'],
                 "Attempted Account Access",
                 "passwordResetFail.email"
@@ -391,7 +391,7 @@ def password_reset():
                 user
             )
 
-            APP.email_manager.sendTemplate(
+            APP.email_manager.send_template(
                 flask.request.form['email'],
                 "Confirm Password Reset",
                 "passwordResetConfirm.email",

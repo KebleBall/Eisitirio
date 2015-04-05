@@ -124,7 +124,7 @@ def profile():
                 login.current_user.secret_key_expiry = (
                     datetime.utcnow() + timedelta(days=7))
 
-                APP.email_manager.sendTemplate(
+                APP.email_manager.send_template(
                     request.form['email'],
                     "Confirm your Email Address",
                     "emailChangeConfirm.email",
