@@ -1,15 +1,24 @@
 # coding: utf-8
+"""Helper functions used to validate user input."""
 
 from datetime import datetime
 
-from kebleball.database import voucher
-from kebleball.database import user
+from kebleball.database import models
 
-Voucher = voucher.Voucher
-User = user.User
+def validate_voucher(code):
+    """Validate a discount voucher.
 
-def validateVoucher(code):
-    voucher = Voucher.query.filter(Voucher.code==code).first()
+    Check that the voucher exists, and that it can still be used.
+
+    Args:
+        code: (str) the voucher code identifying the discount voucher.
+
+    Returns:
+        (bool, dict(class:str, message:str), Voucher or None) returns whether
+        the voucher is valid, a dict containing components of a message to be
+        flashed, and if valid the voucher itself or otherwise None.
+    """
+    voucher = models.Voucher.query.filter(models.Voucher.code == code).first()
 
     if not voucher:
         result = (
@@ -43,11 +52,15 @@ def validateVoucher(code):
             )
         else:
             if voucher.discount_type == 'Fixed Price':
-                message = "This voucher gives a fixed price of &pound;{0:.2f} for ".format(
+                message = (
+                    'This voucher gives a fixed price of &pound;{0:.2f} for '
+                ).format(
                     (voucher.discount_value / 100.0)
                 )
             elif voucher.discount_type == 'Fixed Discount':
-                message = "This voucher gives a fixed &pound;{0:.2f} discount off ".format(
+                message = (
+                    'This voucher gives a fixed &pound;{0:.2f} discount off '
+                ).format(
                     (voucher.discount_value / 100.0)
                 )
             else:
@@ -71,8 +84,22 @@ def validateVoucher(code):
 
     return result
 
-def validateReferrer(email, current_user):
-    user = User.get_by_email(email)
+def validate_referrer(email, current_user):
+    """Validate a referrer.
+
+    Check that the user referred to exists, and that it is not the current user.
+
+    Args:
+        email: (str) the email address entered as referrer.
+        current_user: (models.User) the currently logged in user who has been
+            referred
+
+    Returns:
+        (bool, dict(class:str, message:str), User or None) returns whether
+        the referrer is a valid user, a dict containing components of a message
+        to be flashed, and if valid the user itself or otherwise None.
+    """
+    user = models.User.get_by_email(email)
 
     if user:
         if user == current_user:
@@ -89,7 +116,9 @@ def validateReferrer(email, current_user):
                 True,
                 {
                     'class': 'success',
-                    'message': '{0} will be credited for your order.'.format(user.forenames)
+                    'message': '{0} will be credited for your order.'.format(
+                        user.forenames
+                    )
                 },
                 user
             )
@@ -100,9 +129,9 @@ def validateReferrer(email, current_user):
                 'class': 'warning',
                 'message': (
                     'No user with that email address was found, have you '
-                    'entered it correctly? '
-                    'The person who referred you must have '
-                    'an account before they can be given credit for your order.'
+                    'entered it correctly? The person who referred you must '
+                    'have an account before they can be given credit for your '
+                    'order.'
                 )
             },
             None
@@ -110,8 +139,23 @@ def validateReferrer(email, current_user):
 
     return result
 
-def validateResaleEmail(email, current_user):
-    user = User.get_by_email(email)
+def validate_resale_email(email, current_user):
+    """Validate a user to resell tickets to.
+
+    Check that the user referred to exists, and that it is not the current user.
+
+    Args:
+        email: (str) the email address entered as recipient.
+        current_user: (models.User) the currently logged in user who is
+            reselling tickets
+
+    Returns:
+        (bool, dict(class:str, message:str), User or None) returns whether
+        the email is associated with a valid user, a dict containing components
+        of a message to be flashed, and if valid the user itself or otherwise
+        None.
+    """
+    user = models.User.get_by_email(email)
 
     if user:
         if user == current_user:
@@ -119,7 +163,10 @@ def validateResaleEmail(email, current_user):
                 False,
                 {
                     'class': 'info',
-                    'message': "There is very little, if any, point in reselling tickets to yourself..."
+                    'message': (
+                        'There is very little, if any, point in reselling '
+                        'tickets to yourself...'
+                    )
                 },
                 None
             )
@@ -128,7 +175,9 @@ def validateResaleEmail(email, current_user):
                 True,
                 {
                     'class': 'success',
-                    'message': '{0} will receive an email to confirm the resale.'.format(user.forenames)
+                    'message': (
+                        '{0} will receive an email to confirm the resale.'
+                    ).format(user.forenames)
                 },
                 None
             )

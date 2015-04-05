@@ -90,7 +90,7 @@ def purchase_home():
 
         voucher = None
         if 'voucherCode' in request.form and request.form['voucherCode'] != '':
-            (result, response, voucher) = validators.validateVoucher(
+            (result, response, voucher) = validators.validate_voucher(
                 request.form['voucherCode'])
             if not result:
                 valid = False
@@ -104,7 +104,7 @@ def purchase_home():
         referrer = None
         if ('referrerEmail' in request.form
                 and request.form['referrerEmail'] != ''):
-            (result, response, referrer) = validators.validateReferrer(
+            (result, response, referrer) = validators.validate_referrer(
                 request.form['referrerEmail'], login.current_user)
             if not result:
                 valid = False
@@ -276,7 +276,7 @@ def wait():
         referrer = None
         if ('referrerEmail' in request.form
                 and request.form['referrerEmail'] != ''):
-            (result, response, referrer) = validators.validateReferrer(
+            (result, response, referrer) = validators.validate_referrer(
                 request.form['referrerEmail'], login.current_user)
             if not result:
                 valid = False

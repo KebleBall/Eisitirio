@@ -20,7 +20,7 @@ def validate_voucher():
 
     Check the voucher exists and that it can be used.
     """
-    (_, response, _) = validators.validateVoucher(request.form['code'])
+    (_, response, _) = validators.validate_voucher(request.form['code'])
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
@@ -33,8 +33,8 @@ def validate_referrer():
 
     Check the the referenced user has an account on the system.
     """
-    (_, response, _) = validators.validateReferrer(request.form['email'],
-                                                   login.current_user)
+    (_, response, _) = validators.validate_referrer(request.form['email'],
+                                                    login.current_user)
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
@@ -47,8 +47,8 @@ def validate_resale_email():
 
     Check the the referenced user has an account on the system.
     """
-    (_, response, _) = validators.validateResaleEmail(request.form['email'],
-                                                      login.current_user)
+    (_, response, _) = validators.validate_resale_email(request.form['email'],
+                                                        login.current_user)
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
