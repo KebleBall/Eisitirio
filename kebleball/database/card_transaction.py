@@ -3,12 +3,12 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
+import datetime
 import json
 import requests
 
-from flask import url_for, flash
-from flask.ext.login import current_user
+from flask.ext import login
+import flask
 
 from kebleball import app
 from kebleball.database import db
@@ -69,7 +69,7 @@ class CardTransaction(DB.Model):
             self.user_id = user
 
         self.tickets = tickets
-        self.commenced = datetime.utcnow()
+        self.commenced = datetime.datetime.utcnow()
 
     def __repr__(self):
         status = self.get_status()
@@ -241,10 +241,12 @@ class CardTransaction(DB.Model):
                 'InvoiceReference': 'Trans{0:05d}'.format(self.object_id),
                 'CurrencyCode': 'GBP'
             },
-            'RedirectUrl': url_for('purchase.eway_success',
-                                   object_id=self.object_id, _external=True),
-            'CancelUrl': url_for('purchase.eway_cancel',
-                                 object_id=self.object_id, _external=True),
+            'RedirectUrl': flask.url_for('purchase.eway_success',
+                                         object_id=self.object_id,
+                                         _external=True),
+            'CancelUrl': flask.url_for('purchase.eway_cancel',
+                                       object_id=self.object_id,
+                                       _external=True),
             'Method': 'ProcessPayment',
             'TransactionType': 'Purchase',
             'LogoUrl': 'https://www.kebleball.com/assets/building_big.jpg',
@@ -264,13 +266,13 @@ class CardTransaction(DB.Model):
             APP.log_manager.log_event(
                 'Started Card Payment',
                 self.tickets,
-                current_user,
+                login.current_user,
                 self
             )
 
             return response['SharedPaymentUrl']
         else:
-            flash(
+            flask.flash(
                 (
                     'There is a problem with our payment provider, please '
                     'try again later'
@@ -294,7 +296,7 @@ class CardTransaction(DB.Model):
                                                      data)
 
             if success:
-                self.completed = datetime.utcnow()
+                self.completed = datetime.datetime.utcnow()
                 self.result_code = response['ResponseCode']
                 self.eway_id = response['TransactionID']
                 DB.session.commit()
@@ -312,7 +314,7 @@ class CardTransaction(DB.Model):
                                 response['TotalAmount']
                             ),
                             self.tickets,
-                            current_user,
+                            login.current_user,
                             self
                         )
 
@@ -320,7 +322,7 @@ class CardTransaction(DB.Model):
                             response['TotalAmount'])
 
                         if refund_success:
-                            flash(
+                            flask.flash(
                                 (
                                     'Your card payment was only authorised '
                                     'for a partial amount, and has '
@@ -345,7 +347,7 @@ class CardTransaction(DB.Model):
                                 transaction=self,
                                 ewayresponse=response
                             )
-                            flash(
+                            flask.flash(
                                 (
                                     'Your card payment was only approved for '
                                     'a partial amount. An email has been '
@@ -381,23 +383,23 @@ class CardTransaction(DB.Model):
                             self
                         )
 
-                        flash(
+                        flask.flash(
                             'Your payment has completed successfully',
                             'success'
                         )
                 else:
-                    flash(
+                    flask.flash(
                         'The card payment failed. You have not been charged.',
                         'error'
                     )
 
                 return status[0]
             else:
-                flash(
+                flask.flash(
                     (
                         'There is a problem with our payment provider, '
                         'please contact <a href="{0}">the treasurer</a> '
-                        'giving reference \'Trans{1:05d}\' to confirm that '
+                        'giving reference "Trans{1:05d}" to confirm that '
                         'payment has not been taken before trying again'
                     ).format(
                         APP.config['TREASURER_EMAIL_LINK'],
@@ -409,10 +411,10 @@ class CardTransaction(DB.Model):
 
     def cancel_eway_payment(self):
         """Mark the payment as cancelled."""
-        self.completed = datetime.utcnow()
+        self.completed = datetime.datetime.utcnow()
         self.result_code = 'CX'
 
-        flash(
+        flask.flash(
             'Your payment has been cancelled; you have not been charged.',
             'info'
         )
@@ -461,7 +463,7 @@ class CardTransaction(DB.Model):
                     refunded_amount / 100.0
                 ),
                 [],
-                current_user,
+                login.current_user,
                 self
             )
 
@@ -476,7 +478,7 @@ class CardTransaction(DB.Model):
                     transaction=self,
                     ewayresponse=response
                 )
-                flash(
+                flask.flash(
                     (
                         'Your card refund was only approved for '
                         'a partial amount. An email has been '

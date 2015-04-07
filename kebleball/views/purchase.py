@@ -3,8 +3,8 @@
 
 from __future__ import unicode_literals
 
-from flask import Blueprint, request, render_template, flash, redirect, url_for
 from flask.ext import login
+import flask
 
 from kebleball import app
 from kebleball.database import db
@@ -14,7 +14,7 @@ from kebleball.helpers import validators
 APP = app.APP
 DB = db.DB
 
-PURCHASE = Blueprint('purchase', __name__)
+PURCHASE = flask.Blueprint('purchase', __name__)
 
 @PURCHASE.route('/purchase', methods=['GET', 'POST'])
 @login.login_required
@@ -30,29 +30,29 @@ def purchase_home():
     ) = login.current_user.can_buy()
 
     if not buying_permitted:
-        flash(
+        flask.flash(
             'You cannot currently purchase tickets, because '
             + can_buy_message, 'info'
         )
 
         (waiting_permitted, _, _) = login.current_user.can_wait()
         if waiting_permitted:
-            flash(
+            flask.flash(
                 (
                     'Please join the waiting list, and you will be allocated '
                     'tickets as they become available'
                 ),
                 'info'
             )
-            return redirect(url_for('purchase.wait'))
+            return flask.redirect(flask.url_for('purchase.wait'))
         else:
-            return redirect(url_for('dashboard.dashboard_home'))
+            return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         valid = True
         flashes = []
 
-        num_tickets = int(request.form['num_tickets'])
+        num_tickets = int(flask.request.form['num_tickets'])
 
         if num_tickets > tickets_available:
             valid = False
@@ -61,10 +61,10 @@ def purchase_home():
             valid = False
             flashes.append('You must purchase at least 1 ticket')
 
-        if 'payment_method' not in request.form:
+        if 'payment_method' not in flask.request.form:
             valid = False
             flashes.append('You must select a payment method')
-        elif request.form['payment_method'] not in [
+        elif flask.request.form['payment_method'] not in [
                 'Cash',
                 'Card',
                 'Cheque',
@@ -72,28 +72,31 @@ def purchase_home():
         ]:
             valid = False
             flashes.append('That is not a valid payment method')
-        elif (request.form['payment_method'] == 'Battels'
+        elif (flask.request.form['payment_method'] == 'Battels'
               and not login.current_user.can_pay_by_battels()):
             valid = False
             flashes.append('You cannot pay by battels')
         elif (
-                request.form['payment_method'] == 'Cash' or
-                request.form['payment_method'] == 'Cheque'
+                flask.request.form['payment_method'] == 'Cash' or
+                flask.request.form['payment_method'] == 'Cheque'
         ) and (
-            'payment_reason' not in request.form or
-            request.form['payment_reason'] == ''
+            'payment_reason' not in flask.request.form or
+            flask.request.form['payment_reason'] == ''
         ):
             valid = False
             flashes.append('You must give a reason for paying by cash/cheque.')
 
-        if 'accept_terms' not in request.form:
+        if 'accept_terms' not in flask.request.form:
             valid = False
             flashes.append('You must accept the Terms and Conditions')
 
         voucher = None
-        if 'voucher_code' in request.form and request.form['voucher_code'] != '':
+        if (
+                'voucher_code' in flask.request.form and
+                flask.request.form['voucher_code'] != ''
+        ):
             (result, response, voucher) = validators.validate_voucher(
-                request.form['voucher_code'])
+                flask.request.form['voucher_code'])
             if not result:
                 valid = False
                 flashes.append(
@@ -104,10 +107,10 @@ def purchase_home():
                 )
 
         referrer = None
-        if ('referrer_email' in request.form
-                and request.form['referrer_email'] != ''):
+        if ('referrer_email' in flask.request.form
+                and flask.request.form['referrer_email'] != ''):
             (result, response, referrer) = validators.validate_referrer(
-                request.form['referrer_email'], login.current_user)
+                flask.request.form['referrer_email'], login.current_user)
             if not result:
                 valid = False
                 flashes.append(
@@ -118,7 +121,7 @@ def purchase_home():
                 )
 
         if not valid:
-            flash(
+            flask.flash(
                 (
                     'There were errors in your order. Please fix '
                     'these and try again'
@@ -126,11 +129,11 @@ def purchase_home():
                 'error'
             )
             for msg in flashes:
-                flash(msg, 'warning')
+                flask.flash(msg, 'warning')
 
-            return render_template(
+            return flask.render_template(
                 'purchase/purchase_home.html',
-                form=request.form,
+                form=flask.request.form,
                 num_tickets=num_tickets,
                 can_buy=tickets_available
             )
@@ -141,7 +144,7 @@ def purchase_home():
             tickets.append(
                 models.Ticket(
                     login.current_user,
-                    request.form['payment_method'],
+                    flask.request.form['payment_method'],
                     (
                         login.current_user.get_base_ticket_price() -
                         APP.config['KEBLE_DISCOUNT']
@@ -156,27 +159,27 @@ def purchase_home():
             tickets.append(
                 models.Ticket(
                     login.current_user,
-                    request.form['payment_method'],
+                    flask.request.form['payment_method'],
                     login.current_user.get_base_ticket_price()
                 )
             )
 
         if (
-                request.form['payment_method'] == 'Cash' or
-                request.form['payment_method'] == 'Cheque'
+                flask.request.form['payment_method'] == 'Cash' or
+                flask.request.form['payment_method'] == 'Cheque'
         ):
             for ticket in tickets:
                 ticket.add_note(
-                    request.form['payment_method'] +
+                    flask.request.form['payment_method'] +
                     ' payment reason: ' +
-                    request.form['payment_reason']
+                    flask.request.form['payment_reason']
                 )
 
         if voucher is not None:
             (success, tickets, error) = voucher.apply(tickets,
                                                       login.current_user)
             if not success:
-                flash('Could not use Voucher - ' + error, 'error')
+                flask.flash('Could not use Voucher - ' + error, 'error')
 
         if referrer is not None:
             for ticket in tickets:
@@ -201,7 +204,7 @@ def purchase_home():
 
         total_value = sum([ticket.price for ticket in tickets])
 
-        flash(
+        flask.flash(
             (
                 '{0} tickets have been reserved for you at a total cost of '
                 '&pound;{1:.2f}.'
@@ -213,7 +216,7 @@ def purchase_home():
         )
 
         if total_value > 0:
-            flash(
+            flask.flash(
                 (
                     'You must set a name on your tickets before they can be '
                     'paid for. Please set names on your tickets and then '
@@ -225,11 +228,11 @@ def purchase_home():
                 'info'
             )
         else:
-            flash('Please set names for these tickets before collection',
-                  'info')
-        return redirect(url_for('dashboard.dashboard_home'))
+            flask.flash('Please set names for these tickets before collection',
+                        'info')
+        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
-        return render_template(
+        return flask.render_template(
             'purchase/purchase_home.html',
             can_buy=tickets_available
         )
@@ -249,20 +252,20 @@ def wait():
     ) = login.current_user.can_wait()
 
     if not wait_permitted:
-        flash(
+        flask.flash(
             (
                 'You cannot join the waiting list at this time because ' +
                 can_wait_message
             ),
             'info'
         )
-        return redirect(url_for('dashboard.dashboard_home'))
+        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         valid = True
         flashes = []
 
-        num_tickets = int(request.form['num_tickets'])
+        num_tickets = int(flask.request.form['num_tickets'])
 
         if num_tickets > wait_available:
             valid = False
@@ -271,15 +274,15 @@ def wait():
             valid = False
             flashes.append('You must wait for at least 1 ticket')
 
-        if 'accept_terms' not in request.form:
+        if 'accept_terms' not in flask.request.form:
             valid = False
             flashes.append('You must accept the Terms and Conditions')
 
         referrer = None
-        if ('referrer_email' in request.form
-                and request.form['referrer_email'] != ''):
+        if ('referrer_email' in flask.request.form
+                and flask.request.form['referrer_email'] != ''):
             (result, response, referrer) = validators.validate_referrer(
-                request.form['referrer_email'], login.current_user)
+                flask.request.form['referrer_email'], login.current_user)
             if not result:
                 valid = False
                 flashes.append(
@@ -290,7 +293,7 @@ def wait():
                 )
 
         if not valid:
-            flash(
+            flask.flash(
                 (
                     'There were errors in your order. Please fix '
                     'these and try again'
@@ -298,11 +301,11 @@ def wait():
                 'error'
             )
             for msg in flashes:
-                flash(msg, 'warning')
+                flask.flash(msg, 'warning')
 
-            return render_template(
+            return flask.render_template(
                 'purchase/purchase_home.html',
-                form=request.form,
+                form=flask.request.form,
                 num_tickets=num_tickets,
                 can_wait=wait_available
             )
@@ -324,7 +327,7 @@ def wait():
             login.current_user
         )
 
-        flash(
+        flask.flash(
             (
                 'You have been added to the waiting list for {0} ticket{1}.'
             ).format(
@@ -334,9 +337,9 @@ def wait():
             'success'
         )
 
-        return redirect(url_for('dashboard.dashboard_home'))
+        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
-        return render_template(
+        return flask.render_template(
             'purchase/wait.html',
             can_wait=wait_available
         )
@@ -348,9 +351,9 @@ def change_method():
 
     Displays a list of unpaid tickets with checkboxes, and processes the form.
     """
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         tickets = models.Ticket.query.filter(
-            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+            models.Ticket.object_id.in_(flask.request.form.getlist('tickets[]'))
         ).filter(
             models.Ticket.owner_id == login.current_user.object_id
         ).filter(
@@ -362,38 +365,39 @@ def change_method():
 
         if (
                 (
-                    request.form['payment_method'] == 'Cash' or
-                    request.form['payment_method'] == 'Cheque'
+                    flask.request.form['payment_method'] == 'Cash' or
+                    flask.request.form['payment_method'] == 'Cheque'
                 ) and (
-                    'payment_reason' not in request.form or
-                    request.form['payment_reason'] == ''
+                    'payment_reason' not in flask.request.form or
+                    flask.request.form['payment_reason'] == ''
                 )
         ):
-            flash('You must give a reason for paying by cash or cheque.',
-                  'error')
-            return render_template(
+            flask.flash('You must give a reason for paying by cash or cheque.',
+                        'error')
+            return flask.render_template(
                 'purchase/change_method.html',
-                tickets=request.form.getlist('tickets[]')
+                tickets=flask.request.form.getlist('tickets[]')
             )
-        elif 'payment_reason' in request.form:
-            reason = request.form['payment_reason']
+        elif 'payment_reason' in flask.request.form:
+            reason = flask.request.form['payment_reason']
         else:
             reason = None
 
         for ticket in tickets:
-            ticket.set_payment_method(request.form['payment_method'], reason)
+            ticket.set_payment_method(flask.request.form['payment_method'],
+                                      reason)
 
         DB.session.commit()
 
         APP.log_manager.log_event(
             'Changed Payment Method to {0}'.format(
-                request.form['payment_method']
+                flask.request.form['payment_method']
             ),
             tickets,
             login.current_user
         )
 
-        flash(
+        flask.flash(
             (
                 'The payment method on the selected tickets has been changed '
                 'successfully'
@@ -401,7 +405,7 @@ def change_method():
             'success'
         )
 
-    return render_template('purchase/change_method.html')
+    return flask.render_template('purchase/change_method.html')
 
 @PURCHASE.route('/purchase/card-confirm', methods=['GET', 'POST'])
 @login.login_required
@@ -409,12 +413,12 @@ def card_confirm():
     """Complete a card payment.
 
     Presents a list of tickets due for card payment, and processes the form to
-    create a CardTransaction object and redirect the user to the payment
+    create a CardTransaction object and flask.redirect the user to the payment
     gateway.
     """
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         tickets = models.Ticket.query.filter(
-            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+            models.Ticket.object_id.in_(flask.request.form.getlist('tickets[]'))
         ).filter(
             models.Ticket.owner_id == login.current_user.object_id
         ).filter(
@@ -435,9 +439,9 @@ def card_confirm():
         eway_url = transaction.get_eway_url()
 
         if eway_url is not None:
-            return redirect(eway_url)
+            return flask.redirect(eway_url)
 
-    return render_template('purchase/card_confirm.html')
+    return flask.render_template('purchase/card_confirm.html')
 
 @PURCHASE.route('/purchase/eway-success/<int:object_id>')
 def eway_success(object_id):
@@ -454,7 +458,7 @@ def eway_success(object_id):
 
     transaction.process_eway_payment()
 
-    return redirect(url_for('dashboard.dashboard_home'))
+    return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
 @PURCHASE.route('/purchase/eway-cancel/<int:object_id>')
 def eway_cancel(object_id):
@@ -469,7 +473,7 @@ def eway_cancel(object_id):
 
     transaction.cancel_eway_payment()
 
-    return redirect(url_for('dashboard.dashboard_home'))
+    return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
 @PURCHASE.route('/purchase/battels-confirm', methods=['GET', 'POST'])
 @login.login_required
@@ -481,16 +485,16 @@ def battels_confirm():
     add the charge to users battels account.
     """
     if not login.current_user.can_pay_by_battels():
-        flash(
+        flask.flash(
             'You cannot currently pay by battels. Please change the payment '
             'method on your tickets',
             'warning'
         )
-        return redirect(url_for('purchase.change_method'))
+        return flask.redirect(flask.url_for('purchase.change_method'))
 
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         tickets = models.Ticket.query.filter(
-            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+            models.Ticket.object_id.in_(flask.request.form.getlist('tickets[]'))
         ).filter(
             models.Ticket.owner_id == login.current_user.object_id
         ).filter(
@@ -502,14 +506,14 @@ def battels_confirm():
 
         if (
                 APP.config['CURRENT_TERM'] == 'HT' and
-                request.form['payment_term'] != 'HT'
+                flask.request.form['payment_term'] != 'HT'
         ):
-            flash('Invalid choice of payment term', 'warning')
+            flask.flash('Invalid choice of payment term', 'warning')
         else:
             battels = login.current_user.battels
 
             for ticket in tickets:
-                battels.charge(ticket, request.form['payment_term'])
+                battels.charge(ticket, flask.request.form['payment_term'])
 
             DB.session.commit()
 
@@ -519,9 +523,9 @@ def battels_confirm():
                 login.current_user
             )
 
-            flash('Your battels payment has been confirmed', 'success')
+            flask.flash('Your battels payment has been confirmed', 'success')
 
-    return render_template('purchase/battels_confirm.html')
+    return flask.render_template('purchase/battels_confirm.html')
 
 @PURCHASE.route('/purchase/cancel', methods=['GET', 'POST'])
 @login.login_required
@@ -531,9 +535,9 @@ def cancel():
     Presents the user with a list of tickets, and upon form submission cancels
     the selected tickets, giving refunds as appropriate.
     """
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         tickets = models.Ticket.query.filter(
-            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+            models.Ticket.object_id.in_(flask.request.form.getlist('tickets[]'))
         ).filter(
             models.Ticket.owner_id == login.current_user.object_id
         ).all()
@@ -561,8 +565,8 @@ def cancel():
                 cancelled.append(ticket)
             elif ticket.payment_method == 'Card':
                 if ticket.card_transaction_id in card_transactions:
-                    card_transactions[ticket.card_transaction_id]['tickets'] \
-                        .append(ticket)
+                    transaction = card_transactions[ticket.card_transaction_id]
+                    transaction['tickets'].append(ticket)
                 else:
                     card_transactions[ticket.card_transaction_id] = {
                         'transaction': ticket.card_transaction,
@@ -583,7 +587,7 @@ def cancel():
                 refund_failed = True
 
         if refund_failed:
-            flash(
+            flask.flash(
                 (
                     'Some of your tickets could not be automatically '
                     'refunded, and so were not cancelled. You can try again '
@@ -603,7 +607,7 @@ def cancel():
             )
 
             if refund_failed:
-                flash(
+                flask.flash(
                     (
                         'Some of the tickets you selected have been '
                         'cancelled. See other messages for details.'
@@ -611,9 +615,9 @@ def cancel():
                     'info'
                 )
             else:
-                flash(
+                flask.flash(
                     'All of the tickets you selected have been cancelled.',
                     'info'
                 )
 
-    return render_template('purchase/cancel.html')
+    return flask.render_template('purchase/cancel.html')

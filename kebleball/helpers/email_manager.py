@@ -3,11 +3,11 @@
 
 from __future__ import unicode_literals
 
-from email.mime.text import MIMEText
+from email.mime import text
 import atexit
 import smtplib
 
-from jinja2 import Environment, PackageLoader
+import jinja2
 
 class EmailManager(object):
     """Helper for sending emails.
@@ -49,8 +49,8 @@ class EmailManager(object):
                 templates/emails folder
         """
         if self.jinjaenv is None:
-            self.jinjaenv = Environment(
-                loader=PackageLoader(
+            self.jinjaenv = jinja2.Environment(
+                loader=jinja2.PackageLoader(
                     'kebleball',
                     'templates/emails'
                 )
@@ -84,11 +84,11 @@ class EmailManager(object):
             email_from
         )
 
-    def send_text(self, to, subject, text, email_from=None):
+    def send_text(self, to, subject, message_text, email_from=None):
         """Send an text email.
 
-        Composes the email into a MIMEText object and passes it to the email
-        sending routine.
+        Composes the email into a text.MIMEText object and passes it to the
+        email sending routine.
 
         Args:
             to: (str) the email address of the recipient
@@ -101,8 +101,8 @@ class EmailManager(object):
         if email_from is None:
             email_from = self.default_email_from
 
-        message = MIMEText(
-            text,
+        message = text.MIMEText(
+            message_text,
             'plain',
             'utf-8'
         )
@@ -124,7 +124,7 @@ class EmailManager(object):
         server. Handles sending failures and if email sending is disabled.
 
         Args:
-            message: (MIMEText) A formatted email message.
+            message: (text.MIMEText) A formatted email message.
         """
         if not self.send_emails:
             self.log(

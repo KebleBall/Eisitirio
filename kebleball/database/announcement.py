@@ -3,11 +3,11 @@
 
 from __future__ import unicode_literals
 
+from email.mime import text
 from kebleball import app
 from kebleball.database import db
 from kebleball.database import user
-from email.mime.text import MIMEText
-from datetime import datetime
+import datetime
 
 APP = app.APP
 DB = db.DB
@@ -151,7 +151,7 @@ class Announcement(DB.Model):
                  is_waiting=None,
                  has_collected=None,
                  has_uncollected=None):
-        self.timestamp = datetime.utcnow()
+        self.timestamp = datetime.datetime.utcnow()
         self.subject = subject
         self.content = content
         self.sender_id = sender_id
@@ -217,7 +217,7 @@ class Announcement(DB.Model):
             minus the nuber of emails sent)
         """
         try:
-            message = MIMEText(self.content)
+            message = text.MIMEText(self.content)
             message['Subject'] = self.subject
             message['From'] = self.sender.email
 

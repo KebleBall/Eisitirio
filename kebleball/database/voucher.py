@@ -3,8 +3,9 @@
 
 from __future__ import unicode_literals
 
+import datetime
+
 from kebleball.database import db
-from datetime import datetime, timedelta
 
 DB = db.DB
 
@@ -97,8 +98,8 @@ class Voucher(DB.Model):
         self.applies_to = applies_to
         self.single_use = single_use
 
-        if isinstance(expires, timedelta):
-            self.expires = datetime.utcnow() + expires
+        if isinstance(expires, datetime.timedelta):
+            self.expires = datetime.datetime.utcnow() + expires
         else:
             self.expires = expires
 
@@ -139,7 +140,10 @@ class Voucher(DB.Model):
         if self.single_use and self.used:
             return (False, tickets, 'Voucher has already been used.')
 
-        if self.expires is not None and self.expires < datetime.utcnow():
+        if (
+                self.expires is not None and
+                self.expires < datetime.datetime.utcnow()
+        ):
             return (False, tickets, 'Voucher has expired.')
 
         self.used = True

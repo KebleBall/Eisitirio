@@ -6,8 +6,10 @@ Because we have the separate |models| module for accessing the models together,
 we have this module for accessing all the constants.
 """
 
-from kebleball.database import affiliation
-from kebleball.database import college
+# We make an exception to the usual rule of only importing modules here for
+# neatness.
+#
+# pylint: disable=unused-import
 
-AFFILIATIONS = affiliation.AFFILIATIONS
-COLLEGES = college.COLLEGES
+from kebleball.database.affiliation import AFFILIATIONS
+from kebleball.database.college import COLLEGES

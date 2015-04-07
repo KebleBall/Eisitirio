@@ -3,8 +3,8 @@
 
 from __future__ import unicode_literals
 
-from flask import Blueprint, request, render_template, redirect, flash, url_for
-from flask.ext.login import login_required, current_user
+from flask.ext import login
+import flask
 
 from kebleball import app
 from kebleball.database import db
@@ -13,10 +13,10 @@ from kebleball.database import models
 APP = app.APP
 DB = db.DB
 
-RESALE = Blueprint('resale', __name__)
+RESALE = flask.Blueprint('resale', __name__)
 
 @RESALE.route('/resale', methods=['GET', 'POST'])
-@login_required
+@login.login_required
 def resale_home():
     """Start the resale process.
 
@@ -34,11 +34,11 @@ def resale_home():
         4. Once the sender has been paid, they click the link to confirm this,
             and the tickets are transferred to the recipient's account
     """
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         tickets = models.Ticket.query.filter(
-            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+            models.Ticket.object_id.in_(flask.request.form.getlist('tickets[]'))
         ).filter(
-            models.Ticket.owner_id == current_user.object_id
+            models.Ticket.owner_id == login.current_user.object_id
         ).filter(
             models.Ticket.paid == True
         ).all()
@@ -46,43 +46,43 @@ def resale_home():
         while None in tickets:
             tickets.remove(None)
 
-        resale_to = models.User.get_by_email(request.form['resale_email'])
+        resale_to = models.User.get_by_email(flask.request.form['resale_email'])
 
         if not resale_to:
-            flash(
+            flask.flash(
                 'No user with that email exists'
                 'error'
             )
-            return render_template('resale/resale_home.html')
-        elif resale_to == current_user:
-            flash(
+            return flask.render_template('resale/resale_home.html')
+        elif resale_to == login.current_user:
+            flask.flash(
                 'You can\'t resell tickets to yourself',
                 'info'
             )
-            return render_template('resale/resale_home.html')
+            return flask.render_template('resale/resale_home.html')
 
         models.Ticket.start_resale(tickets, resale_to)
 
-        flash(
+        flask.flash(
             'The resale process has been started',
             'info'
         )
 
-    return render_template('resale/resale_home.html')
+    return flask.render_template('resale/resale_home.html')
 
 @RESALE.route('/resale/cancel', methods=['GET', 'POST'])
-@login_required
+@login.login_required
 def cancel_resale():
     """Allow a user to cancel the resale of tickets they own.
 
     Presents the user with a list of tickets they are reselling, and allows them
     to cancel the resale process for any of them.
     """
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         tickets = models.Ticket.query.filter(
-            models.Ticket.object_id.in_(request.form.getlist('tickets[]'))
+            models.Ticket.object_id.in_(flask.request.form.getlist('tickets[]'))
         ).filter(
-            models.Ticket.owner_id == current_user.object_id
+            models.Ticket.owner_id == login.current_user.object_id
         ).filter(
             models.Ticket.paid == True
         ).all()
@@ -98,15 +98,15 @@ def cancel_resale():
 
         DB.session.commit()
 
-        flash(
+        flask.flash(
             'The tickets have been removed from resale',
             'success'
         )
 
-    return render_template('resale/cancel_resale.html')
+    return flask.render_template('resale/cancel_resale.html')
 
 @RESALE.route('/resale/confirm/<int:resale_from>/<int:resale_to>/<key>')
-@login_required
+@login.login_required
 def resale_confirm(resale_from, resale_to, key):
     """Confirm the resale process.
 
@@ -114,7 +114,7 @@ def resale_confirm(resale_from, resale_to, key):
     3.
     """
     if models.Ticket.confirm_resale(resale_from, resale_to, key):
-        flash(
+        flask.flash(
             (
                 'The resale arrangement has been confirmed. '
                 'You must now arrange payment'
@@ -122,7 +122,7 @@ def resale_confirm(resale_from, resale_to, key):
             'info'
         )
     else:
-        flash(
+        flask.flash(
             (
                 'An error occurred, and the resale could not be confirmed. '
                 'If the error persists, please contact <a href="{0}" '
@@ -133,17 +133,17 @@ def resale_confirm(resale_from, resale_to, key):
             'warning'
         )
 
-    return redirect(url_for('dashboard.dashboard_home'))
+    return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
 @RESALE.route('/resale/complete/<int:resale_from>/<int:resale_to>/<key>')
-@login_required
+@login.login_required
 def resale_complete(resale_from, resale_to, key):
     """Complete the resale process.
 
     Linked to in the completion email, completes step 3 above and starts step 4.
     """
     if models.Ticket.complete_resale(resale_from, resale_to, key):
-        flash(
+        flask.flash(
             (
                 'The resale arrangement has been completed, and the tickets '
                 'have been transferred.'
@@ -151,7 +151,7 @@ def resale_complete(resale_from, resale_to, key):
             'success'
         )
     else:
-        flash(
+        flask.flash(
             (
                 'An error occurred, and the resale could not be completed. '
                 'If the error persists, please contact <a href="{0}" '
@@ -162,10 +162,10 @@ def resale_complete(resale_from, resale_to, key):
             'warning'
         )
 
-    return redirect(url_for('dashboard.dashboard_home'))
+    return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
 @RESALE.route('/resale/cancel/<int:resale_from>/<int:resale_to>/<key>')
-@login_required
+@login.login_required
 def resale_cancel(resale_from, resale_to, key):
     """Cancel the resale process.
 
@@ -173,12 +173,12 @@ def resale_cancel(resale_from, resale_to, key):
     process.
     """
     if models.Ticket.cancel_resale(resale_from, resale_to, key):
-        flash(
+        flask.flash(
             'The resale arrangement has been cancelled.',
             'info'
         )
     else:
-        flash(
+        flask.flash(
             (
                 'An error occurred, and the resale could not be cancelled. '
                 'If the error persists, please contact <a href="{0}" '
@@ -189,4 +189,4 @@ def resale_cancel(resale_from, resale_to, key):
             'warning'
         )
 
-    return redirect(url_for('dashboard.dashboard_home'))
+    return flask.redirect(flask.url_for('dashboard.dashboard_home'))

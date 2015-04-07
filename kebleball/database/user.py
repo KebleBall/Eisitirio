@@ -3,9 +3,8 @@
 
 from __future__ import unicode_literals
 
-from flask import flash
-from flask import url_for
-from flask.ext.bcrypt import Bcrypt
+from flask.ext import bcrypt
+import flask
 
 from kebleball import app
 from kebleball import helpers
@@ -18,7 +17,7 @@ from kebleball.database import waiting
 DB = db.DB
 APP = app.APP
 
-BCRYPT = Bcrypt(APP)
+BCRYPT = bcrypt.Bcrypt(APP)
 
 class User(DB.Model):
     """Model for users."""
@@ -157,7 +156,7 @@ class User(DB.Model):
     def check_password(self, candidate):
         """Check if a password matches the hash stored for the user.
 
-        Runs the Bcrypt checking routine to validate the password.
+        Runs the bcrypt.Bcrypt checking routine to validate the password.
 
         Args:
             candidate: (str) the candidate password
@@ -405,7 +404,7 @@ class User(DB.Model):
             self.email,
             'Affiliation Verified - Buy Your Tickets Now!',
             'affiliation_verified.email',
-            url=url_for('purchase.purchase_home', _external=True)
+            url=flask.url_for('purchase.purchase_home', _external=True)
         )
 
         DB.session.commit()
@@ -481,9 +480,10 @@ class User(DB.Model):
                 'Verify Affiliation',
                 'verify_affiliation.email',
                 user=self,
-                url=url_for('admin_users.verify_affiliations', _external=True)
+                url=flask.url_for('admin_users.verify_affiliations',
+                                  _external=True)
             )
-            flash(
+            flask.flash(
                 (
                     'Your affiliation must be verified before you will be '
                     'able to purchase tickets. You will receive an email when '
@@ -584,10 +584,11 @@ class User(DB.Model):
                 'there are currently people waiting for tickets.'
             )
 
-        unpaid_tickets = self.tickets \
-            .filter(ticket.Ticket.cancelled == False) \
-            .filter(ticket.Ticket.paid == False) \
-            .count()
+        unpaid_tickets = self.tickets.filter(
+            ticket.Ticket.cancelled == False
+        ).filter(
+            ticket.Ticket.paid == False
+        ).count()
 
         if unpaid_tickets >= APP.config['MAX_UNPAID_TICKETS']:
             return (
@@ -599,9 +600,9 @@ class User(DB.Model):
                 )
             )
 
-        tickets_owned = self.tickets \
-            .filter(ticket.Ticket.cancelled == False) \
-            .count()
+        tickets_owned = self.tickets.filter(
+            ticket.Ticket.cancelled == False
+        ).count()
 
         if APP.config['TICKETS_ON_SALE']:
             if tickets_owned >= app.config['MAX_TICKETS']:
@@ -680,9 +681,10 @@ class User(DB.Model):
                 'the waiting list is currently closed.'
             )
 
-        tickets_owned = self.tickets \
-            .filter(ticket.Ticket.cancelled == False) \
-            .count()
+        tickets_owned = self.tickets.filter(
+            ticket.Ticket.cancelled == False
+        ).count()
+
         if tickets_owned >= APP.config['MAX_TICKETS']:
             return (
                 False,

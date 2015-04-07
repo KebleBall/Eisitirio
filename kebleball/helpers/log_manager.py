@@ -5,8 +5,8 @@ from __future__ import unicode_literals
 
 import logging
 
-from flask import session
-from flask.ext.login import current_user, request, AnonymousUserMixin
+from flask.ext import login
+import flask
 
 from kebleball.database import db
 from kebleball.database import models
@@ -42,8 +42,6 @@ class LogManager(object):
         self.purchase = logging.getLogger('purchase')
         self.resale = logging.getLogger('purchase')
 
-        self.session = session
-
     def init_app(self, app):
         app.logger = self
 
@@ -75,7 +73,7 @@ class LogManager(object):
             'LogManager instance has no attribute "{0}"'.format(name)
         )
 
-    def log_event(self, message, tickets=None, user=None, transaction=None):
+    def log_event(self, message, tickets=None, user=None, transaction=None):  # pylint: disable=no-self-use
         """Log a user action to the database.
 
         Creates a log entry in the database which can be found through the admin
@@ -88,21 +86,21 @@ class LogManager(object):
             transaction: (models.CardTransaction or None) transaction this
                 action affected
         """
-        if 'actor_id' in self.session:
-            actor = self.session['actor_id']
-        elif not current_user.is_anonymous():
-            actor = current_user
+        if 'actor_id' in flask.session:
+            actor = flask.session['actor_id']
+        elif not login.current_user.is_anonymous():
+            actor = login.current_user
         else:
             actor = None
 
-        if isinstance(user, AnonymousUserMixin):
+        if isinstance(user, login.AnonymousUserMixin):
             user = None
 
         if tickets is None:
             tickets = []
 
         entry = models.Log(
-            request.remote_addr,
+            flask.request.remote_addr,
             message,
             actor,
             user,

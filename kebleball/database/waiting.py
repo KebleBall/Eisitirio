@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
+import datetime
 
 from kebleball.database import db
 
@@ -66,7 +66,7 @@ class Waiting(DB.Model):
 
         self.waiting_for = waiting_for
 
-        self.waiting_since = datetime.utcnow()
+        self.waiting_since = datetime.datetime.utcnow()
 
     def __repr__(self):
         return '<Waiting: {0} for {1} ticket{2}>'.format(

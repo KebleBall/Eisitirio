@@ -13,7 +13,7 @@ from __future__ import unicode_literals
 
 import datetime
 
-from flask import config
+import flask
 
 class Until(object):
     """Config helper class to handle config values changing at set times."""
@@ -50,7 +50,7 @@ def augment_config(app):
 
     app.config.__class__ = type(
         b'Config',
-        (config.Config,),
+        (flask.config.Config,),
         {'__getitem__': (lambda self, k: parse_until(old_getitem(k)))}
     )
 

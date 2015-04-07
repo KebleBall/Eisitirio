@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
+import datetime
 
 from kebleball.database import models
 
@@ -43,7 +43,7 @@ def validate_voucher(code):
                 None
             )
         elif (voucher.expires is not None
-              and voucher.expires < datetime.utcnow()):
+              and voucher.expires < datetime.datetime.utcnow()):
             result = (
                 False,
                 {

@@ -4,20 +4,20 @@
 from __future__ import unicode_literals
 
 import csv
+import datetime
 import re
-from dateutil.parser import parse
-from datetime import datetime
-from StringIO import StringIO
+import StringIO
 
-from flask.ext.login import current_user
-from sqlalchemy import func
+from dateutil import parser
+from flask.ext import login
 import flask
+import sqlalchemy
 
 from kebleball import app
+from kebleball import helpers
 from kebleball.database import db
 from kebleball.database import models
-from kebleball.helpers import generate_key
-from kebleball.helpers.login_manager import admin_required
+from kebleball.helpers import login_manager
 from kebleball.helpers import statistic_plots
 
 APP = app.APP
@@ -27,7 +27,7 @@ ADMIN = flask.Blueprint('admin', __name__)
 
 @ADMIN.route('/admin', methods=['GET', 'POST'])
 @ADMIN.route('/admin/page/<int:page>', methods=['GET', 'POST'])
-@admin_required
+@login_manager.admin_required
 def admin_home(page=1):
     """Admin homepage, search for users, tickets or log entries.
 
@@ -223,7 +223,7 @@ def admin_home(page=1):
                 flask.request.form['log_start'] != ''
         ):
             try:
-                dtstamp = parse(flask.request.form['log_start'])
+                dtstamp = parser.parse(flask.request.form['log_start'])
                 log_query = log_query.filter(models.Log.timestamp >= dtstamp)
                 has_log_filter = True
             except (ValueError, TypeError) as _:
@@ -237,7 +237,7 @@ def admin_home(page=1):
                 flask.request.form['log_end'] != ''
         ):
             try:
-                dtstamp = parse(flask.request.form['log_end'])
+                dtstamp = parser.parse(flask.request.form['log_end'])
                 log_query = log_query.filter(models.Log.timestamp <= dtstamp)
                 has_log_filter = True
             except (ValueError, TypeError) as _:
@@ -327,7 +327,7 @@ def admin_home(page=1):
     )
 
 @ADMIN.route('/admin/log/<int:object_id>/view')
-@admin_required
+@login_manager.admin_required
 def view_log(object_id):
     """View a log entry."""
     log = models.Log.get_by_id(object_id)
@@ -339,18 +339,17 @@ def view_log(object_id):
 
 @ADMIN.route('/admin/transaction/<int:object_id>/view')
 @ADMIN.route('/admin/transaction/<int:object_id>/view/page/<int:events_page>')
-@admin_required
+@login_manager.admin_required
 def view_transaction(object_id, events_page=1):
     """View a card transaction object."""
     transaction = models.CardTransaction.get_by_id(object_id)
 
     if transaction:
-        events = transaction.events \
-            .paginate(
-                events_page,
-                10,
-                True
-            )
+        events = transaction.events.paginate(
+            events_page,
+            10,
+            True
+        )
     else:
         events = None
 
@@ -363,7 +362,7 @@ def view_transaction(object_id, events_page=1):
 
 @ADMIN.route('/admin/transaction/<int:object_id>/refund',
              methods=['GET', 'POST'])
-@admin_required
+@login_manager.admin_required
 def refund_transaction(object_id):
     """Refund a transaction.
 
@@ -415,43 +414,49 @@ def refund_transaction(object_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/statistics')
-@admin_required
+@login_manager.admin_required
 def statistics():
     """Display statistics about the ball.
 
     Computes a number of statistics about the ball (live), and displays them
     alongside graphs.
     """
-    total_value = DB.flask.session \
-        .query(func.sum(models.Ticket.price)) \
-        .filter(models.Ticket.cancelled != True) \
-        .scalar()
+    total_value = DB.flask.session.query(
+        sqlalchemy.func.sum(models.Ticket.price)
+    ).filter(
+        models.Ticket.cancelled != True
+    ).scalar()
 
     if total_value is None:
         total_value = 0
 
-    paid_value = DB.flask.session \
-        .query(func.sum(models.Ticket.price)) \
-        .filter(models.Ticket.paid == True) \
-        .filter(models.Ticket.cancelled != True) \
-        .scalar()
+    paid_value = DB.flask.session.query(
+        sqlalchemy.func.sum(models.Ticket.price)
+    ).filter(
+        models.Ticket.paid == True
+    ).filter(
+        models.Ticket.cancelled != True
+    ).scalar()
 
     if paid_value is None:
         paid_value = 0
 
-    cancelled_value = DB.flask.session \
-        .query(func.sum(models.Ticket.price)) \
-        .filter(models.Ticket.cancelled == True) \
-        .scalar()
+    cancelled_value = DB.flask.session.query(
+        sqlalchemy.func.sum(models.Ticket.price)
+    ).filter(
+        models.Ticket.cancelled == True
+    ).scalar()
 
     if cancelled_value is None:
         cancelled_value = 0
 
-    payment_method_values = DB.flask.session \
-        .query(func.sum(models.Ticket.price), models.Ticket.payment_method) \
-        .filter(models.Ticket.cancelled != True) \
-        .group_by(models.Ticket.payment_method) \
-        .all()
+    payment_method_values = DB.flask.session.query(
+        sqlalchemy.func.sum(models.Ticket.price), models.Ticket.payment_method
+    ).filter(
+        models.Ticket.cancelled != True
+    ).group_by(
+        models.Ticket.payment_method
+    ).all()
 
     return flask.render_template(
         'admin/statistics.html',
@@ -463,7 +468,7 @@ def statistics():
 
 @ADMIN.route('/admin/announcements', methods=['GET', 'POST'])
 @ADMIN.route('/admin/announcements/page/<int:page>', methods=['GET', 'POST'])
-@admin_required
+@login_manager.admin_required
 def announcements(page=1):
     """Manage announcements.
 
@@ -553,7 +558,7 @@ def announcements(page=1):
             announcement = models.Announcement(
                 form['subject'],
                 form['message'],
-                current_user,
+                login.current_user,
                 send_email,
                 college,
                 affiliation,
@@ -582,7 +587,7 @@ def announcements(page=1):
     )
 
 @ADMIN.route('/admin/announcement/<int:object_id>/delete')
-@admin_required
+@login_manager.admin_required
 def delete_announcement(object_id):
     """Delete an announcement.
 
@@ -609,7 +614,7 @@ def delete_announcement(object_id):
                           flask.url_for('admin.announcements'))
 
 @ADMIN.route('/admin/announcement/<int:object_id>/cancel')
-@admin_required
+@login_manager.admin_required
 def cancel_announcement_emails(object_id):
     """Cancel sending emails for an announcement.
 
@@ -638,7 +643,7 @@ def cancel_announcement_emails(object_id):
 
 @ADMIN.route('/admin/vouchers', methods=['GET', 'POST'])
 @ADMIN.route('/admin/vouchers/page/<int:page>', methods=['GET', 'POST'])
-@admin_required
+@login_manager.admin_required
 def vouchers(page=1):
     """Manage vouchers.
 
@@ -655,8 +660,8 @@ def vouchers(page=1):
 
         if 'expires' in form and form['expires'] != '':
             try:
-                expires = parse(form['expires'])
-                if expires < datetime.utcnow():
+                expires = parser.parse(form['expires'])
+                if expires < datetime.datetime.utcnow():
                     flask.flash(
                         'Expiry date cannot be in the past',
                         'warning'
@@ -705,7 +710,7 @@ def vouchers(page=1):
             single_use = 'single_use' in form and form['single_use'] == 'yes'
 
             for _ in xrange(num_vouchers):
-                key = generate_key(10)
+                key = helpers.generate_key(10)
                 voucher = models.Voucher(
                     '{0}-{1}'.format(
                         form['voucher_prefix'],
@@ -751,7 +756,7 @@ def vouchers(page=1):
     )
 
 @ADMIN.route('/admin/voucher/<int:object_id>/delete')
-@admin_required
+@login_manager.admin_required
 def delete_voucher(object_id):
     """Delete a discount voucher."""
     voucher = models.Voucher.get_by_id(object_id)
@@ -773,7 +778,7 @@ def delete_voucher(object_id):
                           flask.url_for('admin.vouchers'))
 
 @ADMIN.route('/admin/waiting/<int:object_id>/delete')
-@admin_required
+@login_manager.admin_required
 def delete_waiting(object_id):
     """Delete an entry from the waiting list."""
     waiting = models.Waiting.get_by_id(object_id)
@@ -795,7 +800,7 @@ def delete_waiting(object_id):
                           flask.url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/graphs/sales')
-@admin_required
+@login_manager.admin_required
 def graph_sales():
     """Render a graph showing sales statistics
 
@@ -805,7 +810,7 @@ def graph_sales():
     return statistic_plots.create_plot('Sales')
 
 @ADMIN.route('/admin/graphs/colleges')
-@admin_required
+@login_manager.admin_required
 def graph_colleges():
     """Render graph showing statistics on users' colleges.
 
@@ -814,7 +819,7 @@ def graph_colleges():
     return statistic_plots.create_plot('Colleges')
 
 @ADMIN.route('/admin/graphs/payments')
-@admin_required
+@login_manager.admin_required
 def graph_payments():
     """Render graph showing payment statistics.
 
@@ -823,7 +828,7 @@ def graph_payments():
     return statistic_plots.create_plot('Payments')
 
 @ADMIN.route('/admin/data/<group>')
-@admin_required
+@login_manager.admin_required
 def data(group):
     """Export statistics as CSV.
 
@@ -835,7 +840,7 @@ def data(group):
         models.Statistic.timestamp
     ).all()
 
-    csvdata = StringIO()
+    csvdata = StringIO.StringIO()
     csvwriter = csv.writer(csvdata)
 
     for stat in stats:

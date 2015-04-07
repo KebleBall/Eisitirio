@@ -3,13 +3,13 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta
+import datetime
 
-import flask
 from flask.ext import login
+import flask
 
 from kebleball import app
-from kebleball.helpers import generate_key
+from kebleball import helpers
 from kebleball.database import db
 from kebleball.database import models
 
@@ -307,7 +307,7 @@ def email_confirm():
                 'email_confirm_fail.email'
             )
         else:
-            user.secret_key = generate_key(64)
+            user.secret_key = helpers.generate_key(64)
             user.secret_key_expiry = None
 
             DB.flask.session.commit()
@@ -379,10 +379,10 @@ def password_reset():
                 'password_reset_fail.email'
             )
         else:
-            user.secret_key = generate_key(64)
+            user.secret_key = helpers.generate_key(64)
             user.secret_key_expiry = (
-                datetime.utcnow() +
-                timedelta(minutes=30)
+                datetime.datetime.utcnow() +
+                datetime.timedelta(minutes=30)
             )
 
             DB.flask.session.commit()
@@ -444,8 +444,9 @@ def reset_password(user_id, secret_key):
 
     if flask.request.method == 'POST':
         if flask.request.form['password'] != flask.request.form['confirm']:
-            user.secret_key = generate_key(64)
-            user.secret_key_expiry = datetime.utcnow() + timedelta(minutes=5)
+            user.secret_key = helpers.generate_key(64)
+            user.secret_key_expiry = (datetime.datetime.utcnow() +
+                                      datetime.timedelta(minutes=5))
 
             DB.flask.session.commit()
 

@@ -32,30 +32,35 @@ def view_user(object_id, self_actions_page=1, actions_page=1, events_page=1):
     user = models.User.get_by_id(object_id)
 
     if user:
-        self_actions = user.actions \
-            .filter(models.Log.actor_id == models.Log.user_id) \
-            .order_by(models.Log.timestamp.desc()) \
-            .paginate(
-                self_actions_page,
-                10,
-                True
-            )
-        other_actions = user.actions \
-            .filter(models.Log.actor_id != models.Log.user_id) \
-            .order_by(models.Log.timestamp.desc()) \
-            .paginate(
-                actions_page,
-                10,
-                True
-            )
-        events = user.events \
-            .filter(models.Log.actor_id != models.Log.user_id) \
-            .order_by(models.Log.timestamp.desc()) \
-            .paginate(
-                events_page,
-                10,
-                True
-            )
+        self_actions = user.actions.filter(
+            models.Log.actor_id == models.Log.user_id
+        ).order_by(
+            models.Log.timestamp.desc()
+        ).paginate(
+            self_actions_page,
+            10,
+            True
+        )
+
+        other_actions = user.actions.filter(
+            models.Log.actor_id != models.Log.user_id
+        ).order_by(
+            models.Log.timestamp.desc()
+        ).paginate(
+            actions_page,
+            10,
+            True
+        )
+
+        events = user.events.filter(
+            models.Log.actor_id != models.Log.user_id
+        ).order_by(
+            models.Log.timestamp.desc()
+        ).paginate(
+            events_page,
+            10,
+            True
+        )
     else:
         self_actions = None
         other_actions = None

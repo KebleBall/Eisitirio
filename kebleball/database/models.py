@@ -11,15 +11,17 @@ name that is less likely to conflict.
 
 # We make an exception to the usual rule of only importing modules here for
 # neatness.
+#
+# pylint: disable=unused-import
 
-from kebleball.database.affiliation import Affiliation  # pylint: disable=unused-import
-from kebleball.database.announcement import Announcement  # pylint: disable=unused-import
-from kebleball.database.battels import Battels  # pylint: disable=unused-import
-from kebleball.database.card_transaction import CardTransaction  # pylint: disable=unused-import
-from kebleball.database.college import College  # pylint: disable=unused-import
-from kebleball.database.log import Log  # pylint: disable=unused-import
-from kebleball.database.statistic import Statistic  # pylint: disable=unused-import
-from kebleball.database.ticket import Ticket  # pylint: disable=unused-import
-from kebleball.database.user import User  # pylint: disable=unused-import
-from kebleball.database.voucher import Voucher  # pylint: disable=unused-import
-from kebleball.database.waiting import Waiting  # pylint: disable=unused-import
+from kebleball.database.affiliation import Affiliation
+from kebleball.database.announcement import Announcement
+from kebleball.database.battels import Battels
+from kebleball.database.card_transaction import CardTransaction
+from kebleball.database.college import College
+from kebleball.database.log import Log
+from kebleball.database.statistic import Statistic
+from kebleball.database.ticket import Ticket
+from kebleball.database.user import User
+from kebleball.database.voucher import Voucher
+from kebleball.database.waiting import Waiting

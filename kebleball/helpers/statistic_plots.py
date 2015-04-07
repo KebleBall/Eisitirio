@@ -4,11 +4,11 @@
 from __future__ import unicode_literals
 
 import collections
-from StringIO import StringIO
+import StringIO
 
-from flask import send_file
+from matplotlib import dates
 from matplotlib import pyplot
-from matplotlib.dates import DayLocator, DateFormatter
+import flask
 
 from kebleball.database import models
 
@@ -46,10 +46,11 @@ def create_plot(group):
     Returns:
         a flask response object with the plot as a PNG image file
     """
-    statistics = models.Statistic.query \
-        .filter(models.Statistic.group == group) \
-        .order_by(models.Statistic.timestamp) \
-        .all()
+    statistics = models.Statistic.query.filter(
+        models.Statistic.group == group
+    ).order_by(
+        models.Statistic.timestamp
+    ).all()
 
     style_index = 0
 
@@ -116,13 +117,13 @@ def render_plot(plots, x_lim_min, x_lim_max):
     legend = axes.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     axes.spines['top'].set_visible(False)
     axes.spines['right'].set_visible(False)
-    axes.xaxis.set_major_locator(DayLocator())
-    axes.xaxis.set_major_formatter(DateFormatter('%a %d %B %Y'))
+    axes.xaxis.set_major_locator(dates.DayLocator())
+    axes.xaxis.set_major_formatter(dates.DateFormatter('%a %d %B %Y'))
 
-    axes.fmt_xdata = DateFormatter('%Y-%m-%d %H:%M:%S')
+    axes.fmt_xdata = dates.DateFormatter('%Y-%m-%d %H:%M:%S')
     fig.autofmt_xdate()
 
-    image = StringIO()
+    image = StringIO.StringIO()
     pyplot.savefig(
         image,
         format='png',
@@ -132,4 +133,4 @@ def render_plot(plots, x_lim_min, x_lim_max):
     )
 
     image.seek(0)
-    return send_file(image, mimetype='image/png', cache_timeout=900)
+    return flask.send_file(image, mimetype='image/png', cache_timeout=900)

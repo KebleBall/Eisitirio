@@ -3,8 +3,9 @@
 
 from __future__ import unicode_literals
 
+import datetime
+
 from kebleball.database import db
-from datetime import datetime
 
 DB = db.DB
 
@@ -42,7 +43,7 @@ class Statistic(DB.Model):
                 '{0} is not a valid statistic group'.format(group)
             )
 
-        self.timestamp = datetime.utcnow()
+        self.timestamp = datetime.datetime.utcnow()
         self.group = group
         self.statistic = statistic
         self.value = value

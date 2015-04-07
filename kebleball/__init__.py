@@ -5,14 +5,11 @@ from __future__ import unicode_literals
 
 import os
 
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import url_for
-from flask.ext import login as flask_login
-from flask.ext import markdown as flask_markdown
-from jinja2 import Markup
-from werkzeug.exceptions import NotFound
+from flask.ext import login
+from flask.ext import markdown
+from werkzeug import exceptions
+import flask
+import jinja2
 
 from kebleball import app
 from kebleball import views
@@ -38,15 +35,15 @@ def check_for_maintenance():
     if os.path.exists('/var/www/flask_kebleball/.maintenance'):
         APP.config['MAINTENANCE_MODE'] = True
         if (
-                'maintenance' not in request.path and
-                'static' not in request.path
+                'maintenance' not in flask.request.path and
+                'static' not in flask.request.path
         ):
-            return redirect(url_for('maintenance'))
+            return flask.redirect(flask.url_for('maintenance'))
 
 log_manager.LogManager(APP)
 email_manager.EmailManager(APP)
 login_manager.LOGIN_MANAGER.init_app(APP)
-flask_markdown.Markdown(APP)
+markdown.Markdown(APP)
 
 LOG = APP.log_manager.log_main
 
@@ -61,28 +58,28 @@ APP.register_blueprint(views.RESALE)
 @APP.route('/')
 def router():
     """Redirect the user to the appropriate homepage."""
-    if not flask_login.current_user.is_anonymous():
-        return redirect(url_for('dashboard.dashboard_home'))
+    if not login.current_user.is_anonymous():
+        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
-        return redirect(url_for('front.home'))
+        return flask.redirect(flask.url_for('front.home'))
 
 @APP.route('/maintenance')
 def maintenance():
     """Display the Server Maintenance page."""
-    return render_template('maintenance.html'), 503
+    return flask.render_template('maintenance.html'), 503
 
-@APP.errorhandler(NotFound)
+@APP.errorhandler(exceptions.NotFound)
 @APP.errorhandler(404)
 def error_404(_):
     """Display the 404 Page"""
     LOG(
         'error',
         '404 not found for URL {0}, referrer {1}'.format(
-            request.url,
-            request.referrer
+            flask.request.url,
+            flask.request.referrer
         )
     )
-    return render_template('404.html'), 404
+    return flask.render_template('404.html'), 404
 
 def server_error(code, error):
     """Generic handler for displaying Server Error pages."""
@@ -90,11 +87,11 @@ def server_error(code, error):
         'error',
         '{0} server error for URL {1}, error {2}'.format(
             code,
-            request.url,
+            flask.request.url,
             error
         )
     )
-    return render_template('500.html'), code
+    return flask.render_template('500.html'), code
 
 #@APP.errorhandler(Exception)
 @APP.errorhandler(500)
@@ -140,23 +137,23 @@ def context_processor():
     def form_value(form, field, default=None):
         """Quick way of writing an input element's value attribute."""
         if field in form:
-            return Markup('value="{0}" '.format(form[field]))
+            return jinja2.Markup('value="{0}" '.format(form[field]))
         elif default is not None:
-            return Markup('value="{0}" '.format(default))
+            return jinja2.Markup('value="{0}" '.format(default))
         else:
             return ''
 
     def form_selected(form, field, value):
         """Quick way of writing an input element's selected attribute."""
         if field in form and form[field] == str(value):
-            return Markup('selected="selected" ')
+            return jinja2.Markup('selected="selected" ')
         else:
             return ''
 
     def form_checked(form, field, value):
         """Quick way of writing an input element's checked attribute."""
         if field in form and form[field] == str(value):
-            return Markup('checked="checked" ')
+            return jinja2.Markup('checked="checked" ')
         else:
             return ''
 

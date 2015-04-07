@@ -8,7 +8,7 @@ import flask
 from kebleball import app
 from kebleball.database import db
 from kebleball.database import models
-from kebleball.helpers.login_manager import admin_required
+from kebleball.helpers import login_manager
 
 APP = app.APP
 DB = db.DB
@@ -19,18 +19,17 @@ ADMIN_TICKETS = flask.Blueprint('admin_tickets', __name__)
 @ADMIN_TICKETS.route(
     '/admin/ticket/<int:object_id>/view/page/<int:events_page>'
 )
-@admin_required
+@login_manager.admin_required
 def view_ticket(object_id, events_page=1):
     """View a ticket object."""
     ticket = models.Ticket.get_by_id(object_id)
 
     if ticket:
-        events = ticket.log_entries \
-            .paginate(
-                events_page,
-                10,
-                True
-            )
+        events = ticket.log_entries.paginate(
+            events_page,
+            10,
+            True
+        )
     else:
         events = None
 
@@ -43,7 +42,7 @@ def view_ticket(object_id, events_page=1):
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/collect',
                      methods=['GET', 'POST'])
-@admin_required
+@login_manager.admin_required
 def collect_ticket(object_id):
     """Mark a ticket as collected, and add a barcode.
 
@@ -97,7 +96,7 @@ def collect_ticket(object_id):
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/note',
                      methods=['GET', 'POST'])
-@admin_required
+@login_manager.admin_required
 def note_ticket(object_id):
     """Set notes for a ticket."""
     if flask.request.method != 'POST':
@@ -131,7 +130,7 @@ def note_ticket(object_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/markpaid')
-@admin_required
+@login_manager.admin_required
 def mark_ticket_paid(object_id):
     """Mark a ticket as paid.
 
@@ -165,7 +164,7 @@ def mark_ticket_paid(object_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/autocancel')
-@admin_required
+@login_manager.admin_required
 def auto_cancel_ticket(object_id):
     """Cancel and refund a ticket.
 
@@ -221,7 +220,7 @@ def auto_cancel_ticket(object_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/cancel')
-@admin_required
+@login_manager.admin_required
 def cancel_ticket(object_id):
     """Cancel a ticket without refunding it."""
     ticket = models.Ticket.get_by_id(object_id)
@@ -251,7 +250,7 @@ def cancel_ticket(object_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_TICKETS.route('/admin/ticket/validate', methods=['POST', 'GET'])
-@admin_required
+@login_manager.admin_required
 def validate_ticket():
     """Validate a ticket upon entry to the ball.
 

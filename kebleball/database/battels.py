@@ -3,8 +3,8 @@
 
 from __future__ import unicode_literals
 
-from kebleball.database import db
 from kebleball import app
+from kebleball.database import db
 
 DB = db.DB
 APP = app.APP

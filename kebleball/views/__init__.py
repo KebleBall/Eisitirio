@@ -1,18 +1,16 @@
 # coding: utf-8
 """Helper giving access to all the views."""
 
-from kebleball.views import admin
-from kebleball.views import admin_users
-from kebleball.views import ajax
-from kebleball.views import dashboard
-from kebleball.views import front
-from kebleball.views import purchase
-from kebleball.views import resale
+# We make an exception to the usual rule of only importing modules here for
+# neatness.
+#
+# pylint: disable=unused-import
 
-ADMIN = admin.ADMIN
-ADMIN_USERS = admin_users.ADMIN_USERS
-AJAX = ajax.AJAX
-DASHBOARD = dashboard.DASHBOARD
-FRONT = front.FRONT
-PURCHASE = purchase.PURCHASE
-RESALE = resale.RESALE
+from kebleball.views.admin import ADMIN
+from kebleball.views.admin_users import ADMIN_USERS
+from kebleball.views.admin_tickets import ADMIN_TICKETS
+from kebleball.views.ajax import AJAX
+from kebleball.views.dashboard import DASHBOARD
+from kebleball.views.front import FRONT
+from kebleball.views.purchase import PURCHASE
+from kebleball.views.resale import RESALE
