@@ -33,7 +33,7 @@ def check_for_maintenance():
     maintenance mode displaying an information page only.
 
     Created as early as possible to ensure it is called before
-    loginManager.login_user
+    login_manager.login_user
     """
     if os.path.exists('/var/www/flask_kebleball/.maintenance'):
         APP.config['MAINTENANCE_MODE'] = True

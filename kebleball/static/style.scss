@@ -98,8 +98,8 @@ table .button {
     margin: 0;
 }
 
-#giveTickets,
-#refundTransaction {
+#give_tickets,
+#refund_transaction {
     input {
         display: inline;
         &[type="number"] {

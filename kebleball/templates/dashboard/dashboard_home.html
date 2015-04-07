@@ -7,7 +7,7 @@
     <section id="dashboard" class="columns">
         <h3>Your Tickets <a href="{{ url_for('purchase.purchase_home') }}" class="button">Buy Tickets</a></h3>
         {% if current_user.tickets.count() > 0 %}
-            <table id="ticketsTable">
+            <table id="tickets_table">
                 <thead>
                     <tr>
                         <th>Ticket Number</th>
@@ -22,8 +22,8 @@
                             <td>#{{ '%05d' % ticket.object_id }}</td>
                             <td>
                                 {% if ticket.can_change_name() %}
-                                    <span id="ticketNameDisplay-{{ ticket.object_id }}"><span id="ticketName-{{ ticket.object_id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="changeTicketName({{ ticket.object_id }}, false)">Change</a>)</span>
-                                    <span id="ticketNameForm-{{ ticket.object_id }}" style="display: none;"><input name="ticketNameInput-{{ ticket.object_id }}" id="ticketNameInput-{{ ticket.object_id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="changeTicketName({{ ticket.object_id }}, true)">Submit</button></span>
+                                    <span id="ticket_name_display-{{ ticket.object_id }}"><span id="ticket_name-{{ ticket.object_id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="change_ticket_name({{ ticket.object_id }}, false)">Change</a>)</span>
+                                    <span id="ticket_name_form-{{ ticket.object_id }}" style="display: none;"><input name="ticket_name_input-{{ ticket.object_id }}" id="ticket_name_input-{{ ticket.object_id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="change_ticket_name({{ ticket.object_id }}, true)">Submit</button></span>
                                 {% else %}
                                     {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
                                 {% endif %}
@@ -95,7 +95,7 @@
                         <article class="announcement">
                             <h5>{{ announcement.subject }}</h5>
                             {{ announcement.content | truncate(250) | markdown }}
-                            <a href="{{ url_for('dashboard.display_announcement', announcementID=announcement.object_id) }}" class="read-more">Read More</a>
+                            <a href="{{ url_for('dashboard.display_announcement', announcement_id=announcement.object_id) }}" class="read-more">Read More</a>
                         </article>
                     </li>
                 {% endfor %}
@@ -107,7 +107,7 @@
         <h3>Referrals</h3>
         {% if current_user.referrals.count() > 0 %}
             <p>The following tickets have been marked as being referred by you.</p>
-            <ul id="referralsList">
+            <ul id="referrals_list">
                 {% for ticket in current_user.referrals %}
                     <li>#{{ '%05d' % ticket.object_id }}, owned by {{ ticket.owner.full_name }}</li>
                 {% endfor %}
@@ -120,45 +120,45 @@
 
 {% block javascripts %}
     <script type="text/javascript">
-    var nameChangeURL = '{{ url_for('ajax.change_ticket_name', id=123456789, _external=True) }}'
+    var name_change_url = '{{ url_for('ajax.change_ticket_name', id=123456789, _external=True) }}'
 
-        function changeTicketName(id, formSubmit) {
-            if (formSubmit) {
-                var nameInput = $('#ticketNameInput-'+id);
-                var ticketName = $('#ticketName-'+id);
+        function change_ticket_name(id, form_submit) {
+            if (form_submit) {
+                var name_input = $('#ticket_name_input-'+id);
+                var ticket_name = $('#ticket_name-'+id);
                 jQuery.ajax(
-                    nameChangeURL.replace('123456789',id),
+                    name_change_url.replace('123456789',id),
                     {
                         'data': {
-                            'name': nameInput.val()
+                            'name': name_input.val()
                         },
                         'type': 'POST',
                         'dataType': 'json',
                         'success': function(data, code, xhr) {
                             if (data) {
-                                ticketName.html(nameInput.val())
-                                nameInput.attr('value',nameInput.val())
+                                ticket_name.html(name_input.val())
+                                name_input.attr('value',name_input.val())
                                 $('#complete_ticket_payment-'+id).css('display', '');
                                 $('#ticket_payment_message-'+id).css('display', '');
                                 $('#ticket_name_message-'+id).css('display', 'none');
                             } else {
-                                if (ticketName.html() == 'Not Set') {
-                                    nameInput.attr('value','')
-                                    nameInput.val('')
+                                if (ticket_name.html() == 'Not Set') {
+                                    name_input.attr('value','')
+                                    name_input.val('')
                                 } else {
-                                    nameInput.attr('value',ticketName.html())
-                                    nameInput.val(ticketName.html())
+                                    name_input.attr('value',ticket_name.html())
+                                    name_input.val(ticket_name.html())
                                 }
                             }
                         }
                     }
                 );
 
-                $('#ticketNameForm-'+id).hide();
-                $('#ticketNameDisplay-'+id).show();
+                $('#ticket_name_form-'+id).hide();
+                $('#ticket_name_display-'+id).show();
             } else {
-                $('#ticketNameDisplay-'+id).hide();
-                $('#ticketNameForm-'+id).show();
+                $('#ticket_name_display-'+id).hide();
+                $('#ticket_name_form-'+id).show();
             }
         }
     </script>

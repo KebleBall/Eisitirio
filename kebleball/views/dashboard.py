@@ -129,7 +129,7 @@ def profile():
                 APP.email_manager.send_template(
                     request.form['email'],
                     'Confirm your Email Address',
-                    'emailChangeConfirm.email',
+                    'email_change_confirm.email',
                     confirmurl=url_for(
                         'front.confirm_email',
                         user_id=login.current_user.object_id,

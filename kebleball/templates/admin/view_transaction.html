@@ -29,12 +29,12 @@
             <h4>Actions</h4>
             <ul>
                 {% if transaction.get_status()[0] %}
-                    <li><form action="{{ url_for('admin.refund_transaction', id=transaction.object_id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refundAmountPounds" min="0" step="1" />.<input type="number" name="refundAmountPence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
+                    <li><form action="{{ url_for('admin.refund_transaction', id=transaction.object_id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refund_amount_pounds" min="0" step="1" />.<input type="number" name="refund_amount_pence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
                 {% endif %}
             </ul>
             <h4>Transaction's Tickets</h4>
             {% if transaction.tickets.count() > 0 %}
-                <table id="ticketsTable">
+                <table id="tickets_table">
                     <thead>
                         <tr>
                             <th>Ticket Number</th>
@@ -84,7 +84,7 @@
             <a id="events"></a>
             <h4>Events</h4>
             {% if events.items %}
-                <table id="eventsTable">
+                <table id="events_table">
                     <thead>
                         <tr>
                             <th>Log ID</th>

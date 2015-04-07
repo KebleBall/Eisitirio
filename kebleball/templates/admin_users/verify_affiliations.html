@@ -19,7 +19,7 @@
             <tbody>
                 {% for user in users %}
                     <tr id="user-{{ user.object_id }}">
-                        <td><a href="{{ url_for('admin.viewUser', id=user.object_id) }}">{{ user.full_name }}</a></td>
+                        <td><a href="{{ url_for('admin_users.view_user', id=user.object_id) }}">{{ user.full_name }}</a></td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.affiliation.name }}</td>
                         <td><a href="{{ url_for('admin_users.verify_affiliation', id=user.object_id) }}" class="button tiny">Verify Affiliation</a></td>

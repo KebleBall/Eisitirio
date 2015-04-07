@@ -341,7 +341,7 @@ class CardTransaction(DB.Model):
                                     APP.config['TICKETS_EMAIL']
                                 ],
                                 'Partial Ticket Payment',
-                                'partialPayment.email',
+                                'partial_payment.email',
                                 transaction=self,
                                 ewayresponse=response
                             )
@@ -472,7 +472,7 @@ class CardTransaction(DB.Model):
                         APP.config['TICKETS_EMAIL']
                     ],
                     'Partial Refund',
-                    'partialRefund.email',
+                    'partial_refund.email',
                     transaction=self,
                     ewayresponse=response
                 )

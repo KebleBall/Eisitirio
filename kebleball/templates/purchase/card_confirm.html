@@ -10,7 +10,7 @@
 	    <p>Only tickets with names are shown here. If you have unnamed tickets, you will need to set the names on the dashboard before you can pay for them.</p>
         {% if current_user.has_unpaid_tickets('Card') %}
             <form action="{{ url_for('purchase.card_confirm') }}" method="post">
-                <table id="ticketsTable">
+                <table id="tickets_table">
                     <thead>
                         <tr>
                             <th>Select</th>
@@ -22,9 +22,9 @@
                         {% for ticket in current_user.tickets %}
                             {% if ticket.payment_method == 'Card' and not ticket.paid and not ticket.cancelled and ticket.name != None %}
                                 <tr id="ticket-{{ ticket.object_id }}">
-                                    <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
-                                    <td><label for="ticketSelect-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
-                                    <td><label for="ticketSelect-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
+                                    <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
                                 </tr>
                             {% endif %}
                         {% endfor %}

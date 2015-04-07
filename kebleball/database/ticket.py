@@ -311,7 +311,7 @@ class Ticket(DB.Model):
             app.email_manager.send_template(
                 reselling_to.email,
                 'Confirm Ticket Resale',
-                'confirmResale.email',
+                'confirm_resale.email',
                 confirmurl=url_for(
                     'resale.resale_confirm',
                     resale_from=flask_login.current_user.object_id,
@@ -374,14 +374,14 @@ class Ticket(DB.Model):
             app.email_manager.send_template(
                 resale_from.email,
                 'Ticket Resale Cancelled',
-                'ownerCancelResale.email',
+                'owner_cancel_resale.email',
                 resale_to=resale_to
             )
 
             app.email_manager.send_template(
                 resale_to.email,
                 'Ticket Resale Cancelled',
-                'buyerCancelResale.email',
+                'buyer_cancel_resale.email',
                 resale_from=resale_from
             )
 
@@ -429,7 +429,7 @@ class Ticket(DB.Model):
             app.email_manager.send_template(
                 resale_from.email,
                 'Complete Ticket Resale',
-                'completeResale.email',
+                'complete_resale.email',
                 resale_to=resale_to,
                 completeurl=url_for(
                     'resale.resale_complete',

@@ -116,20 +116,20 @@ def give_user(object_id):
     """
     if flask.request.method != 'POST':
         return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.adminHome'))
+                              flask.url_for('admin.admin_home'))
 
     user = models.User.get_by_id(object_id)
 
     if user:
         price = (
-            int(flask.request.form['givePricePounds']) * 100 +
-            int(flask.request.form['givePricePence'])
+            int(flask.request.form['give_price_pounds']) * 100 +
+            int(flask.request.form['give_price_pence'])
         )
-        num_tickets = int(flask.request.form['giveNumTickets'])
+        num_tickets = int(flask.request.form['give_num_tickets'])
 
         if (
-                'giveReason' not in flask.request.form or
-                flask.request.form['giveReason'] == ''
+                'give_reason' not in flask.request.form or
+                flask.request.form['give_reason'] == ''
         ):
             note = 'Given by {0} (#{1}) for no reason.'.format(
                 current_user.full_name,
@@ -139,7 +139,7 @@ def give_user(object_id):
             note = 'Given by {0} (#{1}) with reason: {2}.'.format(
                 current_user.full_name,
                 current_user.object_id,
-                flask.request.form['giveReason']
+                flask.request.form['give_reason']
             )
 
         tickets = []
@@ -189,7 +189,7 @@ def note_user(object_id):
     """Set the notes field for a user."""
     if flask.request.method != 'POST':
         return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.adminHome'))
+                              flask.url_for('admin.admin_home'))
 
     user = models.User.get_by_id(object_id)
 
@@ -350,7 +350,7 @@ def add_manual_battels(object_id):
             'warning'
         )
         return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.adminHome'))
+                              flask.url_for('admin.admin_home'))
 
 @ADMIN_USERS.route('/admin/user/<int:object_id>/verify_affiliation')
 @admin_required

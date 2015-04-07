@@ -1859,11 +1859,11 @@ p.small { font-size: 0.75rem; }
 table .button { margin: 0; }
 
 /* line 103, style.scss */
-#giveTickets input, #refundTransaction input { display: inline; }
+#give_tickets input, #refund_transaction input { display: inline; }
 /* line 105, style.scss */
-#giveTickets input[type="number"], #refundTransaction input[type="number"] { width: 5rem; }
+#give_tickets input[type="number"], #refund_transaction input[type="number"] { width: 5rem; }
 /* line 108, style.scss */
-#giveTickets input[type="text"], #refundTransaction input[type="text"] { width: auto; }
+#give_tickets input[type="text"], #refund_transaction input[type="text"] { width: auto; }
 
 /* line 114, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }

@@ -1,16 +1,16 @@
-<!-- resale/resaleHome.html -->
+<!-- resale/resale_home.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Resell Tickets{% endblock %}
 
 {% block content %}
-    <section id="resaleHome" class="columns">
+    <section id="resale_home" class="columns">
         <p>If you have bought tickets, and no longer require them, you can resell them to another person. Keble Ball provides only the facility to do so, it is your responsibility to arrange the exchange of any recompense for the tickets, monetary or otherwise. Keble Ball accepts no liability for any disputes resulting from the use of this facility.</p>
         <p>To perform a resale, select the tickets you wish to resell, enter the email address of the person you wish to resell them to, and click Resell Tickets. The person in question will receive an email requiring them to click a link to confirm that they wish to buy the tickets from you. Once this is done, you will receive a notification email. At this point you must arrange with them separately how you should be recompensed for the tickets. Once you are satisfied that you have been recompensed in full, you should click the link in your notification email to complete the resale.</p>
         <h3>Your Tickets</h3>
         {% if current_user.has_unresold_tickets() %}
             <form action="{{ url_for('resale.resale_home') }}" method="post">
-                <table id="ticketsTable">
+                <table id="tickets_table">
                     <thead>
                         <tr>
                             <th>Select</th>
@@ -23,10 +23,10 @@
                         {% for ticket in current_user.tickets %}
                             {% if ticket.can_be_resold() %}
                                 <tr id="ticket-{{ ticket.object_id }}">
-                                    <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
-                                    <td><label for="ticketSelect-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
-                                    <td><label for="ticketSelect-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
-                                    <td><label for="ticketSelect-{{ ticket.object_id }}">&pound;{{ '%.2f' % (ticket.price / 100.0) }}</label></td>
+                                    <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">&pound;{{ '%.2f' % (ticket.price / 100.0) }}</label></td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -35,9 +35,9 @@
                 <h5>Who are you reselling these tickets to?</h5>
                 <div class="row">
                     <div class="columns">
-                        <label for="resaleEmail">Email Address</label>
-                        <input type="email" name="resaleEmail" id="resaleEmail" />
-                        <div id="resaleMessage" style="display: none;"></div>
+                        <label for="resale_email">Email Address</label>
+                        <input type="email" name="resale_email" id="resale_email" />
+                        <div id="resale_message" style="display: none;"></div>
                         <p class="small">The person you are reselling to must have an account on the Keble Ball Ticketing System</p>
                     </div>
                 </div>
@@ -51,36 +51,36 @@
 
 {% block javascripts %}
     <script type="text/javascript">
-        var resaleEmail = $("#resaleEmail");
-        var resaleMessage = $("#resaleMessage");
+        var resale_email = $("#resale_email");
+        var resale_message = $("#resale_message");
 
-        resaleEmail.on("blur", function() {
-            if (resaleEmail.val() != '') {
+        resale_email.on("blur", function() {
+            if (resale_email.val() != '') {
                 jQuery.ajax(
                     '{{ url_for('ajax.validate_resale_email', _external=True) }}',
                     {
                         'data': {
-                            'email': resaleEmail.val()
+                            'email': resale_email.val()
                         },
                         'type': 'POST',
                         'dataType': 'json',
                         'success': function(data, code, xhr) {
-                            resaleMessage.attr(
+                            resale_message.attr(
                                 "class",
                                 data.class
                             );
-                            resaleMessage.html(data.message);
-                            resaleMessage.show(0);
+                            resale_message.html(data.message);
+                            resale_message.show(0);
                         }
                     }
                 );
             } else {
-                resaleMessage.hide(0);
+                resale_message.hide(0);
             }
         });
 
-        resaleEmail.on("change", function() {
-            resaleMessage.hide(0);
+        resale_email.on("change", function() {
+            resale_message.hide(0);
         });
     </script>
 {% endblock %}

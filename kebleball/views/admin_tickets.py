@@ -52,7 +52,7 @@ def collect_ticket(object_id):
     """
     if flask.request.method != 'POST':
         return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.adminHome'))
+                              flask.url_for('admin.admin_home'))
 
     existing = models.Ticket.query.filter(
         models.Ticket.barcode == flask.request.form['barcode']
@@ -102,7 +102,7 @@ def note_ticket(object_id):
     """Set notes for a ticket."""
     if flask.request.method != 'POST':
         return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.adminHome'))
+                              flask.url_for('admin.admin_home'))
 
     ticket = models.Ticket.get_by_id(object_id)
 

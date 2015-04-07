@@ -66,11 +66,11 @@
                 {% if user.battels == None %}
                     <li><a href="{{ url_for('admin_users.add_manual_battels', id=user.object_id) }}" class="button tiny">Manually setup battelling</a></li>
                 {% endif %}
-                <li><form action="{{ url_for('admin_users.give_user', id=user.object_id) }}" method="post" id="giveTickets">Give user <input type="number" name="giveNumTickets" min="1" value="1" step="1" /> tickets at &pound;<input type="number" name="givePricePounds" min="0" value="{{ '%d' % (user.get_base_ticket_price() / 100) }}" step="1" />.<input type="number" name="givePricePence" min="0" value="{{ user.get_base_ticket_price() % 100 }}" step="1" max="99" /> each with reason <input type="text" name="giveReason" />. <input type="submit" class="button tiny" /></form></li>
+                <li><form action="{{ url_for('admin_users.give_user', id=user.object_id) }}" method="post" id="give_tickets">Give user <input type="number" name="give_num_tickets" min="1" value="1" step="1" /> tickets at &pound;<input type="number" name="give_price_pounds" min="0" value="{{ '%d' % (user.get_base_ticket_price() / 100) }}" step="1" />.<input type="number" name="give_price_pence" min="0" value="{{ user.get_base_ticket_price() % 100 }}" step="1" max="99" /> each with reason <input type="text" name="give_reason" />. <input type="submit" class="button tiny" /></form></li>
             </ul>
             <h4>User's Tickets</h4>
             {% if user.tickets.count() > 0 %}
-                <table id="ticketsTable">
+                <table id="tickets_table">
                     <thead>
                         <tr>
                             <th>Ticket Number</th>
@@ -119,7 +119,7 @@
             {% endif %}
             <h4>User's Waiting</h4>
             {% if user.waiting.count() > 0 %}
-                <table id="waitingTable">
+                <table id="waiting_table">
                     <thead>
                         <tr>
                             <th>Waiting for</th>
@@ -142,7 +142,7 @@
             {% endif %}
             <h4>User's Referrals</h4>
             {% if user.referrals.count() > 0 %}
-                <table id="ticketsTable">
+                <table id="tickets_table">
                     <thead>
                         <tr>
                             <th>Ticket Number</th>
@@ -171,7 +171,7 @@
             {% endif %}
             <h4>User's Card Transactions</h4>
             {% if user.transactions.count() > 0 %}
-                <table id="transactionTable">
+                <table id="transaction_table">
                     <thead>
                         <tr>
                             <th>Transaction ID</th>
@@ -201,7 +201,7 @@
             <a id="self_actions"></a>
             <h4>User's Events (performed by user)</h4>
             {% if self_actions.items %}
-                <table id="selfActionsTable">
+                <table id="self_actions_table">
                     <thead>
                         <tr>
                             <th>Log ID</th>
@@ -233,7 +233,7 @@
             <a id="events"></a>
             <h4>User's Events (performed by others)</h4>
             {% if events.items %}
-                <table id="eventsTable">
+                <table id="events_table">
                     <thead>
                         <tr>
                             <th>Log ID</th>
@@ -267,7 +267,7 @@
             <a id="other_actions"></a>
             <h4>User's Actions (performed on others)</h4>
             {% if other_actions.items %}
-                <table id="otherActionsTable">
+                <table id="other_actions_table">
                     <thead>
                         <tr>
                             <th>Log ID</th>

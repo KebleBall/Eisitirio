@@ -405,7 +405,7 @@ class User(DB.Model):
             self.email,
             'Affiliation Verified - Buy Your Tickets Now!',
             'affiliation_verified.email',
-            url=url_for('purchase.purchaseHome', _external=True)
+            url=url_for('purchase.purchase_home', _external=True)
         )
 
         DB.session.commit()

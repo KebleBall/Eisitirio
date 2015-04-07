@@ -8,7 +8,7 @@
         <h3>Your Tickets</h3>
         {% if current_user.has_unpaid_tickets() %}
             <form action="{{ url_for('purchase.change_method') }}" method="post">
-                <table id="ticketsTable">
+                <table id="tickets_table">
                     <thead>
                         <tr>
                             <th>Select</th>
@@ -21,29 +21,29 @@
                         {% for ticket in current_user.tickets %}
                             {% if not ticket.paid and not ticket.cancelled %}
                                 <tr id="ticket-{{ ticket.object_id }}">
-                                    <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
-                                    <td><label for="ticketSelect-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
-                                    <td><label for="ticketSelect-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
-                                    <td><label for="ticketSelect-{{ ticket.object_id }}">{{ ticket.payment_method }}</label></td>
+                                    <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.payment_method }}</label></td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>
                 <h5>Change payment method to:</h5>
-                <input type="submit" name="paymentMethod" value="Card" class="button tiny" />
+                <input type="submit" name="payment_method" value="Card" class="button tiny" />
                 {% if current_user.can_pay_by_battels() %}
-                    <input type="submit" name="paymentMethod" value="Battels" class="button tiny" />
+                    <input type="submit" name="payment_method" value="Battels" class="button tiny" />
                 {% endif %}
-                <input type="submit" name="paymentMethod" value="Cash" class="button tiny" />
-                <input type="submit" name="paymentMethod" value="Cheque" class="button tiny" />
+                <input type="submit" name="payment_method" value="Cash" class="button tiny" />
+                <input type="submit" name="payment_method" value="Cheque" class="button tiny" />
                 <div class="row">
                     <div class="large-6 columns">
                         <p>If you wish to pay by cheque/cash, you must contact <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}">the treasurer</a> to arrange the payment before changing the payment method here.</p>
                     </div>
                     <div class="large-6 columns">
-                        <label for="paymentReason">Reason for cash/cheque payment:</label>
-                        <input type="text" name="paymentReason" id="paymentReason" />
+                        <label for="payment_reason">Reason for cash/cheque payment:</label>
+                        <input type="text" name="payment_reason" id="payment_reason" />
                         <p class="small">Leave blank if using card{% if current_user.can_pay_by_battels() %} or battels{% endif %}.</p>
                     </div>
                 </div>

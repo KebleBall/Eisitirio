@@ -95,7 +95,7 @@
             {% endif %}
         </p>
         {% if announcements.items %}
-            <table id="announcementsTable">
+            <table id="announcements_table">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -185,7 +185,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('dashboard.announcement', announcementID=announcement.object_id) }}" class="button tiny">View</a>
+                                <a href="{{ url_for('dashboard.announcement', announcement_id=announcement.object_id) }}" class="button tiny">View</a>
                                 <a href="{{ url_for('admin.delete_announcement', id=announcement.object_id) }}" class="button tiny">Delete</a>
                                 {% if announcement.send_email and not announcement.email_sent %}
                                     <a href="{{ url_for('admin.cancel_announcement_emails', id=announcement.object_id) }}" class="button tiny">Cancel Emails</a>

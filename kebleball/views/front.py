@@ -215,7 +215,7 @@ def register():
     APP.email_manager.send_template(
         flask.request.form['email'],
         'Confirm your Email Address',
-        'emailConfirm.email',
+        'email_confirm.email',
         confirmurl=flask.url_for(
             'front.confirm_email',
             user_id=user.object_id,
@@ -304,7 +304,7 @@ def email_confirm():
             APP.email_manager.send_template(
                 flask.request.form['email'],
                 'Attempted Account Access',
-                'emailConfirmFail.email'
+                'email_confirm_fail.email'
             )
         else:
             user.secret_key = generate_key(64)
@@ -321,7 +321,7 @@ def email_confirm():
             APP.email_manager.send_template(
                 flask.request.form['email'],
                 'Confirm your Email Address',
-                'emailConfirm.email',
+                'email_confirm.email',
                 confirmurl=flask.url_for(
                     'front.confirm_email',
                     user_id=user.object_id,
@@ -376,7 +376,7 @@ def password_reset():
             app.email_manager.send_template(
                 flask.request.form['email'],
                 'Attempted Account Access',
-                'passwordResetFail.email'
+                'password_reset_fail.email'
             )
         else:
             user.secret_key = generate_key(64)
@@ -396,7 +396,7 @@ def password_reset():
             APP.email_manager.send_template(
                 flask.request.form['email'],
                 'Confirm Password Reset',
-                'passwordResetConfirm.email',
+                'password_reset_cnfirm.email',
                 confirmurl=flask.url_for(
                     'front.reset_password',
                     user_id=user.object_id,

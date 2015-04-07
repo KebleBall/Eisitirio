@@ -46,20 +46,20 @@ def resale_home():
         while None in tickets:
             tickets.remove(None)
 
-        resale_to = models.User.get_by_email(request.form['resaleEmail'])
+        resale_to = models.User.get_by_email(request.form['resale_email'])
 
         if not resale_to:
             flash(
                 'No user with that email exists'
                 'error'
             )
-            return render_template('resale/resaleHome.html')
+            return render_template('resale/resale_home.html')
         elif resale_to == current_user:
             flash(
                 'You can\'t resell tickets to yourself',
                 'info'
             )
-            return render_template('resale/resaleHome.html')
+            return render_template('resale/resale_home.html')
 
         models.Ticket.start_resale(tickets, resale_to)
 
@@ -68,7 +68,7 @@ def resale_home():
             'info'
         )
 
-    return render_template('resale/resaleHome.html')
+    return render_template('resale/resale_home.html')
 
 @RESALE.route('/resale/cancel', methods=['GET', 'POST'])
 @login_required
@@ -103,7 +103,7 @@ def cancel_resale():
             'success'
         )
 
-    return render_template('resale/cancelResale.html')
+    return render_template('resale/cancel_resale.html')
 
 @RESALE.route('/resale/confirm/<int:resale_from>/<int:resale_to>/<key>')
 @login_required

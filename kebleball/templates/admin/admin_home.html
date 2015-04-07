@@ -19,27 +19,27 @@
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="userName">Name</label>
-                            <input type="text" name="userName" id="userName" {% if form['userName'] %}value="{{ form['userName'] }}" {% endif %}/>
+                            <label for="user_name">Name</label>
+                            <input type="text" name="user_name" id="user_name" {% if form['user_name'] %}value="{{ form['user_name'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="userEmail">Email</label>
-                            <input type="text" name="userEmail" id="userEmail" {% if form['userEmail'] %}value="{{ form['userEmail'] }}" {% endif %}/>
+                            <label for="user_email">Email</label>
+                            <input type="text" name="user_email" id="user_email" {% if form['user_email'] %}value="{{ form['user_email'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="userCollege">College</label>
-                            <select name="userCollege" id="userCollege">
-                                {% if form['userCollege'] %}
+                            <label for="user_college">College</label>
+                            <select name="user_college" id="user_college">
+                                {% if form['user_college'] %}
                                     <option value="Any">Any</option>
                                 {% else %}
                                     <option value="Any" selected="selected">Any</option>
                                 {% endif %}
                                 {% for college in colleges %}
-                                    {% if form['userCollege'] and form['userCollege']|int(-1) == college.object_id %}
+                                    {% if form['user_college'] and form['user_college']|int(-1) == college.object_id %}
                                         <option value="{{ college.object_id }}" selected="selected">{{ college.name }}</option>
                                     {% else %}
                                         <option value="{{ college.object_id }}">{{ college.name }}</option>
@@ -50,15 +50,15 @@
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="userAffiliation">Affiliation</label>
-                            <select name="userAffiliation" id="userAffiliation">
+                            <label for="user_affiliation">Affiliation</label>
+                            <select name="user_affiliation" id="user_affiliation">
                                 {% if form['affiliation'] %}
                                     <option value="Any">Any</option>
                                 {% else %}
                                     <option value="Any" selected="selected">Any</option>
                                 {% endif %}
                                 {% for affiliation in affiliations %}
-                                    {% if form['userAffiliation'] and form['userAffiliation']|int(-1) == affiliation.object_id %}
+                                    {% if form['user_affiliation'] and form['user_affiliation']|int(-1) == affiliation.object_id %}
                                         <option value="{{ affiliation.object_id }}" selected="selected">{{ affiliation.name }}</option>
                                     {% else %}
                                         <option value="{{ affiliation.object_id }}">{{ affiliation.name }}</option>
@@ -69,21 +69,21 @@
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="userTickets">Ticket Ownership</label>
-                            <select name="userTickets" id="userTickets">
-                                <option value="Any"{% if not form['userTickets'] or form['userTickets'] == 'Any' %} selected="selected"{% endif %}>Any</option>
-                                <option value="Has"{% if form['userTickets'] and form['userTickets'] == 'Has' %} selected="selected"{% endif %}>User has tickets</option>
-                                <option value="HasNot"{% if form['userTickets'] and form['userTickets'] == 'HasNot' %} selected="selected"{% endif %}>User has no tickets</option>
+                            <label for="user_tickets">Ticket Ownership</label>
+                            <select name="user_tickets" id="user_tickets">
+                                <option value="Any"{% if not form['user_tickets'] or form['user_tickets'] == 'Any' %} selected="selected"{% endif %}>Any</option>
+                                <option value="Has"{% if form['user_tickets'] and form['user_tickets'] == 'Has' %} selected="selected"{% endif %}>User has tickets</option>
+                                <option value="HasNot"{% if form['user_tickets'] and form['user_tickets'] == 'HasNot' %} selected="selected"{% endif %}>User has no tickets</option>
                             </select>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="userWaiting">Waiting</label>
-                            <select name="userWaiting" id="userWaiting">
-                                <option value="Any"{% if not form['userWaiting'] or form['userWaiting'] == 'Any' %} selected="selected"{% endif %}>Any</option>
-                                <option value="Is"{% if form['userWaiting'] and form['userWaiting'] == 'Is' %} selected="selected"{% endif %}>User is waiting for tickets</option>
-                                <option value="IsNot"{% if form['userWaiting'] and form['userWaiting'] == 'IsNot' %} selected="selected"{% endif %}>User is not waiting for tickets</option>
+                            <label for="user_waiting">Waiting</label>
+                            <select name="user_waiting" id="user_waiting">
+                                <option value="Any"{% if not form['user_waiting'] or form['user_waiting'] == 'Any' %} selected="selected"{% endif %}>Any</option>
+                                <option value="Is"{% if form['user_waiting'] and form['user_waiting'] == 'Is' %} selected="selected"{% endif %}>User is waiting for tickets</option>
+                                <option value="IsNot"{% if form['user_waiting'] and form['user_waiting'] == 'IsNot' %} selected="selected"{% endif %}>User is not waiting for tickets</option>
                             </select>
                         </div>
                     </div>
@@ -99,74 +99,74 @@
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticketNumber">Ticket Number</label>
-                            <input type="text" name="ticketNumber" id="ticketNumber" {% if form['ticketNumber'] %}value="{{ form['ticketNumber'] }}" {% endif %}/>
+                            <label for="ticket_number">Ticket Number</label>
+                            <input type="text" name="ticket_number" id="ticket_number" {% if form['ticket_number'] %}value="{{ form['ticket_number'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticketName">Name on Ticket</label>
-                            <input type="text" name="ticketName" id="ticketName" {% if form['ticketName'] %}value="{{ form['ticketName'] }}" {% endif %}/>
+                            <label for="ticket_name">Name on Ticket</label>
+                            <input type="text" name="ticket_name" id="ticket_name" {% if form['ticket_name'] %}value="{{ form['ticket_name'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticketBarcode">Ticket Barcode</label>
-                            <input type="text" name="ticketBarcode" id="ticketBarcode" {% if form['ticketBarcode'] %}value="{{ form['ticketBarcode'] }}" {% endif %}/>
+                            <label for="ticket_barcode">Ticket Barcode</label>
+                            <input type="text" name="ticket_barcode" id="ticket_barcode" {% if form['ticket_barcode'] %}value="{{ form['ticket_barcode'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticketMinPrice">Minimum Ticket Price</label>
-                            <input type="number" name="ticketMinPrice" id="ticketMinPrice" {% if form['ticketMinPrice'] %}value="{{ form['ticketMinPrice'] }}" {% endif %}/>
+                            <label for="ticket_min_price">Minimum Ticket Price</label>
+                            <input type="number" name="ticket_min_price" id="ticket_min_price" {% if form['ticket_min_price'] %}value="{{ form['ticket_min_price'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticketMaxPrice">Maximum Ticket Price</label>
-                            <input type="number" name="ticketMaxPrice" id="ticketMaxPrice" {% if form['ticketMaxPrice'] %}value="{{ form['ticketMaxPrice'] }}" {% endif %}/>
+                            <label for="ticket_max_price">Maximum Ticket Price</label>
+                            <input type="number" name="ticket_max_price" id="ticket_max_price" {% if form['ticket_max_price'] %}value="{{ form['ticket_max_price'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticketMethod">Payment Method</label>
-                            <select name="ticketMethod" id="ticketMethod">
-                                <option value="Any"{% if form['ticketMethod'] and form['ticketMethod'] == 'Any' %} selected="selected"{% endif %}>Any</option>
-                                <option value="Battels"{% if form['ticketMethod'] and form['ticketMethod'] == 'Battels' %} selected="selected"{% endif %}>Battels</option>
-                                <option value="Card"{% if form['ticketMethod'] and form['ticketMethod'] == 'Card' %} selected="selected"{% endif %}>Card</option>
-                                <option value="Cash"{% if form['ticketMethod'] and form['ticketMethod'] == 'Cash' %} selected="selected"{% endif %}>Cash</option>
-                                <option value="Cheque"{% if form['ticketMethod'] and form['ticketMethod'] == 'Cheque' %} selected="selected"{% endif %}>Cheque</option>
-                                <option value="Free"{% if form['ticketMethod'] and form['ticketMethod'] == 'Free' %} selected="selected"{% endif %}>Free</option>
+                            <label for="ticket_method">Payment Method</label>
+                            <select name="ticket_method" id="ticket_method">
+                                <option value="Any"{% if form['ticket_method'] and form['ticket_method'] == 'Any' %} selected="selected"{% endif %}>Any</option>
+                                <option value="Battels"{% if form['ticket_method'] and form['ticket_method'] == 'Battels' %} selected="selected"{% endif %}>Battels</option>
+                                <option value="Card"{% if form['ticket_method'] and form['ticket_method'] == 'Card' %} selected="selected"{% endif %}>Card</option>
+                                <option value="Cash"{% if form['ticket_method'] and form['ticket_method'] == 'Cash' %} selected="selected"{% endif %}>Cash</option>
+                                <option value="Cheque"{% if form['ticket_method'] and form['ticket_method'] == 'Cheque' %} selected="selected"{% endif %}>Cheque</option>
+                                <option value="Free"{% if form['ticket_method'] and form['ticket_method'] == 'Free' %} selected="selected"{% endif %}>Free</option>
                             </select>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticketPaid">Paid For</label>
-                            <select name="ticketPaid" id="ticketPaid">
-                                <option value="Any"{% if form['ticketPaid'] and form['ticketPaid'] == 'Any' %} selected="selected"{% endif %}>Any</option>
-                                <option value="Is"{% if form['ticketPaid'] and form['ticketPaid'] == 'Is' %} selected="selected"{% endif %}>Ticket is paid for</option>
-                                <option value="IsNot"{% if form['ticketPaid'] and form['ticketPaid'] == 'IsNot' %} selected="selected"{% endif %}>Ticket is not paid for</option>
+                            <label for="ticket_paid">Paid For</label>
+                            <select name="ticket_paid" id="ticket_paid">
+                                <option value="Any"{% if form['ticket_paid'] and form['ticket_paid'] == 'Any' %} selected="selected"{% endif %}>Any</option>
+                                <option value="Is"{% if form['ticket_paid'] and form['ticket_paid'] == 'Is' %} selected="selected"{% endif %}>Ticket is paid for</option>
+                                <option value="IsNot"{% if form['ticket_paid'] and form['ticket_paid'] == 'IsNot' %} selected="selected"{% endif %}>Ticket is not paid for</option>
                             </select>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticketCollected">Collected</label>
-                            <select name="ticketCollected" id="ticketCollected">
-                                <option value="Any"{% if form['ticketCollected'] and form['ticketCollected'] == 'Any' %} selected="selected"{% endif %}>Any</option>
-                                <option value="Is"{% if form['ticketCollected'] and form['ticketCollected'] == 'Is' %} selected="selected"{% endif %}>Ticket is collected</option>
-                                <option value="IsNot"{% if form['ticketCollected'] and form['ticketCollected'] == 'IsNot' %} selected="selected"{% endif %}>Ticket is not collected</option>
+                            <label for="ticket_collected">Collected</label>
+                            <select name="ticket_collected" id="ticket_collected">
+                                <option value="Any"{% if form['ticket_collected'] and form['ticket_collected'] == 'Any' %} selected="selected"{% endif %}>Any</option>
+                                <option value="Is"{% if form['ticket_collected'] and form['ticket_collected'] == 'Is' %} selected="selected"{% endif %}>Ticket is collected</option>
+                                <option value="IsNot"{% if form['ticket_collected'] and form['ticket_collected'] == 'IsNot' %} selected="selected"{% endif %}>Ticket is not collected</option>
                             </select>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticketReferrer">Referrer</label>
-                            <select name="ticketReferrer" id="ticketReferrer">
-                                <option value="Any"{% if form['ticketReferrer'] and form['ticketReferrer'] == 'Any' %} selected="selected"{% endif %}>Any</option>
-                                <option value="Has"{% if form['ticketReferrer'] and form['ticketReferrer'] == 'Has' %} selected="selected"{% endif %}>Ticket has a referrer</option>
-                                <option value="HasNot"{% if form['ticketReferrer'] and form['ticketReferrer'] == 'HasNot' %} selected="selected"{% endif %}>Ticket has no referrer</option>
+                            <label for="ticket_referrer">Referrer</label>
+                            <select name="ticket_referrer" id="ticket_referrer">
+                                <option value="Any"{% if form['ticket_referrer'] and form['ticket_referrer'] == 'Any' %} selected="selected"{% endif %}>Any</option>
+                                <option value="Has"{% if form['ticket_referrer'] and form['ticket_referrer'] == 'Has' %} selected="selected"{% endif %}>Ticket has a referrer</option>
+                                <option value="HasNot"{% if form['ticket_referrer'] and form['ticket_referrer'] == 'HasNot' %} selected="selected"{% endif %}>Ticket has no referrer</option>
                             </select>
                         </div>
                     </div>
@@ -182,34 +182,34 @@
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="logIP">IP Address</label>
-                            <input type="text" name="logIP" id="logIP" {% if form['logIP'] %}value="{{ form['logIP'] }}" {% endif %}/>
+                            <label for="log_ip">IP Address</label>
+                            <input type="text" name="log_ip" id="log_ip" {% if form['log_ip'] %}value="{{ form['log_ip'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="logStart">Start date/time</label>
-                            <input type="text" name="logStart" id="logStart" {% if form['logStart'] %}value="{{ form['logStart'] }}" {% endif %}/>
+                            <label for="log_start">Start date/time</label>
+                            <input type="text" name="log_start" id="log_start" {% if form['log_start'] %}value="{{ form['log_start'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="logEnd">End date/time</label>
-                            <input type="text" name="logEnd" id="logEnd" {% if form['logEnd'] %}value="{{ form['logEnd'] }}" {% endif %}/>
+                            <label for="log_end">End date/time</label>
+                            <input type="text" name="log_end" id="log_end" {% if form['log_end'] %}value="{{ form['log_end'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="logMessage">Message includes</label>
-                            <input type="text" name="logMessage" id="logMessage" {% if form['logMessage'] %}value="{{ form['logMessage'] }}" {% endif %}/>
+                            <label for="log_message">Message includes</label>
+                            <input type="text" name="log_message" id="log_message" {% if form['log_message'] %}value="{{ form['log_message'] }}" {% endif %}/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="logUser">Search log by</label>
-                            <select name="logUser" id="logUser">
-                                <option value="User"{% if form['logUser'] and form['logUser'] == 'User' %} selected="selected"{% endif %}>User</option>
-                                <option value="Actor"{% if form['logUser'] and form['logUser'] == 'Actor' %} selected="selected"{% endif %}>Actor</option>
+                            <label for="log_user">Search log by</label>
+                            <select name="log_user" id="log_user">
+                                <option value="User"{% if form['log_user'] and form['log_user'] == 'User' %} selected="selected"{% endif %}>User</option>
+                                <option value="Actor"{% if form['log_user'] and form['log_user'] == 'Actor' %} selected="selected"{% endif %}>Actor</option>
                             </select>
                         </div>
                     </div>
@@ -224,14 +224,14 @@
                     {% endif %}
                 </div>
                 <div class="large-6 columns">
-                    <label for="numResults">Results per Page</label>
+                    <label for="num_results">Results per Page</label>
                     <div class="row collapse">
                         <div class="large-6 columns">
-                            <select name="numResults" id="numResults">
-                                <option value="10" {% if form['numResults'] and form['numResults'] == 10 %}selected="selected"{% endif %}>10</option>
-                                <option value="20" {% if form['numResults'] and form['numResults'] == 20 %}selected="selected"{% endif %}>20</option>
-                                <option value="50" {% if form['numResults'] and form['numResults'] == 50 %}selected="selected"{% endif %}>50</option>
-                                <option value="100" {% if form['numResults'] and form['numResults'] == 100 %}selected="selected"{% endif %}>100</option>
+                            <select name="num_results" id="num_results">
+                                <option value="10" {% if form['num_results'] and form['num_results'] == 10 %}selected="selected"{% endif %}>10</option>
+                                <option value="20" {% if form['num_results'] and form['num_results'] == 20 %}selected="selected"{% endif %}>20</option>
+                                <option value="50" {% if form['num_results'] and form['num_results'] == 50 %}selected="selected"{% endif %}>50</option>
+                                <option value="100" {% if form['num_results'] and form['num_results'] == 100 %}selected="selected"{% endif %}>100</option>
                             </select>
                         </div>
                         <div class="large-6 columns">
@@ -250,7 +250,7 @@
         </form>
         {% if category == 'User' %}
             <h3>User Search Results</h3>
-            <table id="usersTable">
+            <table id="users_table">
                 <thead>
                     <tr>
                         <th>User ID</th>
@@ -272,7 +272,7 @@
             </table>
         {% elif category == 'Ticket' %}
             <h3>Ticket Search Results</h3>
-            <table id="ticketsTable">
+            <table id="tickets_table">
                 <thead>
                     <tr>
                         <th>Ticket Number</th>
@@ -314,7 +314,7 @@
             </table>
         {% elif category == 'Log' %}
             <h3>Log Search Results</h3>
-            <table id="ticketsTable">
+            <table id="log_entries_table">
                 <thead>
                     <tr>
                         <th>Date/Time</th>

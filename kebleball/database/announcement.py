@@ -217,18 +217,20 @@ class Announcement(DB.Model):
             minus the nuber of emails sent)
         """
         try:
-            msg = MIMEText(self.content)
-            msg['Subject'] = self.subject
-            msg['From'] = self.sender.email
+            message = MIMEText(self.content)
+            message['Subject'] = self.subject
+            message['From'] = self.sender.email
 
             for recipient in self.emails:
                 if count <= 0:
                     break
+
                 try:
-                    msg.replace_header('To', recipient.email)
+                    message.replace_header('To', recipient.email)
                 except KeyError:
-                    msg['To'] = recipient.email
-                APP.email_manager.sendMsg(msg)
+                    message['To'] = recipient.email
+
+                APP.email_manager.send_message(message)
                 self.emails.remove(recipient)
                 count = count - 1
         finally:

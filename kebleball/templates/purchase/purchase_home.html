@@ -6,7 +6,7 @@
 {% block content %}
     <section id="purchase" class="columns">
         <form action="{{ url_for('purchase.purchase_home') }}" method="post">
-            <ol id="purchaseSteps">
+            <ol id="purchase_steps">
                 <li>
                     <h5>Choose Number of Tickets</h5>
                     <div class="row">
@@ -17,7 +17,7 @@
                                 name="num_tickets"
                                 type="number"
                                 min="1"
-                                max="{{ canBuy }}"
+                                max="{{ can_buy }}"
                                 step="1"
                                 value="{% if num_tickets -%}
                                     {{ num_tickets }}
@@ -25,14 +25,14 @@
                                     1
                                 {% endif %}"
                                 data-slider="true"
-                                data-slider-range="1,{{ canBuy }}"
+                                data-slider-range="1,{{ can_buy }}"
                                 data-slider-snap="true"
                                 data-slider-step="1"
                                 data-slider-highlight="true"
                             />
                         </div>
                     </div>
-                    <p id="ticketInformation">
+                    <p id="ticket_information">
                         The base price for a ticket is &pound;{{ '%.2f' % (current_user.get_base_ticket_price() / 100.0) }}.
                         {% if current_user.gets_discount() %}
                             As a current Keble student you get a &pound;{{ '%.2f' % (template_config['KEBLE_DISCOUNT'] / 100.0) }} discount on your first ticket.
@@ -56,28 +56,28 @@
                     <div class="row">
                         <div class="columns">
                             {% if current_user.can_pay_by_battels() %}
-                                <label for="paymentMethod-Battels">
-                                    <input type="radio" name="paymentMethod" value="Battels" id="paymentMethod-Battels" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Battels' %}checked="checked" {% endif %}/>
+                                <label for="payment_method-Battels">
+                                    <input type="radio" name="payment_method" value="Battels" id="payment_method-Battels" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Battels' %}checked="checked" {% endif %}/>
                                     Battels
                                 </label>
                             {% endif %}
-                            <label for="paymentMethod-Card">
-                                <input type="radio" name="paymentMethod" value="Card" id="paymentMethod-Card" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Card' %}checked="checked" {% endif %}/>
+                            <label for="payment_method-Card">
+                                <input type="radio" name="payment_method" value="Card" id="payment_method-Card" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Card' %}checked="checked" {% endif %}/>
                                 Credit/Debit Card
                             </label>
-                            <p class="small"><a onclick="showAlternativePayments()" style="cursor: pointer;">Can't pay by card{% if current_user.can_pay_by_battels() %}/battels{% endif %}?</a></p>
-                            <div id="paymentAlternatives"{% if not (form and form['paymentMethod'] and (form['paymentMethod'] == 'Cash' or form['paymentMethod'] == 'Cheque')) %} style="display: none;"{% endif %}>
+                            <p class="small"><a onclick="show_alternative_payments()" style="cursor: pointer;">Can't pay by card{% if current_user.can_pay_by_battels() %}/battels{% endif %}?</a></p>
+                            <div id="payment_alternatives"{% if not (form and form['payment_method'] and (form['payment_method'] == 'Cash' or form['payment_method'] == 'Cheque')) %} style="display: none;"{% endif %}>
                                 <p>If you wish to pay by cheque/cash, you must contact <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}">the treasurer</a> to arrange the payment before reserving your tickets here, in order to prevent your tickets expiring before payment is confirmed.</p>
-                                <label for="paymentMethod-Cash">
-                                    <input type="radio" name="paymentMethod" value="Cash" id="paymentMethod-Cash" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Cash' %}checked="checked" {% endif %}/>
+                                <label for="payment_method-Cash">
+                                    <input type="radio" name="payment_method" value="Cash" id="payment_method-Cash" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Cash' %}checked="checked" {% endif %}/>
                                     Cash
                                 </label>
-                                <label for="paymentMethod-Cheque">
-                                    <input type="radio" name="paymentMethod" value="Cheque" id="paymentMethod-Cheque" required="required" {% if form and form['paymentMethod'] and form['paymentMethod'] == 'Cheque' %}checked="checked" {% endif %}/>
+                                <label for="payment_method-Cheque">
+                                    <input type="radio" name="payment_method" value="Cheque" id="payment_method-Cheque" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Cheque' %}checked="checked" {% endif %}/>
                                     Cheque
                                 </label>
-                                <label for="paymentReason">Reason for cash/cheque payment</label>
-                                <input type="text" name="paymentReason" id="paymentReason" {% if form and form['paymentReason'] %}value="{{ form['paymentReason'] }}" {% endif %}/>
+                                <label for="payment_reason">Reason for cash/cheque payment</label>
+                                <input type="text" name="payment_reason" id="payment_reason" {% if form and form['payment_reason'] %}value="{{ form['payment_reason'] }}" {% endif %}/>
                             </div>
                         </div>
                     </div>
@@ -87,9 +87,9 @@
                     <p>If you have been given a discount code, please enter it here. If you do not have a code, leave this field blank. Only one discount code may be used per order</p>
                     <div class="row">
                         <div class="columns">
-                            <label for="voucherCode">Discount Code:</label>
-                            <input type="text" name="voucherCode" id="voucherCode" {% if form and form['voucherCode'] %}value="{{ form['voucherCode'] }}" {% endif %}/>
-                            <div id="voucherMessage" style="display: none;"></div>
+                            <label for="voucher_code">Discount Code:</label>
+                            <input type="text" name="voucher_code" id="voucher_code" {% if form and form['voucher_code'] %}value="{{ form['voucher_code'] }}" {% endif %}/>
+                            <div id="voucher_message" style="display: none;"></div>
                         </div>
                     </div>
                 </li>
@@ -98,9 +98,9 @@
                     <p>If somebody referred you, or recommended Keble Ball to you, please enter their email address here so that we can give them credit for your order.</p>
                     <div class="row">
                         <div class="columns">
-                            <label for="referrerEmail">Email Address:</label>
-                            <input type="email" name="referrerEmail" id="referrerEmail" {% if form and form['referrerEmail'] %}value="{{ form['referrerEmail'] }}" {% endif %}/>
-                            <div id="referrerMessage" style="display: none;"></div>
+                            <label for="referrer_email">Email Address:</label>
+                            <input type="email" name="referrer_email" id="referrer_email" {% if form and form['referrer_email'] %}value="{{ form['referrer_email'] }}" {% endif %}/>
+                            <div id="referrer_message" style="display: none;"></div>
                         </div>
                     </div>
                 </li>
@@ -108,8 +108,8 @@
                     <h5>Terms and Conditions</h5>
                     <div class="row">
                         <div class="columns">
-                            <label for="acceptTerms">
-                                <input type="checkbox" name="acceptTerms" value="yes" id="acceptTerms" required />
+                            <label for="accept_terms">
+                                <input type="checkbox" name="accept_terms" value="yes" id="accept_terms" required />
                                 I have read and accept the <a href="{{ url_for('front.terms') }}" target="_blank">Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} Terms &amp; Conditions</a>
                             </label>
                         </div>
@@ -127,11 +127,11 @@
     <script src="{{ url_for('static', filename='js/vendor/simple-slider.js') }}"></script>
 
     <script type="text/javascript">
-        var ticketPrice = {{ current_user.get_base_ticket_price() }};
-        var kebleDiscount = {{ template_config['KEBLE_DISCOUNT'] }};
-        var getsDiscount = {% if current_user.gets_discount() %}true{% else %}false{% endif %};
+        var ticket_price = {{ current_user.get_base_ticket_price() }};
+        var keble_discount = {{ template_config['KEBLE_DISCOUNT'] }};
+        var gets_discount = {% if current_user.gets_discount() %}true{% else %}false{% endif %};
 
-        function getPlural(num) {
+        function get_plural(num) {
             if (num == 1) {
                 return '';
             } else {
@@ -142,104 +142,104 @@
         $("#num_tickets").bind("slider:changed", function (event, data) {
             $('#num_tickets_display').html(data.value);
 
-            var ticketMessage = "The base price for a ticket is &pound;" + (ticketPrice / 100.0).toFixed(2) + ".";
-            var totalPrice = data.value * ticketPrice;
+            var ticket_message = "The base price for a ticket is &pound;" + (ticket_price / 100.0).toFixed(2) + ".";
+            var total_price = data.value * ticket_price;
 
-            if (getsDiscount) {
-                ticketMessage = (
-                    ticketMessage +
+            if (gets_discount) {
+                ticket_message = (
+                    ticket_message +
                     " As a current Keble student you get a &pound;" +
-                    (kebleDiscount / 100.0).toFixed(2) +
+                    (keble_discount / 100.0).toFixed(2) +
                     " discount on your first ticket."
                 );
-                totalPrice = totalPrice - kebleDiscount;
+                total_price = total_price - keble_discount;
             }
 
-            ticketMessage = (
-                ticketMessage +
+            ticket_message = (
+                ticket_message +
                 "Your order of " +
                 data.value +
                 " ticket" +
-                getPlural(data.value) +
+                get_plural(data.value) +
                 " is currently worth &pound;" +
-                (totalPrice / 100.0).toFixed(2) +
+                (total_price / 100.0).toFixed(2) +
                 ". "
             );
 
-            ticketMessage = (
-                ticketMessage +
+            ticket_message = (
+                ticket_message +
                 "Please note that this price does not reflect the value of any discounts to be applied."
             );
 
-            $('#ticketInformation').html(ticketMessage);
+            $('#ticket_information').html(ticket_message);
         });
 
-        var voucherCode = $("#voucherCode");
-        var voucherMessage = $("#voucherMessage");
+        var voucher_code = $("#voucher_code");
+        var voucher_message = $("#voucher_message");
 
-        voucherCode.on("blur", function() {
-            if (voucherCode.val() != '') {
+        voucher_code.on("blur", function() {
+            if (voucher_code.val() != '') {
                 jQuery.ajax(
                     '{{ url_for('ajax.validate_voucher', _external=True) }}',
                     {
                         'data': {
-                            'code': voucherCode.val()
+                            'code': voucher_code.val()
                         },
                         'type': 'POST',
                         'dataType': 'json',
                         'success': function(data, code, xhr) {
-                            voucherMessage.attr(
+                            voucher_message.attr(
                                 "class",
                                 data.class
                             );
-                            voucherMessage.html(data.message);
-                            voucherMessage.show(0);
+                            voucher_message.html(data.message);
+                            voucher_message.show(0);
                         }
                     }
                 );
             } else {
-                voucherMessage.hide(0);
+                voucher_message.hide(0);
             }
         });
 
-        voucherCode.on("change", function() {
-            voucherMessage.hide(0);
+        voucher_code.on("change", function() {
+            voucher_message.hide(0);
         });
 
-        var referrerEmail = $("#referrerEmail");
-        var referrerMessage = $("#referrerMessage");
+        var referrer_email = $("#referrer_email");
+        var referrer_message = $("#referrer_message");
 
-        referrerEmail.on("blur", function() {
-            if (referrerEmail.val() != '') {
+        referrer_email.on("blur", function() {
+            if (referrer_email.val() != '') {
                 jQuery.ajax(
                     '{{ url_for('ajax.validate_referrer', _external=True) }}',
                     {
                         'data': {
-                            'email': referrerEmail.val()
+                            'email': referrer_email.val()
                         },
                         'type': 'POST',
                         'dataType': 'json',
                         'success': function(data, code, xhr) {
-                            referrerMessage.attr(
+                            referrer_message.attr(
                                 "class",
                                 data.class
                             );
-                            referrerMessage.html(data.message);
-                            referrerMessage.show(0);
+                            referrer_message.html(data.message);
+                            referrer_message.show(0);
                         }
                     }
                 );
             } else {
-                referrerMessage.hide(0);
+                referrer_message.hide(0);
             }
         });
 
-        referrerEmail.on("change", function() {
-            referrerMessage.hide(0);
+        referrer_email.on("change", function() {
+            referrer_message.hide(0);
         });
 
-        function showAlternativePayments() {
-            $("#paymentAlternatives").slideDown();
+        function show_alternative_payments() {
+            $("#payment_alternatives").slideDown();
         }
     </script>
 {% endblock %}
