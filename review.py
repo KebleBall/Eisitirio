@@ -12,6 +12,7 @@ import sys
 CMD_GET_BRANCH = ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
 CMD_ADD_ALL = ['git', 'add', '--all']
 CMD_AMEND_COMMIT = ['git', 'commit', '--amend', '--no-edit']
+CMD_PUSH_REVIEW = ['git', 'push', 'review']
 
 
 def cmd_get_diffbase(branch):
@@ -84,6 +85,8 @@ def main():
         subprocess.call(CMD_AMEND_COMMIT)
     else:
         subprocess.call(cmd_commit(raw_input("Change description: ")))
+
+    subprocess.call(CMD_PUSH_REVIEW)
 
     os.unlink(temp.name)
 
