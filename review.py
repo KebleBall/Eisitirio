@@ -10,6 +10,8 @@ import subprocess
 import sys
 
 CMD_GET_BRANCH = ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+CMD_ADD_ALL = ['git', 'add', '--all']
+CMD_AMEND_COMMIT = ['git', 'commit', '--amend', '--no-edit']
 
 
 def cmd_get_diffbase(branch):
@@ -37,6 +39,10 @@ def cmd_change_branch(branch, new=False):
 
 def cmd_apply_patch(patchfile):
     return ['git', 'apply', patchfile]
+
+
+def cmd_commit(message):
+    return ['git', 'commit', '-m', message]
 
 
 def main():
@@ -72,6 +78,12 @@ def main():
         subprocess.call(cmd_change_branch(review_branch, True))
 
     subprocess.call(cmd_apply_patch(temp.name))
+    subprocess.call(CMD_ADD_ALL)
+
+    if branch in reviews:
+        subprocess.call(CMD_AMEND_COMMIT)
+    else:
+        subprocess.call(cmd_commit(raw_input("Change description: ")))
 
     os.unlink(temp.name)
 
