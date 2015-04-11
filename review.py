@@ -11,11 +11,11 @@ existing review commit and pushes the changes
 from __future__ import unicode_literals
 from __future__ import with_statement
 
-import os
-import tempfile
 import json
+import os
 import subprocess
 import sys
+import tempfile
 
 CMD_GET_BRANCH = ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
 CMD_ADD_ALL = ['git', 'add', '--all']
