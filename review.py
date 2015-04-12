@@ -20,12 +20,14 @@ import tempfile
 CMD_GET_BRANCH = ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
 CMD_ADD_ALL = ['git', 'add', '--all']
 CMD_AMEND_COMMIT = ['git', 'commit', '--amend', '--no-edit']
-CMD_PUSH_REVIEW = ['git', 'push', 'review']
 
 
-def cmd_get_diffbase(branch):
-    """Generate a command to find the appropriate diffbase for |branch|."""
-    return ['git', 'merge-base', 'master', branch]
+def cmd_get_diffbase(review_target, branch):
+    """Generate a command to find the appropriate diffbase.
+
+    Finds the best common ancestor of |review_target| and |branch|.
+    """
+    return ['git', 'merge-base', review_target, branch]
 
 
 def cmd_get_sha(ref):
@@ -60,6 +62,11 @@ def cmd_commit(message):
     return ['git', 'commit', '-m', message]
 
 
+def cmd_push_review(remote):
+    """Generate a command to psuh changes to |remote|."""
+    return ['git', 'push', remote]
+
+
 def main():
     """Run the script."""
     try:
@@ -75,9 +82,20 @@ def main():
         sys.exit(1)
 
     if branch in reviews:
-        diffbase = reviews[branch]
+        review_target = reviews[branch]['review_target']
     else:
-        diffbase = subprocess.check_output(cmd_get_diffbase(branch)).strip()
+        if len(sys.argv) > 1:
+            review_target = sys.argv[1]
+        else:
+            sys.stderr.write('Must specify review target branch.')
+            sys.exit(1)
+
+    if branch in reviews:
+        diffbase = reviews[branch]['last_commit']
+    else:
+        diffbase = subprocess.check_output(
+            cmd_get_diffbase(review_target, branch)
+        ).strip()
 
     temp = tempfile.NamedTemporaryFile(delete=False)
 
@@ -101,11 +119,14 @@ def main():
     else:
         subprocess.call(cmd_commit(raw_input("Change description: ")))
 
-    subprocess.call(CMD_PUSH_REVIEW)
+    subprocess.call(cmd_push_review('review_' + review_target))
 
     os.unlink(temp.name)
 
-    reviews[branch] = subprocess.check_output(cmd_get_sha(branch)).strip()
+    reviews[branch] = {
+        'last_commit': subprocess.check_output(cmd_get_sha(branch)).strip(),
+        'review_target': review_target
+    }
 
     with open(os.path.realpath(__file__)[:-3] + '.json', 'w+') as file_handle:
         json.dump(reviews, file_handle)
