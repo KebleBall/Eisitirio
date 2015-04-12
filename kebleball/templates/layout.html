@@ -26,7 +26,7 @@
                 {% if current_user.is_anonymous() %}
                     <p>You are not currently logged in. <a href="{{ url_for('front.home') }}#log-in-form">Log in.</a></p>
                 {% else %}
-                    <p>You are currently logged in as {{ current_user.firstname }} {{ current_user.surname }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
+                    <p>You are currently logged in as {{ current_user.full_name }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
                 {% endif %}
             </section>
             <section id="logo" class="large-6 large-centered columns">
@@ -41,7 +41,7 @@
             <nav class="row">
                 <ul id="navigation-main">
                     {% include 'blocks/dashboard-navigation.html' %}
-                    {% if current_user.isAdmin() %}
+                    {% if current_user.is_admin() %}
                         {% include 'blocks/admin-navigation.html' %}
                     {% endif %}
                 </ul>

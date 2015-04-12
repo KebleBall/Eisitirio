@@ -1,0 +1,9 @@
+Hi {{ ticket.owner.forenames }}
+
+This message is your last warning that you have a ticket which has been reserved for you for Keble Ball 2014 which has not been paid for, and is expiring within 24 hours. This ticket will expire on {{ ticket.expires.strftime('%A %d %B') }} at {{ ticket.expires.strftime('%I:%M%p') }} unless payment is completed.
+
+Please log in to the ticketing system and complete payment to prevent your tickets being cancelled.
+
+Best Wishes,
+
+The Keble Ball Team

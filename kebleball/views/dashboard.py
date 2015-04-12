@@ -1,188 +1,213 @@
 # coding: utf-8
-from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flask.ext.login import login_required, current_user
+"""Views for the users dashboard."""
 
-from kebleball.app import app
+from __future__ import unicode_literals
+
+import datetime
+
+from flask.ext import login
+import flask
+
+from kebleball import app
+from kebleball import helpers
 from kebleball.database import db
-from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
-from kebleball.database.announcement import Announcement
-from kebleball.database.user import User
-from kebleball.helpers import generate_key
-from datetime import datetime, timedelta
+from kebleball.database import models
 
-log = app.log_manager.log_dashboard
-log_event = app.log_manager.log_event
+APP = app.APP
+DB = db.DB
 
-dashboard = Blueprint('dashboard', __name__)
+DASHBOARD = flask.Blueprint('dashboard', __name__)
 
-@dashboard.route('/dashboard')
-@login_required
-def dashboardHome():
-    return render_template('dashboard/dashboardHome.html')
+@DASHBOARD.route('/dashboard')
+@login.login_required
+def dashboard_home():
+    """Display the users dashboard.
 
-@dashboard.route('/dashboard/profile', methods=['GET','POST'])
-@login_required
+    Does nothing special.
+    """
+    return flask.render_template('dashboard/dashboard_home.html')
+
+@DASHBOARD.route('/dashboard/profile', methods=['GET', 'POST'])
+@login.login_required
 def profile():
-    if request.method == 'POST':
+    """Allow the user to edit their personal details.
+
+    Displays a form and processes it to update the users details.
+    """
+    if flask.request.method == 'POST':
         valid = True
         flashes = []
 
         if (
-            request.form['email'] != current_user.email and
-            User.get_by_email(request.form['email']) is not None
+                flask.request.form['email'] != login.current_user.email and
+                models.User.get_by_email(
+                    flask.request.form['email']
+                ) is not None
         ):
-            flashes.append(u'That email address is already in use. ')
+            flashes.append('That email address is already in use. ')
             valid = False
 
         if (
-            'oldpassword' in request.form and
-            request.form['oldpassword'] != ''
+                'oldpassword' in flask.request.form and
+                flask.request.form['oldpassword'] != ''
         ):
-            if not current_user.checkPassword(request.form['oldpassword']):
-                flashes.append(u'Current password is not correct')
+            if not login.current_user.check_password(
+                    flask.request.form['oldpassword']
+            ):
+                flashes.append('Current password is not correct')
                 valid = False
 
             if (
-                'password' not in request.form or
-                'confirm' not in request.form or
-                request.form['password'] == '' or
-                request.form['password'] != request.form['confirm']
+                    'password' not in flask.request.form or
+                    'confirm' not in flask.request.form or
+                    flask.request.form['password'] == '' or
+                    (
+                        flask.request.form['password'] !=
+                        flask.request.form['confirm']
+                    )
             ):
-                flashes.append(u'New passwords do not match')
+                flashes.append('New passwords do not match')
                 valid = False
 
-            if len(request.form['password']) < 8:
-                flashes.append(u'Password must be at least 8 characters long')
+            if len(flask.request.form['password']) < 8:
+                flashes.append('Password must be at least 8 characters long')
                 valid = False
 
         if (
-            'firstname' not in request.form or
-            request.form['firstname'] == ''
+                'forenames' not in flask.request.form or
+                flask.request.form['forenames'] == ''
         ):
-            flashes.append(u'First Name cannot be blank')
+            flashes.append('First Name cannot be blank')
             valid = False
 
         if (
-            'surname' not in request.form or
-            request.form['surname'] == ''
+                'surname' not in flask.request.form or
+                flask.request.form['surname'] == ''
         ):
-            flashes.append(u'Surname cannot be blank')
+            flashes.append('Surname cannot be blank')
             valid = False
 
         if (
-            'email' not in request.form or
-            request.form['email'] == ''
+                'email' not in flask.request.form or
+                flask.request.form['email'] == ''
         ):
-            flashes.append(u'Email cannot be blank')
+            flashes.append('Email cannot be blank')
             valid = False
 
         if (
-            'phone' not in request.form or
-            request.form['phone'] == ''
+                'phone' not in flask.request.form or
+                flask.request.form['phone'] == ''
         ):
-            flashes.append(u'Phone cannot be blank')
+            flashes.append('Phone cannot be blank')
             valid = False
 
         if (
-            'college' not in request.form or
-            request.form['college'] == '---'
+                'college' not in flask.request.form or
+                flask.request.form['college'] == '---'
         ):
-            flashes.append(u'Please select a college')
+            flashes.append('Please select a college')
             valid = False
 
         if (
-            'affiliation' not in request.form or
-            request.form['affiliation'] == '---'
+                'affiliation' not in flask.request.form or
+                flask.request.form['affiliation'] == '---'
         ):
-            flashes.append(u'Please select an affiliation')
+            flashes.append('Please select an affiliation')
             valid = False
 
         if not valid:
-            flash(
+            flask.flash(
                 (
-                    u'There were errors in your provided details. Please fix '
-                    u'these and try again'
+                    'There were errors in your provided details. Please fix '
+                    'these and try again'
                 ),
                 'error'
             )
             for msg in flashes:
-                flash(msg, 'warning')
+                flask.flash(msg, 'warning')
         else:
-            if request.form['email'] != current_user.email:
-                current_user.newemail = request.form['email']
-                current_user.secretkey = generate_key(64)
-                current_user.secretkeyexpiry = datetime.utcnow() + timedelta(days=7)
+            if flask.request.form['email'] != login.current_user.email:
+                login.current_user.new_email = flask.request.form['email']
+                login.current_user.secret_key = helpers.generate_key(64)
+                login.current_user.secret_key_expiry = (
+                    datetime.datetime.utcnow() + datetime.timedelta(days=7))
 
-                app.email_manager.sendTemplate(
-                    request.form['email'],
-                    "Confirm your Email Address",
-                    "emailChangeConfirm.email",
-                    confirmurl=url_for(
-                        'front.confirmEmail',
-                        userID=current_user.id,
-                        secretkey=current_user.secretkey,
+                APP.email_manager.send_template(
+                    flask.request.form['email'],
+                    'Confirm your Email Address',
+                    'email_change_confirm.email',
+                    confirmurl=flask.url_for(
+                        'front.confirm_email',
+                        user_id=login.current_user.object_id,
+                        secret_key=login.current_user.secret_key,
                         _external=True
                     )
                 )
 
-                flash(
+                flask.flash(
                     (
-                        u'You must confirm your new email address to make '
-                        u'sure that we can contact you if necessary. Please '
-                        u'check your email for further instructions.'
+                        'You must confirm your new email address to make '
+                        'sure that we can contact you if necessary. Please '
+                        'check your email for further instructions.'
                     ),
                     'info'
                 )
 
             if (
-                'oldpassword' in request.form and
-                request.form['oldpassword'] != ""
+                    'oldpassword' in flask.request.form and
+                    flask.request.form['oldpassword'] != ''
             ):
-                current_user.setPassword(request.form['password'])
+                login.current_user.set_password(flask.request.form['password'])
 
-            current_user.firstname = request.form['firstname']
-            current_user.surname = request.form['surname']
-            current_user.phone = request.form['phone']
-            current_user.college_id = request.form['college']
-            current_user.update_affiliation(request.form['affiliation'])
-
-            db.session.commit()
-
-            log_event(
-                'Updated Details',
-                [],
-                current_user
+            login.current_user.forenames = flask.request.form['forenames']
+            login.current_user.surname = flask.request.form['surname']
+            login.current_user.phone = flask.request.form['phone']
+            login.current_user.college_id = flask.request.form['college']
+            login.current_user.update_affiliation(
+                flask.request.form['affiliation']
             )
 
-            flash(
-                u'Your details have been updated',
+            DB.session.commit()
+
+            APP.log_manager.log_event(
+                'Updated Details',
+                [],
+                login.current_user
+            )
+
+            flask.flash(
+                'Your details have been updated',
                 'success'
             )
 
-            current_user.maybe_verify_affiliation()
+            login.current_user.maybe_verify_affiliation()
 
-    return render_template(
+    return flask.render_template(
         'dashboard/profile.html',
-        colleges = College.query.all(),
-        affiliations = Affiliation.query.all()
+        colleges=models.College.query.all(),
+        affiliations=models.Affiliation.query.all()
     )
 
-@dashboard.route('/dashboard/announcement/<int:announcementID>')
-@login_required
-def announcement(announcementID):
-    announcement = Announcement.get_by_id(announcementID)
+@DASHBOARD.route('/dashboard/announcement/<int:announcement_id>')
+@login.login_required
+def display_announcement(announcement_id):
+    """Display an announcement.
+
+    The dashboard shows a condensed listing of announcements, this view allows
+    the user to see an announcement in full.
+    """
+    announcement = models.Announcement.get_by_id(announcement_id)
 
     if not announcement:
-        flash(
-            u'Announcement {0} not found'.format(
-                announcementID
+        flask.flash(
+            'Announcement {0} not found'.format(
+                announcement_id
             ),
             'warning'
         )
-        return redirect(url_for('dashboard.dashboardHome'))
+        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
-        return render_template(
+        return flask.render_template(
             'dashboard/announcement.html',
             announcement=announcement
         )

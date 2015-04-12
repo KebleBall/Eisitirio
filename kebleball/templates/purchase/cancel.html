@@ -16,7 +16,7 @@
         <p>In addition to this, in the weeks preceding the ball, automated ticket cancellations are disabled to aid with organisation of ticket collections. If you find that you have tickets which obey the above rules, but the list below is empty, it is likely that cancellations are disabled. In this case, you should contact <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a> to arrange for your ticket to be refunded and cancelled
         <h3>Your Tickets</h3>
         <form action="{{ url_for('purchase.cancel') }}" method="post">
-            <table id="ticketsTable">
+            <table id="tickets_table">
                 <thead>
                     <tr>
                         <th>Select</th>
@@ -27,18 +27,18 @@
                 </thead>
                 <tbody>
                     {% for ticket in current_user.tickets %}
-                        {% if ticket.canBeCancelledAutomatically() %}
-                            <tr id="ticket-{{ ticket.id }}">
-                                <td><input type="checkbox" name="tickets[]" id="ticketSelect-{{ ticket.id }}" value="{{ ticket.id }}" {% if tickets and ticket.id in tickets %}checked="checked" {% endif %}/></td>
-                                <td><label for="ticketSelect-{{ ticket.id }}">#{{ '%05d' % ticket.id }}</label></td>
-                                <td><label for="ticketSelect-{{ ticket.id }}">{{ ticket.name | default('Not Set') }}</label></td>
+                        {% if ticket.can_be_cancelled_automatically() %}
+                            <tr id="ticket-{{ ticket.object_id }}">
+                                <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
+                                <td><label for="ticket_select-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                                <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
                                 <td>
-                                    <label for="ticketSelect-{{ ticket.id }}">
+                                    <label for="ticket_select-{{ ticket.object_id }}">
                                         {% if ticket.cancelled -%}
                                             Cancelled.
                                         {% elif ticket.collected -%}
                                             Collected as {{ ticket.barcode }}.
-                                        {% elif ticket.resalekey != None -%}
+                                        {% elif ticket.resale_key != None -%}
                                             {% if ticket.resaleconfirmed -%}
                                                 Pending resale completion
                                             {% else -%}
@@ -50,10 +50,10 @@
                                             {% if ticket.payment_method == 'Free' -%}
                                                 Free Ticket.
                                             {% else -%}
-                                                Paid for by {{ ticket.paymentmethod }}.
+                                                Paid for by {{ ticket.payment_method }}.
                                             {% endif %}
                                         {% else -%}
-                                            Awaiting {{ ticket.paymentmethod }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                            Awaiting {{ ticket.payment_method }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                         {% endif %}
                                     </label>
                                 </td>

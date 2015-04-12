@@ -1,997 +1,534 @@
 # coding: utf-8
-from flask import Blueprint, render_template, request, flash, send_file, redirect, url_for, session
+"""Views related to administrative tasks."""
 
-from kebleball.app import app
-from kebleball.helpers.login_manager import admin_required
-from kebleball.database import db
-from kebleball.database.user import User
-from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
-from kebleball.database.announcement import Announcement
-from kebleball.database.ticket import Ticket
-from kebleball.database.log import Log
-from kebleball.database.statistic import Statistic
-from kebleball.database.waiting import Waiting
-from kebleball.database.card_transaction import CardTransaction
-from kebleball.database.voucher import Voucher
-from flask.ext.sqlalchemy import Pagination
-from flask.ext.login import current_user, login_user
-from dateutil.parser import parse
-from datetime import datetime
-from kebleball.helpers.statistic_plots import create_plot
-from kebleball.helpers import generate_key
-from StringIO import StringIO
-from sqlalchemy import func
+from __future__ import unicode_literals
+
 import csv
+import datetime
 import re
+import StringIO
 
-log = app.log_manager.log_admin
-log_event = app.log_manager.log_event
+from dateutil import parser
+from flask.ext import login
+import flask
+import sqlalchemy
 
-admin = Blueprint('admin', __name__)
+from kebleball import app
+from kebleball import helpers
+from kebleball.database import db
+from kebleball.database import models
+from kebleball.helpers import login_manager
+from kebleball.helpers import statistic_plots
 
-@admin.route('/admin', methods=['GET', 'POST'])
-@admin.route('/admin/page/<int:page>', methods=['GET', 'POST'])
-@admin_required
-def adminHome(page=1):
+APP = app.APP
+DB = db.DB
+
+ADMIN = flask.Blueprint('admin', __name__)
+
+@ADMIN.route('/admin', methods=['GET', 'POST'])
+@ADMIN.route('/admin/page/<int:page>', methods=['GET', 'POST'])
+@login_manager.admin_required
+def admin_home(page=1):
+    """Admin homepage, search for users, tickets or log entries.
+
+    Displays a form with lots of filters on users, tickets and log entries. On
+    submission, generates a filtered query for each of users, tickets and log
+    entries, and appropriately joins them to return the results of the requested
+    type.
+    """
     results = None
     category = None
     form = {}
 
-    if request.method == 'POST':
-        userQuery = User.query
-        hasUserFilter = False
-        ticketQuery = Ticket.query
-        hasTicketFilter = False
-        logQuery = Log.query
-        hasLogFilter = False
+    if flask.request.method == 'POST':
+        user_query = models.User.query
+        has_user_filter = False
+        ticket_query = models.Ticket.query
+        has_ticket_filter = False
+        log_query = models.Log.query
+        has_log_filter = False
 
-        numPerPage = int(request.form['numResults'])
-        form = request.form
-
-        if (
-            'userName' in request.form and
-            request.form['userName'] != ''
-        ):
-            userQuery = userQuery.filter(User.fullname.like('%' + request.form['userName'] + '%'))
-            hasUserFilter = True
+        num_per_page = int(flask.request.form['num_results'])
+        form = flask.request.form
 
         if (
-            'userEmail' in request.form and
-            request.form['userEmail'] != ''
+                'user_name' in flask.request.form and
+                flask.request.form['user_name'] != ''
         ):
-            userQuery = userQuery.filter(User.email == request.form['userEmail'])
-            hasUserFilter = True
+            user_query = user_query.filter(
+                models.User.full_name.like(
+                    '%' + flask.request.form['user_name'] + '%'
+                )
+            )
+            has_user_filter = True
 
         if (
-            'userCollege' in request.form and
-            request.form['userCollege'] != '' and
-            request.form['userCollege'] != 'Any'
+                'user_email' in flask.request.form and
+                flask.request.form['user_email'] != ''
         ):
-            userQuery = userQuery.filter(User.college_id == request.form['userCollege'])
-            hasUserFilter = True
+            user_query = user_query.filter(
+                models.User.email == flask.request.form['user_email'])
+            has_user_filter = True
 
         if (
-            'userAffiliation' in request.form and
-            request.form['userAffiliation'] != '' and
-            request.form['userAffiliation'] != 'Any'
+                'user_college' in flask.request.form and
+                flask.request.form['user_college'] != '' and
+                flask.request.form['user_college'] != 'Any'
         ):
-            userQuery = userQuery.filter(User.affiliation_id == request.form['userAffiliation'])
-            hasUserFilter = True
+            user_query = user_query.filter(
+                models.User.college_id ==
+                flask.request.form['user_college']
+            )
+            has_user_filter = True
 
         if (
-            'userTickets' in request.form and
-            request.form['userTickets'] != '' and
-            request.form['userTickets'] != 'Any'
+                'user_affiliation' in flask.request.form and
+                flask.request.form['user_affiliation'] != '' and
+                flask.request.form['user_affiliation'] != 'Any'
         ):
-            if request.form['userTickets'] == 'Has':
-                userQuery = userQuery.filter(User.tickets.any())
+            user_query = user_query.filter(
+                models.User.affiliation_id ==
+                flask.request.form['user_affiliation']
+            )
+            has_user_filter = True
+
+        if (
+                'user_tickets' in flask.request.form and
+                flask.request.form['user_tickets'] != '' and
+                flask.request.form['user_tickets'] != 'Any'
+        ):
+            if flask.request.form['user_tickets'] == 'Has':
+                user_query = user_query.filter(models.User.tickets.any())
             else:
-                userQuery = userQuery.filter(~User.tickets.any())
-            hasUserFilter = True
+                user_query = user_query.filter(~models.User.tickets.any())
+            has_user_filter = True
 
         if (
-            'userWaiting' in request.form and
-            request.form['userWaiting'] != '' and
-            request.form['userWaiting'] != 'Any'
+                'user_waiting' in flask.request.form and
+                flask.request.form['user_waiting'] != '' and
+                flask.request.form['user_waiting'] != 'Any'
         ):
-            if request.form['userWaiting'] == 'Is':
-                userQuery = userQuery.filter(User.waiting.any())
+            if flask.request.form['user_waiting'] == 'Is':
+                user_query = user_query.filter(models.User.waiting.any())
             else:
-                userQuery = userQuery.filter(~User.waiting.any())
-            hasUserFilter = True
+                user_query = user_query.filter(~models.User.waiting.any())
+            has_user_filter = True
 
         if (
-            'ticketNumber' in request.form and
-            request.form['ticketNumber'] != ''
+                'ticket_number' in flask.request.form and
+                flask.request.form['ticket_number'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.id == request.form['ticketNumber'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                models.Ticket.object_id == flask.request.form['ticket_number']
+            )
+            has_ticket_filter = True
 
         if (
-            'ticketName' in request.form and
-            request.form['ticketName'] != ''
+                'ticket_name' in flask.request.form and
+                flask.request.form['ticket_name'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.name.like('%' + request.form['ticketName'] + '%'))
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                models.Ticket.name.like(
+                    '%' + flask.request.form['ticket_name'] + '%'
+                )
+            )
+            has_ticket_filter = True
 
         if (
-            'ticketBarcode' in request.form and
-            request.form['ticketBarcode'] != ''
+                'ticket_barcode' in flask.request.form and
+                flask.request.form['ticket_barcode'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.barcode == request.form['ticketBarcode'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                models.Ticket.barcode == flask.request.form['ticket_barcode']
+            )
+            has_ticket_filter = True
 
         if (
-            'ticketMinPrice' in request.form and
-            request.form['ticketMinPrice'] != ''
+                'ticket_min_price' in flask.request.form and
+                flask.request.form['ticket_min_price'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.price >= request.form['ticketMinPrice'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                models.Ticket.price >= flask.request.form['ticket_min_price']
+            )
+            has_ticket_filter = True
 
         if (
-            'ticketMaxPrice' in request.form and
-            request.form['ticketMaxPrice'] != ''
+                'ticket_max_price' in flask.request.form and
+                flask.request.form['ticket_max_price'] != ''
         ):
-            ticketQuery = ticketQuery.filter(Ticket.price <= request.form['ticketMaxPrice'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                models.Ticket.price <= flask.request.form['ticket_max_price']
+            )
+            has_ticket_filter = True
 
         if (
-            'ticketMethod' in request.form and
-            request.form['ticketMethod'] != '' and
-            request.form['ticketMethod'] != 'Any'
+                'ticket_method' in flask.request.form and
+                flask.request.form['ticket_method'] != '' and
+                flask.request.form['ticket_method'] != 'Any'
         ):
-            ticketQuery = ticketQuery.filter(Ticket.paymentmethod == request.form['ticketMethod'])
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                models.Ticket.payment_method ==
+                flask.request.form['ticket_method']
+            )
+            has_ticket_filter = True
 
         if (
-            'ticketPaid' in request.form and
-            request.form['ticketPaid'] != '' and
-            request.form['ticketPaid'] != 'Any'
+                'ticket_paid' in flask.request.form and
+                flask.request.form['ticket_paid'] != '' and
+                flask.request.form['ticket_paid'] != 'Any'
         ):
-            ticketQuery = ticketQuery.filter(Ticket.paid == (request.form['ticketPaid'] == 'Is'))
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                models.Ticket.paid ==
+                (flask.request.form['ticket_paid'] == 'Is')
+            )
+            has_ticket_filter = True
 
         if (
-            'ticketCollected' in request.form and
-            request.form['ticketCollected'] != '' and
-            request.form['ticketCollected'] != 'Any'
+                'ticket_collected' in flask.request.form and
+                flask.request.form['ticket_collected'] != '' and
+                flask.request.form['ticket_collected'] != 'Any'
         ):
-            ticketQuery = ticketQuery.filter(Ticket.collected == (request.form['ticketCollected'] == 'Is'))
-            hasTicketFilter = True
+            ticket_query = ticket_query.filter(
+                models.Ticket.collected ==
+                (flask.request.form['ticket_collected'] == 'Is')
+            )
+            has_ticket_filter = True
 
         if (
-            'ticketReferrer' in request.form and
-            request.form['ticketReferrer'] != '' and
-            request.form['ticketReferrer'] != 'Any'
+                'ticket_referrer' in flask.request.form and
+                flask.request.form['ticket_referrer'] != '' and
+                flask.request.form['ticket_referrer'] != 'Any'
         ):
-            if request.form['ticketReferrer'] == 'Has':
-                ticketQuery = ticketQuery.filter(Ticket.referrer_id != None)
+            if flask.request.form['ticket_referrer'] == 'Has':
+                ticket_query = ticket_query.filter(
+                    models.Ticket.referrer_id != None
+                )
             else:
-                ticketQuery = ticketQuery.filter(Ticket.referrer_id == None)
-            hasTicketFilter = True
+                ticket_query = ticket_query.filter(
+                    models.Ticket.referrer_id == None
+                )
+            has_ticket_filter = True
 
         if (
-            'logIP' in request.form and
-            request.form['logIP'] != ''
+                'log_ip' in flask.request.form and
+                flask.request.form['log_ip'] != ''
         ):
-            logQuery = logQuery.filter(Log.ip == request.form['logIP'])
-            hasLogFilter = True
+            log_query = log_query.filter(
+                models.Log.ip_address == flask.request.form['log_ip']
+            )
+            has_log_filter = True
 
         if (
-            'logStart' in request.form and
-            request.form['logStart'] != ''
+                'log_start' in flask.request.form and
+                flask.request.form['log_start'] != ''
         ):
             try:
-                dt = parse(request.form['logStart'])
-                logQuery = logQuery.filter(Log.timestamp >= dt)
-                hasLogFilter = True
-            except ValueError, TypeError:
-                flash(
+                dtstamp = parser.parse(flask.request.form['log_start'])
+                log_query = log_query.filter(models.Log.timestamp >= dtstamp)
+                has_log_filter = True
+            except (ValueError, TypeError) as _:
+                flask.flash(
                     'Could not parse start date/time, ignoring.',
                     'warning'
                 )
 
         if (
-            'logEnd' in request.form and
-            request.form['logEnd'] != ''
+                'log_end' in flask.request.form and
+                flask.request.form['log_end'] != ''
         ):
             try:
-                dt = parse(request.form['logEnd'])
-                logQuery = logQuery.filter(Log.timestamp <= dt)
-                hasLogFilter = True
-            except ValueError, TypeError:
-                flash(
+                dtstamp = parser.parse(flask.request.form['log_end'])
+                log_query = log_query.filter(models.Log.timestamp <= dtstamp)
+                has_log_filter = True
+            except (ValueError, TypeError) as _:
+                flask.flash(
                     'Could not parse end date/time, ignoring.',
                     'warning'
                 )
 
         if (
-            'logMessage' in request.form and
-            request.form['logMessage'] != ''
+                'log_message' in flask.request.form and
+                flask.request.form['log_message'] != ''
         ):
-            logQuery = logQuery.filter(Log.action.like('%' + request.form['logMessage'] + '%'))
-            hasLogFilter = True
+            log_query = log_query.filter(
+                models.Log.action.like(
+                    '%' + flask.request.form['log_message'] + '%'
+                )
+            )
+            has_log_filter = True
 
-        logQuery = logQuery.order_by(Log.timestamp.desc())
+        log_query = log_query.order_by(models.Log.timestamp.desc())
 
-        if request.form['search'] == 'user':
-            if hasTicketFilter:
-                userQuery = userQuery.join(
-                    ticketQuery.subquery(),
-                    User.tickets
+        if flask.request.form['search'] == 'user':
+            if has_ticket_filter:
+                user_query = user_query.join(
+                    ticket_query.subquery(),
+                    models.User.tickets
                 )
 
-            if hasLogFilter:
-                if request.form['logUser'] == 'Actor':
-                    userQuery = userQuery.join(
-                        logQuery.subquery(),
-                        User.actions
+            if has_log_filter:
+                if flask.request.form['log_user'] == 'Actor':
+                    user_query = user_query.join(
+                        log_query.subquery(),
+                        models.User.actions
                     )
                 else:
-                    userQuery = userQuery.join(
-                        logQuery.subquery(),
-                        User.events
+                    user_query = user_query.join(
+                        log_query.subquery(),
+                        models.User.events
                     )
 
-            results = userQuery.paginate(page, numPerPage)
+            results = user_query.paginate(page, num_per_page)
             category = 'User'
-        elif request.form['search'] == 'ticket':
-            if hasUserFilter:
-                ticketQuery = ticketQuery.join(
-                    userQuery.subquery(),
-                    Ticket.owner
+        elif flask.request.form['search'] == 'ticket':
+            if has_user_filter:
+                ticket_query = ticket_query.join(
+                    user_query.subquery(),
+                    models.Ticket.owner
                 )
 
-            if hasLogFilter:
-                ticketQuery = ticketQuery.join(
-                    logQuery.subquery(),
-                    Ticket.log_entries
+            if has_log_filter:
+                ticket_query = ticket_query.join(
+                    log_query.subquery(),
+                    models.Ticket.log_entries
                 )
 
-            results = ticketQuery.paginate(page, numPerPage)
+            results = ticket_query.paginate(page, num_per_page)
             category = 'Ticket'
-        elif request.form['search'] == 'log':
-            if hasUserFilter:
-                if request.form['logUser'] == 'Actor':
-                    logQuery = logQuery.join(
-                        userQuery.subquery(),
-                        Log.actor
+        elif flask.request.form['search'] == 'log':
+            if has_user_filter:
+                if flask.request.form['log_user'] == 'Actor':
+                    log_query = log_query.join(
+                        user_query.subquery(),
+                        models.Log.actor
                     )
                 else:
-                    logQuery = logQuery.join(
-                        userQuery.subquery(),
-                        Log.user
+                    log_query = log_query.join(
+                        user_query.subquery(),
+                        models.Log.user
                     )
 
-            if hasTicketFilter:
-                logQuery = logQuery.join(
-                    ticketQuery.subquery(),
-                    Log.tickets
+            if has_ticket_filter:
+                log_query = log_query.join(
+                    ticket_query.subquery(),
+                    models.Log.tickets
                 )
 
-            results = logQuery.paginate(page, numPerPage)
+            results = log_query.paginate(page, num_per_page)
             category = 'Log'
 
-    return render_template(
-        'admin/adminHome.html',
+    return flask.render_template(
+        'admin/admin_home.html',
         form=form,
-        colleges = College.query.all(),
-        affiliations = Affiliation.query.all(),
+        colleges=models.College.query.all(),
+        affiliations=models.Affiliation.query.all(),
         results=results,
         category=category
     )
 
-@admin.route('/admin/user/<int:id>/view')
-@admin.route('/admin/user/<int:id>/view/page/selfactions/<int:selfActionsPage>')
-@admin.route('/admin/user/<int:id>/view/page/actions/<int:actionsPage>')
-@admin.route('/admin/user/<int:id>/view/page/events/<int:eventsPage>')
-@admin_required
-def viewUser(id, selfActionsPage=1, actionsPage=1, eventsPage=1):
-    user = User.get_by_id(id)
-
-    if user:
-        selfActions = user.actions \
-            .filter(Log.actor_id == Log.user_id) \
-            .order_by(Log.timestamp.desc()) \
-            .paginate(
-                selfActionsPage,
-                10,
-                True
-            )
-        otherActions = user.actions \
-            .filter(Log.actor_id != Log.user_id) \
-            .order_by(Log.timestamp.desc()) \
-            .paginate(
-                actionsPage,
-                10,
-                True
-            )
-        events = user.events \
-            .filter(Log.actor_id != Log.user_id) \
-            .order_by(Log.timestamp.desc()) \
-            .paginate(
-                eventsPage,
-                10,
-                True
-            )
-    else:
-        selfActions = None
-        otherActions = None
-        events = None
-
-    return render_template(
-        'admin/viewUser.html',
-        user=user,
-        selfActions=selfActions,
-        otherActions=otherActions,
-        events=events,
-        selfActionsPage=selfActionsPage,
-        actionsPage=actionsPage,
-        eventsPage=eventsPage
-    )
-
-@admin.route('/admin/user/<int:id>/impersonate')
-@admin_required
-def impersonateUser(id):
-    user = User.get_by_id(id)
-
-    if user:
-        session['actor_id'] = current_user.id
-
-        login_user(
-            user,
-            remember=False
-        )
-
-        log_event(
-            'Started impersonating user',
-            [],
-            user
-        )
-
-        return redirect(url_for('dashboard.dashboardHome'))
-    else:
-        flash(
-            u'Could not find user, could not impersonate.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/user/<int:id>/give', methods=['GET', 'POST'])
-@admin_required
-def giveUser(id):
-    if request.method != 'POST':
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-    user = User.get_by_id(id)
-
-    if user:
-        price = (
-            int(request.form['givePricePounds']) * 100 +
-            int(request.form['givePricePence'])
-        )
-        numTickets=int(request.form['giveNumTickets'])
-
-        if (
-            'giveReason' not in request.form or
-            request.form['giveReason'] == ''
-        ):
-            note = 'Given by {0} (#{1}) for no reason.'.format(
-                current_user.fullname,
-                current_user.id
-            )
-        else:
-            note = 'Given by {0} (#{1}) with reason: {2}.'.format(
-                current_user.fullname,
-                current_user.id,
-                request.form['giveReason']
-            )
-
-        tickets = []
-
-        for i in xrange(numTickets):
-            ticket = Ticket(
-                user,
-                None,
-                price
-            )
-            ticket.addNote(note)
-            tickets.append(ticket)
-
-        db.session.add_all(tickets)
-        db.session.commit()
-
-        log_event(
-            'Gave {0} tickets'.format(
-                numTickets
-            ),
-            tickets,
-            user
-        )
-
-        flash(
-            u'Gave {0} {1} tickets'.format(
-                user.firstname,
-                numTickets
-            ),
-            'success'
-        )
-
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
-    else:
-        flash(
-            u'Could not find user, could not give tickets.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/user/<int:id>/note', methods=['GET', 'POST'])
-@admin_required
-def noteUser(id):
-    if request.method != 'POST':
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-    user = User.get_by_id(id)
-
-    if user:
-        user.note = request.form['notes']
-        db.session.commit()
-
-        log_event(
-            'Updated notes',
-            [],
-            user
-        )
-
-        flash(
-            u'Notes set successfully.',
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
-    else:
-        flash(
-            u'Could not find user, could not set notes.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/user/<int:id>/verify')
-@admin_required
-def verifyUser(id):
-    user = User.get_by_id(id)
-
-    if user:
-        user.verified = True
-        db.session.commit()
-
-        log_event(
-            'Verified email',
-            [],
-            user
-        )
-
-        flash(
-            u'User marked as verified.',
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
-    else:
-        flash(
-            u'Could not find user, could not verify.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/user/<int:id>/demote')
-@admin_required
-def demoteUser(id):
-    user = User.get_by_id(id)
-
-    if user:
-        user.demote()
-        db.session.commit()
-
-        log_event(
-            'Demoted user',
-            [],
-            user
-        )
-
-        flash(
-            u'User demoted.',
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
-    else:
-        flash(
-            u'Could not find user, could not demote.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/user/<int:id>/promote')
-@admin_required
-def promoteUser(id):
-    user = User.get_by_id(id)
-
-    if user:
-        user.promote()
-        db.session.commit()
-
-        log_event(
-            'Promoted user',
-            [],
-            user
-        )
-
-        flash(
-            u'User promoted.',
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
-    else:
-        flash(
-            u'Could not find user, could not promote.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/user/<int:id>/add_manual_battels')
-@admin_required
-def add_manual_battels(id):
-    user = User.get_by_id(id)
-
-    if user:
-        user.add_manual_battels()
-
-        log_event(
-            'Manually set up battels',
-            [],
-            user
-        )
-
-        flash(
-            u'Battels set up for user.',
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.viewUser', id=user.id))
-    else:
-        flash(
-            u'Could not find user, could not manually set up battels.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/user/<int:id>/verify_affiliation')
-@admin_required
-def verify_affiliation(id):
-    user = User.get_by_id(id)
-
-    if user:
-        user.verify_affiliation()
-
-        log_event(
-            'Verified affiliation',
-            [],
-            user
-        )
-
-    return redirect(url_for('admin.verify_affiliations'))
-
-@admin.route('/admin/user/<int:id>/deny_affiliation')
-@admin_required
-def deny_affiliation(id):
-    user = User.get_by_id(id)
-
-    if user:
-        user.deny_affiliation()
-
-        log_event(
-            'Denied affiliation',
-            [],
-            user
-        )
-
-    return redirect(url_for('admin.verify_affiliations'))
-
-@admin.route("/admin/verify_affiliations")
-@admin_required
-def verify_affiliations():
-    users = User.query.filter(
-        User.college.has(name="Keble")
-    ).filter(
-        User.affiliation_verified == None
-    ).all()
-
-    return render_template('admin/verify_affiliations.html', users=users)
-
-@admin.route('/admin/user/<int:id>/collect', methods=['GET','POST'])
-@admin_required
-def collectTickets(id):
-    user = User.get_by_id(id)
-
-    if user:
-        return render_template(
-            'admin/collectTickets.html',
-            user=user
-        )
-    else:
-        flash(
-            u'Could not find user, could not process ticket collection.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/ticket/<int:id>/view')
-@admin.route('/admin/ticket/<int:id>/view/page/<int:eventsPage>')
-@admin_required
-def viewTicket(id, eventsPage=1):
-    ticket = Ticket.get_by_id(id)
-
-    if ticket:
-        events = ticket.log_entries \
-            .paginate(
-                eventsPage,
-                10,
-                True
-            )
-    else:
-        events = None
-
-    return render_template(
-        'admin/viewTicket.html',
-        ticket=ticket,
-        events=events,
-        eventsPage=eventsPage
-    )
-
-@admin.route('/admin/ticket/<int:id>/collect', methods=['GET', 'POST'])
-@admin_required
-def collectTicket(id):
-    if request.method != 'POST':
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-    existing = Ticket.query.filter(Ticket.barcode==request.form['barcode']).count()
-
-    if existing > 0:
-        flash(
-            u'Barcode has already been used for a ticket.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-    ticket = Ticket.get_by_id(id)
-
-    if ticket:
-        ticket.barcode = request.form['barcode']
-        ticket.collected = True
-        db.session.commit()
-
-        log_event(
-            'Collected',
-            [ticket]
-        )
-
-        flash(
-            u'Ticket marked as collected with barcode number {0}.'.format(
-                request.form['barcode']
-            ),
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.collectTickets', id=ticket.owner_id))
-    else:
-        flash(
-            u'Could not find ticket, could mark as collected.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/ticket/<int:id>/note', methods=['GET', 'POST'])
-@admin_required
-def noteTicket(id):
-    if request.method != 'POST':
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-    ticket = Ticket.get_by_id(id)
-
-    if ticket:
-        ticket.note = request.form['notes']
-        db.session.commit()
-
-        log_event(
-            'Updated notes',
-            [ticket]
-        )
-
-        flash(
-            u'Notes set successfully.',
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
-    else:
-        flash(
-            u'Could not find ticket, could not set notes.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/ticket/<int:id>/markpaid')
-@admin_required
-def markTicketPaid(id):
-    ticket = Ticket.get_by_id(id)
-
-    if ticket:
-        ticket.paid = True
-        db.session.commit()
-
-        log_event(
-            'Marked as paid',
-            [ticket]
-        )
-
-        flash(
-            u'Ticket successfully marked as paid.',
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
-    else:
-        flash(
-            u'Could not find ticket, could not mark as paid.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/ticket/<int:id>/autocancel')
-@admin_required
-def autoCancelTicket(id):
-    ticket = Ticket.get_by_id(id)
-
-    if ticket:
-        if not ticket.canBeCancelledAutomatically():
-            flash(
-                u'Could not automatically cancel ticket.',
-                'warning'
-            )
-            return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
-
-        if ticket.paymentmethod == 'Battels':
-            ticket.battels.cancel(ticket)
-        elif ticket.paymentmethod == 'Card':
-            refundResult = ticket.card_transaction.processRefund(ticket.price)
-            if not refundResult:
-                flash(
-                    u'Could not process card refund.',
-                    'warning'
-                )
-                return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
-
-        ticket.cancelled = True
-        db.session.commit()
-
-        log_event(
-            'Cancelled and refunded ticket',
-            [ticket]
-        )
-
-        flash(
-            u'Ticket cancelled successfully.',
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
-    else:
-        flash(
-            u'Could not find ticket, could not cancel.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/ticket/<int:id>/cancel')
-@admin_required
-def cancelTicket(id):
-    ticket = Ticket.get_by_id(id)
-
-    if ticket:
-        ticket.cancelled = True
-        db.session.commit()
-
-        log_event(
-            'Marked ticket as cancelled',
-            [ticket]
-        )
-
-        flash(
-            u'Ticket cancelled successfully.',
-            'success'
-        )
-        return redirect(request.referrer or url_for('admin.viewTicket', id=ticket.id))
-    else:
-        flash(
-            u'Could not find ticket, could not cancel.',
-            'warning'
-        )
-        return redirect(request.referrer or url_for('admin.adminHome'))
-
-@admin.route('/admin/ticket/validate', methods=['POST', 'GET'])
-@admin_required
-def validateTicket():
-    valid = None
-    message = None
-
-    if request.method == 'POST':
-        ticket = Ticket.query.filter(Ticket.barcode==request.form['barcode']).first()
-
-        if not ticket:
-            valid = False
-            message = "No such ticket with barcode {0}".format(request.form['barcode'])
-        elif ticket.entered:
-            valid = False
-            message = (
-                "Ticket has already been used for "
-                "entry. Check ID against {0} (owned by {1})"
-            ).format(
-                ticket.name,
-                ticket.owner.fullname
-            )
-        else:
-            ticket.entered = True
-            db.session.commit()
-            valid = True
-            message = "Permit entry for {0}".format(ticket.name)
-
-    return render_template(
-        'admin/validateTicket.html',
-        valid=valid,
-        message=message
-    )
-
-@admin.route('/admin/log/<int:id>/view')
-@admin_required
-def viewLog(id):
-    log = Log.get_by_id(id)
-
-    return render_template(
-        'admin/viewLog.html',
+@ADMIN.route('/admin/log/<int:entry_id>/view')
+@login_manager.admin_required
+def view_log(entry_id):
+    """View a log entry."""
+    log = models.Log.get_by_id(entry_id)
+
+    return flask.render_template(
+        'admin/view_log.html',
         log=log
     )
 
-@admin.route('/admin/transaction/<int:id>/view')
-@admin.route('/admin/transaction/<int:id>/view/page/<int:eventsPage>')
-@admin_required
-def viewTransaction(id, eventsPage=1):
-    transaction = CardTransaction.get_by_id(id)
+@ADMIN.route('/admin/transaction/<int:transaction_id>/view')
+@ADMIN.route(
+    '/admin/transaction/<int:transaction_id>/view/page/<int:events_page>'
+)
+@login_manager.admin_required
+def view_transaction(transaction_id, events_page=1):
+    """View a card transaction object."""
+    transaction = models.CardTransaction.get_by_id(transaction_id)
 
     if transaction:
-        events = transaction.events \
-            .paginate(
-                eventsPage,
-                10,
-                True
-            )
+        events = transaction.events.paginate(
+            events_page,
+            10,
+            True
+        )
     else:
         events = None
 
-    return render_template(
-        'admin/viewTransaction.html',
+    return flask.render_template(
+        'admin/view_transaction.html',
         transaction=transaction,
         events=events,
-        eventsPage=eventsPage
+        events_page=events_page
     )
 
-@admin.route('/admin/transaction/<int:id>/refund', methods=['GET', 'POST'])
-@admin_required
-def refundTransaction(id):
-    if request.method != 'POST':
-        return redirect(request.referrer or url_for('admin.adminHome'))
+@ADMIN.route('/admin/transaction/<int:transaction_id>/refund',
+             methods=['GET', 'POST'])
+@login_manager.admin_required
+def refund_transaction(transaction_id):
+    """Refund a transaction.
 
-    transaction = CardTransaction.get_by_id(id)
+    Allows part or full refunds for whatever reason, sends a request to eWay to
+    refund money back to the user's card.
+    """
+    if flask.request.method != 'POST':
+        return flask.redirect(flask.request.referrer or
+                              flask.url_for('admin.admin_home'))
+
+    transaction = models.CardTransaction.get_by_id(transaction_id)
 
     if transaction:
-        amount = int(request.form['refundAmountPounds']) * 100 + int(request.form['refundAmountPence'])
+        amount = helpers.parse_pounds_pence(flask.request.form,
+                                            'refund_amount_pounds',
+                                            'refund_amount_pence')
 
-        if amount > (transaction.getValue() - transaction.refunded):
-            flash(
-                u'Cannot refund more than has been charged.',
+        if amount == 0:
+            flask.flash(
+                'Cannot refund nothing.',
                 'warning'
             )
-            return redirect(request.referrer or url_for('admin.viewTransaction', id=transaction.id))
+            return flask.redirect(
+                flask.request.referrer or
+                flask.url_for('admin.view_transaction',
+                              transaction_id=transaction.transaction_id)
+            )
 
-        result = transaction.processRefund(amount)
+        if amount > (transaction.get_value() - transaction.refunded):
+            flask.flash(
+                'Cannot refund more than has been charged.',
+                'warning'
+            )
+            return flask.redirect(
+                flask.request.referrer or
+                flask.url_for('admin.view_transaction',
+                              transaction_id=transaction.transaction_id)
+            )
+
+        result = transaction.process_refund(amount)
 
         if not result:
-            flash(
-                u'Could not process refund.',
+            flask.flash(
+                'Could not process refund.',
                 'warning'
             )
-        else:flash(
-                u'Refund processed successfully.',
+        else:
+            flask.flash(
+                'Refund processed successfully.',
                 'success'
             )
-        return redirect(request.referrer or url_for('admin.viewTransaction', id=transaction.id))
+
+        return flask.redirect(
+            flask.request.referrer or
+            flask.url_for('admin.view_transaction',
+                          transaction_id=transaction.transaction_id)
+        )
     else:
-        flash(
-            u'Could not find transaction, could not cancel.',
+        flask.flash(
+            'Could not find transaction, could not refund.',
             'warning'
         )
-        return redirect(request.referrer or url_for('admin.adminHome'))
+        return flask.redirect(flask.request.referrer or
+                              flask.url_for('admin.admin_home'))
 
-@admin.route('/admin/statistics')
-@admin_required
+@ADMIN.route('/admin/statistics')
+@login_manager.admin_required
 def statistics():
-    totalValue = db.session \
-        .query(func.sum(Ticket.price)) \
-        .filter(Ticket.cancelled != True) \
-        .scalar()
+    """Display statistics about the ball.
 
-    if totalValue is None:
-        totalValue = 0
+    Computes a number of statistics about the ball (live), and displays them
+    alongside graphs.
+    """
+    total_value = DB.session.query(
+        sqlalchemy.func.sum(models.Ticket.price)
+    ).filter(
+        models.Ticket.cancelled != True
+    ).scalar()
 
-    paidValue = db.session \
-        .query(func.sum(Ticket.price)) \
-        .filter(Ticket.paid == True) \
-        .filter(Ticket.cancelled != True) \
-        .scalar()
+    if total_value is None:
+        total_value = 0
 
-    if paidValue is None:
-        paidValue = 0
+    paid_value = DB.session.query(
+        sqlalchemy.func.sum(models.Ticket.price)
+    ).filter(
+        models.Ticket.paid == True
+    ).filter(
+        models.Ticket.cancelled != True
+    ).scalar()
 
-    cancelledValue = db.session \
-        .query(func.sum(Ticket.price)) \
-        .filter(Ticket.cancelled == True) \
-        .scalar()
+    if paid_value is None:
+        paid_value = 0
 
-    if cancelledValue is None:
-        cancelledValue = 0
+    cancelled_value = DB.session.query(
+        sqlalchemy.func.sum(models.Ticket.price)
+    ).filter(
+        models.Ticket.cancelled == True
+    ).scalar()
 
-    paymentMethodValues = db.session \
-        .query(func.sum(Ticket.price), Ticket.paymentmethod) \
-        .filter(Ticket.cancelled != True) \
-        .group_by(Ticket.paymentmethod) \
-        .all()
+    if cancelled_value is None:
+        cancelled_value = 0
 
-    return render_template(
+    payment_method_values = DB.session.query(
+        sqlalchemy.func.sum(models.Ticket.price), models.Ticket.payment_method
+    ).filter(
+        models.Ticket.cancelled != True
+    ).group_by(
+        models.Ticket.payment_method
+    ).all()
+
+    return flask.render_template(
         'admin/statistics.html',
-        totalValue=totalValue,
-        paidValue=paidValue,
-        cancelledValue=cancelledValue,
-        paymentMethodValues=paymentMethodValues
+        total_value=total_value,
+        paid_value=paid_value,
+        cancelled_value=cancelled_value,
+        payment_method_values=payment_method_values
     )
 
-@admin.route('/admin/announcements', methods=['GET','POST'])
-@admin.route('/admin/announcements/page/<int:page>', methods=['GET','POST'])
-@admin_required
+@ADMIN.route('/admin/announcements', methods=['GET', 'POST'])
+@ADMIN.route('/admin/announcements/page/<int:page>', methods=['GET', 'POST'])
+@login_manager.admin_required
 def announcements(page=1):
+    """Manage announcements.
+
+    Allows the creation of announcements, viewing and deleting existing
+    announcements, and cancelling email sending for existing announcements.
+    """
     form = {}
 
-    if request.method == 'POST':
-        form = request.form
+    if flask.request.method == 'POST':
+        form = flask.request.form
 
         success = True
 
         if 'subject' not in form or form['subject'] == '':
-            flash(
-                u'Subject must not be blank',
+            flask.flash(
+                'Subject must not be blank',
                 'warning'
             )
             success = False
 
         if 'message' not in form or form['message'] == '':
-            flash(
-                u'Message must not be blank',
+            flask.flash(
+                'Message must not be blank',
                 'warning'
             )
             success = False
 
         if 'tickets' in form and form['tickets'] == 'no':
             if 'collected' in form and form['collected'] == 'yes':
-                flash(
-                    u'A person cannot have no tickets and have collected tickets',
+                flask.flash(
+                    (
+                        'A person cannot have no tickets and have collected '
+                        'tickets'
+                    ),
                     'warning'
                 )
                 success = False
             if 'uncollected' in form and form['uncollected'] == 'yes':
-                flash(
-                    u'A person cannot have no tickets and have uncollected tickets',
+                flask.flash(
+                    (
+                        'A person cannot have no tickets and have uncollected '
+                        'tickets'
+                    ),
                     'warning'
                 )
                 success = False
@@ -1033,12 +570,12 @@ def announcements(page=1):
                 elif form['uncollected'] == 'no':
                     has_uncollected = False
 
-            send_email = 'sendEmails' in form and form['sendEmails'] == 'yes'
+            send_email = 'send_emails' in form and form['send_emails'] == 'yes'
 
-            announcement = Announcement(
+            announcement = models.Announcement(
                 form['subject'],
                 form['message'],
-                current_user,
+                login.current_user.object_id,
                 send_email,
                 college,
                 affiliation,
@@ -1048,75 +585,91 @@ def announcements(page=1):
                 has_uncollected
             )
 
-            db.session.add(announcement)
-            db.session.commit()
+            DB.session.add(announcement)
+            DB.session.commit()
 
-            flash(
-                u'Announcement created successfully',
+            flask.flash(
+                'Announcement created successfully',
                 'success'
             )
 
             form = {}
 
-    return render_template(
+    return flask.render_template(
         'admin/announcements.html',
-        colleges=College.query.all(),
-        affiliations=Affiliation.query.all(),
-        announcements=Announcement.query.paginate(page, 10, False),
+        colleges=models.College.query.all(),
+        affiliations=models.Affiliation.query.all(),
+        announcements=models.Announcement.query.paginate(page, 10, False),
         form=form
     )
 
-@admin.route('/admin/announcement/<int:id>/delete')
-@admin_required
-def deleteAnnouncement(id):
-    announcement = Announcement.get_by_id(id)
+@ADMIN.route('/admin/announcement/<int:announcement_id>/delete')
+@login_manager.admin_required
+def delete_announcement(announcement_id):
+    """Delete an announcement.
+
+    Removes an announcement from the database, but cannot recall any emails
+    which have already been sent
+    """
+    announcement = models.Announcement.get_by_id(announcement_id)
 
     if announcement:
-        db.session.delete(announcement)
-        db.session.commit()
+        DB.session.delete(announcement)
+        DB.session.commit()
 
-        flash(
-            u'Announcement deleted successfully',
+        flask.flash(
+            'Announcement deleted successfully',
             'success'
         )
     else:
-        flash(
-            u'Could not find announcement, could not delete',
+        flask.flash(
+            'Could not find announcement, could not delete',
             'warning'
         )
 
-    return redirect(request.referrer or url_for('admin.announcements'))
+    return flask.redirect(flask.request.referrer or
+                          flask.url_for('admin.announcements'))
 
-@admin.route('/admin/announcement/<int:id>/cancel')
-@admin_required
-def cancelAnnouncementEmails(id):
-    announcement = Announcement.get_by_id(id)
+@ADMIN.route('/admin/announcement/<int:announcement_id>/cancel')
+@login_manager.admin_required
+def cancel_announcement_emails(announcement_id):
+    """Cancel sending emails for an announcement.
+
+    Remove from the sending queue any pending emails for an announcement. Does
+    not recall previously sent emails.
+    """
+    announcement = models.Announcement.get_by_id(announcement_id)
 
     if announcement:
         announcement.emails = []
         announcement.send_email = False
-        db.session.commit()
+        DB.session.commit()
 
-        flash(
-            u'Announcement emails cancelled successfully',
+        flask.flash(
+            'Announcement emails cancelled successfully',
             'success'
         )
     else:
-        flash(
-            u'Could not find announcement, could not cancel emails',
+        flask.flash(
+            'Could not find announcement, could not cancel emails',
             'warning'
         )
 
-    return redirect(request.referrer or url_for('admin.announcements'))
+    return flask.redirect(flask.request.referrer or
+                          flask.url_for('admin.announcements'))
 
-@admin.route('/admin/vouchers', methods=['GET','POST'])
-@admin.route('/admin/vouchers/page/<int:page>', methods=['GET','POST'])
-@admin_required
+@ADMIN.route('/admin/vouchers', methods=['GET', 'POST'])
+@ADMIN.route('/admin/vouchers/page/<int:page>', methods=['GET', 'POST'])
+@login_manager.admin_required
 def vouchers(page=1):
+    """Manage vouchers.
+
+    Handles the creation of discount vouchers, and allows their deletion.
+    """
     form = {}
 
-    if request.method == 'POST':
-        form = request.form
+    if flask.request.method == 'POST':
+        form = flask.request.form
 
         success = True
 
@@ -1124,286 +677,209 @@ def vouchers(page=1):
 
         if 'expires' in form and form['expires'] != '':
             try:
-                expires = parse(form['expires'])
-                if expires < datetime.utcnow():
-                    flash(
-                        u'Expiry date cannot be in the past',
+                expires = parser.parse(form['expires'])
+                if expires < datetime.datetime.utcnow():
+                    flask.flash(
+                        'Expiry date cannot be in the past',
                         'warning'
                     )
                     success = False
-            except KeyError, ValueError:
-                flash(
-                    u'Could not parse expiry date',
+            except (KeyError, ValueError) as _:
+                flask.flash(
+                    'Could not parse expiry date',
                     'warning'
                 )
                 success = False
 
-        if 'voucherType' not in form or form['voucherType'] == '':
-            flash(
-                u'You must select a discout type',
+        if 'voucher_type' not in form or form['voucher_type'] == '':
+            flask.flash(
+                'You must select a discount type',
                 'warning'
             )
             success = False
-        elif form['voucherType'] == 'Fixed Price':
-            value = int(form['fixedPricePounds']) * 100 + int(form['fixedPricePence'])
-        elif form['voucherType'] == 'Fixed Discount':
-            value = int(form['fixedDiscountPounds']) * 100 + int(form['fixedDiscountPence'])
+        elif form['voucher_type'] == 'Fixed Price':
+            value = helpers.parse_pounds_pence(flask.request.form,
+                                               'fixed_price_pounds',
+                                               'fixed_price_pence')
+        elif form['voucher_type'] == 'Fixed Discount':
+            value = helpers.parse_pounds_pence(flask.request.form,
+                                               'fixed_discount_pounds',
+                                               'fixed_discount_pence')
+
+            if value == 0:
+                flask.flash(
+                    'Cannot give no discount',
+                    'warning'
+                )
+                success = False
         else:
-            value = int(form['fixedDiscount'])
-            if value > 100:
-                flash(
-                    u'Cannot give greater than 100% discount',
+            try:
+                value = int(form['fixed_discount'])
+            except ValueError:
+                value = 0
+
+            if value == 0:
+                flask.flash(
+                    'Cannot give 0% discount',
+                    'warning'
+                )
+                success = False
+            elif value > 100:
+                flask.flash(
+                    'Cannot give greater than 100% discount',
                     'warning'
                 )
                 success = False
 
-        if not re.match('[a-zA-Z0-9]+',form['voucherPrefix']):
-            flash(
-                u'Voucher prefix must be non-empty and contain only letters and numbers',
+        if not re.match('[a-zA-Z0-9]+', form['voucher_prefix']):
+            flask.flash(
+                (
+                    'Voucher prefix must be non-empty and contain only '
+                    'letters and numbers'
+                ),
                 'warning'
             )
             success = False
 
         if success:
-            numVouchers = int(form['numVouchers'])
-            singleUse = 'singleUse' in form and form['singleUse'] == 'yes'
+            num_vouchers = int(form['num_vouchers'])
+            single_use = 'single_use' in form and form['single_use'] == 'yes'
 
-            for i in xrange(numVouchers):
-                key = generate_key(10)
-                voucher = Voucher(
+            for _ in xrange(num_vouchers):
+                key = helpers.generate_key(10)
+                voucher = models.Voucher(
                     '{0}-{1}'.format(
-                        form['voucherPrefix'],
+                        form['voucher_prefix'],
                         key
                     ),
                     expires,
-                    form['voucherType'],
+                    form['voucher_type'],
                     value,
-                    form['appliesTo'],
-                    singleUse
+                    form['applies_to'],
+                    single_use
                 )
-                db.session.add(voucher)
+                DB.session.add(voucher)
 
-            db.session.commit()
+            DB.session.commit()
 
-            flash(
-                u'Voucher(s) created successfully',
+            flask.flash(
+                'Voucher(s) created successfully',
                 'success'
             )
 
             form = {}
 
-    vouchers = Voucher.query
+    voucher_query = models.Voucher.query
 
-    if 'search' in request.args:
-        vouchers = vouchers.filter(
-            Voucher.code.like(
+    if 'search' in flask.request.args:
+        voucher_query = voucher_query.filter(
+            models.Voucher.code.like(
                 '%{0}%'.format(
-                    request.args['search']
+                    flask.request.args['search']
                 )
             )
         )
 
-    vouchers = vouchers.paginate(
+    voucher_results = voucher_query.paginate(
         page,
         10
     )
 
-    return render_template(
+    return flask.render_template(
         'admin/vouchers.html',
         form=form,
-        vouchers=vouchers
+        vouchers=voucher_results
     )
 
-@admin.route('/admin/voucher/<int:id>/delete')
-@admin_required
-def deleteVoucher(id):
-    voucher = Voucher.get_by_id(id)
+@ADMIN.route('/admin/voucher/<int:voucher_id>/delete')
+@login_manager.admin_required
+def delete_voucher(voucher_id):
+    """Delete a discount voucher."""
+    voucher = models.Voucher.get_by_id(voucher_id)
 
     if voucher:
-        db.session.delete(voucher)
-        db.session.commit()
-        flash(
-            u'Voucher deleted successfully',
+        DB.session.delete(voucher)
+        DB.session.commit()
+        flask.flash(
+            'Voucher deleted successfully',
             'success'
         )
     else:
-        flash(
-            u'Could not find voucher to delete',
+        flask.flash(
+            'Could not find voucher to delete',
             'warning'
         )
 
-    return redirect(request.referrer or url_for('admin.vouchers'))
+    return flask.redirect(flask.request.referrer or
+                          flask.url_for('admin.vouchers'))
 
-@admin.route('/admin/waiting/<int:id>/delete')
-@admin_required
-def deleteWaiting(id):
-    waiting = Waiting.get_by_id(id)
+@ADMIN.route('/admin/waiting/<int:entry_id>/delete')
+@login_manager.admin_required
+def delete_waiting(entry_id):
+    """Delete an entry from the waiting list."""
+    waiting = models.Waiting.get_by_id(entry_id)
 
     if waiting:
-        db.session.delete(waiting)
-        db.session.commit()
-        flash(
-            u'Waiting list entry deleted',
+        DB.session.delete(waiting)
+        DB.session.commit()
+        flask.flash(
+            'Waiting list entry deleted',
             'success'
         )
     else:
-        flash(
-            u'Waiting list entry not found, could not delete.',
+        flask.flash(
+            'Waiting list entry not found, could not delete.',
             'error'
         )
 
-    return redirect(request.referrer or url_for('admin.adminHome'))
+    return flask.redirect(flask.request.referrer or
+                          flask.url_for('admin.admin_home'))
 
-@admin.route('/admin/graphs/sales')
-@admin_required
-def graphSales():
-    statistics = Statistic.query \
-        .filter(Statistic.group == 'Sales') \
-        .order_by(Statistic.timestamp) \
-        .all()
+@ADMIN.route('/admin/graphs/sales')
+@login_manager.admin_required
+def graph_sales():
+    """Render a graph showing sales statistics
 
-    statisticKeys = [
-        ('Available', 'g-'),
-        ('Ordered', 'b-'),
-        ('Paid', 'r-'),
-        ('Cancelled', 'y-'),
-        ('Collected', 'c-'),
-        ('Waiting', 'm-')
-    ]
+    Shows statistics for number of tickets Available, Ordered, Paid, Collected,
+    and Cancelled, plus the length of the waiting list.
+    """
+    return statistic_plots.create_plot('Sales')
 
-    plots = {
-        key: {
-            'timestamps': [],
-            'datapoints': [],
-            'line': line,
-            'currentValue': 0
-        } for (key, line) in statisticKeys
-    }
+@ADMIN.route('/admin/graphs/colleges')
+@login_manager.admin_required
+def graph_colleges():
+    """Render graph showing statistics on users' colleges.
 
-    for statistic in statistics:
-        plots[statistic.statistic]['timestamps'].append(statistic.timestamp)
-        plots[statistic.statistic]['datapoints'].append(statistic.value)
-        plots[statistic.statistic]['currentValue'] = statistic.value
+    Shows how many users are registered from each college.
+    """
+    return statistic_plots.create_plot('Colleges')
 
-    return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
+@ADMIN.route('/admin/graphs/payments')
+@login_manager.admin_required
+def graph_payments():
+    """Render graph showing payment statistics.
 
-@admin.route('/admin/graphs/colleges')
-@admin_required
-def graphColleges():
-    statistics = Statistic.query \
-        .filter(Statistic.group == 'Colleges') \
-        .order_by(Statistic.timestamp) \
-        .all()
+    Shows how many tickets have been paid for by each payment method.
+    """
+    return statistic_plots.create_plot('Payments')
 
-    statisticKeys = [
-        ("All Souls", "r^-"),
-        ("Balliol", "g^-"),
-        ("Blackfriars", "b^-"),
-        ("Brasenose", "c^-"),
-        ("Campion Hall", "m^-"),
-        ("Christ Church", "y^-"),
-        ("Corpus Christi", "ro-"),
-        ("Exeter", "go-"),
-        ("Green Templeton", "bo-"),
-        ("Harris Manchester", "co-"),
-        ("Hertford", "mo-"),
-        ("Jesus", "yo-"),
-        ("Keble", "rs-"),
-        ("Kellogg", "gs-"),
-        ("Lady Margaret Hall", "bs-"),
-        ("Linacre", "cs-"),
-        ("Lincoln", "ms-"),
-        ("Magdelen", "ys-"),
-        ("Mansfield", "r*-"),
-        ("Merton", "g*-"),
-        ("New", "b*-"),
-        ("Nuffield", "c*-"),
-        ("Oriel", "m*-"),
-        ("Pembroke", "y*-"),
-        ("Queen's", "r+-"),
-        ("Regent's Park", "g+-"),
-        ("Somerville", "b+-"),
-        ("St Anne's", "c+-"),
-        ("St Antony's", "m+-"),
-        ("St Benet's Hall", "y+-"),
-        ("St Catherine's", "rx-"),
-        ("St Cross", "gx-"),
-        ("St Edmund Hall", "bx-"),
-        ("St Hilda's", "cx-"),
-        ("St Hugh's", "mx-"),
-        ("St John's", "yx-"),
-        ("St Peter's", "rD-"),
-        ("St Stephen's House", "gD-"),
-        ("Trinity", "bD-"),
-        ("University", "cD-"),
-        ("Wadham", "mD-"),
-        ("Wolfson", "yD-"),
-        ("Worcester", "rH-"),
-        ("Wycliffe Hall", "gH-"),
-        ("Other", "bH-"),
-        ("None", "cH-")
-    ]
-
-    plots = {
-        key: {
-            'timestamps': [],
-            'datapoints': [],
-            'line': line,
-            'currentValue': 0
-        } for (key, line) in statisticKeys
-    }
-
-    for statistic in statistics:
-        plots[statistic.statistic]['timestamps'].append(statistic.timestamp)
-        plots[statistic.statistic]['datapoints'].append(statistic.value)
-        plots[statistic.statistic]['currentValue'] = statistic.value
-
-    return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
-
-@admin.route('/admin/graphs/payments')
-@admin_required
-def graphPayments():
-    statistics = Statistic.query \
-        .filter(Statistic.group == 'Payments') \
-        .order_by(Statistic.timestamp) \
-        .all()
-
-    statisticKeys = [
-        ('Battels', 'g-'),
-        ('Card', 'b-'),
-        ('Cash', 'r-'),
-        ('Cheque', 'y-'),
-        ('Free', 'c-')
-    ]
-
-    plots = {
-        key: {
-            'timestamps': [],
-            'datapoints': [],
-            'line': line,
-            'currentValue': 0
-        } for (key, line) in statisticKeys
-    }
-
-    for statistic in statistics:
-        plots[statistic.statistic]['timestamps'].append(statistic.timestamp)
-        plots[statistic.statistic]['datapoints'].append(statistic.value)
-        plots[statistic.statistic]['currentValue'] = statistic.value
-
-    return create_plot(plots, statistics[0].timestamp, statistics[-1].timestamp)
-
-@admin.route('/admin/data/<group>')
-@admin_required
+@ADMIN.route('/admin/data/<group>')
+@login_manager.admin_required
 def data(group):
-    statistics = Statistic.query \
-        .filter(Statistic.group == group.title()) \
-        .order_by(Statistic.timestamp) \
-        .all()
+    """Export statistics as CSV.
 
-    csvdata = StringIO()
+    Exports the statistics used to render the graphs as a CSV file.
+    """
+    stats = models.Statistic.query.filter(
+        models.Statistic.group == group.title()
+    ).order_by(
+        models.Statistic.timestamp
+    ).all()
+
+    csvdata = StringIO.StringIO()
     csvwriter = csv.writer(csvdata)
 
-    for stat in statistics:
+    for stat in stats:
         csvwriter.writerow(
             [
                 stat.timestamp.strftime('%c'),
@@ -1413,4 +889,4 @@ def data(group):
         )
 
     csvdata.seek(0)
-    return send_file(csvdata, mimetype="text/csv", cache_timeout=900)
+    return flask.send_file(csvdata, mimetype='text/csv', cache_timeout=900)

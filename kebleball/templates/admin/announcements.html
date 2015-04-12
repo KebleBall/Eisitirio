@@ -26,7 +26,7 @@
                         <select name="college" id="college">
                             <option value="any" {{ form_selected(form, 'college', 'any') }}>Any</option>
                             {% for college in colleges %}
-                                <option value="{{ college.id }}" {{ form_selected(form, 'college', college.id) }}>{{ college.name }}</option>
+                                <option value="{{ college.object_id }}" {{ form_selected(form, 'college', college.object_id) }}>{{ college.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -35,7 +35,7 @@
                         <select name="affiliation" id="affiliation">
                             <option value="any" {{ form_selected(form, 'affiliation', 'any') }}>Any</option>
                             {% for affiliation in affiliations %}
-                                <option value="{{ affiliation.id }}" {{ form_selected(form, 'affiliation', affiliation.id) }}>{{ affiliation.name }}</option>
+                                <option value="{{ affiliation.object_id }}" {{ form_selected(form, 'affiliation', affiliation.object_id) }}>{{ affiliation.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -76,7 +76,7 @@
                 </div>
                 <div class="row">
                     <div class="large-6 columns">
-                        <label for="sendEmails"><input type="checkbox" id="sendEmails" name="sendEmails" value="yes" {{ form_checked(form, 'sendEmails', 'yes') }}/> Send Emails</label>
+                        <label for="send_emails"><input type="checkbox" id="send_emails" name="send_emails" value="yes" {{ form_checked(form, 'send_emails', 'yes') }}/> Send Emails</label>
                     </div>
                     <div class="large-6 columns">
                         <input type="submit" class="button small right">
@@ -95,7 +95,7 @@
             {% endif %}
         </p>
         {% if announcements.items %}
-            <table id="announcementsTable">
+            <table id="announcements_table">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -185,10 +185,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('dashboard.announcement', announcementID=announcement.id) }}" class="button tiny">View</a>
-                                <a href="{{ url_for('admin.deleteAnnouncement', id=announcement.id) }}" class="button tiny">Delete</a>
+                                <a href="{{ url_for('dashboard.display_announcement', announcement_id=announcement.object_id) }}" class="button tiny">View</a>
+                                <a href="{{ url_for('admin.delete_announcement', announcement_id=announcement.object_id) }}" class="button tiny">Delete</a>
                                 {% if announcement.send_email and not announcement.email_sent %}
-                                    <a href="{{ url_for('admin.cancelAnnouncementEmails', id=announcement.id) }}" class="button tiny">Cancel Emails</a>
+                                    <a href="{{ url_for('admin.cancel_announcement_emails', announcement_id=announcement.object_id) }}" class="button tiny">Cancel Emails</a>
                                 {% endif %}
                             </td>
                         </tr>

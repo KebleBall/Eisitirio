@@ -9,9 +9,11 @@ Also includes helper functions for augmenting a flask.config.Config object to
 automatically deal with Until objects
 """
 
+from __future__ import unicode_literals
+
 import datetime
 
-from flask import config
+import flask
 
 class Until(object):
     """Config helper class to handle config values changing at set times."""
@@ -47,9 +49,9 @@ def augment_config(app):
     old_getitem = app.config.__getitem__
 
     app.config.__class__ = type(
-        "Config",
-        (config.Config,),
-        {"__getitem__": (lambda self, k: parse_until(old_getitem(k)))}
+        b'Config',
+        (flask.config.Config,),
+        {'__getitem__': (lambda self, k: parse_until(old_getitem(k)))}
     )
 
     old_get = app.config.get

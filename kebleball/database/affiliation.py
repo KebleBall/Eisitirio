@@ -1,21 +1,21 @@
 # coding: utf-8
-"""
-affiliation.py
+"""Database model for representing a users affiliation to their college."""
 
-Contains Affiliation class
-Used to denote users' affiliations with their colleges
-"""
+from __future__ import unicode_literals
 
 from kebleball.database import db
 
-class Affiliation(db.Model):
-    id = db.Column(
-        db.Integer(),
+DB = db.DB
+
+class Affiliation(DB.Model):
+    """Model for representing a users affiliation to their college."""
+    object_id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    name = db.Column(
-        db.String(25),
+    name = DB.Column(
+        DB.Unicode(25),
         nullable=False
     )
 
@@ -23,11 +23,14 @@ class Affiliation(db.Model):
         self.name = name
 
     def __repr__(self):
-        return "<Affiliation {0}: {1}>".format(self.id, self.name)
+        return '<Affiliation {0}: {1}>'.format(self.object_id, self.name)
 
     @staticmethod
-    def get_by_id(id):
-        affiliation = Affiliation.query.filter(Affiliation.id==int(id)).first()
+    def get_by_id(object_id):
+        """Get and Affiliation object by its database ID."""
+        affiliation = Affiliation.query.filter(
+            Affiliation.object_id == int(object_id)
+        ).first()
 
         if not affiliation:
             return None

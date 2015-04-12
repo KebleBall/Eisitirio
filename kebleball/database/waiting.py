@@ -1,84 +1,86 @@
 # coding: utf-8
-"""
-waiting.py
+"""Database model for entries on the waiting list."""
 
-Contains Waiting class
-Used to store data about users waiting for tickets
-"""
+from __future__ import unicode_literals
+
+import datetime
 
 from kebleball.database import db
-from kebleball.database.user import User
-from datetime import datetime
 
-class Waiting(db.Model):
-    id = db.Column(
-        db.Integer(),
+DB = db.DB
+
+class Waiting(DB.Model):
+    """Model for entries on the waiting list."""
+    object_id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    waitingsince = db.Column(
-        db.DateTime(),
+    waiting_since = DB.Column(
+        DB.DateTime(),
         nullable=False
     )
-    waitingfor = db.Column(
-        db.Integer(),
+    waiting_for = DB.Column(
+        DB.Integer(),
         nullable=False
     )
 
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    user_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
         nullable=False
     )
-    user = db.relationship(
+    user = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'waiting',
             lazy='dynamic'
         ),
         foreign_keys=[user_id]
     )
 
-    referrer_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    referrer_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
-    referrer = db.relationship(
+    referrer = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'waiting_referrals',
             lazy='dynamic'
         ),
         foreign_keys=[referrer_id]
     )
 
-    def __init__(self, user, waitingfor, referrer=None):
-        if hasattr(user, 'id'):
-            self.user_id = user.id
+    def __init__(self, user, waiting_for, referrer=None):
+        if hasattr(user, 'object_id'):
+            self.user_id = user.object_id
         else:
             self.user_id = user
 
-        if hasattr(referrer, 'id'):
-            self.referrer_id = referrer.id
+        if hasattr(referrer, 'object_id'):
+            self.referrer_id = referrer.object_id
         else:
             self.referrer_id = referrer
 
-        self.waitingfor = waitingfor
+        self.waiting_for = waiting_for
 
-        self.waitingsince = datetime.utcnow()
+        self.waiting_since = datetime.datetime.utcnow()
 
     def __repr__(self):
-        return '<Waiting: {0} {1} for {2} ticket{3}>'.format(
-            self.user.firstname,
-            self.user.surname,
-            self.waitingfor,
-            '' if self.waitingfor == 1 else 's'
+        return '<Waiting: {0} for {1} ticket{2}>'.format(
+            self.user.full_name,
+            self.waiting_for,
+            '' if self.waiting_for == 1 else 's'
         )
 
     @staticmethod
-    def get_by_id(id):
-        waiting = Waiting.query.filter(Waiting.id==int(id)).first()
+    def get_by_id(object_id):
+        """Get a waiting object by its database ID."""
+        waiting = Waiting.query.filter(
+            Waiting.object_id == int(object_id)
+        ).first()
 
         if not waiting:
             return None

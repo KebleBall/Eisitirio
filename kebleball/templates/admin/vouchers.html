@@ -9,8 +9,8 @@
         <form action="{{ url_for('admin.vouchers') }}" method="post">
             <div class="row">
                 <div class="large-6 columns">
-                    <label for="voucherPrefix">Voucher Prefix</label>
-                    <input type="text" name="voucherPrefix" id="voucherPrefix" {{ form_value(form,'voucherPrefix') }}/>
+                    <label for="voucher_prefix">Voucher Prefix</label>
+                    <input type="text" name="voucher_prefix" id="voucher_prefix" {{ form_value(form,'voucher_prefix') }}/>
                 </div>
                 <div class="large-6 columns">
                     <label for="expires">Expires (leave blank for never)</label>
@@ -19,21 +19,21 @@
             </div>
             <div class="row">
                 <div class="large-4 columns">
-                    <label for="numVouchers">Number of Vouchers</label>
-                    <input type="number" min="1" step="1" value="1" name="numVouchers" id="numVouchers" {{ form_value(form,'numVouchers') }}/>
+                    <label for="num_vouchers">Number of Vouchers</label>
+                    <input type="number" min="1" step="1" value="1" name="num_vouchers" id="num_vouchers" {{ form_value(form,'num_vouchers') }}/>
                 </div>
                 <div class="large-4 columns">
-                    <label for="appliesTo">Applies To</label>
-                    <select id="appliesTo" name="appliesTo">
-                        <option value="Ticket" {{ form_selected(form,'appliesTo','Ticket') }}>Single Ticket</option>
-                        <option value="Transaction" {{ form_selected(form,'appliesTo','Transaction') }}>All Tickets in Transaction</option>
+                    <label for="applies_to">Applies To</label>
+                    <select id="applies_to" name="applies_to">
+                        <option value="Ticket" {{ form_selected(form,'applies_to','Ticket') }}>Single Ticket</option>
+                        <option value="Transaction" {{ form_selected(form,'applies_to','Transaction') }}>All Tickets in Transaction</option>
                     </select>
                 </div>
                 <div class="large-4 columns">
-                    <label for="singleUse">Single Use</label>
-                    <select name="singleUse" id="singleUse">
-                        <option value="yes" {{ form_selected(form,'singleUse','yes') }}>Yes</option>
-                        <option value="no" {{ form_selected(form,'singleUse','no') }}>No</option>
+                    <label for="single_use">Single Use</label>
+                    <select name="single_use" id="single_use">
+                        <option value="yes" {{ form_selected(form,'single_use','yes') }}>Yes</option>
+                        <option value="no" {{ form_selected(form,'single_use','no') }}>No</option>
                     </select>
                 </div>
             </div>
@@ -41,8 +41,8 @@
                 <legend>Discount Type</legend>
                 <div class="row">
                     <div class="large-4 columns">
-                        <label for="fixedPrice">
-                            <input type="radio" name="voucherType" id="fixedPrice" value="Fixed Price" {{ form_checked(form,'voucherType','Fixed Price') }}/>
+                        <label for="fixed_price">
+                            <input type="radio" name="voucher_type" id="fixed_price" value="Fixed Price" {{ form_checked(form,'voucher_type','Fixed Price') }}/>
                             Fixed Price
                         </label>
                         <div class="row collapse">
@@ -50,19 +50,19 @@
                                 <span class="prefix">&pound;</span>
                             </div>
                             <div class="small-4 columns">
-                                <input type="number" name="fixedPricePounds" min="0" step="1" {{ form_value(form,'fixedPricePounds','0') }}/>
+                                <input type="number" name="fixed_price_pounds" min="0" step="1" {{ form_value(form,'fixed_price_pounds','0') }}/>
                             </div>
                             <div class="small-1 columns">
                                 <span class="prefix postfix">.</span>
                             </div>
                             <div class="small-4 columns">
-                                <input type="number" name="fixedPricePence" min="0" max="99" step="1" {{ form_value(form,'fixedPricePence','0') }}/>
+                                <input type="number" name="fixed_price_pence" min="0" max="99" step="1" {{ form_value(form,'fixed_price_pence','0') }}/>
                             </div>
                         </div>
                     </div>
                     <div class="large-4 columns">
-                        <label for="fixedDiscount">
-                            <input type="radio" name="voucherType" id="fixedDiscount" value="Fixed Discount" {{ form_checked(form,'voucherType','Fixed Discount') }}/>
+                        <label for="fixed_discount">
+                            <input type="radio" name="voucher_type" id="fixed_discount" value="Fixed Discount" {{ form_checked(form,'voucher_type','Fixed Discount') }}/>
                             Fixed Discount
                         </label>
                         <div class="row collapse">
@@ -70,24 +70,24 @@
                                 <span class="prefix">&pound;</span>
                             </div>
                             <div class="small-4 columns">
-                                <input type="number" name="fixedDiscountPounds" min="0" step="1" {{ form_value(form,'fixedDiscountPounds','0') }}/>
+                                <input type="number" name="fixed_discount_pounds" min="0" step="1" {{ form_value(form,'fixed_discount_pounds','0') }}/>
                             </div>
                             <div class="small-1 columns">
                                 <span class="prefix postfix">.</span>
                             </div>
                             <div class="small-4 columns">
-                                <input type="number" name="fixedDiscountPence" min="0" max="99" step="1" {{ form_value(form,'fixedDiscountPence','0') }}/>
+                                <input type="number" name="fixed_discount_pence" min="0" max="99" step="1" {{ form_value(form,'fixed_discount_pence','0') }}/>
                             </div>
                         </div>
                     </div>
                     <div class="large-4 columns">
-                        <label for="percentageDiscount">
-                            <input type="radio" name="voucherType" id="percentageDiscount" value="Percentage Discount" {{ form_checked(form,'voucherType','Percentage Discount') }}/>
+                        <label for="percentage_discount">
+                            <input type="radio" name="voucher_type" id="percentage_discount" value="Percentage Discount" {{ form_checked(form,'voucher_type','Percentage Discount') }}/>
                             Percentage Discount
                         </label>
                         <div class="row collapse">
                             <div class="small-9 columns">
-                                <input type="number" name="fixedDiscount" min="0" max="100" step="1" {{ form_value(form,'fixedDiscount','0') }}/>
+                                <input type="number" name="fixed_discount" min="0" max="100" step="1" {{ form_value(form,'fixed_discount','0') }}/>
                             </div>
                             <div class="small-3 columns">
                                 <span class="postfix">%</span>
@@ -128,7 +128,7 @@
             </div>
         </div>
         {% if vouchers.items %}
-            <table id="vouchersTable">
+            <table id="vouchers_table">
                 <thead>
                     <tr>
                         <th>Code</th>
@@ -146,14 +146,14 @@
                         <tr>
                             <td>{{ voucher.code }}</td>
                             <td>
-                                {{ voucher.discounttype }}:
-                                {% if voucher.discounttype == 'Percentage Discount' %}
-                                    {{ voucher.discountvalue }}%
+                                {{ voucher.discount_type }}:
+                                {% if voucher.discount_type == 'Percentage Discount' %}
+                                    {{ voucher.discount_value }}%
                                 {% else %}
-                                    &pound;{{ '%.02f' % (voucher.discountvalue / 100) }}
+                                    &pound;{{ '%.02f' % (voucher.discount_value / 100) }}
                                 {% endif %}
                             </td>
-                            <td>{{ voucher.appliesto }}</td>
+                            <td>{{ voucher.applies_to }}</td>
                             <td>
                                 {% if voucher.expires != None %}
                                     {{ voucher.expires.strftime('%c') }}
@@ -161,17 +161,17 @@
                                     Never
                                 {% endif %}
                             </td>
-                            <td>{% if voucher.singleuse %}Yes{% else %}No{% endif %}</td>
+                            <td>{% if voucher.single_use %}Yes{% else %}No{% endif %}</td>
                             <td>{% if voucher.used %}Yes{% else %}No{% endif %}</td>
                             <td>
                                 {% if voucher.used_by_id != None %}
-                                    <a href="{{ url_for('admin.viewUser', id=voucher.used_by_id) }}">{{ voucher.used_by.fullname }}</a>
+                                    <a href="{{ url_for('admin_users.view_user', user_id=voucher.used_by_id) }}">{{ voucher.used_by.full_name }}</a>
                                 {% else %}
                                     N/A
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('admin.deleteVoucher', id=voucher.id) }}" class="button small">
+                                <a href="{{ url_for('admin.delete_voucher', voucher_id=voucher.object_id) }}" class="button small">
                                     Delete
                                 </a>
                             </td>

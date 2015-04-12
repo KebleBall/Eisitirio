@@ -1,6 +1,13 @@
 # coding: utf-8
+"""Create the application object for the ticketing system.
+
+Initialises the application object, and loads the appropriate config into it.
+"""
+
+from __future__ import unicode_literals
+
 import flask
 
-app = flask.Flask('kebleball')
+APP = flask.Flask('kebleball')
 
-app.config.from_pyfile('config/default.py')
+APP.config.from_pyfile('config/default.py')

@@ -1846,26 +1846,31 @@ a { font-weight: bold; }
 .message-box.info, #flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
 /* line 78, style.scss */
 .message-box p:last-child, #flashes li p:last-child { margin-bottom: 0; }
+/* line 81, style.scss */
+.message-box h1, #flashes li h1, .message-box h2, #flashes li h2, .message-box h3, #flashes li h3, .message-box h4, #flashes li h4, .message-box h5, #flashes li h5, .message-box h6, #flashes li h6 { font-family: "Open Sans", Helvetica, sans-serif; }
 
-/* line 84, style.scss */
-#flashes ul { margin: 0; }
 /* line 87, style.scss */
+#flashes ul { margin: 0; }
+/* line 90, style.scss */
 #flashes li { margin: 0.5em; }
 
-/* line 93, style.scss */
+/* line 96, style.scss */
 p.small { font-size: 0.75rem; }
 
-/* line 97, style.scss */
+/* line 100, style.scss */
 table .button { margin: 0; }
 
-/* line 103, style.scss */
-#giveTickets input, #refundTransaction input { display: inline; }
-/* line 105, style.scss */
-#giveTickets input[type="number"], #refundTransaction input[type="number"] { width: 5rem; }
+/* line 106, style.scss */
+#give_tickets input, #refund_transaction input { display: inline; }
 /* line 108, style.scss */
-#giveTickets input[type="text"], #refundTransaction input[type="text"] { width: auto; }
+#give_tickets input[type="number"], #refund_transaction input[type="number"] { width: 5rem; }
+/* line 111, style.scss */
+#give_tickets input[type="text"], #refund_transaction input[type="text"] { width: auto; }
 
-/* line 114, style.scss */
+/* line 117, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
+
+/* line 123, style.scss */
+td, td label { color: #000 !important; }
 
 /*# sourceMappingURL=style.css.map */

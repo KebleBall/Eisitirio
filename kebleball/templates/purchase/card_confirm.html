@@ -1,0 +1,39 @@
+<!-- purchase/card_confirm.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Pay for Tickets by Card{% endblock %}
+
+{% block content %}
+    <section id="card_confirm" class="columns">
+        <p><strong>IMPORTANT</strong>: Once you have pressed the "Pay Now" button after entering your card details on our payment gateway, and have reached a page with a button reading "Finalize Payment", your card has been charged. You must then return to our site by pressing the "Finalize Payment" button, so that we are made aware that the payment is completed. If you have reached this page, but your tickets still show as unpaid on our system, please <strong>DO NOT</strong> attempt payment again, but instead contact <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a> for assistance.</p>
+        <h3>Your Tickets</h3>
+	    <p>Only tickets with names are shown here. If you have unnamed tickets, you will need to set the names on the dashboard before you can pay for them.</p>
+        {% if current_user.has_unpaid_tickets('Card') %}
+            <form action="{{ url_for('purchase.card_confirm') }}" method="post">
+                <table id="tickets_table">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Ticket Number</th>
+                            <th>Name on Ticket</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in current_user.tickets %}
+                            {% if ticket.payment_method == 'Card' and not ticket.paid and not ticket.cancelled and ticket.name != None %}
+                                <tr id="ticket-{{ ticket.object_id }}">
+                                    <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                                    <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <input type="submit" value="Pay by Card" class="button small" />
+            </form>
+        {% else %}
+            <p>You have no unpaid tickets marked as paying for by card. Perhaps you'd like to <a href="{{ url_for('purchase.change_method') }}">change the payment method on some tickets</a> or <a href="{{ url_for('purchase.purchase_home') }}">buy some more tickets</a>?</p>
+        {% endif %}
+    </section>
+{% endblock %}

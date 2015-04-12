@@ -1,0 +1,37 @@
+<!-- admin_users/collect_tickets.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Ticket Collection{% endblock %}
+
+{% block content %}
+    <section id="collect_tickets" class="columns">
+        <p>To process a ticket collection, place your cursor into the text field for the relevant ticket and scan the barcode on the wristband (then press "Collect Ticket" if the form does not submit automatically).</p>
+        <p>Tickets must be paid for and have a name set before they can be marked as collected.</p>
+        <h3>{{ user.full_name }}'s Tickets</h3>
+        <table id="tickets_table">
+            <thead>
+                <tr>
+                    <th>Ticket Number</th>
+                    <th>Name on Ticket</th>
+                    <th>Barcode</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in user.tickets %}
+                    {% if ticket.can_be_collected() %}
+                        <tr id="ticket-{{ ticket.object_id }}">
+                            <td><label for="ticket_barcode-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                            <td><label for="ticket_barcode-{{ ticket.object_id }}">{{ ticket.name }}</label></td>
+                            <td>
+                                <form action="{{ url_for('admin_tickets.collect_ticket', ticket_id=ticket.object_id) }}" method="post">
+                                    <input type="text" name="barcode" id="ticket_barcode-{{ ticket.object_id }}" />
+                                    <input type="submit" class="button tiny" value="Collect Ticket" />
+                                </form>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endblock %}

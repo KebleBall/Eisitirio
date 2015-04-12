@@ -1,54 +1,73 @@
 # coding: utf-8
-from flask import Blueprint, Response, request
+"""Views for performing tasks via AJAX requests."""
 
-from kebleball.app import app
-from kebleball.helpers.validators import validateVoucher, validateReferrer, validateResaleEmail
-from kebleball.database import db
-from kebleball.database.ticket import Ticket
-
-from flask.ext.login import current_user
+from __future__ import unicode_literals
 
 import json
 
-log = app.log_manager.log_ajax
+from flask.ext import login
+import flask
 
-ajax = Blueprint('ajax', __name__)
+from kebleball.database import db
+from kebleball.database import models
+from kebleball.helpers import validators
 
-@ajax.route('/ajax/validate/voucher', methods=['POST'])
-def ajaxValidateVoucher():
-    (result, response, voucher) = validateVoucher(request.form['code'])
+DB = db.DB
 
-    response['class'] = 'message-box ' + response['class']
-    response['message'] = '<p>' + response['message'] + '</p>'
+AJAX = flask.Blueprint('ajax', __name__)
 
-    return Response(json.dumps(response), mimetype="text/json")
+@AJAX.route('/ajax/validate/voucher', methods=['POST'])
+def validate_voucher():
+    """Validate a discount voucher.
 
-@ajax.route('/ajax/validate/referrer', methods=['POST'])
-def ajaxValidateReferrer():
-    (result, response, referrer) = validateReferrer(request.form['email'], current_user)
-
-    response['class'] = 'message-box ' + response['class']
-    response['message'] = '<p>' + response['message'] + '</p>'
-
-    return Response(json.dumps(response), mimetype="text/json")
-
-@ajax.route('/ajax/validate/resale-email', methods=['POST'])
-def ajaxValidateResaleEmail():
-    (result, response, buyer) = validateResaleEmail(request.form['email'], current_user)
+    Check the voucher exists and that it can be used.
+    """
+    (_, response, _) = validators.validate_voucher(flask.request.form['code'])
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
 
-    return Response(json.dumps(response), mimetype="text/json")
+    return flask.Response(json.dumps(response), mimetype='text/json')
 
-@ajax.route('/ajax/change/ticket/<int:id>/name', methods=['POST'])
-def ajaxChangeTicketName(id):
-    ticket = Ticket.get_by_id(id)
+@AJAX.route('/ajax/validate/referrer', methods=['POST'])
+def validate_referrer():
+    """Validate a referrer for purchasing tickets.
 
-    if ticket and request.form['name'] != '':
-        ticket.name = request.form['name']
+    Check the the referenced user has an account on the system.
+    """
+    (_, response, _) = validators.validate_referrer(flask.request.form['email'],
+                                                    login.current_user)
 
-        db.session.commit()
-        return Response(json.dumps(True), mimetype="text/json")
+    response['class'] = 'message-box ' + response['class']
+    response['message'] = '<p>' + response['message'] + '</p>'
+
+    return flask.Response(json.dumps(response), mimetype='text/json')
+
+@AJAX.route('/ajax/validate/resale-email', methods=['POST'])
+def validate_resale_email():
+    """Validate a user for reselling tickets.
+
+    Check the the referenced user has an account on the system.
+    """
+    (_, response, _) = validators.validate_resale_email(
+        flask.request.form['email'],
+        login.current_user
+    )
+
+    response['class'] = 'message-box ' + response['class']
+    response['message'] = '<p>' + response['message'] + '</p>'
+
+    return flask.Response(json.dumps(response), mimetype='text/json')
+
+@AJAX.route('/ajax/change/ticket/<int:ticket_id>/name', methods=['POST'])
+def change_ticket_name(ticket_id):
+    """Change the name on a ticket."""
+    ticket = models.Ticket.get_by_id(ticket_id)
+
+    if ticket and flask.request.form['name'] != '':
+        ticket.name = flask.request.form['name']
+
+        DB.session.commit()
+        return flask.Response(json.dumps(True), mimetype='text/json')
     else:
-        return Response(json.dumps(False), mimetype="text/json")
+        return flask.Response(json.dumps(False), mimetype='text/json')

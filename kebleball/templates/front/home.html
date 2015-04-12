@@ -17,7 +17,7 @@
             <section id="homepage-login" class="large-6 columns">
                 <a id="log-in-form"></a>
                 <h2>Log In</h2>
-                <form action="{{ url_for('front.login') }}" method="post">
+                <form action="{{ url_for('front.do_login') }}" method="post">
                     {% if request.args['next'] %}
                         <input type="hidden" name="next" value="{{ request.args['next'] }}" />
                     {% endif %}
@@ -48,8 +48,8 @@
                 <hr />
                 <h4>Can't log in?</h4>
                 <ul id="login-help">
-                    <li><a href="{{ url_for('front.passwordReset') }}">Reset your password</a></li>
-                    <li><a href="{{ url_for('front.emailConfirm') }}">Confirm your email</a></li>
+                    <li><a href="{{ url_for('front.password_reset') }}">Reset your password</a></li>
+                    <li><a href="{{ url_for('front.email_confirm') }}">Confirm your email</a></li>
                 </ul>
             </section>
             <section id="homepage-register" class="large-6 columns">
@@ -58,8 +58,8 @@
                 <form action="{{ url_for('front.register') }}" method="post">
                     <div class="row">
                         <div class="large-12 columns">
-                            <label for="register-firstname">First Name(s)</label>
-                            <input type="text" name="firstname" id="register-firstname"{% if form['firstname'] %} value="{{ form['firstname'] }}"{% endif %} />
+                            <label for="register-forenames">Forename(s)</label>
+                            <input type="text" name="forenames" id="register-forenames"{% if form['forenames'] %} value="{{ form['forenames'] }}"{% endif %} />
                         </div>
                     </div>
                     <div class="row">
@@ -102,10 +102,10 @@
                                     <option value="---" disabled="disabled" selected="selected">---</option>
                                 {% endif %}
                                 {% for college in colleges %}
-                                    {% if form['college'] and form['college']|int(-1) == college.id %}
-                                        <option value="{{ college.id }}" selected="selected">{{ college.name }}</option>
+                                    {% if form['college'] and form['college']|int(-1) == college.object_id %}
+                                        <option value="{{ college.object_id }}" selected="selected">{{ college.name }}</option>
                                     {% else %}
-                                        <option value="{{ college.id }}">{{ college.name }}</option>
+                                        <option value="{{ college.object_id }}">{{ college.name }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -121,10 +121,10 @@
                                     <option value="---" disabled="disabled" selected="selected">---</option>
                                 {% endif %}
                                 {% for affiliation in affiliations %}
-                                    {% if form['affiliation'] and form['affiliation']|int(-1) == affiliation.id %}
-                                        <option value="{{ affiliation.id }}" selected="selected">{{ affiliation.name }}</option>
+                                    {% if form['affiliation'] and form['affiliation']|int(-1) == affiliation.object_id %}
+                                        <option value="{{ affiliation.object_id }}" selected="selected">{{ affiliation.name }}</option>
                                     {% else %}
-                                        <option value="{{ affiliation.id }}">{{ affiliation.name }}</option>
+                                        <option value="{{ affiliation.object_id }}">{{ affiliation.name }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>

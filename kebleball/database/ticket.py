@@ -1,75 +1,74 @@
 # coding: utf-8
-"""
-ticket.py
+"""Database model for tickets."""
 
-Contains Ticket class
-Used to store data about tickets purchased
-"""
+from __future__ import unicode_literals
 
+import datetime
+
+from flask.ext import login
+import flask
+
+from kebleball import app
+from kebleball import helpers
 from kebleball.database import db
-from kebleball.database.battels import Battels
-from kebleball.database.user import User
-from kebleball.database.card_transaction import CardTransaction
-from datetime import datetime
-from kebleball.app import app
-from kebleball.helpers import generate_key
 
-from flask import url_for, flash
-from flask.ext.login import current_user
+APP = app.APP
+DB = db.DB
 
-import re
-
-ticket_transaction_link = db.Table(
+TICKET_TRANSACTION_LINK = DB.Table(
     'ticket_transaction_link',
-    db.Model.metadata,
-    db.Column('ticket_id',
-        db.Integer,
-        db.ForeignKey('ticket.id')
+    DB.Model.metadata,
+    DB.Column(
+        'ticket_id',
+        DB.Integer,
+        DB.ForeignKey('ticket.object_id')
     ),
-    db.Column('transaction_id',
-        db.Integer,
-        db.ForeignKey('card_transaction.id')
+    DB.Column(
+        'transaction_id',
+        DB.Integer,
+        DB.ForeignKey('card_transaction.object_id')
     )
 )
 
-class Ticket(db.Model):
-    id = db.Column(
-        db.Integer(),
+class Ticket(DB.Model):
+    """Model for tickets."""
+    object_id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    paid = db.Column(
-        db.Boolean(),
+    paid = DB.Column(
+        DB.Boolean(),
         default=False,
         nullable=False
     )
-    collected = db.Column(
-        db.Boolean(),
+    collected = DB.Column(
+        DB.Boolean(),
         default=False,
         nullable=False
     )
-    entered = db.Column(
-        db.Boolean(),
+    entered = DB.Column(
+        DB.Boolean(),
         default=False,
         nullable=False
     )
-    barcode = db.Column(
-        db.String(20),
+    barcode = DB.Column(
+        DB.Unicode(20),
         unique=True,
         nullable=True
     )
-    cancelled = db.Column(
-        db.Boolean(),
+    cancelled = DB.Column(
+        DB.Boolean(),
         default=False,
         nullable=False
     )
-    resold = db.Column(
-        db.Boolean(),
+    resold = DB.Column(
+        DB.Boolean(),
         default=False,
         nullable=False
     )
-    paymentmethod = db.Column(
-        db.Enum(
+    payment_method = DB.Column(
+        DB.Enum(
             'Battels',
             'Card',
             'Cash',
@@ -78,191 +77,197 @@ class Ticket(db.Model):
         ),
         nullable=True
     )
-    paymentreference = db.Column(
-        db.String(50),
+    payment_reference = DB.Column(
+        DB.Unicode(50),
         nullable=True
     )
-    price = db.Column(
-        db.Integer(),
+    price = DB.Column(
+        DB.Integer(),
         nullable=False
     )
-    name = db.Column(
-        db.String(120),
+    name = DB.Column(
+        DB.Unicode(120),
         nullable=True
     )
-    note = db.Column(
-        db.Text(),
+    note = DB.Column(
+        DB.UnicodeText(),
         nullable=True
     )
-    expires = db.Column(
-        db.DateTime(),
+    expires = DB.Column(
+        DB.DateTime(),
         nullable=True
     )
-    resalekey = db.Column(
-        db.String(32),
+    resale_key = DB.Column(
+        DB.Unicode(32),
         nullable=True
     )
-    resaleconfirmed = db.Column(
-        db.Boolean(),
+    resaleconfirmed = DB.Column(
+        DB.Boolean(),
         nullable=True
     )
 
-    owner_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    owner_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
         nullable=False
     )
-    owner = db.relationship(
+    owner = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'tickets',
             lazy='dynamic',
-            order_by='Ticket.cancelled'
+            order_by=b'Ticket.cancelled'
         ),
         foreign_keys=[owner_id]
     )
 
-    reselling_to_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    reselling_to_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
-    reselling_to = db.relationship(
+    reselling_to = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'resales',
             lazy='dynamic'
         ),
         foreign_keys=[reselling_to_id]
     )
 
-    referrer_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    referrer_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
-    referrer = db.relationship(
+    referrer = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'referrals',
             lazy='dynamic'
         ),
         foreign_keys=[referrer_id]
     )
 
-    transactions = db.relationship(
+    transactions = DB.relationship(
         'CardTransaction',
-        secondary=ticket_transaction_link,
-        backref=db.backref(
+        secondary=TICKET_TRANSACTION_LINK,
+        backref=DB.backref(
             'tickets',
             lazy='dynamic'
         ),
         lazy='dynamic'
     )
 
-    card_transaction_id = db.Column(
-        db.Integer,
-        db.ForeignKey('card_transaction.id'),
+    card_transaction_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('card_transaction.object_id'),
         nullable=True
     )
-    card_transaction = db.relationship(
+    card_transaction = DB.relationship(
         'CardTransaction',
         foreign_keys=[card_transaction_id]
     )
 
-    battels_term = db.Column(db.String(4), nullable=True)
-    battels_id = db.Column(
-        db.Integer,
-        db.ForeignKey('battels.id'),
+    battels_term = DB.Column(DB.Unicode(4), nullable=True)
+    battels_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('battels.object_id'),
         nullable=True
     )
-    battels = db.relationship(
+    battels = DB.relationship(
         'Battels',
-        backref=db.backref(
+        backref=DB.backref(
             'tickets',
             lazy='dynamic'
         ),
         foreign_keys=[battels_id]
     )
 
-    def __init__(self, owner, paymentmethod, price):
-        if hasattr(owner, 'id'):
-            self.owner_id = owner.id
+    def __init__(self, owner, payment_method, price):
+        if hasattr(owner, 'object_id'):
+            self.owner_id = owner.object_id
         else:
             self.owner_id = owner
 
-        self.paymentmethod = paymentmethod
-        self.setPrice(price)
+        self.payment_method = payment_method
+        self.set_price(price)
 
-        self.expires = datetime.utcnow() + app.config['TICKET_EXPIRY_TIME']
+        self.expires = (datetime.datetime.utcnow() +
+                        APP.config['TICKET_EXPIRY_TIME'])
 
     def __getattr__(self, name):
+        """Magic method to generate ticket price in pounds."""
         if name == 'price_pounds':
             price = '{0:03d}'.format(self.price)
             return price[:-2] + '.' + price[-2:]
         else:
             raise AttributeError(
-                "Ticket instance has no attribute '{0}'".format(name)
+                'Ticket instance has no attribute "{0}"'.format(name)
             )
 
     def __repr__(self):
         return '<Ticket {0} owned by {1} ({2})>'.format(
-            self.id,
-            self.owner.fullname,
+            self.object_id,
+            self.owner.full_name,
             self.owner_id
         )
 
-    def setPrice(self,price):
+    def set_price(self, price):
+        """Set the price of the ticket."""
         price = max(price, 0)
 
         self.price = price
 
         if price == 0:
-            self.markAsPaid('Free', 'Free Ticket')
+            self.mark_as_paid('Free', 'Free Ticket')
 
-    def setPaymentMethod(self, method, reason=None):
-        if method in ['Cash','Cheque']:
-            self.addNote(
+    def set_payment_method(self, method, reason=None):
+        """Set the ticket's payment method."""
+        if method in ['Cash', 'Cheque']:
+            self.add_note(
                 method +
                 ' payment reason: ' +
                 reason
             )
 
-        self.paymentmethod = method
+        self.payment_method = method
 
-    def markAsPaid(self, method, reference, **kwargs):
+    def mark_as_paid(self, method, reference, **kwargs):
+        """Mark the ticket as paid."""
         if method not in [
-            'Battels',
-            'Card',
-            'Cash',
-            'Cheque',
-            'Free'
+                'Battels',
+                'Card',
+                'Cash',
+                'Cheque',
+                'Free',
         ]:
             raise ValueError(
                 '{0} is not an acceptable payment method'.format(method)
             )
 
         self.paid = True
-        self.paymentmethod = method
-        self.paymentreference = reference
+        self.payment_method = method
+        self.payment_reference = reference
         self.expires = None
 
         if 'transaction' in kwargs:
-            if hasattr(kwargs['transaction'], 'id'):
-                self.card_transaction_id = kwargs['transaction'].id
+            if hasattr(kwargs['transaction'], 'object_id'):
+                self.card_transaction_id = kwargs['transaction'].object_id
             else:
                 self.card_transaction_id = kwargs['transaction']
 
         if 'battels' in kwargs:
-            if hasattr(kwargs['battels'], 'id'):
-                self.battels_id = kwargs['battels'].id
+            if hasattr(kwargs['battels'], 'object_id'):
+                self.battels_id = kwargs['battels'].object_id
             else:
                 self.battels_id = kwargs['battels']
 
         if 'battels_term' in kwargs:
             self.battels_term = kwargs['battels_term']
 
-    def addNote(self, note):
+    def add_note(self, note):
+        """Add a note to the ticket."""
         if not note.endswith('\n'):
             note = note + '\n'
 
@@ -271,56 +276,58 @@ class Ticket(db.Model):
         else:
             self.note = self.note + note
 
-    def setReferrer(self, referrer):
-        if hasattr(referrer, 'id'):
-            self.referrer_id = referrer.id
+    def set_referrer(self, referrer):
+        """Set who referred the user to buy this ticket."""
+        if hasattr(referrer, 'object_id'):
+            self.referrer_id = referrer.object_id
         else:
             self.referrer_id = referrer
 
     @staticmethod
-    def startResale(tickets, reselling_to):
+    def start_resale(tickets, reselling_to):
+        """Start the resale process for tickets."""
         if len(tickets) > 0:
-            if hasattr(reselling_to, 'id'):
-                id = reselling_to.id
+            if hasattr(reselling_to, 'object_id'):
+                object_id = reselling_to.object_id
             else:
-                id = reselling_to
-                reselling_to = User.get_by_id(reselling_to)
+                object_id = reselling_to
+                reselling_to = DB.User.get_by_id(reselling_to)
 
-            resalekey = generate_key(32)
+            resale_key = helpers.generate_key(32)
 
             for ticket in tickets:
-                ticket.reselling_to_id = id
-                ticket.resalekey = resalekey
+                ticket.reselling_to_id = object_id
+                ticket.resale_key = resale_key
                 ticket.resaleconfirmed = False
 
-            db.session.commit()
+            DB.session.commit()
 
-            app.log_manager.log_event(
+            APP.log_manager.log_event(
                 'Started Resale',
                 tickets,
-                current_user
+                login.current_user
             )
 
-            app.email_manager.sendTemplate(
+            APP.email_manager.send_template(
                 reselling_to.email,
-                "Confirm Ticket Resale",
-                "confirmResale.email",
-                confirmurl=url_for(
-                    'resale.resaleConfirm',
-                    resale_from=current_user.id,
-                    resale_to=id,
-                    key=resalekey,
+                'Confirm Ticket Resale',
+                'confirm_resale.email',
+                confirmurl=flask.url_for(
+                    'resale.resale_confirm',
+                    resale_from=login.current_user.object_id,
+                    resale_to=object_id,
+                    key=resale_key,
                     _external=True
                 ),
-                cancelurl=url_for(
-                    'resale.resaleCancel',
-                    resale_from=current_user.id,
-                    resale_to=id,
-                    key=resalekey,
+                cancelurl=flask.url_for(
+                    'resale.resale_cancel',
+                    resale_from=login.current_user.object_id,
+                    resale_to=object_id,
+                    key=resale_key,
                     _external=True
                 ),
-                numTickets=len(tickets),
-                resale_from=current_user
+                num_tickets=len(tickets),
+                resale_from=login.current_user
             )
 
             return True
@@ -328,23 +335,26 @@ class Ticket(db.Model):
             return False
 
     @staticmethod
-    def cancelResale(resale_from, resale_to, key):
-        tickets = Ticket.query \
-            .filter(Ticket.owner_id == resale_from) \
-            .filter(Ticket.reselling_to_id == resale_to) \
-            .filter(Ticket.resalekey == key) \
-            .all()
+    def cancel_resale(resale_from, resale_to, key):
+        """Cancel the resale process."""
+        tickets = Ticket.query.filter(
+            Ticket.owner_id == resale_from
+        ).filter(
+            Ticket.reselling_to_id == resale_to
+        ).filter(
+            Ticket.resale_key == key
+        ).all()
 
         if len(tickets) > 0:
             resale_from = tickets[0].owner
             resale_to = tickets[0].reselling_to
 
             if not (
-                current_user == resale_to or
-                current_user == resale_from
+                    login.current_user == resale_to or
+                    login.current_user == resale_from
             ):
-                flash(
-                    u'You are not authorised to perform this action',
+                flask.flash(
+                    'You are not authorised to perform this action',
                     'error'
                 )
                 return False
@@ -352,28 +362,28 @@ class Ticket(db.Model):
             for ticket in tickets:
                 ticket.reselling_to = None
                 ticket.reselling_to_id = None
-                ticket.resalekey = None
+                ticket.resale_key = None
                 ticket.resaleconfirmed = None
 
-            db.session.commit()
+            DB.session.commit()
 
-            app.log_manager.log_event(
+            APP.log_manager.log_event(
                 'Cancelled Resale',
                 tickets,
-                current_user
+                login.current_user
             )
 
-            app.email_manager.sendTemplate(
+            APP.email_manager.send_template(
                 resale_from.email,
-                "Ticket Resale Cancelled",
-                "ownerCancelResale.email",
+                'Ticket Resale Cancelled',
+                'owner_cancel_resale.email',
                 resale_to=resale_to
             )
 
-            app.email_manager.sendTemplate(
+            APP.email_manager.send_template(
                 resale_to.email,
-                "Ticket Resale Cancelled",
-                "buyerCancelResale.email",
+                'Ticket Resale Cancelled',
+                'buyer_cancel_resale.email',
                 resale_from=resale_from
             )
 
@@ -382,57 +392,64 @@ class Ticket(db.Model):
             return False
 
     @staticmethod
-    def confirmResale(resale_from, resale_to, key):
-        tickets = Ticket.query \
-            .filter(Ticket.owner_id == resale_from) \
-            .filter(Ticket.reselling_to_id == resale_to) \
-            .filter(Ticket.resalekey == key) \
-            .all()
+    def confirm_resale(resale_from, resale_to, key):
+        """Confirm the resale.
+
+        The resale is confirmed by the recipient before being completed by the
+        owner of the ticket.
+        """
+        tickets = Ticket.query.filter(
+            Ticket.owner_id == resale_from
+        ).filter(
+            Ticket.reselling_to_id == resale_to
+        ).filter(
+            Ticket.resale_key == key
+        ).all()
 
         if len(tickets) > 0:
             resale_from = tickets[0].owner
             resale_to = tickets[0].reselling_to
-            resalekey = generate_key(32)
+            resale_key = helpers.generate_key(32)
 
-            if current_user != resale_to:
-                flash(
-                    u'You are not authorised to perform this action',
+            if login.current_user != resale_to:
+                flask.flash(
+                    'You are not authorised to perform this action',
                     'error'
                 )
                 return False
 
             for ticket in tickets:
-                ticket.resalekey = resalekey
+                ticket.resale_key = resale_key
                 ticket.resaleconfirmed = True
 
-            db.session.commit()
+            DB.session.commit()
 
-            app.log_manager.log_event(
+            APP.log_manager.log_event(
                 'Confirmed Resale',
                 tickets,
-                current_user
+                login.current_user
             )
 
-            app.email_manager.sendTemplate(
+            APP.email_manager.send_template(
                 resale_from.email,
-                "Complete Ticket Resale",
-                "completeResale.email",
+                'Complete Ticket Resale',
+                'complete_resale.email',
                 resale_to=resale_to,
-                completeurl=url_for(
-                    'resale.resaleComplete',
-                    resale_from=resale_from.id,
-                    resale_to=resale_to.id,
-                    key=resalekey,
+                completeurl=flask.url_for(
+                    'resale.resale_complete',
+                    resale_from=resale_from.object_id,
+                    resale_to=resale_to.object_id,
+                    key=resale_key,
                     _external=True
                 ),
-                cancelurl=url_for(
-                    'resale.resaleCancel',
-                    resale_from=resale_from.id,
-                    resale_to=resale_to.id,
-                    key=resalekey,
+                cancelurl=flask.url_for(
+                    'resale.resale_cancel',
+                    resale_from=resale_from.object_id,
+                    resale_to=resale_to.object_id,
+                    key=resale_key,
                     _external=True
                 ),
-                numTickets=len(tickets)
+                num_tickets=len(tickets)
             )
 
             return True
@@ -440,79 +457,89 @@ class Ticket(db.Model):
             return False
 
     @staticmethod
-    def completeResale(resale_from, resale_to, key):
-        tickets = Ticket.query \
-            .filter(Ticket.owner_id == resale_from) \
-            .filter(Ticket.reselling_to_id == resale_to) \
-            .filter(Ticket.resalekey == key) \
-            .filter(Ticket.resaleconfirmed == True) \
-            .all()
+    def complete_resale(resale_from, resale_to, key):
+        """Complete the resale process.
+
+        After the owner of the ticket is paid, the resale process is completed
+        and the tickets are transferred to the new owner.
+        """
+        tickets = Ticket.query.filter(
+            Ticket.owner_id == resale_from
+        ).filter(
+            Ticket.reselling_to_id == resale_to
+        ).filter(
+            Ticket.resale_key == key
+        ).filter(
+            Ticket.resaleconfirmed == True
+        ).all()
 
         if len(tickets) > 0:
             resale_from = tickets[0].owner
 
-            if current_user != resale_from:
-                flash(
-                    u'You are not authorised to perform this action',
+            if login.current_user != resale_from:
+                flask.flash(
+                    'You are not authorised to perform this action',
                     'error'
                 )
                 return False
 
             for ticket in tickets:
-                ticket.addNote(
+                ticket.add_note(
                     'Resold by {0}/{1} to {2}/{3}'.format(
-                        ticket.owner.id,
-                        ticket.owner.fullname,
-                        ticket.reselling_to.id,
-                        ticket.reselling_to.fullname
+                        ticket.owner.object_id,
+                        ticket.owner.full_name,
+                        ticket.reselling_to.object_id,
+                        ticket.reselling_to.full_name
                     )
                 )
                 ticket.owner = ticket.reselling_to
                 ticket.reselling_to_id = None
                 ticket.reselling_to = None
-                ticket.resalekey = None
+                ticket.resale_key = None
                 ticket.name = None
                 ticket.resold = True
 
-            db.session.commit()
+            DB.session.commit()
 
-            app.log_manager.log_event(
+            APP.log_manager.log_event(
                 'Completed Resale',
                 tickets,
-                current_user
+                login.current_user
             )
 
             return True
         else:
             return False
 
-    def canBeCancelledAutomatically(self):
+    def can_be_cancelled_automatically(self):
+        """Check whether the ticket can be cancelled/refunded automatically."""
         if self.cancelled:
             return False
-        elif app.config['LOCKDOWN_MODE']:
+        elif APP.config['LOCKDOWN_MODE']:
             return False
         elif self.collected:
             return False
-        elif self.resalekey is not None:
+        elif self.resale_key is not None:
             return False
         elif self.resold:
             return False
         elif not self.paid:
             return True
-        elif self.paymentmethod == 'Card':
+        elif self.payment_method == 'Card':
             return True
-        elif self.paymentmethod == 'Battels':
+        elif self.payment_method == 'Battels':
             return (
-                app.config['CURRENT_TERM'] != 'TT' and
+                APP.config['CURRENT_TERM'] != 'TT' and
                 self.battels is not None and
                 self.battels == self.owner.battels
             )
-        elif self.paymentmethod == 'Free':
+        elif self.payment_method == 'Free':
             return True
         else:
             return False
 
-    def canBeCollected(self):
+    def can_be_collected(self):
+        """Check whether a ticket can be collected."""
         return (
             self.paid and
             not self.collected and
@@ -520,29 +547,33 @@ class Ticket(db.Model):
             self.name is not None
         )
 
-    def canBeResold(self):
+    def can_be_resold(self):
+        """Check whether a ticket can be resold."""
         return (
             self.paid and
             not self.collected and
             not self.cancelled and
-            self.resalekey == None and
-            not app.config['LOCKDOWN_MODE']
+            self.resale_key == None and
+            not APP.config['LOCKDOWN_MODE']
         )
 
-    def canChangeName(self):
+    def can_change_name(self):
+        """Check whether a ticket's name can be changed."""
         return not (
-            app.config['LOCKDOWN_MODE'] or
+            APP.config['LOCKDOWN_MODE'] or
             self.cancelled or
             self.collected
         )
 
     @staticmethod
     def count():
-        return Ticket.query.filter(Ticket.cancelled==False).count()
+        """How many tickets have been sold."""
+        return Ticket.query.filter(Ticket.cancelled == False).count()
 
     @staticmethod
-    def get_by_id(id):
-        ticket = Ticket.query.filter(Ticket.id==int(id)).first()
+    def get_by_id(object_id):
+        """Get a ticket object by its database ID."""
+        ticket = Ticket.query.filter(Ticket.object_id == int(object_id)).first()
 
         if not ticket:
             return None

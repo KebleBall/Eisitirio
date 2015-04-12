@@ -1,66 +1,68 @@
 # coding: utf-8
-"""
-battels.py
+"""Database model for battels charges for Keble Students."""
 
-Contains Battels class
-Used to manage Battels charges
-"""
+from __future__ import unicode_literals
+from __future__ import division
 
+from kebleball import app
 from kebleball.database import db
-from kebleball.app import app
 
-class Battels(db.Model):
-    id = db.Column(
-        db.Integer(),
+DB = db.DB
+APP = app.APP
+
+class Battels(DB.Model):
+    """Model for battels charges for Keble Students."""
+    object_id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    battelsid = db.Column(
-        db.String(6),
+    battelsid = DB.Column(
+        DB.Unicode(6),
         unique=True,
         nullable=True
     )
-    email = db.Column(
-        db.String(120),
+    email = DB.Column(
+        DB.Unicode(120),
         unique=True,
         nullable=True
     )
-    title = db.Column(
-        db.String(10),
+    title = DB.Column(
+        DB.Unicode(10),
         nullable=True
     )
-    surname = db.Column(
-        db.String(60),
+    surname = DB.Column(
+        DB.Unicode(60),
         nullable=True
     )
-    forenames = db.Column(
-        db.String(60),
+    forenames = DB.Column(
+        DB.Unicode(60),
         nullable=True
     )
-    mt = db.Column(
-        db.Integer(),
+    michaelmas_charge = DB.Column(
+        DB.Integer(),
         default=0,
         nullable=False
     )
-    ht = db.Column(
-        db.Integer(),
+    hilary_charge = DB.Column(
+        DB.Integer(),
         default=0,
         nullable=False
     )
-    manual = db.Column(
-        db.Boolean(),
+    manual = DB.Column(
+        DB.Boolean(),
         default=False,
         nullable=False
     )
 
     def __init__(
-        self,
-        battelsid = None,
-        email = None,
-        title = None,
-        surname = None,
-        forenames = None,
-        manual = False
+            self,
+            battelsid=None,
+            email=None,
+            title=None,
+            surname=None,
+            forenames=None,
+            manual=False
     ):
         self.battelsid = battelsid
         self.email = email
@@ -70,41 +72,40 @@ class Battels(db.Model):
         self.manual = manual
 
     def __repr__(self):
-        return "<Battels {0}: {1}>".format(self.id, self.battelsid)
+        return '<Battels {0}: {1}>'.format(self.object_id, self.battelsid)
 
     def __getattr__(self, name):
-        if name == 'mt_pounds':
-            mt = '{0:03d}'.format(self.mt)
-            return mt[:-2] + '.' + mt[-2:]
-        elif name == 'ht_pounds':
-            ht = '{0:03d}'.format(self.ht)
-            return ht[:-2] + '.' + ht[-2:]
+        """Magic method to generate amounts charged in pounds."""
+        if name == 'michaelmas_charge_pounds':
+            michaelmas_charge = '{0:03d}'.format(self.michaelmas_charge)
+            return michaelmas_charge[:-2] + '.' + michaelmas_charge[-2:]
+        elif name == 'hilary_charge_pounds':
+            hilary_charge = '{0:03d}'.format(self.hilary_charge)
+            return hilary_charge[:-2] + '.' + hilary_charge[-2:]
         else:
             raise AttributeError(
-                "Battels instance has no attribute '{0}'".format(name)
+                'Battels instance has no attribute "{0}"'.format(name)
             )
 
-    def charge(self, ticket, term, wholepounds=False):
+    def charge(self, ticket, term):
+        """Apply a charge to this battels account."""
         if term == 'MTHT':
-            if wholepounds:
-                half = ((ticket.price // 200) * 100)
-            else:
-                half = (ticket.price / 2)
+            half = (ticket.price // 2)
 
-            self.mt = self.mt + half
-            self.ht = self.ht + (ticket.price - half)
+            self.michaelmas_charge += half
+            self.hilary_charge += ticket.price - half
         elif term == 'MT':
-            self.mt = self.mt + ticket.price
+            self.michaelmas_charge += ticket.price
         elif term == 'HT':
-            self.ht = self.ht + ticket.price
+            self.hilary_charge += ticket.price
         else:
             raise ValueError(
-                "Term '{0}' cannot be charged to battels".format(
+                'Term "{0}" cannot be charged to battels'.format(
                     term
                 )
             )
 
-        ticket.markAsPaid(
+        ticket.mark_as_paid(
             'Battels',
             'Battels {0}, {1} term'.format(
                 'manual' if self.manual else self.battelsid,
@@ -115,25 +116,33 @@ class Battels(db.Model):
         )
 
     def cancel(self, ticket):
-        if app.config['CURRENT_TERM'] == 'MT':
+        """Refund a ticket and mark it as cancelled."""
+        if APP.config['CURRENT_TERM'] == 'MT':
             if ticket.battels_term == 'MTHT':
-                self.mt = self.mt - (ticket.price / 2)
-                self.ht = self.ht - (ticket.price - (ticket.price / 2))
-            elif term == 'MT':
-                self.mt = self.mt - ticket.price
-            elif term == 'HT':
-                self.ht = self.ht - ticket.price
-        elif app.config['CURRENT_TERM'] == 'HT':
-            self.ht = self.ht - ticket.price
+                half = (ticket.price // 2)
+
+                self.michaelmas_charge -= half
+                self.hilary_charge -= ticket.price - half
+            elif ticket.battels_term == 'MT':
+                self.michaelmas_charge -= ticket.price
+            elif ticket.battels_term == 'HT':
+                self.hilary_charge -= ticket.price
+        elif APP.config['CURRENT_TERM'] == 'HT':
+            self.hilary_charge -= ticket.price
         else:
-            raise ValueError("Can't refund battels tickets in the current term")
+            raise ValueError(
+                'Can\'t refund battels tickets in the current term'
+            )
 
         ticket.cancelled = True
-        db.session.commit()
+        DB.session.commit()
 
     @staticmethod
-    def get_by_id(id):
-        battels = Battels.query.filter(Battels.id==int(id)).first()
+    def get_by_id(object_id):
+        """Get a battels object by its database ID."""
+        battels = Battels.query.filter(
+            Battels.object_id == int(object_id)
+        ).first()
 
         if not battels:
             return None
@@ -141,8 +150,9 @@ class Battels(db.Model):
         return battels
 
     @staticmethod
-    def get_by_battelsid(id):
-        battels = Battels.query.filter(Battels.battelsid==int(id)).first()
+    def get_by_battelsid(battelsid):
+        """Get a college object by its college battels ID."""
+        battels = Battels.query.filter(Battels.battelsid == battelsid).first()
 
         if not battels:
             return None

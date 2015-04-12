@@ -1,25 +1,33 @@
 # coding: utf-8
-"""
-log_manager.py
+"""Helper class to log events, both for users actions and for system errors."""
 
-Contains Logger class
-Used to log events, both for users and for system errors
-"""
+from __future__ import unicode_literals
 
 import logging
+
+from flask.ext import login
+import flask
+
 from kebleball.database import db
-from kebleball.database.log import Log
-from flask import session, current_app
-from flask.ext.login import current_user, request, AnonymousUserMixin
+from kebleball.database import models
+
+DB = db.DB
 
 class LogManager(object):
+    """Helper to log events, both for users actions and for system errors.
+
+    Provides passthroughs to various loggers written to disk, plus a separate
+    logging method for logging user actions to the database.
+    """
     def __init__(self, app):
+        app.log_manager = self
+
         logging.basicConfig(
             level=app.config['LOG_LEVEL'],
             format=(
-                "[%(name)s/%(levelname)s] "
-                "%(asctime)s - "
-                "%(message)s"
+                '[%(name)s/%(levelname)s] '
+                '%(asctime)s - '
+                '%(message)s'
             ),
             datefmt='%Y-%m-%d %H:%M:%S'
         )
@@ -34,8 +42,6 @@ class LogManager(object):
         self.purchase = logging.getLogger('purchase')
         self.resale = logging.getLogger('purchase')
 
-        self.session = session
-
     def init_app(self, app):
         app.logger = self
 
@@ -47,15 +53,15 @@ class LogManager(object):
 
         if len(components) == 2:
             if components[1] in [
-                'admin',
-                'ajax',
-                'dashboard',
-                'database',
-                'email',
-                'front',
-                'main',
-                'purchase',
-                'resale',
+                    'admin',
+                    'ajax',
+                    'dashboard',
+                    'database',
+                    'email',
+                    'front',
+                    'main',
+                    'purchase',
+                    'resale',
             ]:
                 return lambda level, message: self.log(
                     components[1],
@@ -64,22 +70,37 @@ class LogManager(object):
                 )
 
         raise AttributeError(
-                    "Logger instance has no attribute '{0}'".format(name)
-                )
+            'LogManager instance has no attribute "{0}"'.format(name)
+        )
 
-    def log_event(self, message, tickets=[], user=None, transaction=None):
-        if 'actor_id' in self.session:
-            actor = self.session['actor_id']
-        elif not current_user.is_anonymous():
-            actor = current_user
+    def log_event(self, message, tickets=None, user=None, transaction=None):  # pylint: disable=no-self-use
+        """Log a user action to the database.
+
+        Creates a log entry in the database which can be found through the admin
+        interface.
+
+        Args:
+            message: (str) The message to be logged
+            tickets: (list(models.Ticket) or None) tickets the action affected
+            user: (models.User or None) user this action affected
+            transaction: (models.CardTransaction or None) transaction this
+                action affected
+        """
+        if 'actor_id' in flask.session:
+            actor = flask.session['actor_id']
+        elif not login.current_user.is_anonymous():
+            actor = login.current_user
         else:
             actor = None
 
-        if isinstance(user, AnonymousUserMixin):
+        if isinstance(user, login.AnonymousUserMixin):
             user = None
 
-        entry = Log(
-            request.remote_addr,
+        if tickets is None:
+            tickets = []
+
+        entry = models.Log(
+            flask.request.remote_addr,
             message,
             actor,
             user,
@@ -87,5 +108,5 @@ class LogManager(object):
             transaction
         )
 
-        db.session.add(entry)
-        db.session.commit()
+        DB.session.add(entry)
+        DB.session.commit()

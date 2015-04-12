@@ -1,269 +1,400 @@
 #!/usr/bin/env python2
 # coding: utf-8
+"""Worker to run repeated tasks on a schedule."""
 
-from datetime import datetime, timedelta
-import os, sys
-from contextlib import contextmanager
-from kebleball.app import app
+from __future__ import unicode_literals
 
-if 'KEBLE_BALL_ENV' in os.environ:
-    if os.environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
-        app.config.from_pyfile('config/production.py')
-    elif os.environ['KEBLE_BALL_ENV'] == 'STAGING':
-        app.config.from_pyfile('config/staging.py')
+import contextlib
+import datetime
+import os
+import sys
 
+import sqlalchemy
 
-from kebleball.database import *
-from kebleball.helpers.email_manager import EmailManager
-from sqlalchemy import func
+from kebleball import app
+from kebleball.database import db
+from kebleball.database import models
+from kebleball.helpers import email_manager
 
-@contextmanager
+APP = app.APP
+DB = db.DB
+
+@contextlib.contextmanager
 def file_lock(lock_file):
+    """Use a lock file to prevent multiple instances of the worker running."""
     if os.path.exists(lock_file):
-        print 'Only one script can run at once. '\
-              'Script is locked with %s' % lock_file
+        print (
+            'Only one script can run at once. '
+            'Script is locked with {}'
+        ).format(lock_file)
         sys.exit(-1)
     else:
-        open(lock_file, 'w').write("1")
+        open(lock_file, 'w').write('1')
         try:
             yield
         finally:
             os.remove(lock_file)
 
-with file_lock(os.path.abspath('./' + app.config['ENVIRONMENT'] + '.cron.lock')):
-    email_manager = EmailManager(app)
-    app.email_manager = email_manager
+def get_last_run_time(timestamp_file):
+    """Get the time at which the set of tasks was last run.
 
-    now = datetime.utcnow()
+    Args:
+        timestamp_file: (str) absolute path to file containing the timestamp
 
+    Returns:
+        (datetime.datetime) The datetime.datetime object representing the time
+            in the timestamp
+    """
     try:
-        with open(app.config['ENVIRONMENT'] + '_cron_timestamp_5min.txt', 'r') as f:
-            timestamp_5min = int(f.read().strip())
+        with open(timestamp_file, 'r') as file_handle:
+            timestamp = int(file_handle.read().strip())
     except IOError:
-        print app.config['ENVIRONMENT'] + '_cron_timestamp_5min.txt not found'
-        timestamp_5min = 0
+        print 'Timestamp not found'
+        timestamp = 0
 
-    last_run_5min = datetime.fromtimestamp(timestamp_5min)
+    return datetime.datetime.fromtimestamp(timestamp)
 
-    difference_5min = now - last_run_5min
+def set_timestamp(timestamp_file, now):
+    """Write the time of the current run to the timestamp file.
 
-    if difference_5min > timedelta(minutes=5):
-        with open(app.config['ENVIRONMENT'] + '_cron_timestamp_5min.txt', 'w') as f:
-            f.write(now.strftime('%s'))
+    Args:
+        timestamp_file: (str) absolute path to file containing the timestamp
+        now: (datetime.datetime) time at which the script was started
+    """
+    with open(timestamp_file, 'w') as file_handle:
+        file_handle.write(now.strftime('%s'))
 
-        emails_count = app.config['EMAILS_BATCH']
+def send_announcements():
+    """Send emails for any pending announcements."""
+    emails_count = APP.config['EMAILS_BATCH']
 
-        announcements = Announcement.query \
-            .filter(Announcement.send_email == True) \
-            .filter(Announcement.email_sent == False) \
-            .all()
+    announcements = models.Announcement.query.filter(
+        models.Announcement.send_email == True
+    ).filter(
+        models.Announcement.email_sent == False
+    ).all()
 
-        for announcement in announcements:
-            if emails_count <= 0:
-                break
+    for announcement in announcements:
+        if emails_count <= 0:
+            break
 
-            emails_count = announcement.sendEmails(emails_count)
+        emails_count = announcement.send_emails(emails_count)
 
-        tickets_available = app.config['TICKETS_AVAILABLE'] - Ticket.count()
+def allocate_waiting():
+    """Allocate available tickets to people on the waiting list."""
+    tickets_available = APP.config['TICKETS_AVAILABLE'] - models.Ticket.count()
 
-        if tickets_available > 0:
-            waiting = Waiting.query.order_by(Waiting.waitingsince).all()
+    for wait in models.Waiting.query.order_by(
+            models.Waiting.waitingsince
+    ).all():
+        if wait.waiting_for > tickets_available:
+            break
 
-            for wait in waiting:
-                if wait.waitingfor > tickets_available:
-                    break
+        tickets = []
 
-                tickets = []
-
-                if wait.user.getsDiscount():
-                    tickets.append(
-                        Ticket(
-                            wait.user,
-                            None,
-                            wait.user.get_base_ticket_price() - app.config['KEBLE_DISCOUNT']
-                        )
+        if wait.user.gets_discount():
+            tickets.append(
+                models.Ticket(
+                    wait.user,
+                    None,
+                    (
+                        wait.user.get_base_ticket_price() -
+                        APP.config['KEBLE_DISCOUNT']
                     )
-                    start = 1
-                else:
-                    start = 0
+                )
+            )
+            start = 1
+        else:
+            start = 0
 
-                for x in xrange(start, wait.waitingfor):
-                    tickets.append(
-                        Ticket(
-                            wait.user,
-                            None,
-                            wait.user.get_base_ticket_price()
-                        )
+        for _ in xrange(start, wait.waiting_for):
+            tickets.append(
+                models.Ticket(
+                    wait.user,
+                    None,
+                    wait.user.get_base_ticket_price()
+                )
+            )
+
+        if wait.referrer is not None:
+            for ticket in tickets:
+                ticket.set_referrer(wait.referrer)
+
+        DB.session.add_all(tickets)
+        DB.session.delete(wait)
+
+        APP.email_manager.send_template(
+            wait.user.email,
+            'You have been allocated tickets',
+            'waiting_allocation.email',
+            user=wait.user,
+            num_tickets=wait.waitingfor,
+            expiry=tickets[0].expires
+        )
+
+        DB.session.commit()
+
+        tickets_available -= wait.waiting_for
+
+def cancel_expired_tickets(now):
+    """Cancel all tickets which have not been paid for in the given time."""
+    expired = models.Ticket.query.filter(
+        models.Ticket.expires != None
+    ).filter(
+        models.Ticket.expires < now
+    ).filter(
+        models.Ticket.cancelled == False
+    ).filter(
+        models.Ticket.paid == False
+    ).all()
+
+    for ticket in expired:
+        ticket.add_note('Cancelled due to non-payment within time limit')
+        ticket.cancelled = True
+        ticket.expires = None
+
+    DB.session.commit()
+
+def remove_expired_secret_keys(now):
+    """Remove expired secret keys for password resets."""
+    expired = models.User.query.filter(
+        models.User.secret_key_expiry != None
+    ).filter(
+        models.User.secret_key_expiry < now
+    ).all()
+
+    for user in expired:
+        user.secret_key_expiry = None
+        user.secret_key = None
+
+    DB.session.commit()
+
+def delete_old_statistics(now):
+    """Delete statistics which are older than the limit."""
+    statistic_limit = now - APP.config['STATISTICS_KEEP']
+
+    models.Statistic.query.filter(
+        models.Statistic.timestamp < statistic_limit
+    ).delete()
+
+    DB.session.commit()
+
+def generate_sales_statistics():
+    """Generate statistics for number of tickets available, sold etc."""
+    def maybe_int(value):
+        """Convert the result of an sqlalchemy scalar to an int."""
+        if value is None:
+            return 0
+        else:
+            return int(value)
+
+    statistics = {
+        'Available':
+            APP.config['TICKETS_AVAILABLE'],
+        'Ordered':
+            models.Ticket.count(),
+        'Paid':
+            models.Ticket.query.filter(
+                models.Ticket.paid == True
+            ).filter(
+                models.Ticket.cancelled == False
+            ).count(),
+        'Cancelled':
+            models.Ticket.query.filter(models.Ticket.cancelled == True).count(),
+        'Collected':
+            models.Ticket.query.filter(models.Ticket.collected == True).count(),
+        'Waiting':
+            maybe_int(
+                DB.session.query(
+                    sqlalchemy.func.sum(
+                        models.Waiting.waiting_for
                     )
+                ).scalar()
+            ),
+    }
 
-                if wait.referrer is not None:
-                    for ticket in tickets:
-                        ticket.setReferrer(wait.referrer)
+    DB.session.add_all(
+        models.Statistic(
+            'Sales',
+            name,
+            value
+        ) for name, value in statistics.iteritems()
+    )
 
-                db.session.add_all(tickets)
-                db.session.delete(wait)
+    DB.session.commit()
 
-                email_manager.sendTemplate(
-                    wait.user.email,
-                    'You have been allocated tickets',
-                    'waitingAllocation.email',
-                    user=wait.user,
-                    numTickets=wait.waitingfor,
-                    expiry=tickets[0].expires
-                )
-
-                db.session.commit()
-
-                tickets_available = tickets_available - wait.waitingfor
-
-        tickets_expired = Ticket.query \
-            .filter(Ticket.expires != None) \
-            .filter(Ticket.expires < datetime.utcnow()) \
-            .filter(Ticket.cancelled == False) \
-            .filter(Ticket.paid == False) \
-            .all()
-
-        for ticket in tickets_expired:
-            ticket.addNote('Cancelled due to non-payment within time limit')
-            ticket.cancelled = True
-            ticket.expires = None
-
-        db.session.commit()
-
-        users_expired = User.query \
-            .filter(User.secretkeyexpiry != None) \
-            .filter(User.secretkeyexpiry < datetime.utcnow()) \
-            .all()
-
-        for user in users_expired:
-            user.secretkeyexpiry = None
-            user.secretkey = None
-
-        db.session.commit()
-
-    try:
-        with open(app.config['ENVIRONMENT'] + '_cron_timestamp_20min.txt', 'r') as f:
-            timestamp_20min = int(f.read().strip())
-    except IOError:
-        print app.config['ENVIRONMENT'] + '_cron_timestamp_20min.txt not found'
-        timestamp_20min = 0
-
-    last_run_20min = datetime.fromtimestamp(timestamp_20min)
-
-    difference_20min = now - last_run_20min
-
-    if difference_20min > timedelta(minutes=20):
-        with open(app.config['ENVIRONMENT'] + '_cron_timestamp_20min.txt', 'w') as f:
-            f.write(now.strftime('%s'))
-
-        statistic_limit = now - app.config['STATISTICS_KEEP']
-
-        Statistic.query.filter(Statistic.timestamp < statistic_limit).delete()
-
-        statistics = []
-
-        def maybe_int(value):
-            if value is None:
-                return 0
-            else:
-                return int(value)
-
-        sales_statistics = {
-            'Available':
-                app.config['TICKETS_AVAILABLE'],
-            'Ordered':
-                Ticket.count(),
-            'Paid':
-                Ticket.query \
-                    .filter(Ticket.paid == True) \
-                    .filter(Ticket.cancelled == False) \
-                    .count(),
-            'Cancelled':
-                Ticket.query.filter(Ticket.cancelled == True).count(),
-            'Collected':
-                Ticket.query.filter(Ticket.collected == True).count(),
-            'Waiting':
-                maybe_int(db.session.query(func.sum(Waiting.waitingfor)).scalar()),
-        }
-
-        for key, value in sales_statistics.iteritems():
-            statistics.append(
-                Statistic(
-                    'Sales',
-                    key,
-                    value
-                )
+def generate_payment_statistics():
+    """Generate statistics for number of tickets paid for by each method."""
+    DB.session.add_all(
+        models.Statistic(
+            'Payments',
+            str(method[0]),
+            models.Ticket.query.filter(
+                models.Ticket.payment_method == method[0]
+            ).filter(
+                models.Ticket.paid == True
+            ).count()
+        ) for method in DB.session.query(
+            sqlalchemy.distinct(
+                models.Ticket.payment_method
             )
+        ).all()
+    )
 
-        paymentMethods = [
-            'Battels',
-            'Card',
-            'Cash',
-            'Cheque',
-            'Free'
-        ]
+    DB.session.commit()
 
-        for method in paymentMethods:
-            statistics.append(
-                Statistic(
-                    'Payments',
-                    method,
-                    Ticket.query \
-                        .filter(Ticket.paymentmethod == method) \
-                        .filter(Ticket.paid == True) \
-                        .count()
-                )
-            )
+def generate_college_statistics():
+    """Generate statistics for number of users from each college."""
+    DB.session.add_all(
+        models.Statistic(
+            'Colleges',
+            college.name,
+            models.User.query.filter(
+                models.User.college_id == college.id
+            ).count()
+        ) for college in models.College.query.all()
+    )
 
-        colleges = College.query.all()
+    DB.session.commit()
 
-        for college in colleges:
-            statistics.append(
-                Statistic(
-                    'Colleges',
-                    college.name,
-                    User.query.filter(User.college_id == college.id).count()
-                )
-            )
+def send_3_day_warnings(now, difference):
+    """Send warnings for tickets expiring in 3 days.
 
-        db.session.add_all(statistics)
-        db.session.commit()
+    Args:
+        now: (datetime.datetime) time at which the script was started
+        difference: (datetime.timedelta) how long since the script last ran
+    """
+    start = now + datetime.timedelta(days=3)
+    end = now + datetime.timedelta(days=3) + difference
 
-        _3day_start = now + timedelta(days=3)
-        _3day_end = now + timedelta(days=3) + difference_20min
-        _1day_start = now + timedelta(days=1)
-        _1day_end = now + timedelta(days=1) + difference_20min
+    tickets = models.Ticket.query.filter(
+        models.Ticket.expires != None
+    ).filter(
+        models.Ticket.expires > start
+    ).filter(
+        models.Ticket.expires <= end
+    ).filter(
+        models.Ticket.cancelled == False
+    ).filter(
+        models.Ticket.paid == False
+    ).group_by(
+        models.Ticket.owner_id
+    ).all()
 
-        tickets_3days = Ticket.query \
-            .filter(Ticket.expires != None) \
-            .filter(Ticket.expires > _3day_start) \
-            .filter(Ticket.expires < _3day_end) \
-            .filter(Ticket.cancelled == False) \
-            .filter(Ticket.paid == False) \
-            .group_by(Ticket.owner_id) \
-            .all()
+    for ticket in tickets:
+        APP.email_manager.send_template(
+            ticket.owner.email,
+            'Tickets Expiring',
+            'tickets_expiring_3_days.email',
+            ticket=ticket
+        )
 
-        for ticket in tickets_3days:
-            email_manager.sendTemplate(
-                ticket.owner.email,
-                'Tickets Expiring',
-                'ticketsExpiring3days.email',
-                ticket=ticket
-            )
+def send_1_day_warnings(now, difference):
+    """Send warnings for tickets expiring in 1 day.
 
-        tickets_1day = Ticket.query \
-            .filter(Ticket.expires != None) \
-            .filter(Ticket.expires > _1day_start) \
-            .filter(Ticket.expires < _1day_end) \
-            .filter(Ticket.cancelled == False) \
-            .filter(Ticket.paid == False) \
-            .group_by(Ticket.owner_id) \
-            .all()
+    Args:
+        now: (datetime.datetime) time at which the script was started
+        difference: (datetime.timedelta) how long since the script last ran
+    """
+    start = now + datetime.timedelta(days=1)
+    end = now + datetime.timedelta(days=1) + difference
 
-        for ticket in tickets_1day:
-            email_manager.sendTemplate(
-                ticket.owner.email,
-                'Final Warning: Tickets Expiring',
-                'ticketsExpiring1day.email',
-                ticket=ticket
-            )
+    tickets = models.Ticket.query.filter(
+        models.Ticket.expires != None
+    ).filter(
+        models.Ticket.expires > start
+    ).filter(
+        models.Ticket.expires <= end
+    ).filter(
+        models.Ticket.cancelled == False
+    ).filter(
+        models.Ticket.paid == False
+    ).group_by(
+        models.Ticket.owner_id
+    ).all()
+
+    for ticket in tickets:
+        APP.email_manager.send_template(
+            ticket.owner.email,
+            'Final Warning: Tickets Expiring',
+            'tickets_expiring_1_day.email',
+            ticket=ticket
+        )
+
+def run_5_minutely(now):
+    """Run tasks which need to be run every 5 minutes.
+
+    Args:
+        now: (datetime.datetime) time at which the script was started
+    """
+    timestamp_file = os.path.abspath(
+        './{}_cron_timestamp_5min.txt'.format(APP.config['ENVIRONMENT'])
+    )
+
+    if now - get_last_run_time(timestamp_file) < datetime.timedelta(minutes=5):
+        return
+
+    set_timestamp(timestamp_file, now)
+
+    send_announcements()
+
+    allocate_waiting()
+
+    cancel_expired_tickets(now)
+
+    remove_expired_secret_keys(now)
+
+def run_20_minutely(now):
+    """Run tasks which need to be run every 20 minutes.
+
+    Args:
+        now: (datetime.datetime) time at which the script was started
+    """
+    timestamp_file = os.path.abspath(
+        './{}_cron_timestamp_20min.txt'.format(APP.config['ENVIRONMENT'])
+    )
+
+    difference = now - get_last_run_time(timestamp_file)
+
+    if difference < datetime.timedelta(minutes=20):
+        return
+
+    set_timestamp(timestamp_file, now)
+
+    delete_old_statistics(now)
+
+    generate_sales_statistics()
+
+    generate_payment_statistics()
+
+    generate_college_statistics()
+
+    send_3_day_warnings(now, difference)
+
+    send_1_day_warnings(now, difference)
+
+def main():
+    """Check the lock, do some setup and run the tasks."""
+    if 'KEBLE_BALL_ENV' in os.environ:
+        if os.environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
+            APP.config.from_pyfile('config/production.py')
+        elif os.environ['KEBLE_BALL_ENV'] == 'STAGING':
+            APP.config.from_pyfile('config/staging.py')
+        elif os.environ['KEBLE_BALL_ENV'] == 'DEVELOPMENT':
+            APP.config.from_pyfile('config/development.py')
+
+    lockfile = os.path.abspath(
+        './{}.cron.lock'.format(APP.config['ENVIRONMENT'])
+    )
+
+    with file_lock(lockfile):
+        email_manager.EmailManager(APP)
+
+        now = datetime.datetime.utcnow()
+
+        run_5_minutely(now)
+
+        run_20_minutely(now)
+
+if __name__ == '__main__':
+    main()

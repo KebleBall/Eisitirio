@@ -78,6 +78,9 @@ a {
     p:last-child {
         margin-bottom: 0;
     }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: $body-font-family;
+    }
 }
 
 #flashes {
@@ -98,8 +101,8 @@ table .button {
     margin: 0;
 }
 
-#giveTickets,
-#refundTransaction {
+#give_tickets,
+#refund_transaction {
     input {
         display: inline;
         &[type="number"] {
@@ -115,4 +118,8 @@ table .button {
     margin: 0;
     position: relative;
     top: -0.25rem;
+}
+
+td, td label {
+    color: #000 !important;
 }

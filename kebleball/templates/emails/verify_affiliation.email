@@ -1,6 +1,6 @@
 Hi!
 
-A Keble member {{ user.fullname }} has just provided their affiliation as being {{ user.affiliation.name }}. You should log in to the Keble Ball Ticketing System at {{ url }} to confirm that this is correct so that they can buy tickets as soon as possible.
+A Keble member {{ user.full_name }} has just provided their affiliation as being {{ user.affiliation.name }}. You should log in to the Keble Ball Ticketing System at {{ url }} to confirm that this is correct so that they can buy tickets as soon as possible.
 
 Best Wishes,
 
