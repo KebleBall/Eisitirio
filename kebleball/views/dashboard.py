@@ -166,7 +166,7 @@ def profile():
                 flask.request.form['affiliation']
             )
 
-            db.session.commit()
+            DB.session.commit()
 
             APP.log_manager.log_event(
                 'Updated Details',

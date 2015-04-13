@@ -16,20 +16,20 @@ DB = db.DB
 
 ADMIN_USERS = flask.Blueprint('admin_users', __name__)
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/view')
+@ADMIN_USERS.route('/admin/user/<int:user_id>/view')
 @ADMIN_USERS.route(
-    '/admin/user/<int:object_id>/view/page/selfactions/<int:self_actions_page>'
+    '/admin/user/<int:user_id>/view/page/selfactions/<int:self_actions_page>'
 )
 @ADMIN_USERS.route(
-    '/admin/user/<int:object_id>/view/page/actions/<int:actions_page>'
+    '/admin/user/<int:user_id>/view/page/actions/<int:actions_page>'
 )
 @ADMIN_USERS.route(
-    '/admin/user/<int:object_id>/view/page/events/<int:events_page>'
+    '/admin/user/<int:user_id>/view/page/events/<int:events_page>'
 )
 @admin_required
-def view_user(object_id, self_actions_page=1, actions_page=1, events_page=1):
+def view_user(user_id, self_actions_page=1, actions_page=1, events_page=1):
     """Display a user's information."""
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         self_actions = user.actions.filter(
@@ -77,9 +77,9 @@ def view_user(object_id, self_actions_page=1, actions_page=1, events_page=1):
         events_page=events_page
     )
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/impersonate')
+@ADMIN_USERS.route('/admin/user/<int:user_id>/impersonate')
 @admin_required
-def impersonate_user(object_id):
+def impersonate_user(user_id):
     """Start impersonating a user.
 
     Some tasks are easier to do just by impersonating the user. This method
@@ -87,7 +87,7 @@ def impersonate_user(object_id):
     noting that it is an administrator performing these actions (used for
     logging)
         """
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         flask.session['actor_id'] = current_user.object_id
@@ -112,9 +112,9 @@ def impersonate_user(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/give', methods=['GET', 'POST'])
+@ADMIN_USERS.route('/admin/user/<int:user_id>/give', methods=['GET', 'POST'])
 @admin_required
-def give_user(object_id):
+def give_user(user_id):
     """Give the user some tickets.
 
     Overrides the ticket limit.
@@ -123,7 +123,7 @@ def give_user(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         price = (
@@ -179,7 +179,7 @@ def give_user(object_id):
 
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_users.view_user',
-                                            object_id=user.object_id))
+                                            user_id=user.object_id))
     else:
         flask.flash(
             'Could not find user, could not give tickets.',
@@ -188,15 +188,15 @@ def give_user(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/note', methods=['GET', 'POST'])
+@ADMIN_USERS.route('/admin/user/<int:user_id>/note', methods=['GET', 'POST'])
 @admin_required
-def note_user(object_id):
+def note_user(user_id):
     """Set the notes field for a user."""
     if flask.request.method != 'POST':
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         user.note = flask.request.form['notes']
@@ -214,7 +214,7 @@ def note_user(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_users.view_user',
-                                            object_id=user.object_id))
+                                            user_id=user.object_id))
     else:
         flask.flash(
             'Could not find user, could not set notes.',
@@ -223,16 +223,16 @@ def note_user(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/verify')
+@ADMIN_USERS.route('/admin/user/<int:user_id>/verify')
 @admin_required
-def verify_user(object_id):
+def verify_user(user_id):
     """Manually mark a user as verified.
 
     If a user suffers an ID.10.T error and is unable to verify their email
     themselves, we can do it as adminstrators to save the hassle of walking the
     user through the process.
     """
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         user.verified = True
@@ -250,7 +250,7 @@ def verify_user(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_users.view_user',
-                                            object_id=user.object_id))
+                                            user_id=user.object_id))
     else:
         flask.flash(
             'Could not find user, could not verify.',
@@ -259,11 +259,11 @@ def verify_user(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/demote')
+@ADMIN_USERS.route('/admin/user/<int:user_id>/demote')
 @admin_required
-def demote_user(object_id):
+def demote_user(user_id):
     """Make an admin not an admin."""
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         user.demote()
@@ -281,7 +281,7 @@ def demote_user(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_users.view_user',
-                                            object_id=user.object_id))
+                                            user_id=user.object_id))
     else:
         flask.flash(
             'Could not find user, could not demote.',
@@ -290,11 +290,11 @@ def demote_user(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/promote')
+@ADMIN_USERS.route('/admin/user/<int:user_id>/promote')
 @admin_required
-def promote_user(object_id):
+def promote_user(user_id):
     """Make a user an administrator."""
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         user.promote()
@@ -312,7 +312,7 @@ def promote_user(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_users.view_user',
-                                            object_id=user.object_id))
+                                            user_id=user.object_id))
     else:
         flask.flash(
             'Could not find user, could not promote.',
@@ -321,9 +321,9 @@ def promote_user(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/add_manual_battels')
+@ADMIN_USERS.route('/admin/user/<int:user_id>/add_manual_battels')
 @admin_required
-def add_manual_battels(object_id):
+def add_manual_battels(user_id):
     """Set up a battels account for a user.
 
     If a user wasn't automatically matched to a battels account (common for
@@ -331,7 +331,7 @@ def add_manual_battels(object_id):
     undergraduates), we can manually create a battels account tied to the user's
     email address.
     """
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         user.add_manual_battels()
@@ -348,7 +348,7 @@ def add_manual_battels(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_users.view_user',
-                                            object_id=user.object_id))
+                                            user_id=user.object_id))
     else:
         flask.flash(
             'Could not find user, could not manually set up battels.',
@@ -357,15 +357,15 @@ def add_manual_battels(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/verify_affiliation')
+@ADMIN_USERS.route('/admin/user/<int:user_id>/verify_affiliation')
 @admin_required
-def verify_affiliation(object_id):
+def verify_affiliation(user_id):
     """Mark a user's affiliation as being verified.
 
     In limited release, users' affiliations must be varified to ensure only
     current college members and graduands are able to purchase tickets.
     """
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         user.verify_affiliation()
@@ -378,11 +378,11 @@ def verify_affiliation(object_id):
 
     return flask.redirect(flask.url_for('admin_users.verify_affiliations'))
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/deny_affiliation')
+@ADMIN_USERS.route('/admin/user/<int:user_id>/deny_affiliation')
 @admin_required
-def deny_affiliation(object_id):
+def deny_affiliation(user_id):
     """Mark a user's affiliation as incorrect/invalid."""
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         user.deny_affiliation()
@@ -412,17 +412,17 @@ def verify_affiliations():
     return flask.render_template('admin_users/verify_affiliations.html',
                                  users=users)
 
-@ADMIN_USERS.route('/admin/user/<int:object_id>/collect',
+@ADMIN_USERS.route('/admin/user/<int:user_id>/collect',
                    methods=['GET', 'POST'])
 @admin_required
-def collect_tickets(object_id):
+def collect_tickets(user_id):
     """Display an interface to collect tickets.
 
     Tickets are attached to barcoded wristbands upon collection. This presents
     an interface displaying all the users tickets, with a field for adding the
     barcode to each (intended to be filled using a barcode scanner).
     """
-    user = models.User.get_by_id(object_id)
+    user = models.User.get_by_id(user_id)
 
     if user:
         return flask.render_template(

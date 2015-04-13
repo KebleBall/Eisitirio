@@ -59,10 +59,10 @@ def validate_resale_email():
 
     return flask.Response(json.dumps(response), mimetype='text/json')
 
-@AJAX.route('/ajax/change/ticket/<int:object_id>/name', methods=['POST'])
-def change_ticket_name(object_id):
+@AJAX.route('/ajax/change/ticket/<int:ticket_id>/name', methods=['POST'])
+def change_ticket_name(ticket_id):
     """Change the name on a ticket."""
-    ticket = models.Ticket.get_by_id(object_id)
+    ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket and flask.request.form['name'] != '':
         ticket.name = flask.request.form['name']

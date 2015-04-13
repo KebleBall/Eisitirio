@@ -32,7 +32,7 @@ def check_for_maintenance():
     Created as early as possible to ensure it is called before
     login_manager.login_user
     """
-    if os.path.exists('/var/www/flask_kebleball/.maintenance'):
+    if os.path.exists(APP.config['MAINTENANCE_FILE_PATH']):
         APP.config['MAINTENANCE_MODE'] = True
         if (
                 'maintenance' not in flask.request.path and
@@ -49,6 +49,7 @@ LOG = APP.log_manager.log_main
 
 APP.register_blueprint(views.ADMIN)
 APP.register_blueprint(views.ADMIN_USERS)
+APP.register_blueprint(views.ADMIN_TICKETS)
 APP.register_blueprint(views.AJAX)
 APP.register_blueprint(views.DASHBOARD)
 APP.register_blueprint(views.FRONT)

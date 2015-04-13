@@ -265,7 +265,7 @@
                             <td>#{{ '%05d' % user.object_id }}</td>
                             <td>{{ user.full_name }}</td>
                             <td>{{ user.email }}</td>
-                            <td><a class="button small" href="{{ url_for('admin_users.view_user', id=user.object_id) }}">View User</a></td>
+                            <td><a class="button small" href="{{ url_for('admin_users.view_user', user_id=user.object_id) }}">View User</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

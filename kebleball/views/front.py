@@ -127,7 +127,7 @@ def register():
             'forenames' not in flask.request.form or
             flask.request.form['forenames'] == ''
     ):
-        flask.flashes.append('First Name cannot be blank')
+        flask.flashes.append('Forenames cannot be blank')
         valid = False
 
     if (
@@ -203,8 +203,8 @@ def register():
         flask.request.form['affiliation']
     )
 
-    DB.flask.session.add(user)
-    DB.flask.session.commit()
+    DB.session.add(user)
+    DB.session.commit()
 
     APP.log_manager.log_event(
         'Registered',
@@ -263,7 +263,7 @@ def confirm_email(user_id, secret_key):
             user.email = user.new_email
             user.new_email = None
 
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Confirmed email',
@@ -310,7 +310,7 @@ def email_confirm():
             user.secret_key = helpers.generate_key(64)
             user.secret_key_expiry = None
 
-            DB.flask.session.commit()
+            DB.session.commit()
 
             APP.log_manager.log_event(
                 'Requested email confirm',
@@ -373,7 +373,7 @@ def password_reset():
                 )
             )
 
-            app.email_manager.send_template(
+            APP.email_manager.send_template(
                 flask.request.form['email'],
                 'Attempted Account Access',
                 'password_reset_fail.email'
@@ -385,7 +385,7 @@ def password_reset():
                 datetime.timedelta(minutes=30)
             )
 
-            DB.flask.session.commit()
+            DB.session.commit()
 
             APP.log_manager.log_event(
                 'Started password reset',
@@ -396,7 +396,7 @@ def password_reset():
             APP.email_manager.send_template(
                 flask.request.form['email'],
                 'Confirm Password Reset',
-                'password_reset_cnfirm.email',
+                'password_reset_confirm.email',
                 confirmurl=flask.url_for(
                     'front.reset_password',
                     user_id=user.object_id,
@@ -432,10 +432,11 @@ def reset_password(user_id, secret_key):
     user = models.User.get_by_id(user_id)
 
     if user is None or user.secret_key != secret_key:
-        user.secret_key = None
-        user.secret_key_expiry = None
+        if user is not None:
+            user.secret_key = None
+            user.secret_key_expiry = None
 
-        DB.flask.session.commit()
+            DB.session.commit()
 
         flask.flash('Could not complete password reset. Please try again',
                     'error')
@@ -448,7 +449,7 @@ def reset_password(user_id, secret_key):
             user.secret_key_expiry = (datetime.datetime.utcnow() +
                                       datetime.timedelta(minutes=5))
 
-            DB.flask.session.commit()
+            DB.session.commit()
 
             flask.flash('Passwords do not match, please try again', 'warning')
 
@@ -465,7 +466,7 @@ def reset_password(user_id, secret_key):
             user.secret_key = None
             user.secret_key_expiry = None
 
-            DB.flask.session.commit()
+            DB.session.commit()
 
             APP.log_manager.log_event(
                 'Completed password reset',
@@ -509,8 +510,8 @@ def destroy_account(user_id, secret_key):
                 )
                 entry.user = None
 
-            DB.flask.session.delete(user)
-            DB.flask.session.commit()
+            DB.session.delete(user)
+            DB.session.commit()
 
             APP.log_manager.log_event(
                 'Deleted account with email address {0}'.format(
@@ -555,6 +556,8 @@ def logout():
         )
 
         actor = models.User.get_by_id(flask.session['actor_id'])
+
+        flask.session.pop('actor_id', None)
 
         if actor:
             login.login_user(
