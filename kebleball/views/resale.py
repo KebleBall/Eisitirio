@@ -43,14 +43,11 @@ def resale_home():
             models.Ticket.paid == True
         ).all()
 
-        while None in tickets:
-            tickets.remove(None)
-
         resale_to = models.User.get_by_email(flask.request.form['resale_email'])
 
         if not resale_to:
             flask.flash(
-                'No user with that email exists'
+                'No user with that email exists',
                 'error'
             )
             return flask.render_template('resale/resale_home.html')
@@ -88,9 +85,6 @@ def cancel_resale():
         ).all()
 
         for ticket in tickets:
-            if not ticket:
-                continue
-
             ticket.resale_key = None
             ticket.resaleconfirmed = None
             ticket.reselling_to = None

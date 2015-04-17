@@ -166,7 +166,7 @@ def validate_resale_email(email, current_user):
                 {
                     'class': 'info',
                     'message': (
-                        'There is very little, if any, point in reselling '
+                        'There is very little point, if any, in reselling '
                         'tickets to yourself...'
                     )
                 },

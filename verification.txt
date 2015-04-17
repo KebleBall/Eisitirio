@@ -112,7 +112,7 @@
 * │       ├── front.py
 * │       ├── __init__.py
 * │       ├── purchase.py
-  │       └── resale.py
+* │       └── resale.py
   ├── make_requirements.py
   ├── requirements.txt
   ├── requirements-unversioned.txt
