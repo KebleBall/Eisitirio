@@ -12,9 +12,7 @@ from email.mime.text import MIMEText
 
 class EmailManager:
     def __init__(self, app):
-        self.defaultfrom = app.config['EMAIL_FROM']
-        self.smtp_host = app.config['SMTP_HOST']
-        self.send_emails = app.config['SEND_EMAILS']
+        self.app = app
 
         app.emailer = self
 
@@ -25,6 +23,49 @@ class EmailManager:
         self.jinjaenv = None
 
         atexit.register(self.shutdown)
+
+    def smtp_connect(self):
+        if self.app.config['SMTP_SSL']:
+            self.smtp = smtplib.SMTP_SSL(self.app.config['SMTP_HOST'],
+                                         self.app.config['SMTP_PORT'])
+        else:
+            self.smtp = smtplib.SMTP(self.app.config['SMTP_HOST'],
+                                     self.app.config['SMTP_PORT'])
+
+        if self.app.config['SMTP_LOGIN']:
+
+            try:
+                self.smtp.login(self.app.config['SMTP_USER'],
+                                self.app.config['SMTP_PASSWORD'])
+            except smtplib.SMTPHeloError as e:
+                self.log(
+                    'error',
+                    (
+                        'SMTP server at {0} did not reply properly to HELO at '
+                        'login'
+                    ).format(
+                        self.app.config['SMTP_HOST']
+                    )
+                )
+            except smtplib.SMTPAuthenticationError as e:
+                self.log(
+                    'error',
+                    (
+                        'SMTP server at {0} did accept the username/password.'
+                    ).format(
+                        self.app.config['SMTP_HOST']
+                    )
+                )
+            except smtplib.SMTPException as e:
+                self.log(
+                    'error',
+                    (
+                        'No suitable authentication method found for SMTP '
+                        'server at {0}'
+                    ).format(
+                        self.app.config['SMTP_HOST']
+                    )
+                )
 
     def smtp_open(self):
         try:
@@ -50,7 +91,7 @@ class EmailManager:
         try:
             msgfrom = kwargs['email_from']
         except KeyError:
-            msgfrom = self.defaultfrom
+            msgfrom = self.app.config['EMAIL_FROM']
 
         self.sendText(
             to,
@@ -61,7 +102,7 @@ class EmailManager:
 
     def sendText(self, to, subject, text, msgfrom=None):
         if msgfrom is None:
-            msgfrom = self.defaultfrom
+            msgfrom = self.app.config['EMAIL_FROM']
 
         msg = MIMEText(
             text,
@@ -80,7 +121,7 @@ class EmailManager:
         self.sendMsg(msg)
 
     def sendMsg(self, msg):
-        if not self.send_emails:
+        if not self.app.config['SEND_EMAILS']:
             self.log(
                 'info',
                 'Email not sent per application policy'
@@ -88,7 +129,7 @@ class EmailManager:
             return
 
         if self.smtp is None or not self.smtp_open():
-            self.smtp = smtplib.SMTP(self.smtp_host)
+            self.smtp_connect()
 
         try:
             self.smtp.sendmail(msg['From'], msg.get_all('To'), msg.as_string())
@@ -99,7 +140,7 @@ class EmailManager:
                     'SMTP server at {0} refused recipients {1} refused for '
                     'message with subject {2}'
                 ).format(
-                    self.smtp_host,
+                    self.app.config['SMTP_HOST'],
                     e.recipients,
                     msg['Subject']
                 )
@@ -111,7 +152,7 @@ class EmailManager:
                     'SMTP server at {0} did not reply properly to HELO for '
                     'message with subject {1}'
                 ).format(
-                    self.smtp_host,
+                    self.app.config['SMTP_HOST'],
                     msg['Subject']
                 )
             )
@@ -122,7 +163,7 @@ class EmailManager:
                     'SMTP server at {0} did not allow sender {1} for '
                     'message with subject {2}'
                 ).format(
-                    self.smtp_host,
+                    self.app.config['SMTP_HOST'],
                     msg['From'],
                     msg['Subject']
                 )
@@ -134,7 +175,7 @@ class EmailManager:
                     'SMTP server at {0} responded with unexpected error code '
                     '{1} with error message {2} for message with subject {3}'
                 ).format(
-                    self.smtp_host,
+                    self.app.config['SMTP_HOST'],
                     e.smtp_code,
                     e.smtp_error,
                     msg['Subject']
