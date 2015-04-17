@@ -307,7 +307,7 @@
                                     Awaiting {{ ticket.payment_method }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                 {% endif %}
                             </td>
-                            <td><a class="button small" href="{{ url_for('admin_tickets.view_ticket', id=ticket.object_id) }}">View Ticket</a></td>
+                            <td><a class="button small" href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id) }}">View Ticket</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -333,7 +333,7 @@
                             <td>{{ log.action }}</td>
                             <td>{{ log.actor.full_name }}</td>
                             <td>{{ log.user.full_name }}</td>
-                            <td><a class="button small" href="{{ url_for('admin.view_log', id=log.object_id) }}">View Log Entry</a></td>
+                            <td><a class="button small" href="{{ url_for('admin.view_log', entry_id=log.object_id) }}">View Log Entry</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

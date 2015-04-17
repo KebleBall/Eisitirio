@@ -194,7 +194,7 @@ class Ticket(DB.Model):
         self.set_price(price)
 
         self.expires = (datetime.datetime.utcnow() +
-                        app.config['TICKET_EXPIRY_TIME'])
+                        APP.config['TICKET_EXPIRY_TIME'])
 
     def __getattr__(self, name):
         """Magic method to generate ticket price in pounds."""
@@ -515,7 +515,7 @@ class Ticket(DB.Model):
         """Check whether the ticket can be cancelled/refunded automatically."""
         if self.cancelled:
             return False
-        elif app.config['LOCKDOWN_MODE']:
+        elif APP.config['LOCKDOWN_MODE']:
             return False
         elif self.collected:
             return False
@@ -529,7 +529,7 @@ class Ticket(DB.Model):
             return True
         elif self.payment_method == 'Battels':
             return (
-                app.config['CURRENT_TERM'] != 'TT' and
+                APP.config['CURRENT_TERM'] != 'TT' and
                 self.battels is not None and
                 self.battels == self.owner.battels
             )
@@ -554,13 +554,13 @@ class Ticket(DB.Model):
             not self.collected and
             not self.cancelled and
             self.resale_key == None and
-            not app.config['LOCKDOWN_MODE']
+            not APP.config['LOCKDOWN_MODE']
         )
 
     def can_change_name(self):
         """Check whether a ticket's name can be changed."""
         return not (
-            app.config['LOCKDOWN_MODE'] or
+            APP.config['LOCKDOWN_MODE'] or
             self.cancelled or
             self.collected
         )

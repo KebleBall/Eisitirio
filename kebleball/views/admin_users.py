@@ -158,8 +158,8 @@ def give_user(user_id):
             ticket.add_note(note)
             tickets.append(ticket)
 
-        DB.flask.session.add_all(tickets)
-        DB.flask.session.commit()
+        DB.session.add_all(tickets)
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Gave {0} tickets'.format(
@@ -200,7 +200,7 @@ def note_user(user_id):
 
     if user:
         user.note = flask.request.form['notes']
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Updated notes',
@@ -236,7 +236,7 @@ def verify_user(user_id):
 
     if user:
         user.verified = True
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Verified email',
@@ -267,7 +267,7 @@ def demote_user(user_id):
 
     if user:
         user.demote()
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Demoted user',
@@ -298,7 +298,7 @@ def promote_user(user_id):
 
     if user:
         user.promote()
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Promoted user',

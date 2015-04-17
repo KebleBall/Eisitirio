@@ -135,7 +135,7 @@ def purchase_home():
                 'purchase/purchase_home.html',
                 form=flask.request.form,
                 num_tickets=num_tickets,
-                can_buy=tickets_available
+                tickets_available=tickets_available
             )
 
         tickets = []
@@ -170,9 +170,10 @@ def purchase_home():
         ):
             for ticket in tickets:
                 ticket.add_note(
-                    flask.request.form['payment_method'] +
-                    ' payment reason: ' +
-                    flask.request.form['payment_reason']
+                    '{} payment reason: {}'.format(
+                        flask.request.form['payment_method'],
+                        flask.request.form['payment_reason']
+                    )
                 )
 
         if voucher is not None:
@@ -234,7 +235,7 @@ def purchase_home():
     else:
         return flask.render_template(
             'purchase/purchase_home.html',
-            can_buy=tickets_available
+            tickets_available=tickets_available
         )
 
 @PURCHASE.route('/purchase/wait', methods=['GET', 'POST'])
@@ -304,10 +305,10 @@ def wait():
                 flask.flash(msg, 'warning')
 
             return flask.render_template(
-                'purchase/purchase_home.html',
+                'purchase/wait.html',
                 form=flask.request.form,
                 num_tickets=num_tickets,
-                can_wait=wait_available
+                wait_available=wait_available
             )
 
         DB.session.add(
@@ -341,7 +342,7 @@ def wait():
     else:
         return flask.render_template(
             'purchase/wait.html',
-            can_wait=wait_available
+            wait_available=wait_available
         )
 
 @PURCHASE.route('/purchase/change-method', methods=['GET', 'POST'])
@@ -359,9 +360,6 @@ def change_method():
         ).filter(
             models.Ticket.paid == False
         ).all()
-
-        while None in tickets:
-            tickets.remove(None)
 
         if (
                 (
@@ -424,9 +422,6 @@ def card_confirm():
         ).filter(
             models.Ticket.paid == False
         ).all()
-
-        while None in tickets:
-            tickets.remove(None)
 
         transaction = models.CardTransaction(
             login.current_user,
@@ -501,9 +496,6 @@ def battels_confirm():
             models.Ticket.paid == False
         ).all()
 
-        while None in tickets:
-            tickets.remove(None)
-
         if (
                 APP.config['CURRENT_TERM'] == 'HT' and
                 flask.request.form['payment_term'] != 'HT'
@@ -541,9 +533,6 @@ def cancel():
         ).filter(
             models.Ticket.owner_id == login.current_user.object_id
         ).all()
-
-        while None in tickets:
-            tickets.remove(None)
 
         tickets = [x for x in tickets if x.can_be_cancelled_automatically()]
 

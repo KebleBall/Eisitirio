@@ -18,7 +18,7 @@
                                 name="num_tickets"
                                 type="number"
                                 min="1"
-                                max="{{ can_wait }}"
+                                max="{{ wait_available }}"
                                 step="1"
                                 value="{% if num_tickets -%}
                                     {{ num_tickets }}
@@ -26,7 +26,7 @@
                                     1
                                 {% endif %}"
                                 data-slider="true"
-                                data-slider-range="1,{{ can_wait }}"
+                                data-slider-range="1,{{ wait_available }}"
                                 data-slider-snap="true"
                                 data-slider-step="1"
                                 data-slider-highlight="true"

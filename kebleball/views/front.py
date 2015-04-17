@@ -271,8 +271,11 @@ def confirm_email(user_id, secret_key):
             user
         )
 
-        flask.flash('Your email address has been verified. You can now log in',
-                    'info')
+        if login.current_user.is_anonymous():
+            flask.flash('Your email address has been verified. You can now log in',
+                        'info')
+        else:
+            flask.flash('Your email address has been verified.', 'info')
     else:
         flask.flash(
             (
@@ -282,7 +285,7 @@ def confirm_email(user_id, secret_key):
             'warning'
         )
 
-    return flask.redirect(flask.url_for('front.home'))
+    return flask.redirect(flask.url_for('router'))
 
 @FRONT.route('/emailconfirm', methods=['GET', 'POST'])
 def email_confirm():

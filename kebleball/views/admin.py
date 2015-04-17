@@ -326,23 +326,23 @@ def admin_home(page=1):
         category=category
     )
 
-@ADMIN.route('/admin/log/<int:object_id>/view')
+@ADMIN.route('/admin/log/<int:entry_id>/view')
 @login_manager.admin_required
-def view_log(object_id):
+def view_log(entry_id):
     """View a log entry."""
-    log = models.Log.get_by_id(object_id)
+    log = models.Log.get_by_id(entry_id)
 
     return flask.render_template(
         'admin/view_log.html',
         log=log
     )
 
-@ADMIN.route('/admin/transaction/<int:object_id>/view')
-@ADMIN.route('/admin/transaction/<int:object_id>/view/page/<int:events_page>')
+@ADMIN.route('/admin/transaction/<int:transaction_id>/view')
+@ADMIN.route('/admin/transaction/<int:transaction_id>/view/page/<int:events_page>')
 @login_manager.admin_required
-def view_transaction(object_id, events_page=1):
+def view_transaction(transaction_id, events_page=1):
     """View a card transaction object."""
-    transaction = models.CardTransaction.get_by_id(object_id)
+    transaction = models.CardTransaction.get_by_id(transaction_id)
 
     if transaction:
         events = transaction.events.paginate(
@@ -360,10 +360,10 @@ def view_transaction(object_id, events_page=1):
         events_page=events_page
     )
 
-@ADMIN.route('/admin/transaction/<int:object_id>/refund',
+@ADMIN.route('/admin/transaction/<int:transaction_id>/refund',
              methods=['GET', 'POST'])
 @login_manager.admin_required
-def refund_transaction(object_id):
+def refund_transaction(transaction_id):
     """Refund a transaction.
 
     Allows part or full refunds for whatever reason, sends a request to eWay to
@@ -373,7 +373,7 @@ def refund_transaction(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-    transaction = models.CardTransaction.get_by_id(object_id)
+    transaction = models.CardTransaction.get_by_id(transaction_id)
 
     if transaction:
         amount = (int(flask.request.form['refund_amount_pounds'])
@@ -387,7 +387,7 @@ def refund_transaction(object_id):
             return flask.redirect(
                 flask.request.referrer or
                 flask.url_for('admin.view_transaction',
-                              object_id=transaction.object_id)
+                              transaction_id=transaction.transaction_id)
             )
 
         result = transaction.process_refund(amount)
@@ -404,7 +404,7 @@ def refund_transaction(object_id):
             )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.view_transaction',
-                                            object_id=transaction.object_id))
+                                            transaction_id=transaction.transaction_id))
     else:
         flask.flash(
             'Could not find transaction, could not cancel.',
@@ -421,7 +421,7 @@ def statistics():
     Computes a number of statistics about the ball (live), and displays them
     alongside graphs.
     """
-    total_value = DB.flask.session.query(
+    total_value = DB.session.query(
         sqlalchemy.func.sum(models.Ticket.price)
     ).filter(
         models.Ticket.cancelled != True
@@ -430,7 +430,7 @@ def statistics():
     if total_value is None:
         total_value = 0
 
-    paid_value = DB.flask.session.query(
+    paid_value = DB.session.query(
         sqlalchemy.func.sum(models.Ticket.price)
     ).filter(
         models.Ticket.paid == True
@@ -441,7 +441,7 @@ def statistics():
     if paid_value is None:
         paid_value = 0
 
-    cancelled_value = DB.flask.session.query(
+    cancelled_value = DB.session.query(
         sqlalchemy.func.sum(models.Ticket.price)
     ).filter(
         models.Ticket.cancelled == True
@@ -450,7 +450,7 @@ def statistics():
     if cancelled_value is None:
         cancelled_value = 0
 
-    payment_method_values = DB.flask.session.query(
+    payment_method_values = DB.session.query(
         sqlalchemy.func.sum(models.Ticket.price), models.Ticket.payment_method
     ).filter(
         models.Ticket.cancelled != True
@@ -558,7 +558,7 @@ def announcements(page=1):
             announcement = models.Announcement(
                 form['subject'],
                 form['message'],
-                login.current_user,
+                login.current_user.object_id,
                 send_email,
                 college,
                 affiliation,
@@ -568,8 +568,8 @@ def announcements(page=1):
                 has_uncollected
             )
 
-            DB.flask.session.add(announcement)
-            DB.flask.session.commit()
+            DB.session.add(announcement)
+            DB.session.commit()
 
             flask.flash(
                 'Announcement created successfully',
@@ -586,19 +586,19 @@ def announcements(page=1):
         form=form
     )
 
-@ADMIN.route('/admin/announcement/<int:object_id>/delete')
+@ADMIN.route('/admin/announcement/<int:announcement_id>/delete')
 @login_manager.admin_required
-def delete_announcement(object_id):
+def delete_announcement(announcement_id):
     """Delete an announcement.
 
     Removes an announcement from the database, but cannot recall any emails
     which have already been sent
     """
-    announcement = models.Announcement.get_by_id(object_id)
+    announcement = models.Announcement.get_by_id(announcement_id)
 
     if announcement:
-        DB.flask.session.delete(announcement)
-        DB.flask.session.commit()
+        DB.session.delete(announcement)
+        DB.session.commit()
 
         flask.flash(
             'Announcement deleted successfully',
@@ -613,20 +613,20 @@ def delete_announcement(object_id):
     return flask.redirect(flask.request.referrer or
                           flask.url_for('admin.announcements'))
 
-@ADMIN.route('/admin/announcement/<int:object_id>/cancel')
+@ADMIN.route('/admin/announcement/<int:announcement_id>/cancel')
 @login_manager.admin_required
-def cancel_announcement_emails(object_id):
+def cancel_announcement_emails(announcement_id):
     """Cancel sending emails for an announcement.
 
     Remove from the sending queue any pending emails for an announcement. Does
     not recall previously sent emails.
     """
-    announcement = models.Announcement.get_by_id(object_id)
+    announcement = models.Announcement.get_by_id(announcement_id)
 
     if announcement:
         announcement.emails = []
         announcement.send_email = False
-        DB.flask.session.commit()
+        DB.session.commit()
 
         flask.flash(
             'Announcement emails cancelled successfully',
@@ -722,9 +722,9 @@ def vouchers(page=1):
                     form['applies_to'],
                     single_use
                 )
-                DB.flask.session.add(voucher)
+                DB.session.add(voucher)
 
-            DB.flask.session.commit()
+            DB.session.commit()
 
             flask.flash(
                 'Voucher(s) created successfully',
@@ -755,15 +755,15 @@ def vouchers(page=1):
         vouchers=voucher_results
     )
 
-@ADMIN.route('/admin/voucher/<int:object_id>/delete')
+@ADMIN.route('/admin/voucher/<int:voucher_id>/delete')
 @login_manager.admin_required
-def delete_voucher(object_id):
+def delete_voucher(voucher_id):
     """Delete a discount voucher."""
-    voucher = models.Voucher.get_by_id(object_id)
+    voucher = models.Voucher.get_by_id(voucher_id)
 
     if voucher:
-        DB.flask.session.delete(voucher)
-        DB.flask.session.commit()
+        DB.session.delete(voucher)
+        DB.session.commit()
         flask.flash(
             'Voucher deleted successfully',
             'success'
@@ -777,15 +777,15 @@ def delete_voucher(object_id):
     return flask.redirect(flask.request.referrer or
                           flask.url_for('admin.vouchers'))
 
-@ADMIN.route('/admin/waiting/<int:object_id>/delete')
+@ADMIN.route('/admin/waiting/<int:entry_id>/delete')
 @login_manager.admin_required
-def delete_waiting(object_id):
+def delete_waiting(entry_id):
     """Delete an entry from the waiting list."""
-    waiting = models.Waiting.get_by_id(object_id)
+    waiting = models.Waiting.get_by_id(entry_id)
 
     if waiting:
-        DB.flask.session.delete(waiting)
-        DB.flask.session.commit()
+        DB.session.delete(waiting)
+        DB.session.commit()
         flask.flash(
             'Waiting list entry deleted',
             'success'

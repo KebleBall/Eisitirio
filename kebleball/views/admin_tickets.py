@@ -15,14 +15,14 @@ DB = db.DB
 
 ADMIN_TICKETS = flask.Blueprint('admin_tickets', __name__)
 
-@ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/view')
+@ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/view')
 @ADMIN_TICKETS.route(
-    '/admin/ticket/<int:object_id>/view/page/<int:events_page>'
+    '/admin/ticket/<int:ticket_id>/view/page/<int:events_page>'
 )
 @login_manager.admin_required
-def view_ticket(object_id, events_page=1):
+def view_ticket(ticket_id, events_page=1):
     """View a ticket object."""
-    ticket = models.Ticket.get_by_id(object_id)
+    ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket:
         events = ticket.log_entries.paginate(
@@ -40,10 +40,10 @@ def view_ticket(object_id, events_page=1):
         events_page=events_page
     )
 
-@ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/collect',
+@ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/collect',
                      methods=['GET', 'POST'])
 @login_manager.admin_required
-def collect_ticket(object_id):
+def collect_ticket(ticket_id):
     """Mark a ticket as collected, and add a barcode.
 
     Performs the requisite logic to check the barcode submitted for a ticket,
@@ -65,12 +65,12 @@ def collect_ticket(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-    ticket = models.Ticket.get_by_id(object_id)
+    ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket:
         ticket.barcode = flask.request.form['barcode']
         ticket.collected = True
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Collected',
@@ -85,7 +85,7 @@ def collect_ticket(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_users.collect_tickets',
-                                            object_id=ticket.owner_id))
+                                            ticket_id=ticket.owner_id))
     else:
         flask.flash(
             'Could not find ticket, could mark as collected.',
@@ -94,20 +94,20 @@ def collect_ticket(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/note',
+@ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/note',
                      methods=['GET', 'POST'])
 @login_manager.admin_required
-def note_ticket(object_id):
+def note_ticket(ticket_id):
     """Set notes for a ticket."""
     if flask.request.method != 'POST':
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-    ticket = models.Ticket.get_by_id(object_id)
+    ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket:
         ticket.note = flask.request.form['notes']
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Updated notes',
@@ -120,7 +120,7 @@ def note_ticket(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_tickets.view_ticket',
-                                            object_id=ticket.object_id))
+                                            ticket_id=ticket.ticket_id))
     else:
         flask.flash(
             'Could not find ticket, could not set notes.',
@@ -129,19 +129,19 @@ def note_ticket(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/markpaid')
+@ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/markpaid')
 @login_manager.admin_required
-def mark_ticket_paid(object_id):
+def mark_ticket_paid(ticket_id):
     """Mark a ticket as paid.
 
     Generally used for tickets being paid for by cash/cheque, but also used if
     something goes wrong and the ticket isn't correctly marked as paid.
     """
-    ticket = models.Ticket.get_by_id(object_id)
+    ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket:
         ticket.paid = True
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Marked as paid',
@@ -154,7 +154,7 @@ def mark_ticket_paid(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_tickets.view_ticket',
-                                            object_id=ticket.object_id))
+                                            ticket_id=ticket.ticket_id))
     else:
         flask.flash(
             'Could not find ticket, could not mark as paid.',
@@ -163,15 +163,15 @@ def mark_ticket_paid(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/autocancel')
+@ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/autocancel')
 @login_manager.admin_required
-def auto_cancel_ticket(object_id):
+def auto_cancel_ticket(ticket_id):
     """Cancel and refund a ticket.
 
     Marks a ticket as cancelled, and refunds the money to the owner via the
     original payment method (where possible).
     """
-    ticket = models.Ticket.get_by_id(object_id)
+    ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket:
         if not ticket.can_be_cancelled_automatically():
@@ -181,7 +181,7 @@ def auto_cancel_ticket(object_id):
             )
             return flask.redirect(flask.request.referrer or
                                   flask.url_for('admin_tickets.view_ticket',
-                                                object_id=ticket.object_id))
+                                                ticket_id=ticket.ticket_id))
 
         if ticket.payment_method == 'Battels':
             ticket.battels.cancel(ticket)
@@ -194,10 +194,10 @@ def auto_cancel_ticket(object_id):
                 )
                 return flask.redirect(flask.request.referrer or
                                       flask.url_for('admin_tickets.view_ticket',
-                                                    object_id=ticket.object_id))
+                                                    ticket_id=ticket.ticket_id))
 
         ticket.cancelled = True
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Cancelled and refunded ticket',
@@ -210,7 +210,7 @@ def auto_cancel_ticket(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_tickets.view_ticket',
-                                            object_id=ticket.object_id))
+                                            ticket_id=ticket.ticket_id))
     else:
         flask.flash(
             'Could not find ticket, could not cancel.',
@@ -219,15 +219,15 @@ def auto_cancel_ticket(object_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
-@ADMIN_TICKETS.route('/admin/ticket/<int:object_id>/cancel')
+@ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/cancel')
 @login_manager.admin_required
-def cancel_ticket(object_id):
+def cancel_ticket(ticket_id):
     """Cancel a ticket without refunding it."""
-    ticket = models.Ticket.get_by_id(object_id)
+    ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket:
         ticket.cancelled = True
-        DB.flask.session.commit()
+        DB.session.commit()
 
         APP.log_manager.log_event(
             'Marked ticket as cancelled',
@@ -240,7 +240,7 @@ def cancel_ticket(object_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_tickets.view_ticket',
-                                            object_id=ticket.object_id))
+                                            ticket_id=ticket.ticket_id))
     else:
         flask.flash(
             'Could not find ticket, could not cancel.',
@@ -280,7 +280,7 @@ def validate_ticket():
             )
         else:
             ticket.entered = True
-            DB.flask.session.commit()
+            DB.session.commit()
             valid = True
             message = 'Permit entry for {0}'.format(ticket.name)
 

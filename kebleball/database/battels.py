@@ -75,10 +75,10 @@ class Battels(DB.Model):
 
     def __getattr__(self, name):
         """Magic method to generate amounts charged in pounds."""
-        if name == 'mt_pounds':
+        if name == 'michaelmas_charge_pounds':
             michaelmas_charge = '{0:03d}'.format(self.michaelmas_charge)
             return michaelmas_charge[:-2] + '.' + michaelmas_charge[-2:]
-        elif name == 'ht_pounds':
+        elif name == 'hilary_charge_pounds':
             hilary_charge = '{0:03d}'.format(self.hilary_charge)
             return hilary_charge[:-2] + '.' + hilary_charge[-2:]
         else:

@@ -21,8 +21,8 @@
                 {% else %}
                     <p><strong>Battels Manually Added</strong></p>
                 {% endif %}
-                <p><strong>MT Battels Charge</strong>: &pound;{{ '%.2f' % (user.battels.mt / 100.0) }}</p>
-                <p><strong>HT Battels Charge</strong>: &pound;{{ '%.2f' % (user.battels.ht / 100.0) }}</p>
+                <p><strong>MT Battels Charge</strong>: &pound;{{ user.battels.michaelmas_charge_pounds }}</p>
+                <p><strong>HT Battels Charge</strong>: &pound;{{ user.battels.hilary_charge_pounds }}</p>
             {% endif %}
             <h4>User Status</h4>
             <ul>
@@ -108,7 +108,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
+                                    <a href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id) }}" class="button tiny">View</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -132,7 +132,7 @@
                             <tr>
                                 <td>{{ waiting.waiting_for }}</td>
                                 <td>{{ waiting.waiting_since.strftime('%c') }}</td>
-                                <td><a href="{{ url_for('admin.delete_waiting', id=waiting.object_id) }}" class="button tiny">Remove</a></td>
+                                <td><a href="{{ url_for('admin.delete_waiting', entry_id=waiting.object_id) }}" class="button tiny">Remove</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -160,7 +160,7 @@
                                 </td>
                                 <td>{{ ticket.owner.full_name }}</td>
                                 <td>
-                                    <a href="{{ url_for('admin.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
+                                    <a href="{{ url_for('admin.view_ticket', ticket_id=ticket.object_id) }}" class="button tiny">View</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -190,7 +190,7 @@
                                 <td>{{ transaction.commenced.strftime('%c') }}</td>
                                 <td>{{ transaction.get_success() }}</td>
                                 <td>{{ transaction.get_status()[1] }}</td>
-                                <td><a href="{{ url_for('admin.view_transaction', id=transaction.object_id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_transaction', transaction_id=transaction.object_id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -216,16 +216,16 @@
                                 <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
                                 <td>{{ log.action }}</td>
-                                <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_log', entry_id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% if self_actions.has_prev %}
-                    <a href="{{ url_for('admin_users.view_user', id=user.object_id, self_actions_page=(self_actions_page-1)) }}#self_actions" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, self_actions_page=(self_actions_page-1)) }}#self_actions" class="button tiny">Previous Page</a>
                 {% endif %}
                 {% if self_actions.has_next %}
-                    <a href="{{ url_for('admin_users.view_user', id=user.object_id, self_actions_page=(self_actions_page+1)) }}#self_actions" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, self_actions_page=(self_actions_page+1)) }}#self_actions" class="button tiny">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events performed by user on self.</p>
@@ -248,18 +248,18 @@
                             <tr>
                                 <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="url_for('admin_users.view_user', id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
+                                <td><a href="url_for('admin_users.view_user', user_id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
                                 <td>{{ log.action }}</td>
-                                <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_log', entry_id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% if events.has_prev %}
-                    <a href="{{ url_for('admin_users.view_user', id=user.object_id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
                 {% endif %}
                 {% if events.has_next %}
-                    <a href="{{ url_for('admin_users.view_user', id=user.object_id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events performed on user by others.</p>
@@ -282,18 +282,18 @@
                             <tr>
                                 <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="url_for('admin_users.view_user', id=log.user_id) }}">{{ log.user.full_name }}</a></td>
+                                <td><a href="url_for('admin_users.view_user', user_id=log.user_id) }}">{{ log.user.full_name }}</a></td>
                                 <td>{{ log.action }}</td>
-                                <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_log', entry_id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% if other_actions.has_prev %}
-                    <a href="{{ url_for('admin_users.view_user', id=user.object_id, actions_page=(actions_page-1)) }}#other_actions" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, actions_page=(actions_page-1)) }}#other_actions" class="button tiny">Previous Page</a>
                 {% endif %}
                 {% if other_actions.has_next %}
-                    <a href="{{ url_for('admin_users.view_user', id=user.object_id, actions_page=(actions_page+1)) }}#other_actions" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, actions_page=(actions_page+1)) }}#other_actions" class="button tiny">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events performed by user on others.</p>

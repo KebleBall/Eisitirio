@@ -519,7 +519,7 @@ class User(DB.Model):
         if (
                 self.college.name == 'Keble' and
                 self.affiliation.name == 'Staff/Fellow' and
-                not app.config['TICKETS_ON_SALE']
+                not APP.config['TICKETS_ON_SALE']
         ):
             return APP.config['KEBLE_STAFF_TICKET_PRICE']
         else:
@@ -605,7 +605,7 @@ class User(DB.Model):
         ).count()
 
         if APP.config['TICKETS_ON_SALE']:
-            if tickets_owned >= app.config['MAX_TICKETS']:
+            if tickets_owned >= APP.config['MAX_TICKETS']:
                 return (
                     False,
                     0,
@@ -672,7 +672,7 @@ class User(DB.Model):
             waiting list, how many tickets the user can wait for, and an error
             message if the user cannot join the waiting list.
         """
-        waiting_open = app.config['WAITING_OPEN']
+        waiting_open = APP.config['WAITING_OPEN']
 
         if not waiting_open:
             return (

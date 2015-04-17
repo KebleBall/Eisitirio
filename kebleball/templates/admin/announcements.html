@@ -185,10 +185,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('dashboard.announcement', announcement_id=announcement.object_id) }}" class="button tiny">View</a>
-                                <a href="{{ url_for('admin.delete_announcement', id=announcement.object_id) }}" class="button tiny">Delete</a>
+                                <a href="{{ url_for('dashboard.display_announcement', announcement_id=announcement.object_id) }}" class="button tiny">View</a>
+                                <a href="{{ url_for('admin.delete_announcement', announcement_id=announcement.object_id) }}" class="button tiny">Delete</a>
                                 {% if announcement.send_email and not announcement.email_sent %}
-                                    <a href="{{ url_for('admin.cancel_announcement_emails', id=announcement.object_id) }}" class="button tiny">Cancel Emails</a>
+                                    <a href="{{ url_for('admin.cancel_announcement_emails', announcement_id=announcement.object_id) }}" class="button tiny">Cancel Emails</a>
                                 {% endif %}
                             </td>
                         </tr>
