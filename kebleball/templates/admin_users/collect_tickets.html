@@ -23,7 +23,7 @@
                             <td><label for="ticket_barcode-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
                             <td><label for="ticket_barcode-{{ ticket.object_id }}">{{ ticket.name }}</label></td>
                             <td>
-                                <form action="{{ url_for('admin_tickets.collect_ticket', id=ticket.object_id) }}" method="post">
+                                <form action="{{ url_for('admin_tickets.collect_ticket', ticket_id=ticket.object_id) }}" method="post">
                                     <input type="text" name="barcode" id="ticket_barcode-{{ ticket.object_id }}" />
                                     <input type="submit" class="button tiny" value="Collect Ticket" />
                                 </form>

@@ -105,9 +105,9 @@
   │   │       └── resale_home.html
   │   └── views
   │       ├── admin.py
-  │       ├── admin_tickets.py
-  │       ├── admin_users.py
-  │       ├── ajax.py
+* │       ├── admin_tickets.py
+* │       ├── admin_users.py
+* │       ├── ajax.py
 * │       ├── dashboard.py
 * │       ├── front.py
 * │       ├── __init__.py

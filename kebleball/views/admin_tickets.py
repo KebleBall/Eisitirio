@@ -120,7 +120,7 @@ def note_ticket(ticket_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_tickets.view_ticket',
-                                            ticket_id=ticket.ticket_id))
+                                            ticket_id=ticket.object_id))
     else:
         flask.flash(
             'Could not find ticket, could not set notes.',
@@ -154,7 +154,7 @@ def mark_ticket_paid(ticket_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_tickets.view_ticket',
-                                            ticket_id=ticket.ticket_id))
+                                            ticket_id=ticket.object_id))
     else:
         flask.flash(
             'Could not find ticket, could not mark as paid.',
@@ -181,7 +181,7 @@ def auto_cancel_ticket(ticket_id):
             )
             return flask.redirect(flask.request.referrer or
                                   flask.url_for('admin_tickets.view_ticket',
-                                                ticket_id=ticket.ticket_id))
+                                                ticket_id=ticket.object_id))
 
         if ticket.payment_method == 'Battels':
             ticket.battels.cancel(ticket)
@@ -194,7 +194,7 @@ def auto_cancel_ticket(ticket_id):
                 )
                 return flask.redirect(flask.request.referrer or
                                       flask.url_for('admin_tickets.view_ticket',
-                                                    ticket_id=ticket.ticket_id))
+                                                    ticket_id=ticket.object_id))
 
         ticket.cancelled = True
         DB.session.commit()
@@ -210,7 +210,7 @@ def auto_cancel_ticket(ticket_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_tickets.view_ticket',
-                                            ticket_id=ticket.ticket_id))
+                                            ticket_id=ticket.object_id))
     else:
         flask.flash(
             'Could not find ticket, could not cancel.',
@@ -240,7 +240,7 @@ def cancel_ticket(ticket_id):
         )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_tickets.view_ticket',
-                                            ticket_id=ticket.ticket_id))
+                                            ticket_id=ticket.object_id))
     else:
         flask.flash(
             'Could not find ticket, could not cancel.',
