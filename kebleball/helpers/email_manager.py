@@ -51,7 +51,8 @@ class EmailManager:
                 self.log(
                     'error',
                     (
-                        'SMTP server at {0} did accept the username/password.'
+                        'SMTP server at {0} did not accept the username and/or '
+                        'password.'
                     ).format(
                         self.app.config['SMTP_HOST']
                     )
