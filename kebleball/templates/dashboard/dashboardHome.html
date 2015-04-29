@@ -23,7 +23,7 @@
                             <td>
                                 {% if ticket.canChangeName() %}
                                     <span id="ticketNameDisplay-{{ ticket.id }}"><span id="ticketName-{{ ticket.id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="changeTicketName({{ ticket.id }}, false)">Change</a>)</span>
-                                    <span id="ticketNameForm-{{ ticket.id }}" style="display: none;"><input name="ticketNameInput-{{ ticket.id }}" id="ticketNameInput-{{ ticket.id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="changeTicketName({{ ticket.id }}, true)">Submit</button></span>
+                                    <span id="ticketNameForm-{{ ticket.id }}" style="display: none;"><input name="ticketNameInput-{{ ticket.id }}" id="ticketNameInput-{{ ticket.id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %} /><button class="tiny" onclick="changeTicketName({{ ticket.id }}, true)">Submit</button></span>
                                 {% else %}
                                     {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
                                 {% endif %}
@@ -159,6 +159,7 @@
             } else {
                 $('#ticketNameDisplay-'+id).hide();
                 $('#ticketNameForm-'+id).show();
+                $('#ticketNameInput-'+id).focus();
             }
         }
     </script>
