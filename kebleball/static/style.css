@@ -1868,4 +1868,7 @@ table .button { margin: 0; }
 /* line 114, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
 
+/* line 120, style.scss */
+td, td label { color: #000 !important; }
+
 /*# sourceMappingURL=style.css.map */
