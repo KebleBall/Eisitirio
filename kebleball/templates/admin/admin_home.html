@@ -329,7 +329,7 @@
                     {% for log in results.items %}
                         <tr id="log-{{ log.object_id }}">
                             <td>{{ log.timestamp.strftime('%c') }}</td>
-                            <td>{{ log.ip }}</td>
+                            <td>{{ log.ip_address }}</td>
                             <td>{{ log.action }}</td>
                             <td>{{ log.actor.full_name }}</td>
                             <td>{{ log.user.full_name }}</td>

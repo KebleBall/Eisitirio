@@ -214,7 +214,7 @@ def admin_home(page=1):
                 flask.request.form['log_ip'] != ''
         ):
             log_query = log_query.filter(
-                models.Log.ip == flask.request.form['log_ip']
+                models.Log.ip_address == flask.request.form['log_ip']
             )
             has_log_filter = True
 
@@ -376,8 +376,20 @@ def refund_transaction(transaction_id):
     transaction = models.CardTransaction.get_by_id(transaction_id)
 
     if transaction:
-        amount = (int(flask.request.form['refund_amount_pounds'])
-                  * 100 + int(flask.request.form['refund_amount_pence']))
+        amount = helpers.parse_pounds_pence(flask.request.form,
+                                            'refund_amount_pounds',
+                                            'refund_amount_pence')
+
+        if amount == 0:
+            flask.flash(
+                'Cannot refund nothing.',
+                'warning'
+            )
+            return flask.redirect(
+                flask.request.referrer or
+                flask.url_for('admin.view_transaction',
+                              transaction_id=transaction.transaction_id)
+            )
 
         if amount > (transaction.get_value() - transaction.refunded):
             flask.flash(
@@ -407,7 +419,7 @@ def refund_transaction(transaction_id):
                                             transaction_id=transaction.transaction_id))
     else:
         flask.flash(
-            'Could not find transaction, could not cancel.',
+            'Could not find transaction, could not refund.',
             'warning'
         )
         return flask.redirect(flask.request.referrer or
@@ -676,19 +688,38 @@ def vouchers(page=1):
 
         if 'voucher_type' not in form or form['voucher_type'] == '':
             flask.flash(
-                'You must select a discout type',
+                'You must select a discount type',
                 'warning'
             )
             success = False
         elif form['voucher_type'] == 'Fixed Price':
-            value = (int(form['fixed_price_pounds'])
-                     * 100 + int(form['fixed_price_pence']))
+            value = helpers.parse_pounds_pence(flask.request.form,
+                                               'fixed_price_pounds',
+                                               'fixed_price_pence')
         elif form['voucher_type'] == 'Fixed Discount':
-            value = (int(form['fixed_discount_pounds'])
-                     * 100 + int(form['fixed_discount_pence']))
+            value = helpers.parse_pounds_pence(flask.request.form,
+                                               'fixed_discount_pounds',
+                                               'fixed_discount_pence')
+
+            if value == 0:
+                flask.flash(
+                    'Cannot give no discount',
+                    'warning'
+                )
+                success = False
         else:
-            value = int(form['fixed_discount'])
-            if value > 100:
+            try:
+                value = int(form['fixed_discount'])
+            except ValueError:
+                value = 0
+
+            if value == 0:
+                flask.flash(
+                    'Cannot give 0% discount',
+                    'warning'
+                )
+                success = False
+            elif value > 100:
                 flask.flash(
                     'Cannot give greater than 100% discount',
                     'warning'

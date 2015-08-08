@@ -9,7 +9,7 @@
             <p>No transaction was found with that ID.</p>
         {% else %}
             <h4>Transaction Details</h4>
-            <p><strong>User</strong>: <a href="{{ url_for('admin_users.view_user', id=transaction.user_id) }}">{{ transaction.user.full_name }}</a></p>
+            <p><strong>User</strong>: <a href="{{ url_for('admin_users.view_user', user_id=transaction.user_id) }}">{{ transaction.user.full_name }}</a></p>
             <p><strong>Total Value</strong>: &pound;{{ '%.2f' % (transaction.get_value() / 100.0) }}</p>
             <p><strong>Commenced</strong>: {{ transaction.commenced.strftime('%c') }}</p>
             {% if transaction.completed != null %}
@@ -29,7 +29,7 @@
             <h4>Actions</h4>
             <ul>
                 {% if transaction.get_status()[0] %}
-                    <li><form action="{{ url_for('admin.refund_transaction', id=transaction.object_id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refund_amount_pounds" min="0" step="1" />.<input type="number" name="refund_amount_pence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
+                    <li><form action="{{ url_for('admin.refund_transaction', transaction_id=transaction.object_id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refund_amount_pounds" min="0" step="1" />.<input type="number" name="refund_amount_pence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
                 {% endif %}
             </ul>
             <h4>Transaction's Tickets</h4>
@@ -72,7 +72,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('admin_tickets.view_ticket', id=ticket.object_id) }}" class="button tiny">View</a>
+                                    <a href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id) }}" class="button tiny">View</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -99,18 +99,18 @@
                             <tr>
                                 <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="{{ url_for('admin_users.view_user', id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
+                                <td><a href="{{ url_for('admin_users.view_user', user_id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
                                 <td>{{ log.action }}</td>
-                                <td><a href="{{ url_for('admin.view_log', id=log.object_id) }}" class="button tiny">View</a></td>
+                                <td><a href="{{ url_for('admin.view_log', entry_id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% if events.has_prev %}
-                    <a href="{{ url_for('admin.view_transaction', id=transaction.object_id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin.view_transaction', transaction_id=transaction.object_id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
                 {% endif %}
                 {% if events.has_next %}
-                    <a href="{{ url_for('admin.view_transaction', id=transaction.object_id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin.view_transaction', transaction_id=transaction.object_id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events recorded.</p>
