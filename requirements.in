@@ -5,7 +5,6 @@ Flask-Markdown
 Flask-SQLAlchemy
 MySQL-python
 newrelic
-pylint
 python-dateutil
 requests
 matplotlib
