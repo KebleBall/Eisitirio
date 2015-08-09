@@ -1,14 +1,16 @@
   .
   ├── cron_worker.py
+* ├── dev-requirements.in
+* ├── dev-requirements.txt
 * ├── __init__.py
   ├── kebleball
 * │   ├── app.py
-  │   ├── config
-  │   │   ├── default.py
-  │   │   ├── development.py
+* │   ├── config
+* │   │   ├── default.py
+* │   │   ├── development.py
 * │   │   ├── __init__.py
-  │   │   ├── production.py
-  │   │   └── staging.py
+* │   │   ├── production.py
+* │   │   └── staging.py
   │   ├── database
   │   │   ├── affiliation.py
   │   │   ├── announcement.py
@@ -35,15 +37,15 @@
   │   │   ├── timed_config.py
   │   │   └── validators.py
 * │   ├── __init__.py
-  │   ├── static
-  │   │   ├── js
-  │   │   │   ├── footer.js
-  │   │   ├── scss
-  │   │   │   ├── fonts
-  │   │   │   │   ├── _adele.scss
-  │   │   │   │   └── _chopinscript.scss
-  │   │   │   ├── _variables.scss
-  │   │   └── style.scss
+* │   ├── static
+* │   │   ├── js
+* │   │   │   ├── footer.js
+* │   │   ├── scss
+* │   │   │   ├── fonts
+* │   │   │   │   ├── _adele.scss
+* │   │   │   │   └── _chopinscript.scss
+* │   │   │   ├── _variables.scss
+* │   │   └── style.scss
   │   ├── templates
   │   │   ├── 404.html
   │   │   ├── 500.html
@@ -113,9 +115,8 @@
 * │       ├── __init__.py
 * │       ├── purchase.py
 * │       └── resale.py
-  ├── make_requirements.py
-  ├── requirements.txt
-  ├── requirements-unversioned.txt
+* ├── requirements.in
+* ├── requirements.txt
   ├── review.py
   ├── run_dev.py
   ├── run_prod.py
