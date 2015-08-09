@@ -338,7 +338,9 @@ def view_log(entry_id):
     )
 
 @ADMIN.route('/admin/transaction/<int:transaction_id>/view')
-@ADMIN.route('/admin/transaction/<int:transaction_id>/view/page/<int:events_page>')
+@ADMIN.route(
+    '/admin/transaction/<int:transaction_id>/view/page/<int:events_page>'
+)
 @login_manager.admin_required
 def view_transaction(transaction_id, events_page=1):
     """View a card transaction object."""
@@ -414,9 +416,12 @@ def refund_transaction(transaction_id):
                 'Refund processed successfully.',
                 'success'
             )
-        return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.view_transaction',
-                                            transaction_id=transaction.transaction_id))
+
+        return flask.redirect(
+            flask.request.referrer or
+            flask.url_for('admin.view_transaction',
+                          transaction_id=transaction.transaction_id)
+        )
     else:
         flask.flash(
             'Could not find transaction, could not refund.',

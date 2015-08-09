@@ -272,8 +272,10 @@ def confirm_email(user_id, secret_key):
         )
 
         if login.current_user.is_anonymous():
-            flask.flash('Your email address has been verified. You can now log in',
-                        'info')
+            flask.flash(
+                'Your email address has been verified. You can now log in',
+                'info'
+            )
         else:
             flask.flash('Your email address has been verified.', 'info')
     else:

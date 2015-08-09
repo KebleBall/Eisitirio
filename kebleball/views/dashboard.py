@@ -52,7 +52,7 @@ def profile():
                 flask.request.form['oldpassword'] != ''
         ):
             if not login.current_user.check_password(
-                flask.request.form['oldpassword']
+                    flask.request.form['oldpassword']
             ):
                 flashes.append('Current password is not correct')
                 valid = False
