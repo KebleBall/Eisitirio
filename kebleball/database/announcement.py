@@ -234,7 +234,6 @@ class Announcement(DB.Model):
                 self.emails.remove(recipient)
                 count = count - 1
         finally:
-            DB.session.commit()
             self.email_sent = (self.emails.count() == 0)
             DB.session.commit()
 

@@ -12,8 +12,8 @@
 * │   │   ├── production.py
 * │   │   └── staging.py
   │   ├── database
-  │   │   ├── affiliation.py
-  │   │   ├── announcement.py
+* │   │   ├── affiliation.py
+* │   │   ├── announcement.py
   │   │   ├── battels.py
   │   │   ├── card_transaction.py
   │   │   ├── college.py
