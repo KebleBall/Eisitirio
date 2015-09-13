@@ -1870,4 +1870,7 @@ table .button { margin: 0; }
 /* line 117, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
 
+/* line 123, style.scss */
+td, td label { color: #000 !important; }
+
 /*# sourceMappingURL=style.css.map */

@@ -17,9 +17,7 @@ class EmailManager(object):
     from templates and sending emails.
     """
     def __init__(self, app):
-        self.default_email_from = app.config['EMAIL_FROM']
-        self.smtp_host = app.config['SMTP_HOST']
-        self.send_emails = app.config['SEND_EMAILS']
+        self.app = app
 
         app.email_manager = self
 
@@ -30,6 +28,70 @@ class EmailManager(object):
         self.jinjaenv = None
 
         atexit.register(self.shutdown)
+
+    def smtp_connect(self):
+        if self.smtp_open():
+            return True
+
+        try:
+            if self.app.config['SMTP_SSL']:
+                self.smtp = smtplib.SMTP_SSL(self.app.config['SMTP_HOST'],
+                                             self.app.config['SMTP_PORT'])
+            else:
+                self.smtp = smtplib.SMTP(self.app.config['SMTP_HOST'],
+                                         self.app.config['SMTP_PORT'])
+        except socket.error as error:
+            self.log(
+                'error',
+                'Could not connect to SMTP server at {0}: {1}'.format(
+                    self.smtp_host,
+                    error
+                )
+            )
+            return False
+
+        if self.app.config['SMTP_LOGIN']:
+            try:
+                self.smtp.login(self.app.config['SMTP_USER'],
+                                self.app.config['SMTP_PASSWORD'])
+            except smtplib.SMTPHeloError as error:
+                self.log(
+                    'error',
+                    (
+                        'SMTP server at {0} did not reply properly to HELO at '
+                        'login: {1}'
+                    ).format(
+                        self.app.config['SMTP_HOST'],
+                        error
+                    )
+                )
+                return False
+            except smtplib.SMTPAuthenticationError as error:
+                self.log(
+                    'error',
+                    (
+                        'SMTP server at {0} did not accept the username and/or '
+                        'password: {1}'
+                    ).format(
+                        self.app.config['SMTP_HOST'],
+                        error
+                    )
+                )
+                return False
+            except smtplib.SMTPException as error:
+                self.log(
+                    'error',
+                    (
+                        'No suitable authentication method found for SMTP '
+                        'server at {0}: {1}'
+                    ).format(
+                        self.app.config['SMTP_HOST'],
+                        error
+                    )
+                )
+                return False
+
+        return True
 
     def smtp_open(self):
         """Check if the cached connection to the SMTP server is valid."""
@@ -80,7 +142,7 @@ class EmailManager(object):
         try:
             email_from = kwargs['email_from']
         except KeyError:
-            email_from = self.default_email_from
+            email_from = self.app.config['EMAIL_FROM']
 
         self.send_text(
             recipient,
@@ -104,7 +166,7 @@ class EmailManager(object):
                 used.
         """
         if email_from is None:
-            email_from = self.default_email_from
+            email_from = self.app.config['EMAIL_FROM']
 
         message = text.MIMEText(
             message_text,
@@ -127,29 +189,15 @@ class EmailManager(object):
         Args:
             message: (text.MIMEText) A formatted email message.
         """
-        if not self.send_emails:
+        if not self.app.config['SEND_EMAILS']:
             self.log(
                 'info',
                 'Email not sent per application policy'
             )
             return
 
-        if not self.smtp_open():
-            try:
-                self.smtp = smtplib.SMTP(self.smtp_host)
-            except socket.error as error:
-                self.log(
-                    'error',
-                    (
-                        'Could not connect to SMTP server at {0} for message '
-                        'with subject {1}: {2}'
-                    ).format(
-                        self.smtp_host,
-                        message['Subject'],
-                        error
-                    )
-                )
-                return
+        if not self.smtp_connect():
+            return
 
         try:
             self.smtp.sendmail(message['From'],
