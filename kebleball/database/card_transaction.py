@@ -78,7 +78,7 @@ class CardTransaction(DB.Model):
         else:
             status_str = 'Successful' if status[0] else 'Failed'
 
-        return '<{0} CardTransaction: {1}, {2}'.format(
+        return '<{0} CardTransaction: {1}, {2}>'.format(
             status_str,
             self.object_id,
             status[1]
@@ -201,7 +201,19 @@ class CardTransaction(DB.Model):
             )
         }
 
-        request = requests.post(url, data=payload, headers=headers)
+        try:
+            request = requests.post(url, data=payload, headers=headers)
+        except requests.ConnectionError as exc:
+            APP.log_manager.log_event(
+                'Failed request to eWay endpoint {0} with error {1}'.format(
+                    endpoint,
+                    exc
+                ),
+                [],
+                None,
+                self
+            )
+            return (False, None)
 
         if request.status_code == 200:
             return (True, request.json())
@@ -217,7 +229,6 @@ class CardTransaction(DB.Model):
                 None,
                 self
             )
-            return (False, None)
 
     def get_eway_url(self):
         """Get a URL for the payment gateway.

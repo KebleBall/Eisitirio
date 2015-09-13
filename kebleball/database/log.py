@@ -125,29 +125,6 @@ class Log(DB.Model):
             self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)')
         )
 
-    def display(self):
-        """Neatly render all the information contained in a log entry."""
-        return '{0}: {1} acting as {2} {3}{4} - {5}'.format(
-            self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)'),
-            self.actor.full_name,
-            self.user.full_name,
-            (
-                '' if self.ticket is None else (
-                    ', in relation to {0} tickets'
-                ).format(
-                    self.tickets.count()
-                )
-            ),
-            (
-                '' if self.transaction is None else (
-                    ', in relation to transaction {0}'
-                ).format(
-                    self.transaction.object_id
-                )
-            ),
-            self.message
-        )
-
     @staticmethod
     def get_by_id(object_id):
         """Get a Log object by its database ID."""

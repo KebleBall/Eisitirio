@@ -11,23 +11,23 @@
 * │   │   ├── __init__.py
 * │   │   ├── production.py
 * │   │   └── staging.py
-  │   ├── database
+* │   ├── database
 * │   │   ├── affiliation.py
 * │   │   ├── announcement.py
-  │   │   ├── battels.py
-  │   │   ├── card_transaction.py
-  │   │   ├── college.py
-  │   │   ├── db.py
-  │   │   ├── helpers.py
+* │   │   ├── battels.py
+* │   │   ├── card_transaction.py
+* │   │   ├── college.py
+* │   │   ├── db.py
+* │   │   ├── helpers.py
 * │   │   ├── __init__.py
-  │   │   ├── log.py
-  │   │   ├── models.py
-  │   │   ├── static.py
-  │   │   ├── statistic.py
-  │   │   ├── ticket.py
-  │   │   ├── user.py
-  │   │   ├── voucher.py
-  │   │   └── waiting.py
+* │   │   ├── log.py
+* │   │   ├── models.py
+* │   │   ├── static.py
+* │   │   ├── statistic.py
+* │   │   ├── ticket.py
+* │   │   ├── user.py
+* │   │   ├── voucher.py
+* │   │   └── waiting.py
   │   ├── helpers
   │   │   ├── email_manager.py
   │   │   ├── __init__.py

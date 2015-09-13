@@ -108,7 +108,7 @@ class Voucher(DB.Model):
 
     @staticmethod
     def get_by_id(object_id):
-        """Get an Announcement object by its database ID."""
+        """Get an Voucher object by its database ID."""
         voucher = Voucher.query.filter(
             Voucher.object_id == int(object_id)
         ).first()
@@ -121,7 +121,7 @@ class Voucher(DB.Model):
     @staticmethod
     def get_by_code(code):
         """Get an Announcement object by a voucher code."""
-        return Voucher.query().filter_by(Voucher.code == code).first()
+        return Voucher.query.filter(Voucher.code == code).first()
 
     def apply(self, tickets, user):
         """Apply the voucher to a set of tickets.

@@ -197,7 +197,7 @@ class User(DB.Model):
                     if not x.cancelled and x.resale_key is None]) > 0
 
     def is_reselling_tickets(self):
-        """Is the user currently in the process of reslling tickets?"""
+        """Is the user currently in the process of reselling tickets?"""
         return len([x for x in self.tickets
                     if x.resale_key is not None]) > 0
 
@@ -672,9 +672,7 @@ class User(DB.Model):
             waiting list, how many tickets the user can wait for, and an error
             message if the user cannot join the waiting list.
         """
-        waiting_open = APP.config['WAITING_OPEN']
-
-        if not waiting_open:
+        if not APP.config['WAITING_OPEN']:
             return (
                 False,
                 0,

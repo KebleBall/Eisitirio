@@ -2,6 +2,7 @@
 """Database model for battels charges for Keble Students."""
 
 from __future__ import unicode_literals
+from __future__ import division
 
 from kebleball import app
 from kebleball.database import db
@@ -86,20 +87,17 @@ class Battels(DB.Model):
                 'Battels instance has no attribute "{0}"'.format(name)
             )
 
-    def charge(self, ticket, term, wholepounds=False):
+    def charge(self, ticket, term):
         """Apply a charge to this battels account."""
         if term == 'MTHT':
-            if wholepounds:
-                half = ((ticket.price // 200) * 100)
-            else:
-                half = (ticket.price / 2)
+            half = (ticket.price // 2)
 
-            self.michaelmas_charge = self.michaelmas_charge + half
-            self.hilary_charge = self.hilary_charge + (ticket.price - half)
+            self.michaelmas_charge += half
+            self.hilary_charge += ticket.price - half
         elif term == 'MT':
-            self.michaelmas_charge = self.michaelmas_charge + ticket.price
+            self.michaelmas_charge += ticket.price
         elif term == 'HT':
-            self.hilary_charge = self.hilary_charge + ticket.price
+            self.hilary_charge += ticket.price
         else:
             raise ValueError(
                 'Term "{0}" cannot be charged to battels'.format(
@@ -121,24 +119,16 @@ class Battels(DB.Model):
         """Refund a ticket and mark it as cancelled."""
         if APP.config['CURRENT_TERM'] == 'MT':
             if ticket.battels_term == 'MTHT':
-                self.michaelmas_charge = (
-                    self.michaelmas_charge -
-                    (ticket.price / 2)
-                )
+                half = (ticket.price // 2)
 
-                self.hilary_charge = (
-                    self.hilary_charge -
-                    (
-                        ticket.price -
-                        (ticket.price / 2)
-                    )
-                )
+                self.michaelmas_charge -= half
+                self.hilary_charge -= ticket.price - half
             elif ticket.battels_term == 'MT':
-                self.michaelmas_charge = self.michaelmas_charge - ticket.price
+                self.michaelmas_charge -= ticket.price
             elif ticket.battels_term == 'HT':
-                self.hilary_charge = self.hilary_charge - ticket.price
+                self.hilary_charge -= ticket.price
         elif APP.config['CURRENT_TERM'] == 'HT':
-            self.hilary_charge = self.hilary_charge - ticket.price
+            self.hilary_charge -= ticket.price
         else:
             raise ValueError(
                 'Can\'t refund battels tickets in the current term'
