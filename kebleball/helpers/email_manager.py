@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from email.mime import text
 import atexit
 import smtplib
+import socket
 
 import jinja2
 
@@ -32,10 +33,14 @@ class EmailManager(object):
 
     def smtp_open(self):
         """Check if the cached connection to the SMTP server is valid."""
+        if self.smtp is None:
+            return False
+
         try:
             status = self.smtp.noop()[0]
         except smtplib.SMTPServerDisconnected:
             status = -1
+
         return True if status == 250 else False
 
     def get_template(self, template):
@@ -58,11 +63,11 @@ class EmailManager(object):
 
         return self.jinjaenv.get_template(template)
 
-    def send_template(self, to, subject, template, **kwargs):
+    def send_template(self, recipient, subject, template, **kwargs):
         """Send an email based on a template.
 
         Args:
-            to: (str) the email address of the recipient
+            recipient: (str) the email address of the recipient
             subject: (str) the subject line of the email to be sent
             template: (str) the filename of a template located in the
                 templates/emails folder, to be rendered as the email body
@@ -78,20 +83,20 @@ class EmailManager(object):
             email_from = self.default_email_from
 
         self.send_text(
-            to,
+            recipient,
             subject,
             template.render(**kwargs),
             email_from
         )
 
-    def send_text(self, to, subject, message_text, email_from=None):
+    def send_text(self, recipient, subject, message_text, email_from=None):
         """Send an text email.
 
         Composes the email into a text.MIMEText object and passes it to the
         email sending routine.
 
         Args:
-            to: (str) the email address of the recipient
+            recipient: (str) the email address of the recipient
             subject: (str) the subject line of the email to be sent
             text: (str) the body of the email
             email_from: (str or None) the reported sender of the email. If this
@@ -107,13 +112,9 @@ class EmailManager(object):
             'utf-8'
         )
 
-        message['Subject'] = ('[Keble Ball] - ' + subject)
+        message['Subject'] = ('[Keble Ball] ' + subject)
         message['From'] = email_from
-        if isinstance(to, list):
-            for email in to:
-                message['To'] = email
-        else:
-            message['To'] = to
+        message['To'] = recipient
 
         self.send_message(message)
 
@@ -133,8 +134,22 @@ class EmailManager(object):
             )
             return
 
-        if self.smtp is None or not self.smtp_open():
-            self.smtp = smtplib.SMTP(self.smtp_host)
+        if not self.smtp_open():
+            try:
+                self.smtp = smtplib.SMTP(self.smtp_host)
+            except socket.error as error:
+                self.log(
+                    'error',
+                    (
+                        'Could not connect to SMTP server at {0} for message '
+                        'with subject {1}: {2}'
+                    ).format(
+                        self.smtp_host,
+                        message['Subject'],
+                        error
+                    )
+                )
+                return
 
         try:
             self.smtp.sendmail(message['From'],
@@ -190,5 +205,5 @@ class EmailManager(object):
             )
 
     def shutdown(self):
-        if self.smtp is not None and self.smtp_open():
+        if self.smtp_open():
             self.smtp.quit()

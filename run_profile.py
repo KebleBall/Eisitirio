@@ -4,15 +4,15 @@
 
 from __future__ import unicode_literals
 
-from werkzeug.contrib.profiler import ProfilerMiddleware
+from werkzeug.contrib import profiler
 
-import kebleball
+from kebleball import app
 
-APP = kebleball.APP
+APP = app.APP
 
 APP.config.from_pyfile('config/development.py')
 APP.config['PROFILE'] = True
-APP.wsgi_app = ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
+APP.wsgi_app = profiler.ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
 
 if __name__ == '__main__':
     APP.run()

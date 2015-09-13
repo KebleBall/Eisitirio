@@ -4,10 +4,8 @@
 
 from __future__ import unicode_literals
 
-import kebleball
-
-APP = kebleball.APP
+from kebleball import app
 
 if __name__ == '__main__':
-    APP.config.from_pyfile('config/production.py')
-    APP.run()
+    app.APP.config.from_pyfile('config/production.py')
+    app.APP.run()

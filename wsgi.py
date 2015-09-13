@@ -10,15 +10,15 @@ import sys
 site.addsitedir('/var/www/flask/lib/python2.7/site-packages/')
 sys.path.append(os.path.realpath(__file__).replace('/wsgi.py', ''))
 
-import newrelic.agent
+from newrelic import agent
 
-import kebleball
+from kebleball import app
 
-newrelic.agent.initialize('/var/www/flask/newrelic.ini')
+APP = app.APP
 
-APP = kebleball.APP
+agent.initialize('/var/www/flask/newrelic.ini')
 
-@newrelic.agent.wsgi_application()
+@agent.wsgi_application()
 def application(req_environ, start_response):
     """Wrapper around actual application to load config based on environment."""
     if 'KEBLE_BALL_ENV' in req_environ:
