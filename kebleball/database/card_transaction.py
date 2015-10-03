@@ -229,6 +229,7 @@ class CardTransaction(DB.Model):
                 None,
                 self
             )
+            return (False, None)
 
     def get_eway_url(self):
         """Get a URL for the payment gateway.
@@ -419,6 +420,8 @@ class CardTransaction(DB.Model):
                     'error'
                 )
                 return None
+
+        return None
 
     def cancel_eway_payment(self):
         """Mark the payment as cancelled."""
