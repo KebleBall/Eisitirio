@@ -22,6 +22,9 @@ agent.initialize('/var/www/flask/newrelic.ini')
 def application(req_environ, start_response):
     """Wrapper around actual application to load config based on environment."""
     if 'KEBLE_BALL_ENV' in req_environ:
+        if req_environ['KEBLE_BALL_ENV'] == 'DEMO':
+            APP.config.from_pyfile('config/demo.py')
+            return APP(req_environ, start_response)
         if req_environ['KEBLE_BALL_ENV'] == 'DEVELOPMENT':
             APP.config.from_pyfile('config/development.py')
             return APP(req_environ, start_response)
