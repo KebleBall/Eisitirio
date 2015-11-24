@@ -54,7 +54,7 @@
                                     {% if ticket.cancelled -%}
                                         Cancelled.
                                     {% elif ticket.collected -%}
-                                    Collected as {{ ticket.barcode }}.
+                                        Collected as {{ ticket.barcode }}.
                                     {% elif ticket.paid -%}
                                         {% if ticket.payment_method == 'Free' -%}
                                             Free Ticket.
