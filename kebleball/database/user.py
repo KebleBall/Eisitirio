@@ -11,6 +11,7 @@ from kebleball.database import affiliation
 from kebleball.database import battels
 from kebleball.database import db
 from kebleball.database import ticket
+from kebleball.database import photo
 from kebleball.database import waiting
 from kebleball.helpers import util
 
@@ -128,14 +129,28 @@ class User(DB.Model):
         nullable=True
     )
 
-    def __init__(self, email, password, forenames,
-                 surname, phone, college_id, affiliation_id):
+    photo_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('photo.object_id'),
+        nullable=False
+    )
+    photo = DB.relationship(
+        'Photo',
+        backref=DB.backref(
+            'user',
+            uselist=False
+        )
+    )
+
+    def __init__(self, email, password, forenames, surname, phone, college,
+                 affiliation, photo):
         self.email = email
         self.forenames = forenames
         self.surname = surname
         self.phone = phone
         self.college = college
         self.affiliation = affiliation
+        self.photo = photo
 
         self.set_password(password)
 

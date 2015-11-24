@@ -9,6 +9,7 @@
             <p>No user was found with that ID.</p>
         {% else %}
             <h4>User Details</h4>
+            <p><a href="{{ user.photo.full_url }}"><img src="{{ user.photo.thumb_url }}" /></a></p>
             <p><strong>First Name(s)</strong>: {{ user.forenames }}</p>
             <p><strong>Last Name(s)</strong>: {{ user.surname }}</p>
             <p><strong>Email</strong>: {{ user.email }}</p>

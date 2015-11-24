@@ -8,3 +8,5 @@ newrelic
 python-dateutil
 requests
 matplotlib
+boto
+Pillow

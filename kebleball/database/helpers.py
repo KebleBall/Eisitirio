@@ -29,6 +29,7 @@ def initialise_db(prefill=True, clear=False):
             models.CardTransaction.query.delete()
             models.College.query.delete()
             models.Log.query.delete()
+            models.Photo.query.delete()
             models.Statistic.query.delete()
             models.Ticket.query.delete()
             models.Transaction.query.delete()

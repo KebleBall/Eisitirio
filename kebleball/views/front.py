@@ -11,6 +11,7 @@ import flask
 from kebleball import app
 from kebleball.database import db
 from kebleball.database import models
+from kebleball.helpers import photos
 from kebleball.helpers import util
 
 APP = app.APP
@@ -101,8 +102,7 @@ def register():
     if flask.request.method != 'POST':
         return flask.redirect(flask.url_for('router'))
 
-    valid = True
-    flask.flashes = []
+    flashes = []
 
     if models.User.get_by_email(flask.request.form['email']) is not None:
         flask.flash(
@@ -120,62 +120,59 @@ def register():
             'confirm' not in flask.request.form or
             flask.request.form['password'] != flask.request.form['confirm']
     ):
-        flask.flashes.append('Passwords do not match')
-        valid = False
+        flashes.append('Passwords do not match')
 
     if (
             'forenames' not in flask.request.form or
             flask.request.form['forenames'] == ''
     ):
-        flask.flashes.append('Forenames cannot be blank')
-        valid = False
+        flashes.append('Forenames cannot be blank')
 
     if (
             'surname' not in flask.request.form or
             flask.request.form['surname'] == ''
     ):
-        flask.flashes.append('Surname cannot be blank')
-        valid = False
+        flashes.append('Surname cannot be blank')
 
     if (
             'email' not in flask.request.form or
             flask.request.form['email'] == ''
     ):
-        flask.flashes.append('Email cannot be blank')
-        valid = False
+        flashes.append('Email cannot be blank')
 
     if (
             'password' not in flask.request.form or
             flask.request.form['password'] == ''
     ):
-        flask.flashes.append('Password cannot be blank')
-        valid = False
+        flashes.append('Password cannot be blank')
     elif len(flask.request.form['password']) < 8:
-        flask.flashes.append('Password must be at least 8 characters long')
-        valid = False
+        flashes.append('Password must be at least 8 characters long')
 
     if (
             'phone' not in flask.request.form or
             flask.request.form['phone'] == ''
     ):
-        flask.flashes.append('Phone cannot be blank')
-        valid = False
+        flashes.append('Phone cannot be blank')
 
     if (
             'college' not in flask.request.form or
             flask.request.form['college'] == '---'
     ):
-        flask.flashes.append('Please select a college')
-        valid = False
+        flashes.append('Please select a college')
 
     if (
             'affiliation' not in flask.request.form or
             flask.request.form['affiliation'] == '---'
     ):
-        flask.flashes.append('Please select an affiliation')
-        valid = False
+        flashes.append('Please select an affiliation')
 
-    if not valid:
+    if (
+            'photo' not in flask.request.files or
+            flask.request.files['photo'].filename == ''
+    ):
+        flashes.append('Please upload a photo')
+
+    if flashes:
         flask.flash(
             (
                 'There were errors in your provided details. Please fix '
@@ -183,7 +180,7 @@ def register():
             ),
             'error'
         )
-        for msg in flask.flashes:
+        for msg in flashes:
             flask.flash(msg, 'warning')
 
         return flask.render_template(
@@ -193,6 +190,11 @@ def register():
             affiliations=models.Affiliation.query.all()
         )
 
+    photo = photos.save_photo(flask.request.files['photo'])
+
+    DB.session.add(photo)
+    DB.session.commit()
+
     user = models.User(
         flask.request.form['email'],
         flask.request.form['password'],
@@ -200,7 +202,8 @@ def register():
         flask.request.form['surname'],
         flask.request.form['phone'],
         models.College.get_by_id(flask.request.form['college']),
-        models.Affiliation.get_by_id(flask.request.form['affiliation'])
+        models.Affiliation.get_by_id(flask.request.form['affiliation']),
+        photo
     )
 
     DB.session.add(user)

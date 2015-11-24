@@ -55,7 +55,7 @@
             <section id="homepage-register" class="large-6 columns">
                 <h2>Register</h2>
                 <p>If you are a Keble Student, you must use your Keble email address in order to be able to pay by battels</p>
-                <form action="{{ url_for('front.register') }}" method="post">
+                <form action="{{ url_for('front.register') }}" enctype="multipart/form-data" method="post">
                     <div class="row">
                         <div class="large-12 columns">
                             <label for="register-forenames">Forename(s)</label>
@@ -128,6 +128,12 @@
                                     {% endif %}
                                 {% endfor %}
                             </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="large-12 columns">
+                            <label for="photo">Upload Photo</label>
+                            <input type="file" name="photo" accept="{{ template_config['IMAGE_ACCEPT_STRING'] }}" required="required" />
                         </div>
                     </div>
                     <div class="row">
