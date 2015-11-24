@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 from kebleball import app
+from kebleball import system # pylint: disable=unused-import
 
 if __name__ == '__main__':
     app.APP.config.from_pyfile('config/production.py')

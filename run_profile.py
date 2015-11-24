@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 from werkzeug.contrib import profiler
 
 from kebleball import app
+from kebleball import system # pylint: disable=unused-import
 
 APP = app.APP
 
