@@ -27,7 +27,7 @@ class Affiliation(DB.Model):
 
     @staticmethod
     def get_by_id(object_id):
-        """Get and Affiliation object by its database ID."""
+        """Get an Affiliation object by its database ID."""
         affiliation = Affiliation.query.filter(
             Affiliation.object_id == int(object_id)
         ).first()
