@@ -63,12 +63,8 @@ class CardTransaction(DB.Model):
     )
 
     def __init__(self, user, tickets):
-        if hasattr(user, 'object_id'):
-            self.user_id = user.object_id
-        else:
-            self.user_id = user
-
         self.tickets = tickets
+        self.user = user
         self.commenced = datetime.datetime.utcnow()
 
     def __repr__(self):

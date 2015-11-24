@@ -185,14 +185,10 @@ class Ticket(DB.Model):
     )
 
     def __init__(self, owner, payment_method, price):
-        if hasattr(owner, 'object_id'):
-            self.owner_id = owner.object_id
-        else:
-            self.owner_id = owner
-
         self.payment_method = payment_method
         self.set_price(price)
 
+        self.owner = owner
         self.expires = (datetime.datetime.utcnow() +
                         APP.config['TICKET_EXPIRY_TIME'])
 

@@ -143,10 +143,10 @@ class Announcement(DB.Model):
     def __init__(self,
                  subject,
                  content,
-                 sender_id,
+                 sender,
                  send_email,
-                 college_id=None,
-                 affiliation_id=None,
+                 college=None,
+                 affiliation=None,
                  has_tickets=None,
                  is_waiting=None,
                  has_collected=None,
@@ -154,10 +154,10 @@ class Announcement(DB.Model):
         self.timestamp = datetime.datetime.utcnow()
         self.subject = subject
         self.content = content
-        self.sender_id = sender_id
+        self.sender = sender
         self.send_email = send_email
-        self.college_id = college_id
-        self.affiliation_id = affiliation_id
+        self.college = college
+        self.affiliation = affiliation
         self.has_tickets = has_tickets
         self.is_waiting = is_waiting
         self.has_collected = has_collected
@@ -165,14 +165,14 @@ class Announcement(DB.Model):
 
         recipient_query = user.User.query
 
-        if self.college_id is not None:
+        if self.college is not None:
             recipient_query = recipient_query.filter(
-                user.User.college_id == self.college_id
+                user.User.college == self.college
             )
 
-        if self.affiliation_id is not None:
+        if self.affiliation is not None:
             recipient_query = recipient_query.filter(
-                user.User.affiliation_id == self.affiliation_id
+                user.User.affiliation == self.affiliation
             )
 
         for recipient in recipient_query.all():
@@ -183,7 +183,7 @@ class Announcement(DB.Model):
                     ) and
                     (
                         self.is_waiting is None or
-                        recipient.is_waiting() == self.is_waiting
+                        recipient.is_waiting == self.is_waiting
                     ) and
                     (
                         self.has_collected is None or

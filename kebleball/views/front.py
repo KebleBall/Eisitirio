@@ -199,8 +199,8 @@ def register():
         flask.request.form['forenames'],
         flask.request.form['surname'],
         flask.request.form['phone'],
-        flask.request.form['college'],
-        flask.request.form['affiliation']
+        models.College.get_by_id(flask.request.form['college']),
+        models.Affiliation.get_by_id(flask.request.form['affiliation'])
     )
 
     DB.session.add(user)
