@@ -61,7 +61,7 @@ APP.register_blueprint(all_views.RESALE)
 @APP.route('/')
 def router():
     """Redirect the user to the appropriate homepage."""
-    if not login.current_user.is_anonymous():
+    if not login.current_user.is_anonymous:
         return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
         return flask.redirect(flask.url_for('front.home'))

@@ -23,7 +23,7 @@
     <body>
         <header class="row">
             <section id="user" class="large-3 columns right">
-                {% if current_user.is_anonymous() %}
+                {% if current_user.is_anonymous %}
                     <p>You are not currently logged in. <a href="{{ url_for('front.home') }}#log-in-form">Log in.</a></p>
                 {% else %}
                     <p>You are currently logged in as {{ current_user.full_name }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
@@ -37,11 +37,11 @@
                 </a>
             </section>
         </header>
-        {% if not current_user.is_anonymous() %}
+        {% if not current_user.is_anonymous %}
             <nav class="row">
                 <ul id="navigation-main">
                     {% include 'blocks/dashboard-navigation.html' %}
-                    {% if current_user.is_admin() %}
+                    {% if current_user.is_admin %}
                         {% include 'blocks/admin-navigation.html' %}
                     {% endif %}
                 </ul>

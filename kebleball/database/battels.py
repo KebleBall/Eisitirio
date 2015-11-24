@@ -74,18 +74,15 @@ class Battels(DB.Model):
     def __repr__(self):
         return '<Battels {0}: {1}>'.format(self.object_id, self.battelsid)
 
-    def __getattr__(self, name):
-        """Magic method to generate amounts charged in pounds."""
-        if name == 'michaelmas_charge_pounds':
-            michaelmas_charge = '{0:03d}'.format(self.michaelmas_charge)
-            return michaelmas_charge[:-2] + '.' + michaelmas_charge[-2:]
-        elif name == 'hilary_charge_pounds':
-            hilary_charge = '{0:03d}'.format(self.hilary_charge)
-            return hilary_charge[:-2] + '.' + hilary_charge[-2:]
-        else:
-            raise AttributeError(
-                'Battels instance has no attribute "{0}"'.format(name)
-            )
+    @property
+    def michaelmas_charge_pounds(self):
+        michaelmas_charge = '{0:03d}'.format(self.michaelmas_charge)
+        return michaelmas_charge[:-2] + '.' + michaelmas_charge[-2:]
+
+    @property
+    def hilary_charge_pounds(self):
+        hilary_charge = '{0:03d}'.format(self.hilary_charge)
+        return hilary_charge[:-2] + '.' + hilary_charge[-2:]
 
     def charge(self, ticket, term):
         """Apply a charge to this battels account."""

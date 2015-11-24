@@ -28,12 +28,12 @@
             <ul>
                 <li>User <strong>is{% if not user.verified %} not{% endif %}</strong> verified.</li>
                 <li>User <strong>is{% if not user.deleted %} not{% endif %}</strong> deleted.</li>
-                <li>User <strong>is{% if not user.is_admin() %} not{% endif %}</strong> an administrator.</li>
+                <li>User <strong>is{% if not user.is_admin %} not{% endif %}</strong> an administrator.</li>
                 <li>User <strong>has{% if not user.has_tickets() %} no{% endif %}</strong> tickets.</li>
                 <li>User <strong>has{% if not user.has_unpaid_tickets() %} no{% endif %}</strong> unpaid tickets.</li>
                 <li>User <strong>has{% if not user.has_paid_tickets() %} no{% endif %}</strong> paid tickets.</li>
                 <li>User <strong>has{% if not user.has_uncollected_tickets() %} no{% endif %}</strong> uncollected tickets.</li>
-                <li>User <strong>is{% if not user.is_waiting() %} not{% endif %}</strong> waiting.</li>
+                <li>User <strong>is{% if not user.is_waiting %} not{% endif %}</strong> waiting.</li>
                 <li>User <strong>is{% if not user.is_reselling_tickets() %} not{% endif %}</strong> reselling tickets.</li>
                 <li>User <strong>can{% if not user.can_pay_by_battels() %} not{% endif %}</strong> pay for tickets by battels.</li>
                 {% if user.affiliation_verified == None %}
@@ -55,7 +55,7 @@
                 {% if not user.verified %}
                     <li><a href="{{ url_for('admin_users.verify_user', user_id=user.object_id) }}" class="button tiny">Verify User</a></li>
                 {% endif %}
-                {% if user.is_admin() %}
+                {% if user.is_admin %}
                     <li><a href="{{ url_for('admin_users.demote_user', user_id=user.object_id) }}" class="button tiny">Demote User</a></li>
                 {% else %}
                     <li><a href="{{ url_for('admin_users.promote_user', user_id=user.object_id) }}" class="button tiny">Promote User</a></li>

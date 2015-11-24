@@ -40,9 +40,9 @@ def admin_required(func):
     def decorated_view(*args, **kwargs):
         if flask.current_app.login_manager._login_disabled:  # pylint: disable=protected-access
             return func(*args, **kwargs)
-        elif not login.current_user.is_authenticated():
+        elif not login.current_user.is_authenticated:
             return flask.current_app.login_manager.unauthorized()
-        elif not login.current_user.is_admin():
+        elif not login.current_user.is_admin:
             flask.flash(
                 'You are not permitted to perform that action',
                 'error'

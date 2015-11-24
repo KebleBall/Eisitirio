@@ -88,7 +88,7 @@ class LogManager(object):
         """
         if 'actor_id' in flask.session:
             actor = flask.session['actor_id']
-        elif not login.current_user.is_anonymous():
+        elif not login.current_user.is_anonymous:
             actor = login.current_user
         else:
             actor = None
