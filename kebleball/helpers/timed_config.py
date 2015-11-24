@@ -10,6 +10,7 @@ automatically deal with Until objects
 """
 
 from __future__ import unicode_literals
+from __future__ import division
 
 import datetime
 
@@ -18,24 +19,33 @@ import flask
 class Until(object):
     """Config helper class to handle config values changing at set times."""
 
-    def __init__(self, before, time, after):
+    def __init__(self, *args):
         """Initialise class.
 
-        Arguments:
-            before: (any) config value to use if we are currently before |time|
-            time: (datetime.datetime) when the config value should switch
-            after: (any) config value to use if we are currently after |time|
+        Args should be an alternating sequence of values and sequential
+        datetimes.
         """
-        self._before = before
-        self._time = time
-        self._after = after
+        self._values = args[::2]
+        self._times = args[1::2]
+
+        assert len(self._values) == len(self._times) + 1
+        assert all(isinstance(dt, datetime.datetime) for dt in self._times)
 
     def get(self):
         """Return the appropriate value based on the current time."""
-        if datetime.datetime.utcnow() < self._time:
-            return self._before
-        else:
-            return self._after
+        left = 0
+        right = len(self._times)
+        now = datetime.datetime.utcnow()
+
+        while left != right:
+            mid = (left + right) // 2
+            if now >= self._times[mid]:
+                left = mid + 1
+            else:
+                right = mid
+
+        return self._values[left]
+
 
 def parse_until(value):
     """If the config value is an Until object, call its get() method."""
