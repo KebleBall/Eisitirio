@@ -42,11 +42,6 @@ class Ticket(DB.Model):
         default=False,
         nullable=False
     )
-    barcode = DB.Column(
-        DB.Unicode(20),
-        unique=True,
-        nullable=True
-    )
     cancelled = DB.Column(
         DB.Boolean(),
         default=False,
@@ -67,6 +62,11 @@ class Ticket(DB.Model):
     )
     expires = DB.Column(
         DB.DateTime(),
+        nullable=True
+    )
+    barcode = DB.Column(
+        DB.Unicode(20),
+        unique=True,
         nullable=True
     )
 
@@ -93,21 +93,16 @@ class Ticket(DB.Model):
 
         self.set_price(price)
 
-    def __getattr__(self, name):
-        """Magic method to generate ticket price in pounds."""
-        if name == 'price_pounds':
-            price = '{0:03d}'.format(self.price)
-            return price[:-2] + '.' + price[-2:]
-        else:
-            raise AttributeError(
-                'Ticket instance has no attribute "{0}"'.format(name)
-            )
+    @property
+    def price_pounds(self):
+        price = '{0:03d}'.format(self.price)
+        return price[:-2] + '.' + price[-2:]
 
     def __repr__(self):
         return '<Ticket {0} owned by {1} ({2})>'.format(
             self.object_id,
             self.owner.full_name,
-            self.owner_id
+            self.owner.object_id
         )
 
     @property
@@ -130,7 +125,6 @@ class Ticket(DB.Model):
         self.paid = True
         self.expires = None
 
-
     def add_note(self, note):
         """Add a note to the ticket."""
         if not note.endswith('\n'):
@@ -147,6 +141,7 @@ class Ticket(DB.Model):
 
     def can_be_collected(self):
         """Check whether a ticket can be collected."""
+        # TODO
         return (
             self.paid and
             not self.collected and
@@ -156,6 +151,7 @@ class Ticket(DB.Model):
 
     def can_change_name(self):
         """Check whether a ticket's name can be changed."""
+        # TODO
         return not (
             APP.config['LOCKDOWN_MODE'] or
             self.cancelled or
@@ -165,6 +161,7 @@ class Ticket(DB.Model):
     @staticmethod
     def count():
         """How many tickets have been sold."""
+        # TODO
         return Ticket.query.filter(Ticket.cancelled == False).count()
 
     @staticmethod
