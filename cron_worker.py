@@ -92,29 +92,7 @@ def allocate_waiting():
 
         tickets = []
 
-        if wait.user.gets_discount():
-            tickets.append(
-                models.Ticket(
-                    wait.user,
-                    None,
-                    (
-                        wait.user.get_base_ticket_price() -
-                        APP.config['KEBLE_DISCOUNT']
-                    )
-                )
-            )
-            start = 1
-        else:
-            start = 0
-
-        for _ in xrange(start, wait.waiting_for):
-            tickets.append(
-                models.Ticket(
-                    wait.user,
-                    None,
-                    wait.user.get_base_ticket_price()
-                )
-            )
+        # TODO
 
         DB.session.add_all(tickets)
         DB.session.delete(wait)
