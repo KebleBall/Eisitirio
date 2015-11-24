@@ -7,12 +7,12 @@ from flask.ext import bcrypt
 import flask
 
 from kebleball import app
-from kebleball import helpers
 from kebleball.database import affiliation
 from kebleball.database import battels
 from kebleball.database import db
 from kebleball.database import ticket
 from kebleball.database import waiting
+from kebleball.helpers import util
 
 DB = db.DB
 APP = app.APP
@@ -139,7 +139,7 @@ class User(DB.Model):
 
         self.set_password(password)
 
-        self.secret_key = helpers.generate_key(64)
+        self.secret_key = util.generate_key(64)
         self.verified = False
         self.deleted = False
         self.role = 'User'

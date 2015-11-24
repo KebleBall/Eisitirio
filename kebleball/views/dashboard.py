@@ -9,9 +9,9 @@ from flask.ext import login
 import flask
 
 from kebleball import app
-from kebleball import helpers
 from kebleball.database import db
 from kebleball.database import models
+from kebleball.helpers import util
 
 APP = app.APP
 DB = db.DB
@@ -128,7 +128,7 @@ def profile():
         else:
             if flask.request.form['email'] != login.current_user.email:
                 login.current_user.new_email = flask.request.form['email']
-                login.current_user.secret_key = helpers.generate_key(64)
+                login.current_user.secret_key = util.generate_key(64)
                 login.current_user.secret_key_expiry = (
                     datetime.datetime.utcnow() + datetime.timedelta(days=7))
 
