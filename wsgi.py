@@ -13,6 +13,7 @@ sys.path.append(os.path.realpath(__file__).replace('/wsgi.py', ''))
 from newrelic import agent
 
 from kebleball import app
+from kebleball import system # pylint: disable=unused-import
 
 APP = app.APP
 
