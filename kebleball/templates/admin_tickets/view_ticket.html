@@ -15,9 +15,6 @@
             {% if ticket.collected %}
                 <p><strong>Collected as</strong>: {{ ticket.barcode }}</p>
             {% endif %}
-            {% if ticket.referrer_id != None %}
-                <p><strong>Referrer</strong>: <a href="{{ url_for('admin_users.view_user', user_id=ticket.referrer_id) }}">{{ ticket.referrer.full_name }}</a></p>
-            {% endif %}
             <h4>Ticket Status</h4>
             <ul>
                 <li>Ticket <strong>is{% if not ticket.paid %} not{% endif %}</strong> paid.</li>

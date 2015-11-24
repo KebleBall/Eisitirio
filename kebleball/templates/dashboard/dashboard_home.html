@@ -80,18 +80,6 @@
             {% else %}
                 <p>The Keble Ball committee has not posted any announcements yet. Watch this space and check your email for important information about the Ball</p>
             {% endif %}
-
-        <h3>Referrals</h3>
-        {% if current_user.referrals.count() > 0 %}
-            <p>The following tickets have been marked as being referred by you.</p>
-            <ul id="referrals_list">
-                {% for ticket in current_user.referrals %}
-                    <li>#{{ '%05d' % ticket.object_id }}, owned by {{ ticket.owner.full_name }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You haven't referred any tickets yet</p>
-        {% endif %}
     </section>
 {% endblock %}
 

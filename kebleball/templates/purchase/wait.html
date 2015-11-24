@@ -35,17 +35,6 @@
                     </div>
                 </li>
                 <li>
-                    <h5>Credit where credit is due?</h5>
-                    <p>If somebody referred you, or recommended Keble Ball to you, please enter their email address here so that we can give them credit for your order.</p>
-                    <div class="row">
-                        <div class="columns">
-                            <label for="referrer_email">Email Address:</label>
-                            <input type="email" name="referrer_email" id="referrer_email" {% if form and form['referrer_email'] %}value="{{ form['referrer_email'] }}" {% endif %}/>
-                            <div id="referrer_message" style="display: none;"></div>
-                        </div>
-                    </div>
-                </li>
-                <li>
                     <h5>Terms and Conditions</h5>
                     <div class="row">
                         <div class="columns">
@@ -70,38 +59,6 @@
     <script type="text/javascript">
         $("#num_tickets").bind("slider:changed", function (event, data) {
             $('#num_tickets_display').html(data.value);
-        });
-
-        var referrer_email = $("#referrer_email");
-        var referrer_message = $("#referrer_message");
-
-        referrer_email.on("blur", function() {
-            if (referrer_email.val() != '') {
-                jQuery.ajax(
-                    '{{ url_for('ajax.validate_referrer', _external=True) }}',
-                    {
-                        'data': {
-                            'email': referrer_email.val()
-                        },
-                        'type': 'POST',
-                        'dataType': 'json',
-                        'success': function(data, code, xhr) {
-                            referrer_message.attr(
-                                "class",
-                                data.class
-                            );
-                            referrer_message.html(data.message);
-                            referrer_message.show(0);
-                        }
-                    }
-                );
-            } else {
-                referrer_message.hide(0);
-            }
-        });
-
-        referrer_email.on("change", function() {
-            referrer_message.hide(0);
         });
     </script>
 {% endblock %}

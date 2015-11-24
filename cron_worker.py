@@ -116,10 +116,6 @@ def allocate_waiting():
                 )
             )
 
-        if wait.referrer is not None:
-            for ticket in tickets:
-                ticket.set_referrer(wait.referrer)
-
         DB.session.add_all(tickets)
         DB.session.delete(wait)
 
