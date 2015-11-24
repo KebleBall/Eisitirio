@@ -43,22 +43,6 @@ def validate_referrer():
 
     return flask.Response(json.dumps(response), mimetype='text/json')
 
-@AJAX.route('/ajax/validate/resale-email', methods=['POST'])
-def validate_resale_email():
-    """Validate a user for reselling tickets.
-
-    Check the the referenced user has an account on the system.
-    """
-    (_, response, _) = validators.validate_resale_email(
-        flask.request.form['email'],
-        login.current_user
-    )
-
-    response['class'] = 'message-box ' + response['class']
-    response['message'] = '<p>' + response['message'] + '</p>'
-
-    return flask.Response(json.dumps(response), mimetype='text/json')
-
 @AJAX.route('/ajax/change/ticket/<int:ticket_id>/name', methods=['POST'])
 def change_ticket_name(ticket_id):
     """Change the name on a ticket."""

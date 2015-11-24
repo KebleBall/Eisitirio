@@ -206,16 +206,6 @@ class User(DB.Model):
         return len([x for x in self.tickets
                     if not x.cancelled and x.collected]) > 0
 
-    def has_unresold_tickets(self):
-        """Has the user got any tickets they can resell?"""
-        return len([x for x in self.tickets
-                    if not x.cancelled and x.resale_key is None]) > 0
-
-    def is_reselling_tickets(self):
-        """Is the user currently in the process of reselling tickets?"""
-        return len([x for x in self.tickets
-                    if x.resale_key is not None]) > 0
-
     def has_unpaid_tickets(self, method=None):
         """Does the user have any unpaid tickets?
 

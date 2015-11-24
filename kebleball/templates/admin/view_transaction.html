@@ -55,12 +55,6 @@
                                         Cancelled.
                                     {% elif ticket.collected -%}
                                     Collected as {{ ticket.barcode }}.
-                                    {% elif ticket.resale_key != None -%}
-                                        {% if ticket.resaleconfirmed -%}
-                                            Pending resale completion
-                                        {% else -%}
-                                            Pending resale confirmation
-                                        {% endif %}
                                     {% elif ticket.paid -%}
                                         {% if ticket.payment_method == 'Free' -%}
                                             Free Ticket.

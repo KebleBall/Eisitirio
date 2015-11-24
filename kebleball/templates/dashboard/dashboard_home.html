@@ -35,12 +35,6 @@
                                     Collected as {{ ticket.barcode }}.
                                 {% elif ticket.name == None -%}
                                     Awaiting name.
-                                {% elif ticket.resale_key != None -%}
-                                    {% if ticket.resaleconfirmed -%}
-                                        Pending resale completion
-                                    {% else -%}
-                                        Pending resale confirmation
-                                    {% endif %}
                                 {% elif ticket.paid -%}
                                     Paid
                                 {% else -%}
