@@ -162,6 +162,7 @@ def generate_sales_statistics():
         else:
             return int(value)
 
+    # TODO: Add by ticket type
     statistics = {
         'Available':
             APP.config['TICKETS_AVAILABLE'],
@@ -230,70 +231,6 @@ def generate_college_statistics():
     )
 
     DB.session.commit()
-
-def send_3_day_warnings(now, difference):
-    """Send warnings for tickets expiring in 3 days.
-
-    Args:
-        now: (datetime.datetime) time at which the script was started
-        difference: (datetime.timedelta) how long since the script last ran
-    """
-    start = now + datetime.timedelta(days=3)
-    end = now + datetime.timedelta(days=3) + difference
-
-    tickets = models.Ticket.query.filter(
-        models.Ticket.expires != None
-    ).filter(
-        models.Ticket.expires > start
-    ).filter(
-        models.Ticket.expires <= end
-    ).filter(
-        models.Ticket.cancelled == False
-    ).filter(
-        models.Ticket.paid == False
-    ).group_by(
-        models.Ticket.owner_id
-    ).all()
-
-    for ticket in tickets:
-        APP.email_manager.send_template(
-            ticket.owner.email,
-            'Tickets Expiring',
-            'tickets_expiring_3_days.email',
-            ticket=ticket
-        )
-
-def send_1_day_warnings(now, difference):
-    """Send warnings for tickets expiring in 1 day.
-
-    Args:
-        now: (datetime.datetime) time at which the script was started
-        difference: (datetime.timedelta) how long since the script last ran
-    """
-    start = now + datetime.timedelta(days=1)
-    end = now + datetime.timedelta(days=1) + difference
-
-    tickets = models.Ticket.query.filter(
-        models.Ticket.expires != None
-    ).filter(
-        models.Ticket.expires > start
-    ).filter(
-        models.Ticket.expires <= end
-    ).filter(
-        models.Ticket.cancelled == False
-    ).filter(
-        models.Ticket.paid == False
-    ).group_by(
-        models.Ticket.owner_id
-    ).all()
-
-    for ticket in tickets:
-        APP.email_manager.send_template(
-            ticket.owner.email,
-            'Final Warning: Tickets Expiring',
-            'tickets_expiring_1_day.email',
-            ticket=ticket
-        )
 
 def run_5_minutely(now):
     """Run tasks which need to be run every 5 minutes.
