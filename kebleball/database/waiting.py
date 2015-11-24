@@ -40,11 +40,7 @@ class Waiting(DB.Model):
     )
 
     def __init__(self, user, waiting_for):
-        if hasattr(user, 'object_id'):
-            self.user_id = user.object_id
-        else:
-            self.user_id = user
-
+        self.user = user
         self.waiting_for = waiting_for
 
         self.waiting_since = datetime.datetime.utcnow()
