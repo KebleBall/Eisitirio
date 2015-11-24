@@ -1,0 +1,16 @@
+<script type="text/javascript">
+    var postage_options_need_address = {{ template_config['POSTAGE_OPTIONS_NEED_ADDRESS'] |tojson }};
+
+    var address_section = $('#postage_address');
+
+    $('.postage_option').on('change', function () {
+        if ($.inArray(
+                document.forms.purchase_form.postage.value,
+                postage_options_need_address
+        ) != -1) {
+            address_section.slideDown();
+        } else {
+            address_section.slideUp();
+        }
+    });
+</script>

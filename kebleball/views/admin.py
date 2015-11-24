@@ -393,7 +393,7 @@ def refund_transaction(transaction_id):
                               transaction_id=transaction.transaction_id)
             )
 
-        if amount > (transaction.get_value() - transaction.refunded):
+        if amount > (transaction.value - transaction.refunded):
             flask.flash(
                 'Cannot refund more than has been charged.',
                 'warning'

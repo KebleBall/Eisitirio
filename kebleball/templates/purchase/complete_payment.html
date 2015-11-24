@@ -1,0 +1,50 @@
+<!-- purchase/complete_payment.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Complete Payment{% endblock %}
+
+{% block content %}
+    <section id="complete_payment" class="columns">
+        {% if current_user.has_unpaid_tickets() %}
+            <form action="{{ url_for('purchase.complete_payment') }}" id="purchase_form" method="post">
+                <ol id="purchase_steps">
+                    <li>
+                        <table id="tickets_table">
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Ticket Number</th>
+                                    <th>Name on Ticket</th>
+                                    <th>Ticket Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in current_user.tickets %}
+                                    {% if not ticket.paid and not ticket.cancelled %}
+                                        <tr id="ticket-{{ ticket.object_id }}">
+                                            <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if form and ticket.object_id in form.getlist('tickets[]') %}checked="checked" {% endif %}/></td>
+                                            <td><label for="ticket_select-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                                            <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
+                                            <td><label for="ticket_select-{{ ticket.object_id }}">&pound;{{ ticket.price_pounds }}</label></td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </li>
+                    {% include 'purchase/blocks/choose_postage_method.html' %}
+                    {% include 'purchase/blocks/choose_payment_method.html' %}
+                    <li>
+                        <input type="submit" value="Complete Payment" class="button tiny" />
+                    </li>
+                </ol>
+            </form>
+        {% else %}
+            <p>You have no unpaid tickets.</p>
+        {% endif %}
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {% include 'purchase/blocks/script_show_postage_address.html' %}
+{% endblock %}

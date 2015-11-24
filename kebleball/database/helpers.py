@@ -31,6 +31,8 @@ def initialise_db(prefill=True, clear=False):
             models.Log.query.delete()
             models.Statistic.query.delete()
             models.Ticket.query.delete()
+            models.Transaction.query.delete()
+            models.TransactionItem.query.delete()
             models.User.query.delete()
             models.Voucher.query.delete()
             models.Waiting.query.delete()

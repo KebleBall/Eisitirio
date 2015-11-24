@@ -77,12 +77,12 @@ class Log(DB.Model):
         lazy='dynamic'
     )
 
-    transaction_id = DB.Column(
+    card_transaction_id = DB.Column(
         DB.Integer(),
         DB.ForeignKey('card_transaction.object_id'),
         nullable=True
     )
-    transaction = DB.relationship(
+    card_transaction = DB.relationship(
         'CardTransaction',
         backref=DB.backref(
             'events',
@@ -91,16 +91,17 @@ class Log(DB.Model):
     )
 
     def __init__(self, ip_address, action, actor, user, tickets=None,
-                 transaction=None):
+                 card_transaction=None):
         if tickets is None:
             tickets = []
+
         self.timestamp = datetime.datetime.utcnow()
         self.ip_address = ip_address
         self.action = action
         self.actor = actor
         self.user = user
         self.tickets = tickets
-        self.transaction = transaction
+        self.card_transaction = card_transaction
 
     def __repr__(self):
         return '<Log {0}: {1}>'.format(

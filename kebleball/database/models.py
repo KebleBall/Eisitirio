@@ -22,6 +22,8 @@ from kebleball.database.college import College
 from kebleball.database.log import Log
 from kebleball.database.statistic import Statistic
 from kebleball.database.ticket import Ticket
+from kebleball.database.transaction import Transaction
+from kebleball.database.transaction_item import TransactionItem
 from kebleball.database.user import User
 from kebleball.database.voucher import Voucher
 from kebleball.database.waiting import Waiting

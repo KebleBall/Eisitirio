@@ -57,13 +57,12 @@ class CardTransaction(DB.Model):
     user = DB.relationship(
         'User',
         backref=DB.backref(
-            'transactions',
+            'card_transactions',
             lazy='dynamic'
         )
     )
 
-    def __init__(self, user, tickets):
-        self.tickets = tickets
+    def __init__(self, user):
         self.user = user
         self.commenced = datetime.datetime.utcnow()
 
@@ -80,9 +79,10 @@ class CardTransaction(DB.Model):
             status[1]
         )
 
-    def get_value(self):
+    @property
+    def value(self):
         """Get the total value of the transaction."""
-        return sum([ticket.price for ticket in self.tickets])
+        return self.transaction.value
 
     def get_status(self):
         """Get a better representation of the status of this transaction.
@@ -245,8 +245,11 @@ class CardTransaction(DB.Model):
                 'Email': self.user.email
             },
             'Payment': {
-                'TotalAmount': self.get_value(),
-                'InvoiceReference': 'Trans{0:05d}'.format(self.object_id),
+                'TotalAmount': self.value,
+                'InvoiceReference': 'Trans{0:05d}/{1:05d}'.format(
+                    self.object_id,
+                    self.transaction.object_id
+                ),
                 'CurrencyCode': 'GBP'
             },
             'RedirectUrl': flask.url_for('purchase.eway_success',
@@ -273,7 +276,7 @@ class CardTransaction(DB.Model):
 
             APP.log_manager.log_event(
                 'Started Card Payment',
-                self.tickets,
+                self.transaction.tickets,
                 login.current_user,
                 self
             )
@@ -373,21 +376,14 @@ class CardTransaction(DB.Model):
                                 'warning'
                             )
                     else:
-                        for ticket in self.tickets:
-                            ticket.mark_as_paid(
-                                'Card',
-                                'Card Transaction {0}'.format(
-                                    self.object_id
-                                ),
-                                transaction=self
-                            )
+                        self.transaction.mark_as_paid()
 
                         DB.session.commit()
 
                         APP.log_manager.log_event(
                             'Completed Card Payment',
-                            self.tickets,
-                            self.user_id,
+                            self.transaction.tickets,
+                            self.user,
                             self
                         )
 
@@ -433,8 +429,8 @@ class CardTransaction(DB.Model):
 
         APP.log_manager.log_event(
             'Cancelled Card Payment',
-            self.tickets,
-            self.user_id,
+            self.transaction.tickets,
+            self.user,
             self
         )
 

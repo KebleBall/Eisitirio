@@ -84,17 +84,17 @@ class Battels(DB.Model):
         hilary_charge = '{0:03d}'.format(self.hilary_charge)
         return hilary_charge[:-2] + '.' + hilary_charge[-2:]
 
-    def charge(self, ticket, term):
+    def charge(self, amount, term):
         """Apply a charge to this battels account."""
         if term == 'MTHT':
-            half = (ticket.price // 2)
+            half = amount // 2
 
             self.michaelmas_charge += half
-            self.hilary_charge += ticket.price - half
+            self.hilary_charge += amount - half
         elif term == 'MT':
-            self.michaelmas_charge += ticket.price
+            self.michaelmas_charge += amount
         elif term == 'HT':
-            self.hilary_charge += ticket.price
+            self.hilary_charge += amount
         else:
             raise ValueError(
                 'Term "{0}" cannot be charged to battels'.format(
@@ -102,37 +102,24 @@ class Battels(DB.Model):
                 )
             )
 
-        ticket.mark_as_paid(
-            'Battels',
-            'Battels {0}, {1} term'.format(
-                'manual' if self.manual else self.battelsid,
-                term
-            ),
-            battels_term=term,
-            battels=self
-        )
-
-    def cancel(self, ticket):
+    def refund(self, amount, term):
         """Refund a ticket and mark it as cancelled."""
         if APP.config['CURRENT_TERM'] == 'MT':
-            if ticket.battels_term == 'MTHT':
-                half = (ticket.price // 2)
+            if term == 'MTHT':
+                half = amount // 2
 
                 self.michaelmas_charge -= half
-                self.hilary_charge -= ticket.price - half
-            elif ticket.battels_term == 'MT':
-                self.michaelmas_charge -= ticket.price
-            elif ticket.battels_term == 'HT':
-                self.hilary_charge -= ticket.price
+                self.hilary_charge -= amount - half
+            elif term == 'MT':
+                self.michaelmas_charge -= amount
+            elif term == 'HT':
+                self.hilary_charge -= amount
         elif APP.config['CURRENT_TERM'] == 'HT':
-            self.hilary_charge -= ticket.price
+            self.hilary_charge -= amount
         else:
             raise ValueError(
                 'Can\'t refund battels tickets in the current term'
             )
-
-        ticket.cancelled = True
-        DB.session.commit()
 
     @staticmethod
     def get_by_id(object_id):

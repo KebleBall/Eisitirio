@@ -5,81 +5,38 @@
 
 {% block content %}
     <section id="purchase" class="columns">
-        <form action="{{ url_for('purchase.purchase_home') }}" method="post">
+        <form action="{{ url_for('purchase.purchase_home') }}" id="purchase_form" method="post">
             <ol id="purchase_steps">
                 <li>
                     <h5>Choose Number of Tickets</h5>
-                    <div class="row">
-                        <div class="columns">
-                            <label for="num_tickets">Number of Tickets: <span id="num_tickets_display">1</span></label>
-                            <input
-                                id="num_tickets"
-                                name="num_tickets"
-                                type="number"
-                                min="1"
-                                max="{{ tickets_available }}"
-                                step="1"
-                                value="{% if num_tickets -%}
-                                    {{ num_tickets }}
-                                {% else -%}
-                                    1
-                                {% endif %}"
-                                data-slider="true"
-                                data-slider-range="1,{{ tickets_available }}"
-                                data-slider-snap="true"
-                                data-slider-step="1"
-                                data-slider-highlight="true"
-                            />
-                        </div>
-                    </div>
-                    <p id="ticket_information">
-                        The base price for a ticket is &pound;{{ '%.2f' % (current_user.get_base_ticket_price() / 100.0) }}.
-                        {% if current_user.gets_discount() %}
-                            As a current Keble student you get a &pound;{{ '%.2f' % (template_config['KEBLE_DISCOUNT'] / 100.0) }} discount on your first ticket.
-                            {% if num_tickets -%}
-                                Your order of {{ num_tickets }} ticket{% if num_tickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % (((current_user.get_base_ticket_price() * num_tickets) - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
-                            {% else -%}
-                                Your order of 1 ticket is currently worth &pound;{{ '%.2f' % ((current_user.get_base_ticket_price() - template_config['KEBLE_DISCOUNT']) / 100.0) }}.
-                            {% endif %}
-                        {% else %}
-                            {% if num_tickets -%}
-                                Your order of {{ num_tickets }} ticket{% if num_tickets != 1 %}s{% endif %} is currently worth &pound;{{ '%.2f' % ((current_user.get_base_ticket_price() * num_tickets) / 100.0) }}.
-                            {% else -%}
-                                Your order of 1 ticket is currently worth &pound;{{ '%.2f' % (current_user.get_base_ticket_price() / 100.0) }}.
-                            {% endif %}
-                        {% endif %}
-                        Please note that this price does not reflect the value of any discounts to be applied.
-                    </p>
+                    <table id="ticket_type_table">
+                        <thead>
+                            <th>Ticket type</th>
+                            <th>Price</th>
+                            <th>Number</th>
+                        </thead>
+                        {% for ticket_type, limit in ticket_info.ticket_types %}
+                            <tr>
+                                <td>{{ ticket_type.name }}</td>
+                                <td>&pound;{{ ticket_type.price_pounds }}</td>
+                                <td><input type="number" name="num_tickets_{{ ticket_type.slug }}" id="num_tickets_{{ ticket_type.slug }}" class="num_ticket_input" min="0" max="{{ limit }}" value="{{ num_tickets[ticket_type.slug] }}" /></td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>Total:</td>
+                            <td id="total_value">&pound;0.00</td>
+                            <td id="total_tickets">0</td>
+                    </table>
                 </li>
                 <li>
-                    <h5>Choose Payment Method</h5>
-                    <div class="row">
-                        <div class="columns">
-                            {% if current_user.can_pay_by_battels() %}
-                                <label for="payment_method-Battels">
-                                    <input type="radio" name="payment_method" value="Battels" id="payment_method-Battels" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Battels' %}checked="checked" {% endif %}/>
-                                    Battels
-                                </label>
-                            {% endif %}
-                            <label for="payment_method-Card">
-                                <input type="radio" name="payment_method" value="Card" id="payment_method-Card" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Card' %}checked="checked" {% endif %}/>
-                                Credit/Debit Card
-                            </label>
-                            <p class="small"><a onclick="show_alternative_payments()" style="cursor: pointer;">Can't pay by card{% if current_user.can_pay_by_battels() %}/battels{% endif %}?</a></p>
-                            <div id="payment_alternatives"{% if not (form and form['payment_method'] and (form['payment_method'] == 'Cash' or form['payment_method'] == 'Cheque')) %} style="display: none;"{% endif %}>
-                                <p>If you wish to pay by cheque/cash, you must contact <a href="{{ template_config['TREASURER_EMAIL_LINK'] }}">the treasurer</a> to arrange the payment before reserving your tickets here, in order to prevent your tickets expiring before payment is confirmed.</p>
-                                <label for="payment_method-Cash">
-                                    <input type="radio" name="payment_method" value="Cash" id="payment_method-Cash" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Cash' %}checked="checked" {% endif %}/>
-                                    Cash
-                                </label>
-                                <label for="payment_method-Cheque">
-                                    <input type="radio" name="payment_method" value="Cheque" id="payment_method-Cheque" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Cheque' %}checked="checked" {% endif %}/>
-                                    Cheque
-                                </label>
-                                <label for="payment_reason">Reason for cash/cheque payment</label>
-                                <input type="text" name="payment_reason" id="payment_reason" {% if form and form['payment_reason'] %}value="{{ form['payment_reason'] }}" {% endif %}/>
-                            </div>
+                    <h5>Enter Names for Tickets</h5>
+                    <p>You must set the full name of the guest holding each ticket you purchase. If you do not know who will be accompanying you at this point, leave the field blank, but you must set the name on the ticket in order to be allowed entry to the Ball. Setting/changing ticket names after {{ template_config['LOCKDOWN_STARTS'].strftime('%-d') }}{{ get_ord(template_config['LOCKDOWN_STARTS']) }} {{ template_config['LOCKDOWN_STARTS'].strftime('%B %Y') }} will incur a fee.</p>
+                    <div class="row" id="ticket_names">
+                        {% for ticket_name in ticket_names %}
+                        <div class="columns large-3 end">
+                            <input type="text" name="ticket_name[]" value="{{ ticket_name }}" />
                         </div>
+                        {% endfor %}
                     </div>
                 </li>
                 <li>
@@ -93,17 +50,8 @@
                         </div>
                     </div>
                 </li>
-                <li>
-                    <h5>Credit where credit is due?</h5>
-                    <p>If somebody referred you, or recommended Keble Ball to you, please enter their email address here so that we can give them credit for your order.</p>
-                    <div class="row">
-                        <div class="columns">
-                            <label for="referrer_email">Email Address:</label>
-                            <input type="email" name="referrer_email" id="referrer_email" {% if form and form['referrer_email'] %}value="{{ form['referrer_email'] }}" {% endif %}/>
-                            <div id="referrer_message" style="display: none;"></div>
-                        </div>
-                    </div>
-                </li>
+                {% include 'purchase/blocks/choose_postage_method.html' %}
+                {% include 'purchase/blocks/choose_payment_method.html' %}
                 <li>
                     <h5>Terms and Conditions</h5>
                     <div class="row">
@@ -124,56 +72,78 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{ url_for('static', filename='js/vendor/simple-slider.js') }}"></script>
-
     <script type="text/javascript">
-        var ticket_price = {{ current_user.get_base_ticket_price() }};
-        var keble_discount = {{ template_config['KEBLE_DISCOUNT'] }};
-        var gets_discount = {% if current_user.gets_discount() %}true{% else %}false{% endif %};
-
-        function get_plural(num) {
-            if (num == 1) {
-                return '';
-            } else {
-                return 's'
-            }
+        String.prototype.toInt = function(){
+            return parseInt(this, 10);
         }
 
-        $("#num_tickets").bind("slider:changed", function (event, data) {
-            $('#num_tickets_display').html(data.value);
+        var ticket_info = {{ ticket_info.to_json()|safe }};
 
-            var ticket_message = "The base price for a ticket is &pound;" + (ticket_price / 100.0).toFixed(2) + ".";
-            var total_price = data.value * ticket_price;
+        var num_ticket_inputs = $(".num_ticket_input")
 
-            if (gets_discount) {
-                ticket_message = (
-                    ticket_message +
-                    " As a current Keble student you get a &pound;" +
-                    (keble_discount / 100.0).toFixed(2) +
-                    " discount on your first ticket."
-                );
-                total_price = total_price - keble_discount;
+        num_ticket_inputs.on("change", function () {
+            var guest_tickets_ordered = 0;
+            var total_tickets_ordered = 0;
+            var total_value = 0;
+
+            $(ticket_info.ticket_types).each(function(_, ticket_type) {
+                var input = $("#num_tickets_" + ticket_type.slug);
+
+                var ordered = input.val().toInt();
+                var max = input.attr("max").toInt();
+
+                if (ordered > max) {
+                    ordered = max;
+                    input.val(max);
+                }
+
+                if (ticket_type.counts_towards_guest_limit)
+                    guest_tickets_ordered = guest_tickets_ordered + ordered;
+
+                total_tickets_ordered = total_tickets_ordered + ordered;
+
+                total_value = total_value + ordered * ticket_type.price;
+            });
+
+            var price_str = total_value + "";
+            while (price_str.length < 3) price_str = "0" + price_str;
+
+            $("#total_value").html("&pound;" + price_str.slice(0, -2) + "." + price_str.slice(-2));
+            $("#total_tickets").html(total_tickets_ordered);
+
+            var guest_tickets_available = ticket_info.guest_tickets_available - guest_tickets_ordered;
+            var total_tickets_available = ticket_info.total_tickets_available - total_tickets_ordered;
+
+            var name_fields = document.getElementById("ticket_names");
+            var name_fields_count = name_fields.childElementCount;
+
+            if (total_tickets_ordered > name_fields_count) {
+                var e = document.createElement("div")
+                e.innerHTML = "<div class=\"columns large-3 end\"><input type=\"text\" name=\"ticket_name[]\" /></div>".repeat(total_tickets_ordered - name_fields_count);
+
+                while (e.firstChild) name_fields.appendChild(e.firstChild);
+            } else {
+                for (var i = 0; i < name_fields_count - total_tickets_ordered; i++)
+                    name_fields.removeChild(name_fields.lastChild);
             }
 
-            ticket_message = (
-                ticket_message +
-                "Your order of " +
-                data.value +
-                " ticket" +
-                get_plural(data.value) +
-                " is currently worth &pound;" +
-                (total_price / 100.0).toFixed(2) +
-                ". "
-            );
+            $(ticket_info.ticket_types).each(function(_, ticket_type) {
+                var input = $("#num_tickets_" + ticket_type.slug);
 
-            ticket_message = (
-                ticket_message +
-                "Please note that this price does not reflect the value of any discounts to be applied."
-            );
+                var ordered = input.val().toInt();
+                var limit = Math.min(
+                    ticket_type.purchase_limit,
+                    ordered + total_tickets_available
+                );
 
-            $('#ticket_information').html(ticket_message);
+                if (ticket_type.counts_towards_guest_limit)
+                    limit = Math.min(limit, ordered + guest_tickets_available)
+
+                input.attr("max", Math.max(0, limit));
+            });
         });
-
+    </script>
+    <script type="text/javascript">
         var voucher_code = $("#voucher_code");
         var voucher_message = $("#voucher_message");
 
@@ -205,41 +175,6 @@
         voucher_code.on("change", function() {
             voucher_message.hide(0);
         });
-
-        var referrer_email = $("#referrer_email");
-        var referrer_message = $("#referrer_message");
-
-        referrer_email.on("blur", function() {
-            if (referrer_email.val() != '') {
-                jQuery.ajax(
-                    '{{ url_for('ajax.validate_referrer', _external=True) }}',
-                    {
-                        'data': {
-                            'email': referrer_email.val()
-                        },
-                        'type': 'POST',
-                        'dataType': 'json',
-                        'success': function(data, code, xhr) {
-                            referrer_message.attr(
-                                "class",
-                                data.class
-                            );
-                            referrer_message.html(data.message);
-                            referrer_message.show(0);
-                        }
-                    }
-                );
-            } else {
-                referrer_message.hide(0);
-            }
-        });
-
-        referrer_email.on("change", function() {
-            referrer_message.hide(0);
-        });
-
-        function show_alternative_payments() {
-            $("#payment_alternatives").slideDown();
-        }
     </script>
+    {% include 'purchase/blocks/script_show_postage_address.html' %}
 {% endblock %}

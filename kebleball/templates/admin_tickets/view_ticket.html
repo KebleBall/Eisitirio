@@ -15,17 +15,8 @@
             {% if ticket.collected %}
                 <p><strong>Collected as</strong>: {{ ticket.barcode }}</p>
             {% endif %}
-            <p><strong>Payment method</strong>: {{ ticket.payment_method }}</p>
-            <p><strong>Payment reference</strong>: {{ ticket.payment_reference }}</p>
             {% if ticket.referrer_id != None %}
                 <p><strong>Referrer</strong>: <a href="{{ url_for('admin_users.view_user', user_id=ticket.referrer_id) }}">{{ ticket.referrer.full_name }}</a></p>
-            {% endif %}
-            {% if ticket.card_transaction_id != None %}
-                <p><strong>Payment Transaction</strong>: <a href="{{ url_for('admin.view_transaction', transaction_id=ticket.card_transaction_id) }}">#{{ '%05d' % ticket.card_transaction_id }}</a></p>
-            {% endif %}
-            {% if ticket.battels_id != None %}
-                <p><strong>Battels term</strong>: {{ ticket.battels_term }}</p>
-                <p><strong>Battels ID</strong>: <a href="{{ url_for('admin_users.view_user', user_id=ticket.battels.user.object_id) }}">{{ ticket.battels.battelsid }}</a></p>
             {% endif %}
             {% if ticket.reselling_to_id != None %}
                 <p><strong>Reselling to</strong>: <a href="{{ url_for('admin_users.view_user', user_id=ticket.reselling_to_id) }}">{{ ticket.reselling_to.full_name }}</a></p>
@@ -51,40 +42,13 @@
                     {% endif %}
                     <li><a href="{{ url_for('admin_tickets.cancel_ticket', ticket_id=ticket.object_id) }}" class="button tiny">Cancel</a><span class="small">N.B. This does not process any refund on the ticket</span></li>
                 {% endif %}
-                {% if not ticket.paid %}
+                {% if not ticket.paid and not ticket.cancelled %}
                     <li><a href="{{ url_for('admin_tickets.mark_ticket_paid', ticket_id=ticket.object_id) }}" class="button tiny">Mark as Paid</a></li>
                 {% endif %}
                 {% if ticket.collected %}
                     <li><a href="{{ url_for('admin_tickets.uncollect_ticket', ticket_id=ticket.object_id) }}" class="button tiny">Mark as Uncollected</a><span class="small">N.B. If the ticket owner has already been given a wristband they will not be able to use it to enter the ball.</span></li>
                 {% endif %}
             </ul>
-            <h4>Ticket's Card Transactions</h4>
-            {% if ticket.transactions.count() > 0 %}
-                <table id="transaction_table">
-                    <thead>
-                        <tr>
-                            <th>Transaction ID</th>
-                            <th>Commenced</th>
-                            <th>Success</th>
-                            <th>Status</th>
-                            <th>View</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for transaction in ticket.transactions %}
-                            <tr>
-                                <td>{{ '%05d' % transaction.object_id }}</td>
-                                <td>{{ transaction.commenced.strftime('%c') }}</td>
-                                <td>{{ transaction.get_success() }}</td>
-                                <td>{{ transaction.get_status()[1] }}</td>
-                                <td><a href="{{ url_for('admin.view_transaction', transaction_id=transaction.object_id) }}" class="button tiny">View</a></td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p>No transactions.</p>
-            {% endif %}
             <a id="events"></a>
             <h4>Events</h4>
             {% if events.items %}

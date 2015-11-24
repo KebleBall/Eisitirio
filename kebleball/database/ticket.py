@@ -15,21 +15,6 @@ from kebleball.database import db
 APP = app.APP
 DB = db.DB
 
-TICKET_TRANSACTION_LINK = DB.Table(
-    'ticket_transaction_link',
-    DB.Model.metadata,
-    DB.Column(
-        'ticket_id',
-        DB.Integer,
-        DB.ForeignKey('ticket.object_id')
-    ),
-    DB.Column(
-        'transaction_id',
-        DB.Integer,
-        DB.ForeignKey('card_transaction.object_id')
-    )
-)
-
 class Ticket(DB.Model):
     """Model for tickets."""
     object_id = DB.Column(
@@ -37,6 +22,11 @@ class Ticket(DB.Model):
         primary_key=True,
         nullable=False
     )
+    ticket_type = DB.Column(
+        DB.Unicode(50),
+        nullable=False
+    )
+
     paid = DB.Column(
         DB.Boolean(),
         default=False,
@@ -67,20 +57,7 @@ class Ticket(DB.Model):
         default=False,
         nullable=False
     )
-    payment_method = DB.Column(
-        DB.Enum(
-            'Battels',
-            'Card',
-            'Cash',
-            'Cheque',
-            'Free'
-        ),
-        nullable=True
-    )
-    payment_reference = DB.Column(
-        DB.Unicode(50),
-        nullable=True
-    )
+
     price = DB.Column(
         DB.Integer(),
         nullable=False
@@ -149,48 +126,13 @@ class Ticket(DB.Model):
         foreign_keys=[referrer_id]
     )
 
-    transactions = DB.relationship(
-        'CardTransaction',
-        secondary=TICKET_TRANSACTION_LINK,
-        backref=DB.backref(
-            'tickets',
-            lazy='dynamic'
-        ),
-        lazy='dynamic'
-    )
-
-    card_transaction_id = DB.Column(
-        DB.Integer,
-        DB.ForeignKey('card_transaction.object_id'),
-        nullable=True
-    )
-    card_transaction = DB.relationship(
-        'CardTransaction',
-        foreign_keys=[card_transaction_id]
-    )
-
-    battels_term = DB.Column(DB.Unicode(4), nullable=True)
-    battels_id = DB.Column(
-        DB.Integer,
-        DB.ForeignKey('battels.object_id'),
-        nullable=True
-    )
-    battels = DB.relationship(
-        'Battels',
-        backref=DB.backref(
-            'tickets',
-            lazy='dynamic'
-        ),
-        foreign_keys=[battels_id]
-    )
-
-    def __init__(self, owner, payment_method, price):
-        self.payment_method = payment_method
-        self.set_price(price)
-
+    def __init__(self, owner, ticket_type, price):
         self.owner = owner
+        self.ticket_type = ticket_type
         self.expires = (datetime.datetime.utcnow() +
                         APP.config['TICKET_EXPIRY_TIME'])
+
+        self.set_price(price)
 
     def __getattr__(self, name):
         """Magic method to generate ticket price in pounds."""
@@ -209,6 +151,13 @@ class Ticket(DB.Model):
             self.owner_id
         )
 
+    @property
+    def description(self):
+        return '{0} Ticket ({1})'.format(
+            self.ticket_type,
+            self.name if self.name else 'No Name Set'
+        )
+
     def set_price(self, price):
         """Set the price of the ticket."""
         price = max(price, 0)
@@ -216,51 +165,12 @@ class Ticket(DB.Model):
         self.price = price
 
         if price == 0:
-            self.mark_as_paid('Free', 'Free Ticket')
+            self.mark_as_paid()
 
-    def set_payment_method(self, method, reason=None):
-        """Set the ticket's payment method."""
-        if method in ['Cash', 'Cheque']:
-            self.add_note(
-                method +
-                ' payment reason: ' +
-                reason
-            )
-
-        self.payment_method = method
-
-    def mark_as_paid(self, method, reference, **kwargs):
-        """Mark the ticket as paid."""
-        if method not in [
-                'Battels',
-                'Card',
-                'Cash',
-                'Cheque',
-                'Free',
-        ]:
-            raise ValueError(
-                '{0} is not an acceptable payment method'.format(method)
-            )
-
+    def mark_as_paid(self):
         self.paid = True
-        self.payment_method = method
-        self.payment_reference = reference
         self.expires = None
 
-        if 'transaction' in kwargs:
-            if hasattr(kwargs['transaction'], 'object_id'):
-                self.card_transaction_id = kwargs['transaction'].object_id
-            else:
-                self.card_transaction_id = kwargs['transaction']
-
-        if 'battels' in kwargs:
-            if hasattr(kwargs['battels'], 'object_id'):
-                self.battels_id = kwargs['battels'].object_id
-            else:
-                self.battels_id = kwargs['battels']
-
-        if 'battels_term' in kwargs:
-            self.battels_term = kwargs['battels_term']
 
     def add_note(self, note):
         """Add a note to the ticket."""
@@ -272,6 +182,9 @@ class Ticket(DB.Model):
         else:
             self.note = self.note + note
 
+    def can_be_cancelled(self):
+        # TODO
+        return False
     def set_referrer(self, referrer):
         """Set who referred the user to buy this ticket."""
         if hasattr(referrer, 'object_id'):
@@ -507,32 +420,6 @@ class Ticket(DB.Model):
         else:
             return False
 
-    def can_be_cancelled_automatically(self):
-        """Check whether the ticket can be cancelled/refunded automatically."""
-        if self.cancelled:
-            return False
-        elif APP.config['LOCKDOWN_MODE']:
-            return False
-        elif self.collected:
-            return False
-        elif self.resale_key is not None:
-            return False
-        elif self.resold:
-            return False
-        elif not self.paid:
-            return True
-        elif self.payment_method == 'Card':
-            return True
-        elif self.payment_method == 'Battels':
-            return (
-                APP.config['CURRENT_TERM'] != 'TT' and
-                self.battels is not None and
-                self.battels == self.owner.battels
-            )
-        elif self.payment_method == 'Free':
-            return True
-        else:
-            return False
 
     def can_be_collected(self):
         """Check whether a ticket can be collected."""
