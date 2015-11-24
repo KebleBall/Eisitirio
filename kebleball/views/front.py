@@ -13,6 +13,7 @@ from kebleball.database import db
 from kebleball.database import models
 from kebleball.helpers import photos
 from kebleball.helpers import util
+from kebleball.logic import affiliation_logic
 
 APP = app.APP
 DB = db.DB
@@ -243,7 +244,7 @@ def register():
         'info'
     )
 
-    user.maybe_verify_affiliation()
+    affiliation_logic.maybe_verify_affiliation(user)
 
     return flask.redirect(flask.url_for('front.home'))
 

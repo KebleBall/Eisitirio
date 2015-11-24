@@ -10,6 +10,7 @@ from kebleball import app
 from kebleball.database import db
 from kebleball.database import models
 from kebleball.helpers.login_manager import admin_required
+from kebleball.logic import affiliation_logic
 
 APP = app.APP
 DB = db.DB
@@ -368,7 +369,7 @@ def verify_affiliation(user_id):
     user = models.User.get_by_id(user_id)
 
     if user:
-        user.verify_affiliation()
+        affiliation_logic.verify_affiliation(user)
 
         APP.log_manager.log_event(
             'Verified affiliation',
@@ -385,7 +386,7 @@ def deny_affiliation(user_id):
     user = models.User.get_by_id(user_id)
 
     if user:
-        user.deny_affiliation()
+        affiliation_logic.deny_affiliation(user)
 
         APP.log_manager.log_event(
             'Denied affiliation',

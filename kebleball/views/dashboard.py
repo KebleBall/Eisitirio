@@ -12,6 +12,7 @@ from kebleball import app
 from kebleball.database import db
 from kebleball.database import models
 from kebleball.helpers import util
+from kebleball.logic import affiliation_logic
 
 APP = app.APP
 DB = db.DB
@@ -163,7 +164,8 @@ def profile():
             login.current_user.surname = flask.request.form['surname']
             login.current_user.phone = flask.request.form['phone']
             login.current_user.college_id = flask.request.form['college']
-            login.current_user.update_affiliation(
+            affiliation_logic.update_affiliation(
+                login.current_user,
                 flask.request.form['affiliation']
             )
 
