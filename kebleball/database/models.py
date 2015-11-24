@@ -20,6 +20,7 @@ from kebleball.database.battels import Battels
 from kebleball.database.card_transaction import CardTransaction
 from kebleball.database.college import College
 from kebleball.database.log import Log
+from kebleball.database.photo import Photo
 from kebleball.database.statistic import Statistic
 from kebleball.database.ticket import Ticket
 from kebleball.database.transaction import Transaction
