@@ -164,7 +164,7 @@
                             <td>{% if voucher.single_use %}Yes{% else %}No{% endif %}</td>
                             <td>{% if voucher.used %}Yes{% else %}No{% endif %}</td>
                             <td>
-                                {% if voucher.used_by_id != None %}
+                                {% if voucher.used_by.object_id != None %}
                                     <a href="{{ url_for('admin_users.view_user', user_id=voucher.used_by_id) }}">{{ voucher.used_by.full_name }}</a>
                                 {% else %}
                                     N/A
