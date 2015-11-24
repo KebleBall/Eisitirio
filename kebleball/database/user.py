@@ -4,15 +4,12 @@
 from __future__ import unicode_literals
 
 from flask.ext import bcrypt
-import flask
 
 from kebleball import app
-from kebleball.database import affiliation
 from kebleball.database import battels
 from kebleball.database import db
 from kebleball.database import ticket
 from kebleball.database import photo
-from kebleball.database import waiting
 from kebleball.helpers import util
 
 DB = db.DB
@@ -385,110 +382,6 @@ class User(DB.Model):
             return None
 
         return user
-
-    def verify_affiliation(self):
-        """Mark the users affiliation as verified.
-
-        For limited release, we require that the user's affiliation is verified.
-        For current members with known battels accounts, this is done
-        automatically, but for graduands, fellows, staff members etc an admin
-        must manually check and approve them. This method is called when the
-        affiliation is approved, and updates a flag before sending an email to
-        the user reminding them to buy tickets.
-        """
-        self.affiliation_verified = True
-
-        APP.email_manager.send_template(
-            self.email,
-            'Affiliation Verified - Buy Your Tickets Now!',
-            'affiliation_verified.email',
-            url=flask.url_for('purchase.purchase_home', _external=True)
-        )
-
-        DB.session.commit()
-
-    def deny_affiliation(self):
-        """Mark the users affiliation as invalid.
-
-        For limited release, we require that the user's affiliation is verified.
-        For current members with known battels accounts, this is done
-        automatically, but for graduands, fellows, staff members etc an admin
-        must manually check and approve them. This method is called when the
-        affiliation is rejected, and updates a flag accordingly.
-        """
-        self.affiliation_verified = False
-
-        DB.session.commit()
-
-    def update_affiliation(self, new_affiliation):
-        """Change the users affiliation.
-
-        In order to maintain the verification of users' affiliations, when we
-        update an affiliation we must re-submit it for verification as
-        appropriate.
-        """
-        old_affiliation = self.affiliation
-
-        if hasattr(affiliation, 'object_id'):
-            self.affiliation_id = affiliation.object_id
-        else:
-            self.affiliation_id = new_affiliation
-            new_affiliation = affiliation.Affiliation.get_by_id(new_affiliation)
-
-        if (
-                old_affiliation != new_affiliation and
-                self.college.name == 'Keble' and
-                new_affiliation.name not in [
-                    'Other',
-                    'None',
-                    'Graduate/Alumnus'
-                ]
-        ):
-            self.affiliation_verified = None
-
-    def maybe_verify_affiliation(self):
-        """Check if a user's affiliation can be verified
-
-        Checks if a user's affiliation can be verified automatically, and
-        otherwise sends an email to the ball ticketing officer to ask them to
-        verify it manually
-        """
-        if (
-                self.affiliation_verified is None and
-                not APP.config['TICKETS_ON_SALE']
-        ):
-            if (
-                    self.college.name != 'Keble' or
-                    self.affiliation.name in [
-                        'Other',
-                        'None',
-                        'Graduate/Alumnus'
-                    ] or
-                    (
-                        self.affiliation.name == 'Student' and
-                        self.battels_id is not None
-                    )
-            ):
-                self.affiliation_verified = True
-                DB.session.commit()
-                return
-
-            APP.email_manager.send_template(
-                APP.config['TICKETS_EMAIL'],
-                'Verify Affiliation',
-                'verify_affiliation.email',
-                user=self,
-                url=flask.url_for('admin_users.verify_affiliations',
-                                  _external=True)
-            )
-            flask.flash(
-                (
-                    'Your affiliation must be verified before you will be '
-                    'able to purchase tickets. You will receive an email when '
-                    'your status has been verified.'
-                ),
-                'info'
-            )
 
     def add_manual_battels(self):
         """Manually add a battels account for the user
