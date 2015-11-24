@@ -271,7 +271,7 @@ def confirm_email(user_id, secret_key):
             user
         )
 
-        if login.current_user.is_anonymous():
+        if login.current_user.is_anonymous:
             flask.flash(
                 'Your email address has been verified. You can now log in',
                 'info'
@@ -505,7 +505,7 @@ def destroy_account(user_id, secret_key):
     user = models.User.get_by_id(user_id)
 
     if user is not None and user.secret_key == secret_key:
-        if not user.is_verified():
+        if not user.is_verified:
             for entry in user.events:
                 entry.action = (
                     entry.action +

@@ -275,10 +275,12 @@ class User(DB.Model):
         """Make the user an ordinary user (no admin privileges)"""
         self.role = 'User'
 
+    @property
     def is_admin(self):
         """Check if the user is an admin"""
         return self.role == 'Admin'
 
+    @property
     def is_waiting(self):
         """Is the user on the waiting list?"""
         return self.waiting.count() > 0
@@ -304,6 +306,7 @@ class User(DB.Model):
             APP.config['CURRENT_TERM'] != 'TT'
         )
 
+    @property
     def gets_discount(self):
         """Does the user get a discount?
 
@@ -322,6 +325,7 @@ class User(DB.Model):
         """Has the user's email address been verified?"""
         return self.verified
 
+    @property
     def is_deleted(self):
         """Has the user been deleted?
 
@@ -331,14 +335,16 @@ class User(DB.Model):
         """
         return self.deleted
 
+    @property
     def is_active(self):
         """Is the user active?
 
         This method is specifically for the use of the Flask-Login extension,
         and refers to whether the user can log in.
         """
-        return self.is_verified() and not self.is_deleted()
+        return self.is_verified and not self.is_deleted
 
+    @property
     def is_authenticated(self):  # pylint: disable=no-self-use
         """Is the user authenticated?
 
@@ -349,6 +355,7 @@ class User(DB.Model):
         """
         return True
 
+    @property
     def is_anonymous(self):  # pylint: disable=no-self-use
         """Is the user anonymous?
 
