@@ -18,16 +18,11 @@
             {% if ticket.referrer_id != None %}
                 <p><strong>Referrer</strong>: <a href="{{ url_for('admin_users.view_user', user_id=ticket.referrer_id) }}">{{ ticket.referrer.full_name }}</a></p>
             {% endif %}
-            {% if ticket.reselling_to_id != None %}
-                <p><strong>Reselling to</strong>: <a href="{{ url_for('admin_users.view_user', user_id=ticket.reselling_to_id) }}">{{ ticket.reselling_to.full_name }}</a></p>
-            {% endif %}
             <h4>Ticket Status</h4>
             <ul>
                 <li>Ticket <strong>is{% if not ticket.paid %} not{% endif %}</strong> paid.</li>
                 <li>Ticket <strong>is{% if not ticket.cancelled %} not{% endif %}</strong> cancelled.</li>
                 <li>Ticket <strong>is{% if not ticket.collected %} not{% endif %}</strong> collected.</li>
-                <li>Ticket <strong>is{% if ticket.reselling_to_id == None %} not{% endif %}</strong> being resold.</li>
-                <li>Ticket <strong>has{% if not ticket.resold %} not{% endif %}</strong> been resold.</li>
             </ul>
             <h4>Ticket Notes</h4>
             <form action="{{ url_for('admin_tickets.note_ticket', ticket_id=ticket.object_id) }}" method="post">

@@ -40,7 +40,6 @@ class LogManager(object):
         self.front = logging.getLogger('front')
         self.main = logging.getLogger('main')
         self.purchase = logging.getLogger('purchase')
-        self.resale = logging.getLogger('purchase')
 
     def init_app(self, app):
         app.logger = self
@@ -61,7 +60,6 @@ class LogManager(object):
                     'front',
                     'main',
                     'purchase',
-                    'resale',
             ]:
                 return lambda level, message: self.log(
                     components[1],

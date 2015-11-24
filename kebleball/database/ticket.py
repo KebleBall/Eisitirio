@@ -52,11 +52,6 @@ class Ticket(DB.Model):
         default=False,
         nullable=False
     )
-    resold = DB.Column(
-        DB.Boolean(),
-        default=False,
-        nullable=False
-    )
 
     price = DB.Column(
         DB.Integer(),
@@ -74,14 +69,6 @@ class Ticket(DB.Model):
         DB.DateTime(),
         nullable=True
     )
-    resale_key = DB.Column(
-        DB.Unicode(32),
-        nullable=True
-    )
-    resaleconfirmed = DB.Column(
-        DB.Boolean(),
-        nullable=True
-    )
 
     owner_id = DB.Column(
         DB.Integer,
@@ -96,20 +83,6 @@ class Ticket(DB.Model):
             order_by=b'Ticket.cancelled'
         ),
         foreign_keys=[owner_id]
-    )
-
-    reselling_to_id = DB.Column(
-        DB.Integer,
-        DB.ForeignKey('user.object_id'),
-        nullable=True
-    )
-    reselling_to = DB.relationship(
-        'User',
-        backref=DB.backref(
-            'resales',
-            lazy='dynamic'
-        ),
-        foreign_keys=[reselling_to_id]
     )
 
     referrer_id = DB.Column(
@@ -192,234 +165,6 @@ class Ticket(DB.Model):
         else:
             self.referrer_id = referrer
 
-    @staticmethod
-    def start_resale(tickets, reselling_to):
-        """Start the resale process for tickets."""
-        if len(tickets) > 0:
-            if hasattr(reselling_to, 'object_id'):
-                object_id = reselling_to.object_id
-            else:
-                object_id = reselling_to
-                reselling_to = DB.User.get_by_id(reselling_to)
-
-            resale_key = helpers.generate_key(32)
-
-            for ticket in tickets:
-                ticket.reselling_to_id = object_id
-                ticket.resale_key = resale_key
-                ticket.resaleconfirmed = False
-
-            DB.session.commit()
-
-            APP.log_manager.log_event(
-                'Started Resale',
-                tickets,
-                login.current_user
-            )
-
-            APP.email_manager.send_template(
-                reselling_to.email,
-                'Confirm Ticket Resale',
-                'confirm_resale.email',
-                confirmurl=flask.url_for(
-                    'resale.resale_confirm',
-                    resale_from=login.current_user.object_id,
-                    resale_to=object_id,
-                    key=resale_key,
-                    _external=True
-                ),
-                cancelurl=flask.url_for(
-                    'resale.resale_cancel',
-                    resale_from=login.current_user.object_id,
-                    resale_to=object_id,
-                    key=resale_key,
-                    _external=True
-                ),
-                num_tickets=len(tickets),
-                resale_from=login.current_user
-            )
-
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def cancel_resale(resale_from, resale_to, key):
-        """Cancel the resale process."""
-        tickets = Ticket.query.filter(
-            Ticket.owner_id == resale_from
-        ).filter(
-            Ticket.reselling_to_id == resale_to
-        ).filter(
-            Ticket.resale_key == key
-        ).all()
-
-        if len(tickets) > 0:
-            resale_from = tickets[0].owner
-            resale_to = tickets[0].reselling_to
-
-            if not (
-                    login.current_user == resale_to or
-                    login.current_user == resale_from
-            ):
-                flask.flash(
-                    'You are not authorised to perform this action',
-                    'error'
-                )
-                return False
-
-            for ticket in tickets:
-                ticket.reselling_to = None
-                ticket.reselling_to_id = None
-                ticket.resale_key = None
-                ticket.resaleconfirmed = None
-
-            DB.session.commit()
-
-            APP.log_manager.log_event(
-                'Cancelled Resale',
-                tickets,
-                login.current_user
-            )
-
-            APP.email_manager.send_template(
-                resale_from.email,
-                'Ticket Resale Cancelled',
-                'owner_cancel_resale.email',
-                resale_to=resale_to
-            )
-
-            APP.email_manager.send_template(
-                resale_to.email,
-                'Ticket Resale Cancelled',
-                'buyer_cancel_resale.email',
-                resale_from=resale_from
-            )
-
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def confirm_resale(resale_from, resale_to, key):
-        """Confirm the resale.
-
-        The resale is confirmed by the recipient before being completed by the
-        owner of the ticket.
-        """
-        tickets = Ticket.query.filter(
-            Ticket.owner_id == resale_from
-        ).filter(
-            Ticket.reselling_to_id == resale_to
-        ).filter(
-            Ticket.resale_key == key
-        ).all()
-
-        if len(tickets) > 0:
-            resale_from = tickets[0].owner
-            resale_to = tickets[0].reselling_to
-            resale_key = helpers.generate_key(32)
-
-            if login.current_user != resale_to:
-                flask.flash(
-                    'You are not authorised to perform this action',
-                    'error'
-                )
-                return False
-
-            for ticket in tickets:
-                ticket.resale_key = resale_key
-                ticket.resaleconfirmed = True
-
-            DB.session.commit()
-
-            APP.log_manager.log_event(
-                'Confirmed Resale',
-                tickets,
-                login.current_user
-            )
-
-            APP.email_manager.send_template(
-                resale_from.email,
-                'Complete Ticket Resale',
-                'complete_resale.email',
-                resale_to=resale_to,
-                completeurl=flask.url_for(
-                    'resale.resale_complete',
-                    resale_from=resale_from.object_id,
-                    resale_to=resale_to.object_id,
-                    key=resale_key,
-                    _external=True
-                ),
-                cancelurl=flask.url_for(
-                    'resale.resale_cancel',
-                    resale_from=resale_from.object_id,
-                    resale_to=resale_to.object_id,
-                    key=resale_key,
-                    _external=True
-                ),
-                num_tickets=len(tickets)
-            )
-
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def complete_resale(resale_from, resale_to, key):
-        """Complete the resale process.
-
-        After the owner of the ticket is paid, the resale process is completed
-        and the tickets are transferred to the new owner.
-        """
-        tickets = Ticket.query.filter(
-            Ticket.owner_id == resale_from
-        ).filter(
-            Ticket.reselling_to_id == resale_to
-        ).filter(
-            Ticket.resale_key == key
-        ).filter(
-            Ticket.resaleconfirmed == True
-        ).all()
-
-        if len(tickets) > 0:
-            resale_from = tickets[0].owner
-
-            if login.current_user != resale_from:
-                flask.flash(
-                    'You are not authorised to perform this action',
-                    'error'
-                )
-                return False
-
-            for ticket in tickets:
-                ticket.add_note(
-                    'Resold by {0}/{1} to {2}/{3}'.format(
-                        ticket.owner.object_id,
-                        ticket.owner.full_name,
-                        ticket.reselling_to.object_id,
-                        ticket.reselling_to.full_name
-                    )
-                )
-                ticket.owner = ticket.reselling_to
-                ticket.reselling_to_id = None
-                ticket.reselling_to = None
-                ticket.resale_key = None
-                ticket.name = None
-                ticket.resold = True
-
-            DB.session.commit()
-
-            APP.log_manager.log_event(
-                'Completed Resale',
-                tickets,
-                login.current_user
-            )
-
-            return True
-        else:
-            return False
-
 
     def can_be_collected(self):
         """Check whether a ticket can be collected."""
@@ -428,16 +173,6 @@ class Ticket(DB.Model):
             not self.collected and
             not self.cancelled and
             self.name is not None
-        )
-
-    def can_be_resold(self):
-        """Check whether a ticket can be resold."""
-        return (
-            self.paid and
-            not self.collected and
-            not self.cancelled and
-            self.resale_key == None and
-            not APP.config['LOCKDOWN_MODE']
         )
 
     def can_change_name(self):

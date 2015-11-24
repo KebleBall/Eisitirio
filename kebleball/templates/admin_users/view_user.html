@@ -35,7 +35,6 @@
                 <li>User <strong>has{% if not user.has_paid_tickets() %} no{% endif %}</strong> paid tickets.</li>
                 <li>User <strong>has{% if not user.has_uncollected_tickets() %} no{% endif %}</strong> uncollected tickets.</li>
                 <li>User <strong>is{% if not user.is_waiting %} not{% endif %}</strong> waiting.</li>
-                <li>User <strong>is{% if not user.is_reselling_tickets() %} not{% endif %}</strong> reselling tickets.</li>
                 <li>User <strong>can{% if not user.can_pay_by_battels() %} not{% endif %}</strong> pay for tickets by battels.</li>
                 {% if user.affiliation_verified == None %}
                     <li>User <strong>has not</strong> had their affiliation verified.</li>
@@ -110,12 +109,6 @@
                                         Cancelled.
                                     {% elif ticket.collected -%}
                                         Collected as {{ ticket.barcode }}.
-                                    {% elif ticket.resale_key != None -%}
-                                        {% if ticket.resaleconfirmed -%}
-                                            Pending resale completion
-                                        {% else -%}
-                                            Pending resale confirmation
-                                        {% endif %}
                                     {% elif ticket.paid -%}
                                         {% if ticket.payment_method == 'Free' -%}
                                             Free Ticket.
