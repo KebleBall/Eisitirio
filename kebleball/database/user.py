@@ -134,8 +134,8 @@ class User(DB.Model):
         self.forenames = forenames
         self.surname = surname
         self.phone = phone
-        self.college_id = college_id
-        self.affiliation_id = affiliation_id
+        self.college = college
+        self.affiliation = affiliation
 
         self.set_password(password)
 

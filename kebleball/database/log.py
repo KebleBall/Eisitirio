@@ -97,27 +97,10 @@ class Log(DB.Model):
         self.timestamp = datetime.datetime.utcnow()
         self.ip_address = ip_address
         self.action = action
-
-        if hasattr(actor, 'object_id'):
-            self.actor_id = actor.object_id
-        else:
-            self.actor_id = actor
-
-        if hasattr(user, 'object_id'):
-            self.user_id = user.object_id
-        else:
-            self.user_id = user
-
-        for ticket in tickets:
-            if hasattr(ticket, 'object_id'):
-                self.tickets.append(ticket)
-            else:
-                self.tickets.append(ticket.Ticket.get_by_id(ticket))
-
-        if hasattr(transaction, 'object_id'):
-            self.transaction_id = transaction.object_id
-        else:
-            self.transaction_id = transaction
+        self.actor = actor
+        self.user = user
+        self.tickets = tickets
+        self.transaction = transaction
 
     def __repr__(self):
         return '<Log {0}: {1}>'.format(

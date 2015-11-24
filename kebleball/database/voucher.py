@@ -148,10 +148,7 @@ class Voucher(DB.Model):
 
         self.used = True
         if self.single_use:
-            if hasattr(user, 'object_id'):
-                self.used_by_id = user.object_id
-            else:
-                self.used_by_id = user
+            self.used_by = user
 
         if self.applies_to == 'Ticket':
             tickets[0] = self.apply_to_ticket(tickets[0])

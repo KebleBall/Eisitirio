@@ -575,10 +575,10 @@ def announcements(page=1):
             announcement = models.Announcement(
                 form['subject'],
                 form['message'],
-                login.current_user.object_id,
+                login.current_user,
                 send_email,
-                college,
-                affiliation,
+                models.College.get_by_id(college),
+                models.Affiliation.get_by_id(affiliation),
                 has_tickets,
                 is_waiting,
                 has_collected,
