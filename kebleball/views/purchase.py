@@ -94,18 +94,6 @@ def purchase_home():
                 )
 
         postage, address = purchase_logic.check_postage(flashes)
-        referrer = None
-        if ('referrer_email' in flask.request.form
-                and flask.request.form['referrer_email'] != ''):
-            (result, response, referrer) = validators.validate_referrer(
-                flask.request.form['referrer_email'], login.current_user)
-            if not result:
-                flashes.append(
-                    (
-                        '{} Please clear the referrer field to continue '
-                        'without giving somebody credit.'
-                    ).format(response['message'])
-                )
 
         if flashes:
             flask.flash(
@@ -138,10 +126,6 @@ def purchase_home():
                                                       login.current_user)
             if not success:
                 flask.flash('Could not use voucher - ' + error, 'error')
-
-        if referrer is not None:
-            for ticket in tickets:
-                ticket.set_referrer(referrer)
 
         DB.session.add_all(tickets)
         DB.session.commit()
@@ -208,20 +192,6 @@ def wait():
             valid = False
             flashes.append('You must accept the Terms and Conditions')
 
-        referrer = None
-        if ('referrer_email' in flask.request.form
-                and flask.request.form['referrer_email'] != ''):
-            (result, response, referrer) = validators.validate_referrer(
-                flask.request.form['referrer_email'], login.current_user)
-            if not result:
-                valid = False
-                flashes.append(
-                    (
-                        '{} Please clear the referrer field to continue '
-                        'without giving somebody credit.'
-                    ).format(response['message'])
-                )
-
         if not valid:
             flask.flash(
                 (
@@ -243,8 +213,7 @@ def wait():
         DB.session.add(
             models.Waiting(
                 login.current_user,
-                num_tickets,
-                referrer
+                num_tickets
             )
         )
         DB.session.commit()

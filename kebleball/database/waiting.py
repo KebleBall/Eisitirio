@@ -39,30 +39,11 @@ class Waiting(DB.Model):
         foreign_keys=[user_id]
     )
 
-    referrer_id = DB.Column(
-        DB.Integer,
-        DB.ForeignKey('user.object_id'),
-        nullable=True
-    )
-    referrer = DB.relationship(
-        'User',
-        backref=DB.backref(
-            'waiting_referrals',
-            lazy='dynamic'
-        ),
-        foreign_keys=[referrer_id]
-    )
-
-    def __init__(self, user, waiting_for, referrer=None):
+    def __init__(self, user, waiting_for):
         if hasattr(user, 'object_id'):
             self.user_id = user.object_id
         else:
             self.user_id = user
-
-        if hasattr(referrer, 'object_id'):
-            self.referrer_id = referrer.object_id
-        else:
-            self.referrer_id = referrer
 
         self.waiting_for = waiting_for
 

@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import json
 
-from flask.ext import login
 import flask
 
 from kebleball.database import db
@@ -23,20 +22,6 @@ def validate_voucher():
     Check the voucher exists and that it can be used.
     """
     (_, response, _) = validators.validate_voucher(flask.request.form['code'])
-
-    response['class'] = 'message-box ' + response['class']
-    response['message'] = '<p>' + response['message'] + '</p>'
-
-    return flask.Response(json.dumps(response), mimetype='text/json')
-
-@AJAX.route('/ajax/validate/referrer', methods=['POST'])
-def validate_referrer():
-    """Validate a referrer for purchasing tickets.
-
-    Check the the referenced user has an account on the system.
-    """
-    (_, response, _) = validators.validate_referrer(flask.request.form['email'],
-                                                    login.current_user)
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'

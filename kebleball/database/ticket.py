@@ -85,20 +85,6 @@ class Ticket(DB.Model):
         foreign_keys=[owner_id]
     )
 
-    referrer_id = DB.Column(
-        DB.Integer,
-        DB.ForeignKey('user.object_id'),
-        nullable=True
-    )
-    referrer = DB.relationship(
-        'User',
-        backref=DB.backref(
-            'referrals',
-            lazy='dynamic'
-        ),
-        foreign_keys=[referrer_id]
-    )
-
     def __init__(self, owner, ticket_type, price):
         self.owner = owner
         self.ticket_type = ticket_type
@@ -158,13 +144,6 @@ class Ticket(DB.Model):
     def can_be_cancelled(self):
         # TODO
         return False
-    def set_referrer(self, referrer):
-        """Set who referred the user to buy this ticket."""
-        if hasattr(referrer, 'object_id'):
-            self.referrer_id = referrer.object_id
-        else:
-            self.referrer_id = referrer
-
 
     def can_be_collected(self):
         """Check whether a ticket can be collected."""
