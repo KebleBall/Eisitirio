@@ -14,11 +14,11 @@ import flask
 import sqlalchemy
 
 from kebleball import app
-from kebleball import helpers
 from kebleball.database import db
 from kebleball.database import models
 from kebleball.helpers import login_manager
 from kebleball.helpers import statistic_plots
+from kebleball.helpers import util
 
 APP = app.APP
 DB = db.DB
@@ -378,7 +378,7 @@ def refund_transaction(transaction_id):
     transaction = models.CardTransaction.get_by_id(transaction_id)
 
     if transaction:
-        amount = helpers.parse_pounds_pence(flask.request.form,
+        amount = util.parse_pounds_pence(flask.request.form,
                                             'refund_amount_pounds',
                                             'refund_amount_pence')
 
@@ -698,11 +698,11 @@ def vouchers(page=1):
             )
             success = False
         elif form['voucher_type'] == 'Fixed Price':
-            value = helpers.parse_pounds_pence(flask.request.form,
+            value = util.parse_pounds_pence(flask.request.form,
                                                'fixed_price_pounds',
                                                'fixed_price_pence')
         elif form['voucher_type'] == 'Fixed Discount':
-            value = helpers.parse_pounds_pence(flask.request.form,
+            value = util.parse_pounds_pence(flask.request.form,
                                                'fixed_discount_pounds',
                                                'fixed_discount_pence')
 
@@ -746,7 +746,7 @@ def vouchers(page=1):
             single_use = 'single_use' in form and form['single_use'] == 'yes'
 
             for _ in xrange(num_vouchers):
-                key = helpers.generate_key(10)
+                key = util.generate_key(10)
                 voucher = models.Voucher(
                     '{0}-{1}'.format(
                         form['voucher_prefix'],
