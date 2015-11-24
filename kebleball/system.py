@@ -21,6 +21,8 @@ from kebleball.helpers import timed_config
 APP = app.APP
 
 APP.config.from_pyfile('config/default.py')
+APP.config.from_pyfile('config/ticket_types.py')
+APP.config.from_pyfile('config/postage.py')
 
 timed_config.augment_config(APP)
 
