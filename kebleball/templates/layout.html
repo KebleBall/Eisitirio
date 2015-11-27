@@ -39,12 +39,14 @@
         </header>
         {% if not current_user.is_anonymous %}
             <nav class="row">
-                <ul id="navigation-main">
-                    {% include 'blocks/dashboard-navigation.html' %}
-                    {% if current_user.is_admin %}
-                        {% include 'blocks/admin-navigation.html' %}
-                    {% endif %}
-                </ul>
+                <div class="large-12 columns">
+                    <ul id="navigation-main">
+                        {% include 'blocks/dashboard-navigation.html' %}
+                        {% if current_user.is_admin %}
+                            {% include 'blocks/admin-navigation.html' %}
+                        {% endif %}
+                    </ul>
+                </div>
             </nav>
         {% endif %}
         <section id="page-title" class="row">

@@ -1812,65 +1812,68 @@ th.hide-for-touch { display: table-cell !important; }
 .slider > .highlight-track { background-color: #640325; }
 
 /* line 17, style.scss */
-a { font-weight: bold; }
+header, nav, #page-title, #main, footer { background-color: #f6f2ed; }
 
 /* line 21, style.scss */
+a { font-weight: bold; }
+
+/* line 25, style.scss */
 .headline, h1, h2, h3, h4, h5, h6 { font-family: 'Headline One', sans-serif; text-transform: uppercase; vertical-align: -3%; font-weight: normal; }
 
-/* line 28, style.scss */
+/* line 32, style.scss */
 #logo { padding-bottom: 2em; text-align: center; }
-/* line 31, style.scss */
+/* line 35, style.scss */
 #logo a { color: #fff; }
-/* line 34, style.scss */
+/* line 38, style.scss */
 #logo h1 { font-size: 3rem; margin: 2rem 0 0; color: #000; }
-/* line 39, style.scss */
-#logo h2 { font-size: 5rem; margin: 0; }
 /* line 43, style.scss */
+#logo h2 { font-size: 5rem; margin: 0; }
+/* line 47, style.scss */
 #logo h3 { font-size: 2rem; margin: 0 0 2rem; color: #000; }
 
-/* line 50, style.scss */
+/* line 54, style.scss */
 #user { text-align: right; }
 
-/* line 54, style.scss */
+/* line 58, style.scss */
 #copyright { text-align: center; }
 
-/* line 58, style.scss */
+/* line 62, style.scss */
 .message-box, #flashes li { display: block; border: 3px solid; padding: 0.5em; margin-bottom: 0.5em; background-color: #f6f2ed; color: #000; }
-/* line 65, style.scss */
-.message-box.error, #flashes li.error { background-color: #f3afbf; border: 3px solid #f31323; }
 /* line 69, style.scss */
-.message-box.warning, #flashes li.warning { background-color: #f3cf9f; border: 3px solid #f38323; }
+.message-box.error, #flashes li.error { background-color: #f3afbf; border: 3px solid #f31323; }
 /* line 73, style.scss */
-.message-box.success, #flashes li.success { background-color: #83ef9f; border: 3px solid #338323; }
+.message-box.warning, #flashes li.warning { background-color: #f3cf9f; border: 3px solid #f38323; }
 /* line 77, style.scss */
-.message-box.info, #flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
+.message-box.success, #flashes li.success { background-color: #83ef9f; border: 3px solid #338323; }
 /* line 81, style.scss */
+.message-box.info, #flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
+/* line 85, style.scss */
 .message-box p:last-child, #flashes li p:last-child { margin-bottom: 0; }
-/* line 84, style.scss */
+/* line 88, style.scss */
 .message-box h1, #flashes li h1, .message-box h2, #flashes li h2, .message-box h3, #flashes li h3, .message-box h4, #flashes li h4, .message-box h5, #flashes li h5, .message-box h6, #flashes li h6 { font-family: "Open Sans", Helvetica, sans-serif; }
 
-/* line 90, style.scss */
+/* line 94, style.scss */
 #flashes ul { margin: 0; }
-/* line 93, style.scss */
+/* line 97, style.scss */
 #flashes li { margin: 0.5em; }
 
-/* line 99, style.scss */
-p.small { font-size: 0.75rem; }
-
 /* line 103, style.scss */
+p.small, li.small { font-size: 0.75rem; }
+
+/* line 107, style.scss */
 table .button { margin: 0; }
 
-/* line 109, style.scss */
+/* line 113, style.scss */
 #give_tickets input, #refund_transaction input { display: inline; }
-/* line 111, style.scss */
+/* line 115, style.scss */
 #give_tickets input[type="number"], #refund_transaction input[type="number"] { width: 5rem; }
-/* line 114, style.scss */
+/* line 118, style.scss */
 #give_tickets input[type="text"], #refund_transaction input[type="text"] { width: auto; }
 
-/* line 120, style.scss */
+/* line 124, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
 
-/* line 126, style.scss */
+/* line 130, style.scss */
 td, td label { color: #000 !important; }
 
 /*# sourceMappingURL=style.css.map */
