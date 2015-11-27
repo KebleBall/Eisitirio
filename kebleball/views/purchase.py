@@ -73,7 +73,9 @@ def purchase_home():
             ticket_names
         )
 
-        payment_method, payment_term = purchase_logic.check_payment_method()
+        payment_method, payment_term = purchase_logic.check_payment_method(
+            flashes
+        )
 
         if 'accept_terms' not in flask.request.form:
             flashes.append('You must accept the Terms and Conditions')
