@@ -32,8 +32,8 @@
             <section id="logo" class="large-6 large-centered columns">
                 <a href="/">
                     <h1>Keble Ball {{ template_config['START_TIME'].year }}</h1>
-                    <h4 class="adele">{{ template_config['THEME'] }}</h4>
-                    <h3 class="adele">{{ template_config['START_TIME'].day }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}</h3>
+                    <h2>{{ template_config['THEME'] }}</h2>
+                    <h3>{{ template_config['START_TIME'].strftime('%d%m%Y') }}</h3>
                 </a>
             </section>
         </header>

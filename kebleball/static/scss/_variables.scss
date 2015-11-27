@@ -1,33 +1,36 @@
 @import "vendor/foundation/functions";
 
-$white: #f9f6f1;
-$black: #070707;
-$purple: #971f60;
-$grey: #808080;
+$cream1: #e7e2d4;
+$purple: #640325;
+$red: #950219;
+$cream2: #f3ede1;
+$white: #f6f2ed;
+$black: #000;
+$grey: #333;
 
 $rem-base: 16px;
 
-$body-bg: $black;
-$body-font-color: $white;
+$body-bg: $cream1;
+$body-font-color: $black;
 $body-font-family: "Open Sans", Helvetica, sans-serif;
 $body-font-weight: lighter;
 
 $primary-color: $purple;
-$secondary-color: $grey;
+$secondary-color: $cream2;
 
-$header-font-family: "Chopin Script", serif;
+$header-font-family: "Headline One", sans-serif;
 $header-font-weight: normal;
-$header-font-color: $white;
+$header-font-color: $purple;
 $header-line-height: 1em;
 $header-top-margin: 0.3em;
 $header-bottom-margin: 0.2em;
 
-$h1-font-size: 4rem;
-$h2-font-size: 3.6rem;
-$h3-font-size: 3.2rem;
-$h4-font-size: 2.8rem;
-$h5-font-size: 2.4rem;
-$h6-font-size: 2rem;
+$h1-font-size: 3rem;
+$h2-font-size: 2.6rem;
+$h3-font-size: 2.2rem;
+$h4-font-size: 1.8rem;
+$h5-font-size: 1.4rem;
+$h6-font-size: 1rem;
 
 $anchor-font-color: $grey;
 $anchor-font-color-hover: $purple;
@@ -38,7 +41,7 @@ $button-font-tny: rem-calc(14);
 $button-font-sml: rem-calc(14);
 
 $form-label-font-size: 1rem;
-$form-label-font-color: #ccc;
+$form-label-font-color: #222;
 
 $legend-bg: transparent;
 

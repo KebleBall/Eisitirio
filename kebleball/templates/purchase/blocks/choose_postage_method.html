@@ -10,7 +10,7 @@
                 </label>
             {% endfor %}
         </div>
-        <div id="postage_address" class="columns"{% if form and not template_config['POSTAGE_OPTIONS'][form['postage']].needs_address %} style="display: none"{% endif %}>
+        <div id="postage_address" class="columns"{% if not form or not template_config['POSTAGE_OPTIONS'][form['postage']].needs_address %} style="display: none"{% endif %}>
             <p>Send to <textarea placeholder="Address" name="address">{% if form and form['address'] and form['address'] %}{{ form['address'] }}{% endif %}</textarea></p>
         </div>
     </div>

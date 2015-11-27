@@ -260,7 +260,8 @@ class CardTransaction(DB.Model):
                                        _external=True),
             'Method': 'ProcessPayment',
             'TransactionType': 'Purchase',
-            'LogoUrl': 'https://www.kebleball.com/assets/building_big.jpg',
+            'LogoUrl': flask.url_for('static', filename='images/eway_logo.png',
+                                     _external=True, _scheme='https'),
             'HeaderText': 'Keble Ball {0}'.format(
                 APP.config['START_TIME'].strftime('%Y')
             ),
@@ -270,7 +271,7 @@ class CardTransaction(DB.Model):
 
         (success, response) = self._send_request('CreateAccessCodeShared', data)
 
-        if success:
+        if success and response['Errors'] is None:
             self.access_code = response['AccessCode']
             DB.session.commit()
 
