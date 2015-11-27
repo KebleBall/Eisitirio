@@ -1,158 +1,118 @@
 # coding: utf-8
-"""
-log.py
+"""Database model for log entries persisted to the database."""
 
-Contains Log class
-Used to store log entries
-"""
+from __future__ import unicode_literals
+
+import datetime
 
 from kebleball.database import db
-from kebleball.database.user import User
-from kebleball.database.ticket import Ticket
-from kebleball.database.card_transaction import CardTransaction
-from datetime import datetime
 
-log_ticket_link = db.Table(
+DB = db.DB
+
+LOG_TICKET_LINK = DB.Table(
     'log_ticket_link',
-    db.Model.metadata,
-    db.Column('log_id',
-        db.Integer,
-        db.ForeignKey('log.id')
-    ),
-    db.Column('ticket_id',
-        db.Integer,
-        db.ForeignKey('ticket.id')
-    )
+    DB.Model.metadata,
+    DB.Column('log_id',
+              DB.Integer,
+              DB.ForeignKey('log.object_id')
+             ),
+    DB.Column('ticket_id',
+              DB.Integer,
+              DB.ForeignKey('ticket.object_id')
+             )
 )
 
-class Log(db.Model):
-    id = db.Column(
-        db.Integer(),
+class Log(DB.Model):
+    """Model for log entries persisted to the database."""
+    object_id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    timestamp = db.Column(
-        db.DateTime,
+    timestamp = DB.Column(
+        DB.DateTime,
         nullable=False
     )
-    ip = db.Column(
-        db.String(45),
+    ip_address = DB.Column(
+        DB.Unicode(45),
         nullable=False
     )
-    action = db.Column(db.Text())
+    action = DB.Column(DB.UnicodeText())
 
-    actor_id = db.Column(
-        db.Integer(),
-        db.ForeignKey('user.id'),
+    actor_id = DB.Column(
+        DB.Integer(),
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
-    actor = db.relationship(
-        User,
-        backref=db.backref(
+    actor = DB.relationship(
+        'User',
+        backref=DB.backref(
             'actions',
             lazy='dynamic'
         ),
         foreign_keys=[actor_id]
     )
 
-    user_id = db.Column(
-        db.Integer(),
-        db.ForeignKey('user.id'),
+    user_id = DB.Column(
+        DB.Integer(),
+        DB.ForeignKey('user.object_id'),
         nullable=True
     )
-    user = db.relationship(
-        User,
-        backref=db.backref(
+    user = DB.relationship(
+        'User',
+        backref=DB.backref(
             'events',
             lazy='dynamic'
         ),
         foreign_keys=[user_id]
     )
 
-    tickets = db.relationship(
+    tickets = DB.relationship(
         'Ticket',
-        secondary=log_ticket_link,
-        backref=db.backref(
+        secondary=LOG_TICKET_LINK,
+        backref=DB.backref(
             'log_entries',
             lazy='dynamic'
         ),
         lazy='dynamic'
     )
 
-    transaction_id = db.Column(
-        db.Integer(),
-        db.ForeignKey('card_transaction.id'),
+    card_transaction_id = DB.Column(
+        DB.Integer(),
+        DB.ForeignKey('card_transaction.object_id'),
         nullable=True
     )
-    transaction = db.relationship(
-        CardTransaction,
-        backref=db.backref(
+    card_transaction = DB.relationship(
+        'CardTransaction',
+        backref=DB.backref(
             'events',
             lazy='dynamic'
         )
     )
 
-    def __init__(self, ip, action, actor, user, tickets=[], transaction=None):
-        self.timestamp = datetime.utcnow()
-        self.ip = ip
+    def __init__(self, ip_address, action, actor, user, tickets=None,
+                 card_transaction=None):
+        if tickets is None:
+            tickets = []
+
+        self.timestamp = datetime.datetime.utcnow()
+        self.ip_address = ip_address
         self.action = action
-
-        if hasattr(actor, 'id'):
-            self.actor_id = actor.id
-        else:
-            self.actor_id = actor
-
-        if hasattr(user, 'id'):
-            self.user_id = user.id
-        else:
-            self.user_id = user
-
-        for ticket in tickets:
-            if hasattr(ticket, 'id'):
-                self.tickets.append(ticket)
-            else:
-                self.tickets.append(Ticket.get_by_id(ticket))
-
-        if hasattr(transaction, 'id'):
-            self.transaction_id = transaction.id
-        else:
-            self.transaction_id = transaction
+        self.actor = actor
+        self.user = user
+        self.tickets = tickets
+        self.card_transaction = card_transaction
 
     def __repr__(self):
         return '<Log {0}: {1}>'.format(
-            self.id,
+            self.object_id,
             self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)')
         )
 
-    def display(self):
-        return '{0}: {1} {2} acting as {3} {4}{5}{6} - {7}'.format(
-            self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)'),
-            self.actor.firstname,
-            self.actor.surname,
-            self.user.firstname,
-            self.user.surname,
-            (
-                "" if self.ticket is None else (
-                    ", in relation "
-                    "to {0} tickets"
-                ).format(
-                    self.tickets.count()
-                )
-            ),
-            (
-                "" if self.transaction is None else (
-                    ", in relation "
-                    "to transaction {0}"
-                ).format(
-                    self.transaction.id
-                )
-            ),
-            self.message
-        )
-
     @staticmethod
-    def get_by_id(id):
-        log = Log.query.filter(Log.id==int(id)).first()
+    def get_by_id(object_id):
+        """Get a Log object by its database ID."""
+        log = Log.query.filter(Log.object_id == int(object_id)).first()
 
         if not log:
             return None

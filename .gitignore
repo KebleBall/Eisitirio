@@ -10,3 +10,4 @@ man
 share
 pip-selfcheck.json
 review.json
+.idea/*

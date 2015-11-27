@@ -1,0 +1,169 @@
+<!-- purchase/purchase_home.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Buy Tickets{% endblock %}
+
+{% block content %}
+    <section id="purchase" class="columns">
+        <form action="{{ url_for('purchase.purchase_home') }}" id="purchase_form" method="post">
+            <ol id="purchase_steps">
+                <li>
+                    <h5>Choose Number of Tickets</h5>
+                    <table id="ticket_type_table">
+                        <thead>
+                            <th>Ticket type</th>
+                            <th>Price</th>
+                            <th>Number</th>
+                        </thead>
+                        {% for ticket_type, limit in ticket_info.ticket_types %}
+                            <tr>
+                                <td>{{ ticket_type.name }}</td>
+                                <td>&pound;{{ ticket_type.price_pounds }}</td>
+                                <td><input type="number" name="num_tickets_{{ ticket_type.slug }}" id="num_tickets_{{ ticket_type.slug }}" class="num_ticket_input" min="0" max="{{ limit }}" value="{{ num_tickets[ticket_type.slug] }}" /></td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>Total:</td>
+                            <td id="total_value">&pound;0.00</td>
+                            <td id="total_tickets">0</td>
+                    </table>
+                </li>
+                <li>
+                    <h5>Enter Names for Tickets</h5>
+                    <p>You must set the full name of the guest holding each ticket you purchase. If you do not know who will be accompanying you at this point, leave the field blank, but you must set the name on the ticket in order to be allowed entry to the Ball. Setting/changing ticket names after {{ template_config['LOCKDOWN_STARTS'].strftime('%-d') }}{{ get_ord(template_config['LOCKDOWN_STARTS']) }} {{ template_config['LOCKDOWN_STARTS'].strftime('%B %Y') }} will incur a fee.</p>
+                    <div class="row" id="ticket_names">
+                        {% for ticket_name in ticket_names %}
+                        <div class="columns large-3 end">
+                            <input type="text" name="ticket_name[]" value="{{ ticket_name }}" />
+                        </div>
+                        {% endfor %}
+                    </div>
+                </li>
+                <li>
+                    <h5>Apply voucher code</h5>
+                    <p>If you have been given a discount code, please enter it here. If you do not have a code, leave this field blank. Only one discount code may be used per order</p>
+                    <div class="row">
+                        <div class="columns">
+                            <label for="voucher_code">Discount Code:</label>
+                            <input type="text" name="voucher_code" id="voucher_code" {% if form and form['voucher_code'] %}value="{{ form['voucher_code'] }}" {% endif %}/>
+                            <div id="voucher_message" style="display: none;"></div>
+                        </div>
+                    </div>
+                </li>
+                {% include 'purchase/blocks/choose_postage_method.html' %}
+                {% include 'purchase/blocks/choose_payment_method.html' %}
+                <li>
+                    <input type="submit" value="Buy Tickets" class="button tiny" />
+                </li>
+            </ol>
+        </form>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        String.prototype.toInt = function(){
+            return parseInt(this, 10);
+        }
+
+        var ticket_info = {{ ticket_info.to_json()|safe }};
+
+        var num_ticket_inputs = $(".num_ticket_input")
+
+        num_ticket_inputs.on("change", function () {
+            var guest_tickets_ordered = 0;
+            var total_tickets_ordered = 0;
+            var total_value = 0;
+
+            $(ticket_info.ticket_types).each(function(_, ticket_type) {
+                var input = $("#num_tickets_" + ticket_type.slug);
+
+                var ordered = input.val().toInt();
+                var max = input.attr("max").toInt();
+
+                if (ordered > max) {
+                    ordered = max;
+                    input.val(max);
+                }
+
+                if (ticket_type.counts_towards_guest_limit)
+                    guest_tickets_ordered = guest_tickets_ordered + ordered;
+
+                total_tickets_ordered = total_tickets_ordered + ordered;
+
+                total_value = total_value + ordered * ticket_type.price;
+            });
+
+            var price_str = total_value + "";
+            while (price_str.length < 3) price_str = "0" + price_str;
+
+            $("#total_value").html("&pound;" + price_str.slice(0, -2) + "." + price_str.slice(-2));
+            $("#total_tickets").html(total_tickets_ordered);
+
+            var guest_tickets_available = ticket_info.guest_tickets_available - guest_tickets_ordered;
+            var total_tickets_available = ticket_info.total_tickets_available - total_tickets_ordered;
+
+            var name_fields = document.getElementById("ticket_names");
+            var name_fields_count = name_fields.childElementCount;
+
+            if (total_tickets_ordered > name_fields_count) {
+                var e = document.createElement("div")
+                e.innerHTML = "<div class=\"columns large-3 end\"><input type=\"text\" name=\"ticket_name[]\" /></div>".repeat(total_tickets_ordered - name_fields_count);
+
+                while (e.firstChild) name_fields.appendChild(e.firstChild);
+            } else {
+                for (var i = 0; i < name_fields_count - total_tickets_ordered; i++)
+                    name_fields.removeChild(name_fields.lastChild);
+            }
+
+            $(ticket_info.ticket_types).each(function(_, ticket_type) {
+                var input = $("#num_tickets_" + ticket_type.slug);
+
+                var ordered = input.val().toInt();
+                var limit = Math.min(
+                    ticket_type.purchase_limit,
+                    ordered + total_tickets_available
+                );
+
+                if (ticket_type.counts_towards_guest_limit)
+                    limit = Math.min(limit, ordered + guest_tickets_available)
+
+                input.attr("max", Math.max(0, limit));
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        var voucher_code = $("#voucher_code");
+        var voucher_message = $("#voucher_message");
+
+        voucher_code.on("blur", function() {
+            if (voucher_code.val() != '') {
+                jQuery.ajax(
+                    '{{ url_for('ajax.validate_voucher', _external=True) }}',
+                    {
+                        'data': {
+                            'code': voucher_code.val()
+                        },
+                        'type': 'POST',
+                        'dataType': 'json',
+                        'success': function(data, code, xhr) {
+                            voucher_message.attr(
+                                "class",
+                                data.class
+                            );
+                            voucher_message.html(data.message);
+                            voucher_message.show(0);
+                        }
+                    }
+                );
+            } else {
+                voucher_message.hide(0);
+            }
+        });
+
+        voucher_code.on("change", function() {
+            voucher_message.hide(0);
+        });
+    </script>
+    {% include 'purchase/blocks/script_show_postage_address.html' %}
+{% endblock %}

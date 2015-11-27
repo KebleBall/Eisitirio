@@ -1,492 +1,588 @@
 # coding: utf-8
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+"""Views related to users who aren't logged in."""
 
-from flask.ext.login import login_user, logout_user, login_required, current_user
+from __future__ import unicode_literals
 
-from kebleball.app import app
-from kebleball.helpers import generate_key
+import datetime
+
+from flask.ext import login
+import flask
+
+from kebleball import app
 from kebleball.database import db
-from kebleball.database.user import User
-from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
+from kebleball.database import models
+from kebleball.helpers import photos
+from kebleball.helpers import util
+from kebleball.logic import affiliation_logic
 
-from datetime import datetime, timedelta
+APP = app.APP
+DB = db.DB
 
-log = app.log_manager.log_front
-log_event = app.log_manager.log_event
+FRONT = flask.Blueprint('front', __name__)
 
-front = Blueprint('front', __name__)
-
-@front.route('/home')
+@FRONT.route('/home')
 def home():
-    return render_template(
+    """Display the homepage.
+
+    Contains forms for registering and logging in.
+    """
+    return flask.render_template(
         'front/home.html',
-        colleges = College.query.all(),
-        affiliations = Affiliation.query.all(),
+        colleges=models.College.query.all(),
+        affiliations=models.Affiliation.query.all(),
         form={}
     )
 
-@front.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method != 'POST':
-        return redirect(url_for('router'))
+@FRONT.route('/login', methods=['GET', 'POST'])
+def do_login():
+    """Process a login."""
+    if flask.request.method != 'POST':
+        return flask.redirect(flask.url_for('router'))
 
-    user = User.get_by_email(request.form['email'])
+    user = models.User.get_by_email(flask.request.form['email'])
 
-    if not user or not user.checkPassword(request.form['password']):
+    if not user or not user.check_password(flask.request.form['password']):
         if user:
-            log_event(
+            APP.log_manager.log_event(
                 'Failed login attempt - invalid password',
                 [],
                 user
             )
         else:
-            log_event(
+            APP.log_manager.log_event(
                 'Failed login attempt - invalid email {0}'.format(
-                    request.form['email']
+                    flask.request.form['email']
                 ),
                 [],
                 None
             )
 
-        flash(u'Could not complete log in. Invalid email or password.', 'error')
-        return redirect(url_for('front.home'))
+        flask.flash(
+            'Could not complete log in. Invalid email or password.',
+            'error'
+        )
+        return flask.redirect(flask.url_for('front.home'))
 
     if not user.verified:
-        log_event(
+        APP.log_manager.log_event(
             'Failed login attempt - not verified',
             [],
             user
         )
-        flash(
-            u'Could not complete log in. Email address is not confirmed.',
+        flask.flash(
+            'Could not complete log in. Email address is not confirmed.',
             'warning'
         )
-        return redirect(url_for('front.home'))
+        return flask.redirect(flask.url_for('front.home'))
 
-    login_user(
+    login.login_user(
         user,
         remember=(
-            'remember-me' in request.form and
-            request.form['remember-me'] == 'yes'
+            'remember-me' in flask.request.form and
+            flask.request.form['remember-me'] == 'yes'
         )
     )
 
-    log_event(
+    APP.log_manager.log_event(
         'Logged in',
         [],
         user
     )
 
-    flash(u'Logged in successfully.', 'success')
-    return redirect(request.form.get('next', False) or url_for("dashboard.dashboardHome"))
+    flask.flash('Logged in successfully.', 'success')
+    return flask.redirect(flask.request.form.get('next', False) or
+                          flask.url_for('dashboard.dashboard_home'))
 
-@front.route('/register', methods=['GET', 'POST'])
+@FRONT.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method != 'POST':
-        return redirect(url_for('router'))
+    """Process a registration.
 
-    valid = True
+    After registration, the user must click a link in an email sent to the
+    address they registered with to confirm that it is valid.
+    """
+    if flask.request.method != 'POST':
+        return flask.redirect(flask.url_for('router'))
+
     flashes = []
 
-    if User.get_by_email(request.form['email']) is not None:
-        flash(
+    if models.User.get_by_email(flask.request.form['email']) is not None:
+        flask.flash(
             (
-                u'That email address already has an associated account. '
-                u'Use the links below to verify your email or reset your '
-                u'password.'
+                'That email address already has an associated account. '
+                'Use the links below to verify your email or reset your '
+                'password.'
             ),
             'error'
         )
-        return redirect(url_for('front.home'))
+        return flask.redirect(flask.url_for('front.home'))
 
     if (
-        'password' not in request.form or
-        'confirm' not in request.form or
-        request.form['password'] != request.form['confirm']
+            'password' not in flask.request.form or
+            'confirm' not in flask.request.form or
+            flask.request.form['password'] != flask.request.form['confirm']
     ):
-        flashes.append(u'Passwords do not match')
-        valid = False
+        flashes.append('Passwords do not match')
 
     if (
-        'firstname' not in request.form or
-        request.form['firstname'] == ''
+            'forenames' not in flask.request.form or
+            flask.request.form['forenames'] == ''
     ):
-        flashes.append(u'First Name cannot be blank')
-        valid = False
+        flashes.append('Forenames cannot be blank')
 
     if (
-        'surname' not in request.form or
-        request.form['surname'] == ''
+            'surname' not in flask.request.form or
+            flask.request.form['surname'] == ''
     ):
-        flashes.append(u'Surname cannot be blank')
-        valid = False
+        flashes.append('Surname cannot be blank')
 
     if (
-        'email' not in request.form or
-        request.form['email'] == ''
+            'email' not in flask.request.form or
+            flask.request.form['email'] == ''
     ):
-        flashes.append(u'Email cannot be blank')
-        valid = False
+        flashes.append('Email cannot be blank')
 
     if (
-        'password' not in request.form or
-        request.form['password'] == ''
+            'password' not in flask.request.form or
+            flask.request.form['password'] == ''
     ):
-        flashes.append(u'Password cannot be blank')
-        valid = False
-    elif len(request.form['password']) < 8:
-        flashes.append(u'Password must be at least 8 characters long')
-        valid = False
+        flashes.append('Password cannot be blank')
+    elif len(flask.request.form['password']) < 8:
+        flashes.append('Password must be at least 8 characters long')
 
     if (
-        'phone' not in request.form or
-        request.form['phone'] == ''
+            'phone' not in flask.request.form or
+            flask.request.form['phone'] == ''
     ):
-        flashes.append(u'Phone cannot be blank')
-        valid = False
+        flashes.append('Phone cannot be blank')
 
     if (
-        'college' not in request.form or
-        request.form['college'] == '---'
+            'college' not in flask.request.form or
+            flask.request.form['college'] == '---'
     ):
-        flashes.append(u'Please select a college')
-        valid = False
+        flashes.append('Please select a college')
 
     if (
-        'affiliation' not in request.form or
-        request.form['affiliation'] == '---'
+            'affiliation' not in flask.request.form or
+            flask.request.form['affiliation'] == '---'
     ):
-        flashes.append(u'Please select an affiliation')
-        valid = False
+        flashes.append('Please select an affiliation')
 
-    if not valid:
-        flash(
+    if (
+            'photo' not in flask.request.files or
+            flask.request.files['photo'].filename == ''
+    ):
+        flashes.append('Please upload a photo')
+
+    if 'accept_terms' not in flask.request.form:
+        flashes.append('You must accept the Terms and Conditions')
+
+    if flashes:
+        flask.flash(
             (
-                u'There were errors in your provided details. Please fix '
-                u'these and try again'
+                'There were errors in your provided details. Please fix '
+                'these and try again'
             ),
             'error'
         )
         for msg in flashes:
-            flash(msg, 'warning')
+            flask.flash(msg, 'warning')
 
-        return render_template(
+        return flask.render_template(
             'front/home.html',
-            form=request.form,
-            colleges = College.query.all(),
-            affiliations = Affiliation.query.all()
+            form=flask.request.form,
+            colleges=models.College.query.all(),
+            affiliations=models.Affiliation.query.all()
         )
 
-    user = User(
-        request.form['email'],
-        request.form['password'],
-        request.form['firstname'],
-        request.form['surname'],
-        request.form['phone'],
-        request.form['college'],
-        request.form['affiliation']
+    photo = photos.save_photo(flask.request.files['photo'])
+
+    DB.session.add(photo)
+    DB.session.commit()
+
+    user = models.User(
+        flask.request.form['email'],
+        flask.request.form['password'],
+        flask.request.form['forenames'],
+        flask.request.form['surname'],
+        flask.request.form['phone'],
+        models.College.get_by_id(flask.request.form['college']),
+        models.Affiliation.get_by_id(flask.request.form['affiliation']),
+        photo
     )
 
-    db.session.add(user)
-    db.session.commit()
+    DB.session.add(user)
+    DB.session.commit()
 
-    log_event(
+    APP.log_manager.log_event(
         'Registered',
         [],
         user
     )
 
-    app.email_manager.sendTemplate(
-        request.form['email'],
-        "Confirm your Email Address",
-        "emailConfirm.email",
-        confirmurl=url_for(
-            'front.confirmEmail',
-            userID=user.id,
-            secretkey=user.secretkey,
+    APP.email_manager.send_template(
+        flask.request.form['email'],
+        'Confirm your Email Address',
+        'email_confirm.email',
+        confirmurl=flask.url_for(
+            'front.confirm_email',
+            user_id=user.object_id,
+            secret_key=user.secret_key,
             _external=True
         ),
-        destroyurl=url_for(
-            'front.destroyAccount',
-            userID=user.id,
-            secretkey=user.secretkey,
+        destroyurl=flask.url_for(
+            'front.destroy_account',
+            user_id=user.object_id,
+            secret_key=user.secret_key,
             _external=True
         )
     )
 
-    flash(u'Your user account has been registered', 'success')
-    flash(
+    flask.flash('Your user account has been registered', 'success')
+    flask.flash(
         (
-            u'Before you can log in, you must confirm your email address. '
-            u'Please check your email for further instructions. If the message '
-            u'does not arrive, please check your spam/junk mail folder.'
+            'Before you can log in, you must confirm your email address. '
+            'Please check your email for further instructions. If the message '
+            'does not arrive, please check your spam/junk mail folder.'
         ),
         'info'
     )
 
-    user.maybe_verify_affiliation()
+    affiliation_logic.maybe_verify_affiliation(user)
 
-    return redirect(url_for('front.home'))
+    return flask.redirect(flask.url_for('front.home'))
 
-@front.route('/terms')
-def terms():
-    return render_template('front/terms.html')
+@FRONT.route('/confirmemail/<int:user_id>/<secret_key>')
+def confirm_email(user_id, secret_key):
+    """Confirm the user's email address.
 
-@front.route('/passwordreset', methods=['GET','POST'])
-def passwordReset():
-    if request.method == 'POST':
-        user = User.get_by_email(request.form['email'])
+    The user is sent a link to this view in an email. Visiting this view
+    confirms the validity of their email address.
+    """
+    user = models.User.get_by_id(user_id)
 
-        if not user:
-            log_event(
-                'Attempted password reset for {0}'.format(
-                    request.form['email']
-                )
-            )
-
-            app.email_manager.sendTemplate(
-                request.form['email'],
-                "Attempted Account Access",
-                "passwordResetFail.email"
-            )
-        else:
-            user.secretkey = generate_key(64)
-            user.secretkeyexpiry = (
-                datetime.utcnow() +
-                timedelta(minutes=30)
-            )
-
-            db.session.commit()
-
-            log_event(
-                'Started password reset',
-                [],
-                user
-            )
-
-            app.email_manager.sendTemplate(
-                request.form['email'],
-                "Confirm Password Reset",
-                "passwordResetConfirm.email",
-                confirmurl=url_for(
-                    'front.resetPassword',
-                    userID=user.id,
-                    secretkey=user.secretkey,
-                    _external=True
-                )
-            )
-
-        flash(
-            (
-                u'An email has been sent to {0} with detailing what to do '
-                u'next. Please check your email (including your spam folder) '
-                u'and follow the instructions given'
-            ).format(
-                request.form['email']
-            ),
-            'info'
-        )
-
-        return redirect(url_for('front.home'))
-    else:
-        return render_template('front/passwordReset.html')
-
-@front.route('/emailconfirm', methods=['GET','POST'])
-def emailConfirm():
-    if request.method == 'POST':
-        user = User.get_by_email(request.form['email'])
-
-        if not user:
-            log_event(
-                'Attempted email confirm for {0}'.format(
-                    request.form['email']
-                )
-            )
-
-            app.email_manager.sendTemplate(
-                request.form['email'],
-                "Attempted Account Access",
-                "emailConfirmFail.email"
-            )
-        else:
-            user.secretkey = generate_key(64)
-            user.secretkeyexpiry = None
-
-            db.session.commit()
-
-            log_event(
-                'Requested email confirm',
-                [],
-                user
-            )
-
-            app.email_manager.sendTemplate(
-                request.form['email'],
-                "Confirm your Email Address",
-                "emailConfirm.email",
-                confirmurl=url_for(
-                    'front.confirmEmail',
-                    userID=user.id,
-                    secretkey=user.secretkey,
-                    _external=True
-                ),
-                destroyurl=url_for(
-                    'front.destroyAccount',
-                    userID=user.id,
-                    secretkey=user.secretkey,
-                    _external=True
-                )
-            )
-
-        flash(
-            (
-                u'An email has been sent to {0} with detailing what to do '
-                u'next. Please check your email (including your spam folder) '
-                u'and follow the instructions given'
-            ).format(
-                request.form['email']
-            ),
-            'info'
-        )
-
-        return redirect(url_for('front.home'))
-    else:
-        return render_template('front/emailConfirm.html')
-
-@front.route('/resetpassword/<int:userID>/<secretkey>', methods=['GET', 'POST'])
-def resetPassword(userID, secretkey):
-    user = User.get_by_id(userID)
-
-    if user is None or user.secretkey != secretkey:
-        user.secretkey = None
-        user.secretkeyexpiry = None
-        db.session.commit()
-        flash(u'Could not complete password reset. Please try again','error')
-        return redirect(url_for('front.home'))
-
-    if request.method == 'POST':
-        if request.form['password'] != request.form['confirm']:
-            user.secretkey = generate_key(64)
-            user.secretkeyexpiry = datetime.utcnow() + timedelta(minutes=5)
-            db.session.commit()
-            flash(u'Passwords do not match, please try again', 'warning')
-            return redirect(
-                url_for(
-                    'front.resetPassword',
-                    userID=user.id,
-                    secretkey=user.secretkey
-                )
-            )
-        else:
-            user.setPassword(request.form['password'])
-            user.secretkey = None
-            user.secretkeyexpiry = None
-            db.session.commit()
-
-            log_event(
-                'Completed password reset',
-                [],
-                user
-            )
-
-            flash(u'Your password has been reset, please log in.','success')
-            return redirect(url_for('front.home'))
-    else:
-        return render_template(
-            'front/resetPassword.html',
-            userID=userID,
-            secretkey=secretkey
-        )
-
-@front.route('/confirmemail/<int:userID>/<secretkey>')
-def confirmEmail(userID, secretkey):
-    user = User.get_by_id(userID)
-
-    if user is not None and user.secretkey == secretkey:
-        user.secretkey = None
+    if user is not None and user.secret_key == secret_key:
+        user.secret_key = None
         user.verified = True
 
-        if user.newemail is not None:
-            user.email = user.newemail
-            user.newemail = None
+        # This view is used to verify the email address if an already registered
+        # user decides to change their registered email.
+        if user.new_email is not None:
+            user.email = user.new_email
+            user.new_email = None
 
-        db.session.commit()
+        DB.session.commit()
 
-        log_event(
+        APP.log_manager.log_event(
             'Confirmed email',
             [],
             user
         )
 
-        flash(u'Your email address has been verified. You can now log in','info')
+        if login.current_user.is_anonymous:
+            flask.flash(
+                'Your email address has been verified. You can now log in',
+                'info'
+            )
+        else:
+            flask.flash('Your email address has been verified.', 'info')
     else:
-        flash(u'Could not confirm email address. Check that you have used the correct link','warning')
+        flask.flash(
+            (
+                'Could not confirm email address. Check that you have used '
+                'the correct link'
+            ),
+            'warning'
+        )
 
-    return redirect(url_for('front.home'))
+    return flask.redirect(flask.url_for('router'))
 
-@front.route('/destroyaccount/<int:userID>/<secretkey>')
-def destroyAccount(userID, secretkey):
-    user = User.get_by_id(userID)
+@FRONT.route('/emailconfirm', methods=['GET', 'POST'])
+def email_confirm():
+    """Retry email confirmation.
 
-    if user is not None and user.secretkey == secretkey:
-        if not user.is_verified():
+    If the user somehow manages to lose the email confirmation message, they can
+    use this view to have it resent.
+    """
+    if flask.request.method == 'POST':
+        user = models.User.get_by_email(flask.request.form['email'])
+
+        if not user:
+            APP.log_manager.log_event(
+                'Attempted email confirm for {0}'.format(
+                    flask.request.form['email']
+                )
+            )
+
+            APP.email_manager.send_template(
+                flask.request.form['email'],
+                'Attempted Account Access',
+                'email_confirm_fail.email'
+            )
+        else:
+            user.secret_key = util.generate_key(64)
+            user.secret_key_expiry = None
+
+            DB.session.commit()
+
+            APP.log_manager.log_event(
+                'Requested email confirm',
+                [],
+                user
+            )
+
+            APP.email_manager.send_template(
+                flask.request.form['email'],
+                'Confirm your Email Address',
+                'email_confirm.email',
+                confirmurl=flask.url_for(
+                    'front.confirm_email',
+                    user_id=user.object_id,
+                    secret_key=user.secret_key,
+                    _external=True
+                ),
+                destroyurl=flask.url_for(
+                    'front.destroy_account',
+                    user_id=user.object_id,
+                    secret_key=user.secret_key,
+                    _external=True
+                )
+            )
+
+        flask.flash(
+            (
+                'An email has been sent to {0} with detailing what to do '
+                'next. Please check your email (including your spam folder) '
+                'and follow the instructions given'
+            ).format(
+                flask.request.form['email']
+            ),
+            'info'
+        )
+
+        return flask.redirect(flask.url_for('front.home'))
+    else:
+        return flask.render_template('front/email_confirm.html')
+
+@FRONT.route('/terms')
+def terms():
+    """Display the terms and conditions."""
+    return flask.render_template('front/terms.html')
+
+@FRONT.route('/passwordreset', methods=['GET', 'POST'])
+def password_reset():
+    """Display a form to start the password reset process.
+
+    User enters their email, and is sent an email containing a link with a
+    random key to validate their identity.
+    """
+    if flask.request.method == 'POST':
+        user = models.User.get_by_email(flask.request.form['email'])
+
+        if not user:
+            APP.log_manager.log_event(
+                'Attempted password reset for {0}'.format(
+                    flask.request.form['email']
+                )
+            )
+
+            APP.email_manager.send_template(
+                flask.request.form['email'],
+                'Attempted Account Access',
+                'password_reset_fail.email'
+            )
+        else:
+            user.secret_key = util.generate_key(64)
+            user.secret_key_expiry = (
+                datetime.datetime.utcnow() +
+                datetime.timedelta(minutes=30)
+            )
+
+            DB.session.commit()
+
+            APP.log_manager.log_event(
+                'Started password reset',
+                [],
+                user
+            )
+
+            APP.email_manager.send_template(
+                flask.request.form['email'],
+                'Confirm Password Reset',
+                'password_reset_confirm.email',
+                confirmurl=flask.url_for(
+                    'front.reset_password',
+                    user_id=user.object_id,
+                    secret_key=user.secret_key,
+                    _external=True
+                )
+            )
+
+        flask.flash(
+            (
+                'An email has been sent to {0} with detailing what to do '
+                'next. Please check your email (including your spam folder) '
+                'and follow the instructions given'
+            ).format(
+                flask.request.form['email']
+            ),
+            'info'
+        )
+
+        return flask.redirect(flask.url_for('front.home'))
+    else:
+        return flask.render_template('front/password_reset.html')
+
+@FRONT.route('/resetpassword/<int:user_id>/<secret_key>',
+             methods=['GET', 'POST'])
+def reset_password(user_id, secret_key):
+    """Complete the password reset process.
+
+    To reset their password, the user is sent an email with a link to this view.
+    Upon clicking it, they are presented with a form to define a new password,
+    which is saved when the form is submitted (to this view)
+    """
+    user = models.User.get_by_id(user_id)
+
+    if user is None or user.secret_key != secret_key:
+        if user is not None:
+            user.secret_key = None
+            user.secret_key_expiry = None
+
+            DB.session.commit()
+
+        flask.flash('Could not complete password reset. Please try again',
+                    'error')
+
+        return flask.redirect(flask.url_for('front.home'))
+
+    if flask.request.method == 'POST':
+        if flask.request.form['password'] != flask.request.form['confirm']:
+            user.secret_key = util.generate_key(64)
+            user.secret_key_expiry = (datetime.datetime.utcnow() +
+                                      datetime.timedelta(minutes=5))
+
+            DB.session.commit()
+
+            flask.flash('Passwords do not match, please try again', 'warning')
+
+            return flask.redirect(
+                flask.url_for(
+                    'front.reset_password',
+                    user_id=user.object_id,
+                    secret_key=user.secret_key
+                )
+            )
+        else:
+            user.set_password(flask.request.form['password'])
+
+            user.secret_key = None
+            user.secret_key_expiry = None
+
+            DB.session.commit()
+
+            APP.log_manager.log_event(
+                'Completed password reset',
+                [],
+                user
+            )
+
+            flask.flash('Your password has been reset, please log in.',
+                        'success')
+
+            return flask.redirect(flask.url_for('front.home'))
+    else:
+        return flask.render_template(
+            'front/reset_password.html',
+            user_id=user_id,
+            secret_key=secret_key
+        )
+
+@FRONT.route('/destroyaccount/<int:user_id>/<secret_key>')
+def destroy_account(user_id, secret_key):
+    """Destroy an unverified account.
+
+    If a user is unverified (and therefore has never been able to log in), we
+    allow their account to be destroyed. This is useful if somebody tries to
+    register with an email address that isn't theirs, where the actual owner of
+    the email address can trigger the account's distruction.
+
+    If a user is verified, it gets a little too complicated to destroy their
+    account (what happens to any tickets they own?)
+    """
+    user = models.User.get_by_id(user_id)
+
+    if user is not None and user.secret_key == secret_key:
+        if not user.is_verified:
             for entry in user.events:
                 entry.action = (
                     entry.action +
-                    " (destroyed user with email address {0})".format(
-                        self.email
+                    ' (destroyed user with email address {0})'.format(
+                        user.email
                     )
                 )
                 entry.user = None
 
-            db.session.delete(user)
-            db.session.commit()
+            DB.session.delete(user)
+            DB.session.commit()
 
-            log_event(
+            APP.log_manager.log_event(
                 'Deleted account with email address {0}'.format(
                     user.email
                 )
             )
 
-            flash(u'The account has been deleted.','info')
+            flask.flash('The account has been deleted.', 'info')
         else:
-            log_event(
+            APP.log_manager.log_event(
                 'Attempted deletion of verified account',
                 [],
                 user
             )
 
-            flash(u'Could not delete user account.','warning')
+            flask.flash('Could not delete user account.', 'warning')
     else:
-        flash(u'Could not delete user account. Check that you have used the correct link','warning')
-
-    return redirect(url_for('front.home'))
-
-@front.route('/logout')
-@login_required
-def logout():
-    if 'actor_id' in session:
-        log_event(
-            'Finished impersonating user',
-            [],
-            current_user
+        flask.flash(
+            (
+                'Could not delete user account. Check that you have used the '
+                'correct link'
+            ),
+            'warning'
         )
 
-        actor = User.get_by_id(session['actor_id'])
+    return flask.redirect(flask.url_for('front.home'))
+
+@FRONT.route('/logout')
+@login.login_required
+def logout():
+    """Log out the currently logged in user.
+
+    The system allows admins to impersonate other users; this view checks if the
+    currently logged in user is being impersonated, and if so logs back in as
+    the admin who is impersonating them.
+    """
+    if 'actor_id' in flask.session:
+        APP.log_manager.log_event(
+            'Finished impersonating user',
+            [],
+            login.current_user
+        )
+
+        actor = models.User.get_by_id(flask.session['actor_id'])
+
+        flask.session.pop('actor_id', None)
 
         if actor:
-            login_user(
+            login.login_user(
                 actor
             )
 
-            return redirect(url_for('admin.adminHome'))
+            return flask.redirect(flask.url_for('admin.admin_home'))
 
-    log_event(
+    APP.log_manager.log_event(
         'Logged Out',
         [],
-        current_user
+        login.current_user
     )
 
-    logout_user()
-    return redirect(url_for('front.home'))
+    login.logout_user()
+    return flask.redirect(flask.url_for('front.home'))

@@ -1,48 +1,49 @@
 # coding: utf-8
-"""
-statistic.py
+"""Database model for representing a statistic in a timeseries."""
 
-Contains Statistic class
-Used to store historical statistics for displaying graphs
-"""
+from __future__ import unicode_literals
+
+import datetime
 
 from kebleball.database import db
-from datetime import datetime
 
-class Statistic(db.Model):
-    id = db.Column(
-        db.Integer(),
+DB = db.DB
+
+class Statistic(DB.Model):
+    """Model for representing a statistic in a timeseries."""
+    object_id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    timestamp = db.Column(
-        db.DateTime,
+    timestamp = DB.Column(
+        DB.DateTime,
         nullable=False
     )
-    group = db.Column(
-        db.Enum(
+    group = DB.Column(
+        DB.Enum(
             'Colleges',
             'Payments',
             'Sales'
         ),
         nullable=False
     )
-    statistic = db.Column(
-        db.String(25),
+    statistic = DB.Column(
+        DB.Unicode(25),
         nullable=False
     )
-    value = db.Column(
-        db.Integer(),
+    value = DB.Column(
+        DB.Integer(),
         nullable=False
     )
 
     def __init__(self, group, statistic, value):
-        if group not in ['Colleges','Payments','Sales']:
+        if group not in ['Colleges', 'Payments', 'Sales']:
             raise ValueError(
                 '{0} is not a valid statistic group'.format(group)
             )
 
-        self.timestamp = datetime.utcnow()
+        self.timestamp = datetime.datetime.utcnow()
         self.group = group
         self.statistic = statistic
         self.value = value
@@ -56,10 +57,14 @@ class Statistic(db.Model):
         )
 
     @staticmethod
-    def get_by_id(id):
-        statistic = Statistic.query.filter(Statistic.id==int(id)).first()
+    def get_by_id(object_id):
+        """Get a Statistic object by its database ID."""
+        statistic = Statistic.query.filter(
+            Statistic.object_id == int(object_id)
+        ).first()
 
         if not statistic:
             return None
 
         return statistic
+

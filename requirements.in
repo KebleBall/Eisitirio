@@ -1,0 +1,12 @@
+Flask
+Flask-Bcrypt
+Flask-Login
+Flask-Markdown
+Flask-SQLAlchemy
+MySQL-python
+newrelic
+python-dateutil
+requests
+matplotlib
+boto
+Pillow
