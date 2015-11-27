@@ -1812,7 +1812,7 @@ th.hide-for-touch { display: table-cell !important; }
 .slider > .highlight-track { background-color: #640325; }
 
 /* line 17, style.scss */
-header, nav, #page-title, #main, footer { background-color: #f6f2ed; }
+header, nav, #page-title, #main, footer, #flashes { background-color: #f6f2ed; }
 
 /* line 21, style.scss */
 a { font-weight: bold; }
