@@ -10,8 +10,8 @@
                 <legend>Your Details</legend>
                 <div class="row">
                     <div class="large-6 columns">
-                        <label for="firstname">First Name(s)</label>
-                        <input type="text" name="firstname" id="firstname" value="{{ current_user.firstname }}" />
+                        <label for="forenames">Forename(s)</label>
+                        <input type="text" name="forenames" id="forenames" value="{{ current_user.forenames }}" />
                     </div>
                     <div class="large-6 columns">
                         <label for="surname">Surname</label>
@@ -27,9 +27,9 @@
                         <label for="phone">Phone Number</label>
                         <input type="text" name="phone" id="phone" value="{{ current_user.phone }}" />
                     </div>
-                    {% if current_user.newemail != None %}
+                    {% if current_user.new_email != None %}
                         <div class="large-12 columns">
-                            <div class="message-box info">Awaiting verification of new email address {{ current_user.newemail }}</div>
+                            <div class="message-box info">Awaiting verification of new email address {{ current_user.new_email }}</div>
                         </div>
                     {% endif %}
                 </div>
@@ -38,10 +38,10 @@
                         <label for="college">College</label>
                         <select name="college" id="college">
                             {% for college in colleges %}
-                                {% if current_user.college_id == college.id %}
-                                    <option value="{{ college.id }}" selected="selected">{{ college.name }}</option>
+                                {% if current_user.college_id == college.object_id %}
+                                    <option value="{{ college.object_id }}" selected="selected">{{ college.name }}</option>
                                 {% else %}
-                                    <option value="{{ college.id }}">{{ college.name }}</option>
+                                    <option value="{{ college.object_id }}">{{ college.name }}</option>
                                 {% endif %}
                             {% endfor %}
                         </select>
@@ -50,10 +50,10 @@
                         <label for="affiliation">Affiliation</label>
                         <select name="affiliation" id="affiliation">
                             {% for affiliation in affiliations %}
-                                {% if current_user.affiliation_id == affiliation.id %}
-                                    <option value="{{ affiliation.id }}" selected="selected">{{ affiliation.name }}</option>
+                                {% if current_user.affiliation_id == affiliation.object_id %}
+                                    <option value="{{ affiliation.object_id }}" selected="selected">{{ affiliation.name }}</option>
                                 {% else %}
-                                    <option value="{{ affiliation.id }}">{{ affiliation.name }}</option>
+                                    <option value="{{ affiliation.object_id }}">{{ affiliation.name }}</option>
                                 {% endif %}
                             {% endfor %}
                         </select>

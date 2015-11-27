@@ -5,17 +5,23 @@
 
 {% block content %}
     <section id="terms" class="columns">
-        <h6>Last Updated 23rd December 2013</h6>
+        <p>Last Updated 27th November 2015</p>
+
+        <h3>Use of Images</h3>
+
+        <p>By registering with the Keble Ball Ticketing System, and uploading a photo of yourself, you grant Keble Ball permission to use the uploaded image on the night of the ball. Your image will be deleted after the ball. If you have any queries regarding the use of your image, please email <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a>.</p>
+
+        <h3>Ticket Terms &amp; Conditions</h3>
 
         <p>Tickets for Keble Ball are subject to the following terms and conditions. By confirming, reserving, booking, or purchasing tickets for the ball, you agree to the following:</p>
 
         <ol>
-            <li>You and any guests you invite are over 18 years of age on or before {{ template_config['START_TIME'].strftime('%d') }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}.</li>
-            <li>Ball tickets are non-refundable, and must not be sold or transferred except through the ticketing website.</li>
+            <li>You and any guests you invite are over 18 years of age on or before {{ template_config['START_TIME'].strftime('%-d') }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}.</li>
+            <li>Ball tickets are non-refundable, and must not be sold or transferred.</li>
             <li>Keble Ball reserves the right to cancel and refund any ticket at any time before the ball.</li>
-            <li>It is your responsibility to ensure that you collect your ticket and those of any guests you may bring, at one of the ticket collection sessions to be held in the week prior to the ball. If you are not able to attend at any of the given times for whatever reason, it is your responsibility to contact the Keble Ball Committee by email to discuss alternative arrangements.</li>
-            <li>You must check that you have been given the correct number of tickets when you come to collect your order. No discussion will be entered into once you have signed for your tickets.</li>
-            <li>Tickets can only be collected upon presentation of photographic ID of the purchaser. Accepted forms of ID are Bod cards, driving licenses, and passports. Other forms of ID, or ID with an expired date, will not be accepted.</li>
+            <li>It is your responsibility to ensure that you either arrange for your ticket and those of any guests you may bring to be posted to you, or that you collect them at one of the ticket collection sessions to be held in the week prior to the ball. If you are not able to attend at any of the given times for whatever reason, it is your responsibility to contact the Keble Ball Committee by email to discuss alternative arrangements.</li>
+            <li>You must check that you have been given the correct number of tickets when you come to collect your order. No discussion will be entered into once you have collected your tickets.</li>
+            <li>Tickets can only be collected upon presentation of photographic ID of the purchaser. Accepted forms of ID are official University ID cards, driving licenses, and passports. Other forms of ID, or ID with an expired date, will not be accepted.</li>
             <li>Keble Ball Committee reserves the right to refuse admittance, with no refund of ticket, to any guest who they believe is intoxicated or under the influence of drugs.</li>
             <li>You are obliged to wear the given security ID at all times and carry with you valid photo ID in order to comply with security checks at the entrance and during the event. Failure to do so may result in your expulsion from the premises, with no refund of your ticket.</li>
             <li>Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} will operate a strict no re-admittance policy. Any guest who leaves the Ball after having been admitted, will have their security ID removed and will not be allowed to re-enter under any circumstances whatsoever.</li>
@@ -32,5 +38,34 @@
             <li>In the unlikely event of an emergency requiring a full scale evacuation from the ball, you must comply with instructions given by Keble Ball Committee and security staff, and you will not be issued with any compensation nor a refund for your ticket.</li>
             <li>These terms and conditions are subject to change without notice.</li>
         </ol>
+
+        <h3>Data Protection</h3>
+
+        <p>By registering with the Keble Ball Ticketing System, you agree:</p>
+
+        <ol>
+            <li>
+                To the necessary processing of data in order for the performance of a contract to which you, the data subject, are a party.
+                <ul>
+                    <li class="small">This means you agree to let us collect and store your personal information (name, email address, phone number, photo) for the purposes of keeping track of who has bought tickets</li>
+                </ul>
+            </li>
+            <li>
+                That the processing is necessary for the purposes of legitimate interests pursued by Keble Ball, the data controller, except where the processing is unwarranted in any particular case by reason of prejudice to the rights and freedoms or legitimate interests of the data subject.
+                <ul>
+                    <li class="small">This means that the processing we do is necessary for Keble Ball to sell tickets, and that Keble Ball will not do anything with your personal information that would do harm to you.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <p>Keble Ball, the Data Controller in return will:</p>
+
+        <ol>
+            <li>Provide all information held on the data subject when a formal written request is received.</li>
+            <li>Register with the Information Commissioner as data controller if required.</li>
+            <li>Delete all personal data held on the data subject when it is no longer required.</li>
+        </ol>
+
+        <p>The terms "data controller", "data subject", "personal data", "processing" are interpreted under the definitions given in Section 1 of the Data Protection Act 1998</p>
     </section>
 {% endblock %}

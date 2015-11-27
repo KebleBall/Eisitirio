@@ -1,0 +1,9 @@
+Hi!
+
+{{ transaction.user.full_name }} has just attempted to cancel some tickets, but eWay only approved the refund for a partial amount. (The error code given was {{ ewayresponse['Errors'] }})
+
+You should log in to the eWay Merchant gateway, find transaction {{ transaction.eway_id }}, and refund it for the full amount that was charged. You should then email {{ transaction.user.forenames }} ({{ transaction.user.email }}) just to let them know that the refund has been completed.
+
+Best Wishes,
+
+The Keble Ball Ticketing System

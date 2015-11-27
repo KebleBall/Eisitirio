@@ -1,139 +1,142 @@
 # coding: utf-8
-"""
-announcement.py
+"""Database model for an announcement sent to registered users."""
 
-Contains Announcement class
-Used to store announcements displayed on site and emailed
-"""
+from __future__ import unicode_literals
 
-from kebleball.app import app
+from email.mime import text
+from kebleball import app
 from kebleball.database import db
-from kebleball.database.user import User
-from kebleball.database.college import College
-from kebleball.database.affiliation import Affiliation
-from email.mime.text import MIMEText
-from datetime import datetime
+from kebleball.database import user
+import datetime
 
-user_announce_link = db.Table(
+APP = app.APP
+DB = db.DB
+
+USER_ANNOUNCE_LINK = DB.Table(
     'user_announce_link',
-    db.Model.metadata,
-    db.Column('user_id',
-        db.Integer,
-        db.ForeignKey('user.id')
+    DB.Model.metadata,
+    DB.Column(
+        'user_id',
+        DB.Integer,
+        DB.ForeignKey('user.object_id')
     ),
-    db.Column('announcement_id',
-        db.Integer,
-        db.ForeignKey('announcement.id')
+    DB.Column(
+        'announcement_id',
+        DB.Integer,
+        DB.ForeignKey('announcement.object_id')
     )
 )
 
-email_announce_link = db.Table(
+EMAIL_ANNOUNCE_LINK = DB.Table(
     'email_announce_link',
-    db.Model.metadata,
-    db.Column('user_id',
-        db.Integer,
-        db.ForeignKey('user.id')
+    DB.Model.metadata,
+    DB.Column(
+        'user_id',
+        DB.Integer,
+        DB.ForeignKey('user.object_id')
     ),
-    db.Column('announcement_id',
-        db.Integer,
-        db.ForeignKey('announcement.id')
+    DB.Column(
+        'announcement_id',
+        DB.Integer,
+        DB.ForeignKey('announcement.object_id')
     )
 )
 
-class Announcement(db.Model):
-    id = db.Column(
-        db.Integer,
+class Announcement(DB.Model):
+    """Model for an announcement sent to registered users."""
+    object_id = DB.Column(
+        DB.Integer,
         primary_key=True,
         nullable=False
     )
-    timestamp = db.Column(
-        db.DateTime(),
+    timestamp = DB.Column(
+        DB.DateTime(),
         nullable=False
     )
-    content = db.Column(
-        db.Text(65536),
+    content = DB.Column(
+        DB.UnicodeText(65536),
         nullable=False
     )
-    subject = db.Column(
-        db.Text(256),
+    subject = DB.Column(
+        DB.UnicodeText(256),
         nullable=False
     )
-    send_email = db.Column(
-        db.Boolean,
+    send_email = DB.Column(
+        DB.Boolean,
         default=True,
         nullable=False
     )
-    email_sent = db.Column(
-        db.Boolean,
+    email_sent = DB.Column(
+        DB.Boolean,
         default=False,
         nullable=False
     )
 
-    sender_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    sender_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
         nullable=False
     )
-    sender = db.relationship(
+    sender = DB.relationship(
         'User',
-        backref=db.backref(
+        backref=DB.backref(
             'announcements-sent',
             lazy='dynamic'
         )
     )
 
-    college_id = db.Column(
-        db.Integer,
-        db.ForeignKey('college.id'),
+    college_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('college.object_id'),
         nullable=True
     )
-    college = db.relationship(
+    college = DB.relationship(
         'College',
-        backref=db.backref(
+        backref=DB.backref(
             'announcements',
             lazy='dynamic'
         )
     )
 
-    affiliation_id = db.Column(
-        db.Integer,
-        db.ForeignKey('affiliation.id'),
+    affiliation_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('affiliation.object_id'),
         nullable=True
     )
-    affiliation = db.relationship(
+    affiliation = DB.relationship(
         'Affiliation',
-        backref=db.backref(
+        backref=DB.backref(
             'announcements-received',
             lazy='dynamic'
         )
     )
 
-    is_waiting = db.Column(
-        db.Boolean,
+    is_waiting = DB.Column(
+        DB.Boolean,
         nullable=True
     )
-    has_tickets = db.Column(
-        db.Boolean,
+    has_tickets = DB.Column(
+        DB.Boolean,
         nullable=True
     )
-    has_collected = db.Column(
-        db.Boolean,
+    has_collected = DB.Column(
+        DB.Boolean,
         nullable=True
     )
-    has_uncollected = db.Column(
-        db.Boolean,
+    has_uncollected = DB.Column(
+        DB.Boolean,
         nullable=True
     )
 
-    users = db.relationship(
+    users = DB.relationship(
         'User',
-        secondary=user_announce_link,
+        secondary=USER_ANNOUNCE_LINK,
         backref='announcements'
     )
 
-    emails = db.relationship(
+    emails = DB.relationship(
         'User',
-        secondary=email_announce_link,
+        secondary=EMAIL_ANNOUNCE_LINK,
         lazy='dynamic'
     )
 
@@ -148,90 +151,93 @@ class Announcement(db.Model):
                  is_waiting=None,
                  has_collected=None,
                  has_uncollected=None):
-        self.timestamp = datetime.utcnow()
+        self.timestamp = datetime.datetime.utcnow()
         self.subject = subject
         self.content = content
+        self.sender = sender
         self.send_email = send_email
+        self.college = college
+        self.affiliation = affiliation
         self.has_tickets = has_tickets
         self.is_waiting = is_waiting
         self.has_collected = has_collected
         self.has_uncollected = has_uncollected
 
-        if hasattr(sender, 'id'):
-            self.sender_id = sender.id
-        else:
-            self.sender_id = sender
+        recipient_query = user.User.query
 
-        if hasattr(college, 'id'):
-            self.college_id = college.id
-        else:
-            self.college_id = college
+        if self.college is not None:
+            recipient_query = recipient_query.filter(
+                user.User.college == self.college
+            )
 
-        if hasattr(affiliation, 'id'):
-            self.affiliation_id = affiliation.id
-        else:
-            self.affiliation_id = affiliation
+        if self.affiliation is not None:
+            recipient_query = recipient_query.filter(
+                user.User.affiliation == self.affiliation
+            )
 
-        query = User.query
-
-        if self.college_id is not None:
-            query = query.filter(User.college_id==self.college_id)
-
-        if self.affiliation_id is not None:
-            query = query.filter(User.affiliation_id==self.affiliation_id)
-
-        for user in query.all():
+        for recipient in recipient_query.all():
             if (
-                (
-                    self.has_tickets is None or
-                    user.hasTickets()==self.has_tickets
-                ) and
-                (
-                    self.is_waiting is None or
-                    user.isWaiting()==self.is_waiting
-                ) and
-                (
-                    self.has_collected is None or
-                    user.hasCollectedTickets()==self.has_collected
-                ) and
-                (
-                    self.has_uncollected is None or
-                    user.hasUncollectedTickets()==self.has_uncollected
-                )
+                    (
+                        self.has_tickets is None or
+                        recipient.has_tickets() == self.has_tickets
+                    ) and
+                    (
+                        self.is_waiting is None or
+                        recipient.is_waiting == self.is_waiting
+                    ) and
+                    (
+                        self.has_collected is None or
+                        recipient.has_collected_tickets() == self.has_collected
+                    ) and
+                    (
+                        self.has_uncollected is None or (
+                            recipient.has_uncollected_tickets() ==
+                            self.has_uncollected
+                        )
+                    )
             ):
-                self.users.append(user)
+                self.users.append(recipient)
                 if send_email:
-                    self.emails.append(user)
+                    self.emails.append(recipient)
 
     def __repr__(self):
-        return "<Announcement {0}: {1}>".format(self.id, self.subject)
+        return '<Announcement {0}: {1}>'.format(self.object_id, self.subject)
 
-    def sendEmails(self, count):
+    def send_emails(self, count):
+        """Send the announcement as an email to a limited number of recipients.
+
+        Used for batch sending, renders the text of the announcement into an
+        email and sends it to users who match the criteria.
+
+        Args:
+            count: (int) Maximum number of emails to send
+
+        Returns:
+            (int) How much of the original limit is remaining (i.e. |count|
+            minus the nuber of emails sent)
+        """
         try:
-            msg = MIMEText(self.content)
-            msg['Subject'] = self.subject
-            msg['From'] = self.sender.email
-
-            for user in self.emails:
+            for recipient in self.emails:
                 if count <= 0:
                     break
-                try:
-                    msg.replace_header('To', user.email)
-                except KeyError:
-                    msg['To'] = user.email
-                app.email_manager.sendMsg(msg)
-                self.emails.remove(user)
+
+                APP.email_manager.send_text(recipient.email, self.subject,
+                                            self.content, self.sender.email)
+
+                self.emails.remove(recipient)
                 count = count - 1
         finally:
-            db.session.commit()
             self.email_sent = (self.emails.count() == 0)
-            db.session.commit()
+            DB.session.commit()
 
         return count
 
     @staticmethod
-    def get_by_id(id):
-        announcement = Announcement.query.filter(Announcement.id==int(id)).first()
+    def get_by_id(object_id):
+        """Get an Announcement object by its database ID."""
+        announcement = Announcement.query.filter(
+            Announcement.object_id == int(object_id)
+        ).first()
 
         if not announcement:
             return None

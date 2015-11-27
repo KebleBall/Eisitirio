@@ -1,94 +1,99 @@
 # coding: utf-8
-"""
-card-transaction.py
+"""Database model for information about Card Transactions performed via eWay."""
 
-Contains CardTransaction class
-Used to store data about card payments
-"""
+from __future__ import unicode_literals
 
-from kebleball.database import db
-from kebleball.database.user import User
-from datetime import datetime
-from kebleball.app import app
-from kebleball.helpers import generate_key
-from flask import url_for, flash
-from flask.ext.login import current_user
-
-import re
+import datetime
 import json
 import requests
 
-class CardTransaction(db.Model):
-    id = db.Column(
-        db.Integer(),
+from flask.ext import login
+import flask
+
+from kebleball import app
+from kebleball.database import db
+
+APP = app.APP
+DB = db.DB
+
+class CardTransaction(DB.Model):
+    """Model for information about Card Transactions performed via eWay."""
+    object_id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    commenced = db.Column(
-        db.DateTime(),
+    commenced = DB.Column(
+        DB.DateTime(),
         nullable=False
     )
-    completed = db.Column(
-        db.DateTime(),
+    completed = DB.Column(
+        DB.DateTime(),
         nullable=True
     )
-    accesscode = db.Column(
-        db.String(200),
+    access_code = DB.Column(
+        DB.Unicode(200),
         nullable=True
     )
-    resultcode = db.Column(
-        db.String(2),
+    result_code = DB.Column(
+        DB.Unicode(2),
         nullable=True
     )
-    ewayid = db.Column(
-        db.Integer(),
+    eway_id = DB.Column(
+        DB.Integer(),
         nullable=True
     )
-    refunded = db.Column(
-        db.Integer(),
+    refunded = DB.Column(
+        DB.Integer(),
         nullable=False,
         default=0
     )
 
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    user_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
         nullable=False
     )
-    user = db.relationship(
+    user = DB.relationship(
         'User',
-        backref=db.backref(
-            'transactions',
+        backref=DB.backref(
+            'card_transactions',
             lazy='dynamic'
         )
     )
 
-    def __init__(self, user, tickets):
-        if hasattr(user, 'id'):
-            self.user_id = user.id
-        else:
-            self.user_id = user
-
-        self.tickets = tickets
-        self.commenced = datetime.utcnow()
+    def __init__(self, user):
+        self.user = user
+        self.commenced = datetime.datetime.utcnow()
 
     def __repr__(self):
-        status = self.getStatus()
+        status = self.get_status()
         if status[0] is None:
-            statusStr = 'Uncompleted'
+            status_str = 'Uncompleted'
         else:
-            statusStr = 'Successful' if status[0] else 'Failed'
+            status_str = 'Successful' if status[0] else 'Failed'
 
-        return '<{0} CardTransaction: {1}, {2}'.format(
-            statusStr,
-            self.id,
+        return '<{0} CardTransaction: {1}, {2}>'.format(
+            status_str,
+            self.object_id,
             status[1]
         )
 
-    def getValue(self):
-        return sum([ticket.price for ticket in self.tickets])
+    @property
+    def value(self):
+        """Get the total value of the transaction."""
+        return self.transaction.value
 
-    def getStatus(self):
+    def get_status(self):
+        """Get a better representation of the status of this transaction.
+
+        The eWay API returns statuses as 2 digit codes; this function provides
+        a mapping from these codes to a boolean success value and associated
+        explanation.
+
+        Returns:
+            (bool, str) pair of success value and explanation
+        """
         try:
             return {
                 None: (None, 'Transaction not completed'),
@@ -120,7 +125,8 @@ class CardTransaction(db.Model):
                 '34': (False, 'Suspected Fraud, Retain Card'),
                 '35': (False, 'Card Acceptor, Contact Acquirer, Retain Card'),
                 '36': (False, 'Restricted Card, Retain Card'),
-                '37': (False, 'Contact Acquirer Security Department, Retain Card'),
+                '37': (False,
+                       'Contact Acquirer Security Department, Retain Card'),
                 '38': (False, 'PIN Tries Exceeded, Capture'),
                 '39': (False, 'No Credit Account'),
                 '40': (False, 'Function Not Supported'),
@@ -153,12 +159,13 @@ class CardTransaction(db.Model):
                 '94': (False, 'Duplicate Transaction'),
                 '96': (False, 'System Error'),
                 'CX': (False, 'Customer Cancelled Transaction')
-            }[self.resultcode]
-        except KeyError as e:
-            return (False, 'Unknown response: {0}'.format(e.args[0]))
+            }[self.result_code]
+        except KeyError as err:
+            return (False, 'Unknown response: {0}'.format(err.args[0]))
 
-    def getSuccess(self):
-        success = self.getStatus()[0]
+    def get_success(self):
+        """Get whether the transaction was completed successfully."""
+        success = self.get_status()[0]
         if success is None:
             return 'Incomplete'
         elif success:
@@ -166,27 +173,37 @@ class CardTransaction(db.Model):
         else:
             return 'Unsuccessful'
 
-    def sendRequest(self, endpoint, data=None):
-        url = app.config['EWAY_API_BASE'] + endpoint + '.json'
+    def _send_request(self, endpoint, data=None):
+        """Helper to send requests to the eWay API.
+
+        Formats the data payload, sets up authorisation headers, and sends the
+        request to the eWay API.
+
+        Args:
+            endpoint: (str) the API endpoint to send the request to
+            data: (dict or None) a dictionary of data to serialise and send to
+                eWay
+
+        Returns:
+            (bool, dict) whether the request was successful, and any data
+            returned by the API
+        """
+        url = APP.config['EWAY_API_BASE'] + endpoint + '.json'
         payload = json.dumps(data)
         headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Basic {0}".format(
-                app.config['EWAY_API_PASSCODE']
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic {0}'.format(
+                APP.config['EWAY_API_PASSCODE']
             )
         }
 
-        r = requests.post(url, data=payload, headers=headers)
-
-        if r.status_code == 200:
-            return (True, r.json())
-        else:
-            app.log_manager.log_event(
-                (
-                    'Failed request to eWay endpoint {0} returning status {1}'
-                ).format(
+        try:
+            request = requests.post(url, data=payload, headers=headers)
+        except requests.ConnectionError as exc:
+            APP.log_manager.log_event(
+                'Failed request to eWay endpoint {0} with error {1}'.format(
                     endpoint,
-                    r.status_code
+                    exc
                 ),
                 [],
                 None,
@@ -194,249 +211,297 @@ class CardTransaction(db.Model):
             )
             return (False, None)
 
-    def getEwayURL(self):
+        if request.status_code == 200:
+            return (True, request.json())
+        else:
+            APP.log_manager.log_event(
+                (
+                    'Failed request to eWay endpoint {0} returning status {1}'
+                ).format(
+                    endpoint,
+                    request.status_code
+                ),
+                [],
+                None,
+                self
+            )
+
+    def get_eway_url(self):
+        """Get a URL for the payment gateway.
+
+        Sends a request to eWay with the users information and transaction
+        amount, and returns the URL generated by eWay that the user should be
+        redirected to to carry out payment.
+
+        Returns:
+            (str) What URL the user should be redirected to to carry out payment
+        """
         data = {
-            "Customer": {
-              "Reference": "U{0:05d}".format(self.user.id),
-              "FirstName": self.user.firstname,
-              "LastName": self.user.surname,
-              "Email": self.user.email
+            'Customer': {
+                'Reference': 'U{0:05d}'.format(self.user.object_id),
+                'FirstName': self.user.forenames,
+                'LastName': self.user.surname,
+                'Email': self.user.email
             },
-            "Payment": {
-              "TotalAmount": self.getValue(),
-              "InvoiceReference": "Trans{0:05d}".format(self.id),
-              "CurrencyCode": "GBP"
+            'Payment': {
+                'TotalAmount': self.value,
+                'InvoiceReference': 'Trans{0:05d}/{1:05d}'.format(
+                    self.object_id,
+                    self.transaction.object_id
+                ),
+                'CurrencyCode': 'GBP'
             },
-            "RedirectUrl": url_for("purchase.ewaySuccess", id=self.id, _external=True),
-            "CancelUrl": url_for("purchase.ewayCancel", id=self.id, _external=True),
-            "Method": "ProcessPayment",
-            "TransactionType": "Purchase",
-            "LogoUrl": "https://www.kebleball.com/assets/building_big.jpg",
-            "HeaderText": "Keble Ball {0}".format(
-                app.config['START_TIME'].strftime('%Y')
+            'RedirectUrl': flask.url_for('purchase.eway_success',
+                                         object_id=self.object_id,
+                                         _external=True),
+            'CancelUrl': flask.url_for('purchase.eway_cancel',
+                                       object_id=self.object_id,
+                                       _external=True),
+            'Method': 'ProcessPayment',
+            'TransactionType': 'Purchase',
+            'LogoUrl': flask.url_for('static', filename='images/eway_logo.png',
+                                     _external=True, _scheme='https'),
+            'HeaderText': 'Keble Ball {0}'.format(
+                APP.config['START_TIME'].strftime('%Y')
             ),
-            "Language": "EN",
-            "CustomerReadOnly": True
+            'Language': 'EN',
+            'CustomerReadOnly': True
         }
 
-        (success, response) = self.sendRequest('CreateAccessCodeShared', data)
+        (success, response) = self._send_request('CreateAccessCodeShared', data)
 
-        if success:
-            self.accesscode = response['AccessCode']
-            db.session.commit()
+        if success and response['Errors'] is None:
+            self.access_code = response['AccessCode']
+            DB.session.commit()
 
-            app.log_manager.log_event(
+            APP.log_manager.log_event(
                 'Started Card Payment',
-                self.tickets,
-                current_user,
+                self.transaction.tickets,
+                login.current_user,
                 self
             )
 
             return response['SharedPaymentUrl']
         else:
-            flash(
+            flask.flash(
                 (
-                    u'There is a problem with our payment provider, please '
-                    u'try again later'
+                    'There is a problem with our payment provider, please '
+                    'try again later'
                 ),
                 'error'
             )
             return None
 
-    def processEwayPayment(self):
-        if self.accesscode is not None:
-            data = {'AccessCode': self.accesscode}
+    def process_eway_payment(self):
+        """Check if the transaction has been completed, and update the database.
 
-            (success, response) = self.sendRequest('GetAccessCodeResult', data)
+        Intended to be called by the eWay callback, queries the eWay API for the
+        result of the transaction (whether payment was completed) and updates
+        the persisted state of this transaction object and related ticket
+        objects
+        """
+        if self.access_code is not None:
+            data = {'AccessCode': self.access_code}
+
+            (success, response) = self._send_request('GetAccessCodeResult',
+                                                     data)
 
             if success:
-                self.completed = datetime.utcnow()
-                self.resultcode = response['ResponseCode']
-                self.ewayid = response['TransactionID']
-                db.session.commit()
+                self.completed = datetime.datetime.utcnow()
+                self.result_code = response['ResponseCode']
+                self.eway_id = response['TransactionID']
+                DB.session.commit()
 
-                status = self.getStatus()
+                status = self.get_status()
 
                 if status[0]:
-                    if self.resultcode == '10':
-                        app.log_manager.log_event(
+                    if self.result_code == '10':
+                        APP.log_manager.log_event(
                             (
                                 'Partial eWay payment for transaction {0} '
                                 'with value {1}'
                             ).format(
-                                self.id,
+                                self.object_id,
                                 response['TotalAmount']
                             ),
                             self.tickets,
-                            current_user,
+                            login.current_user,
                             self
                         )
 
-                        refundSuccess = self.processRefund(response['TotalAmount'])
+                        refund_success = self.process_refund(
+                            response['TotalAmount'])
 
-                        if refundSuccess:
-                            flash(
+                        if refund_success:
+                            flask.flash(
                                 (
-                                    u'Your card payment was only authorised '
-                                    u'for a partial amount, and has '
-                                    u'subsequently been automatically '
-                                    u'reversed. Please check that you have '
-                                    u'enough available funds in your account, '
-                                    u'and then attempt payment again. If in '
-                                    u'doubt, pay for your tickets one-by-one '
-                                    u'to limit the value of the individual '
-                                    u'transactions.'
+                                    'Your card payment was only authorised '
+                                    'for a partial amount, and has '
+                                    'subsequently been automatically '
+                                    'reversed. Please check that you have '
+                                    'enough available funds in your account, '
+                                    'and then attempt payment again. If in '
+                                    'doubt, pay for your tickets one-by-one '
+                                    'to limit the value of the individual '
+                                    'transactions.'
                                 ),
                                 'warning'
                             )
                         else:
-                            app.email_manager.sendTemplate(
+                            APP.email_manager.send_template(
                                 [
-                                    app.config['TREASURER_EMAIL'],
-                                    app.config['TICKETS_EMAIL']
+                                    APP.config['TREASURER_EMAIL'],
+                                    APP.config['TICKETS_EMAIL']
                                 ],
-                                "Partial Ticket Payment",
-                                "partialPayment.email",
+                                'Partial Ticket Payment',
+                                'partial_payment.email',
                                 transaction=self,
                                 ewayresponse=response
                             )
-                            flash(
+                            flask.flash(
                                 (
-                                    u'Your card payment was only approved for '
-                                    u'a partial amount. An email has been '
-                                    u'sent to Keble Ball staff, and the '
-                                    u'partial payment will be reversed. After '
-                                    u'this, you will be contacted via email, '
-                                    u'and you should then reattempt payment. '
-                                    u'Please check that you have enough '
-                                    u'available funds in your account to '
-                                    u'complete payment for the full amount, '
-                                    u'and that you have no transaction '
-                                    u'limits. If in doubt, please pay for '
-                                    u'your tickets one-by-one.'
+                                    'Your card payment was only approved for '
+                                    'a partial amount. An email has been '
+                                    'sent to Keble Ball staff, and the '
+                                    'partial payment will be reversed. After '
+                                    'this, you will be contacted via email, '
+                                    'and you should then reattempt payment. '
+                                    'Please check that you have enough '
+                                    'available funds in your account to '
+                                    'complete payment for the full amount, '
+                                    'and that you have no transaction '
+                                    'limits. If in doubt, please pay for '
+                                    'your tickets one-by-one.'
                                 ),
                                 'warning'
                             )
                     else:
-                        for ticket in self.tickets:
-                            ticket.markAsPaid(
-                                'Card',
-                                'Card Transaction {0}'.format(
-                                    self.id
-                                ),
-                                transaction=self
-                            )
+                        self.transaction.mark_as_paid()
 
-                        db.session.commit()
+                        DB.session.commit()
 
-                        app.log_manager.log_event(
+                        APP.log_manager.log_event(
                             'Completed Card Payment',
-                            self.tickets,
-                            self.user_id,
+                            self.transaction.tickets,
+                            self.user,
                             self
                         )
 
-                        flash(
+                        flask.flash(
                             'Your payment has completed successfully',
                             'success'
                         )
                 else:
-                    flash(
+                    flask.flash(
                         'The card payment failed. You have not been charged.',
                         'error'
                     )
 
                 return status[0]
             else:
-                flash(
+                flask.flash(
                     (
-                        u'There is a problem with our payment provider, '
-                        u'please contact <a href="{0}">the treasurer</a> '
-                        u'giving reference "Trans{1:05d}" to confirm that '
-                        u'payment has not been taken before trying again'
+                        'There is a problem with our payment provider, '
+                        'please contact <a href="{0}">the treasurer</a> '
+                        'giving reference "Trans{1:05d}" to confirm that '
+                        'payment has not been taken before trying again'
                     ).format(
-                        app.config['TREASURER_EMAIL_LINK'],
-                        self.id
+                        APP.config['TREASURER_EMAIL_LINK'],
+                        self.object_id
                     ),
                     'error'
                 )
                 return None
 
-    def cancelEwayPayment(self):
-        self.completed = datetime.utcnow()
-        self.resultcode = 'CX'
+    def cancel_eway_payment(self):
+        """Mark the payment as cancelled."""
+        self.completed = datetime.datetime.utcnow()
+        self.result_code = 'CX'
 
-        flash(
+        flask.flash(
             'Your payment has been cancelled; you have not been charged.',
             'info'
         )
 
-        db.session.commit()
+        DB.session.commit()
 
-        app.log_manager.log_event(
+        APP.log_manager.log_event(
             'Cancelled Card Payment',
-            self.tickets,
-            self.user_id,
+            self.transaction.tickets,
+            self.user,
             self
         )
 
-    def processRefund(self, amount):
+    def process_refund(self, amount):
+        """Refund some amount of money to the customer.
+
+        Sends a request to the eWay API requesting that the given amount is
+        refunded back to the customers card.
+
+        Args:
+            amount: (int) amount to refund in pence
+
+        Returns:
+            (bool) whether the refund was successful
+        """
         data = {
-            "Refund": {
-                "TotalAmount": amount,
-                "TransactionID": self.ewayid
+            'Refund': {
+                'TotalAmount': amount,
+                'TransactionID': self.eway_id
             }
         }
 
-        (success, response) = self.sendRequest(
+        (success, response) = self._send_request(
             'DirectRefund',
             data
         )
 
         if success and response['TransactionStatus']:
-            refundedAmount = response['Refund']['TotalAmount']
+            refunded_amount = response['Refund']['TotalAmount']
 
-            self.refunded = self.refunded + refundedAmount
-            db.session.commit()
+            self.refunded = self.refunded + refunded_amount
+            DB.session.commit()
 
-            app.log_manager.log_event(
+            APP.log_manager.log_event(
                 'Refunded £{0:.02f}'.format(
-                    refundedAmount / 100.0
+                    refunded_amount / 100.0
                 ),
                 [],
-                current_user,
+                login.current_user,
                 self
             )
 
-            if refundedAmount != amount:
-                app.email_manager.sendTemplate(
+            if refunded_amount != amount:
+                APP.email_manager.send_template(
                     [
-                        app.config['TREASURER_EMAIL'],
-                        app.config['TICKETS_EMAIL']
+                        APP.config['TREASURER_EMAIL'],
+                        APP.config['TICKETS_EMAIL']
                     ],
-                    "Partial Refund",
-                    "partialRefund.email",
+                    'Partial Refund',
+                    'partial_refund.email',
                     transaction=self,
                     ewayresponse=response
                 )
-                flash(
+                flask.flash(
                     (
-                        u'Your card refund was only approved for '
-                        u'a partial amount. An email has been '
-                        u'sent to Keble Ball staff, and the '
-                        u'refund will be manually completed.'
+                        'Your card refund was only approved for '
+                        'a partial amount. An email has been '
+                        'sent to Keble Ball staff, and the '
+                        'refund will be manually completed.'
                     ),
                     'warning'
                 )
 
             return True
         else:
-            app.log_manager.log_purchase('warning',str(response))
+            APP.log_manager.log_purchase('warning', str(response))
             return False
 
     @staticmethod
-    def get_by_id(id):
-        transaction = CardTransaction.query.filter(CardTransaction.id==int(id)).first()
+    def get_by_id(object_id):
+        """Get a card transaction object by its database ID."""
+        transaction = CardTransaction.query.filter(
+            CardTransaction.object_id == int(object_id)).first()
 
         if not transaction:
             return None

@@ -1,21 +1,21 @@
 # coding: utf-8
-"""
-college.py
+"""Database model for a user's college."""
 
-Contains College class
-Used to associate users with their colleges
-"""
+from __future__ import unicode_literals
 
 from kebleball.database import db
 
-class College(db.Model):
-    id = db.Column(
-        db.Integer(),
+DB = db.DB
+
+class College(DB.Model):
+    """Model for a user's college."""
+    object_id = DB.Column(
+        DB.Integer(),
         primary_key=True,
         nullable=False
     )
-    name = db.Column(
-        db.String(50),
+    name = DB.Column(
+        DB.Unicode(50),
         unique=True,
         nullable=False
     )
@@ -24,11 +24,14 @@ class College(db.Model):
         self.name = name
 
     def __repr__(self):
-        return "<College {0}: {1}>".format(self.id, self.name)
+        return '<College {0}: {1}>'.format(self.object_id, self.name)
 
     @staticmethod
-    def get_by_id(id):
-        college = College.query.filter(College.id==int(id)).first()
+    def get_by_id(object_id):
+        """Get a college object by its ID."""
+        college = College.query.filter(
+            College.object_id == int(object_id)
+        ).first()
 
         if not college:
             return None
@@ -36,50 +39,50 @@ class College(db.Model):
         return college
 
 COLLEGES = [
-    College("All Souls"),
-    College("Balliol"),
-    College("Blackfriars"),
-    College("Brasenose"),
-    College("Campion Hall"),
-    College("Christ Church"),
-    College("Corpus Christi"),
-    College("Exeter"),
-    College("Green Templeton"),
-    College("Harris Manchester"),
-    College("Hertford"),
-    College("Jesus"),
-    College("Keble"),
-    College("Kellogg"),
-    College("Lady Margaret Hall"),
-    College("Linacre"),
-    College("Lincoln"),
-    College("Magdelen"),
-    College("Mansfield"),
-    College("Merton"),
-    College("New"),
-    College("Nuffield"),
-    College("Oriel"),
-    College("Pembroke"),
-    College("Queen's"),
-    College("Regent's Park"),
-    College("Somerville"),
-    College("St Anne's"),
-    College("St Antony's"),
-    College("St Benet's Hall"),
-    College("St Catherine's"),
-    College("St Cross"),
-    College("St Edmund Hall"),
-    College("St Hilda's"),
-    College("St Hugh's"),
-    College("St John's"),
-    College("St Peter's"),
-    College("St Stephen's House"),
-    College("Trinity"),
-    College("University"),
-    College("Wadham"),
-    College("Wolfson"),
-    College("Worcester"),
-    College("Wycliffe Hall"),
-    College("Other"),
-    College("None"),
+    College('All Souls'),
+    College('Balliol'),
+    College('Blackfriars'),
+    College('Brasenose'),
+    College('Campion Hall'),
+    College('Christ Church'),
+    College('Corpus Christi'),
+    College('Exeter'),
+    College('Green Templeton'),
+    College('Harris Manchester'),
+    College('Hertford'),
+    College('Jesus'),
+    College('Keble'),
+    College('Kellogg'),
+    College('Lady Margaret Hall'),
+    College('Linacre'),
+    College('Lincoln'),
+    College('Magdelen'),
+    College('Mansfield'),
+    College('Merton'),
+    College('New'),
+    College('Nuffield'),
+    College('Oriel'),
+    College('Pembroke'),
+    College('Queen\'s'),
+    College('Regent\'s Park'),
+    College('Somerville'),
+    College('St Anne\'s'),
+    College('St Antony\'s'),
+    College('St Benet\'s Hall'),
+    College('St Catherine\'s'),
+    College('St Cross'),
+    College('St Edmund Hall'),
+    College('St Hilda\'s'),
+    College('St Hugh\'s'),
+    College('St John\'s'),
+    College('St Peter\'s'),
+    College('St Stephen\'s House'),
+    College('Trinity'),
+    College('University'),
+    College('Wadham'),
+    College('Wolfson'),
+    College('Worcester'),
+    College('Wycliffe Hall'),
+    College('Other'),
+    College('None'),
 ]
