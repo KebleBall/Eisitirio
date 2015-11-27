@@ -14,6 +14,10 @@
 
 @import "scss/vendor/simple-slider";
 
+header, nav, #page-title, #main, footer {
+    background-color: $white;
+}
+
 a {
     font-weight: bold;
 }
@@ -96,7 +100,7 @@ a {
     }
 }
 
-p.small {
+p.small, li.small {
     font-size: 0.75rem;
 }
 
