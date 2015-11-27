@@ -77,9 +77,6 @@ def purchase_home():
             flashes
         )
 
-        if 'accept_terms' not in flask.request.form:
-            flashes.append('You must accept the Terms and Conditions')
-
         voucher = None
         if (
                 'voucher_code' in flask.request.form and
@@ -189,10 +186,6 @@ def wait():
         elif num_tickets < 1:
             valid = False
             flashes.append('You must wait for at least 1 ticket')
-
-        if 'accept_terms' not in flask.request.form:
-            valid = False
-            flashes.append('You must accept the Terms and Conditions')
 
         if not valid:
             flask.flash(

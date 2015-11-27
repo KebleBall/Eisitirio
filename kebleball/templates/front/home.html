@@ -138,6 +138,14 @@
                     </div>
                     <div class="row">
                         <div class="large-12 columns">
+                            <label for="accept_terms">
+                                <input type="checkbox" name="accept_terms" value="yes" id="accept_terms" required />
+                                I have read and accept the <a href="{{ url_for('front.terms') }}" target="_blank">Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} Terms &amp; Conditions</a>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="large-12 columns">
                             <input type="submit" value="Register" class="button small" />
                         </div>
                     </div>

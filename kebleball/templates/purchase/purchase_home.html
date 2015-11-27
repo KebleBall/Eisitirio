@@ -53,17 +53,6 @@
                 {% include 'purchase/blocks/choose_postage_method.html' %}
                 {% include 'purchase/blocks/choose_payment_method.html' %}
                 <li>
-                    <h5>Terms and Conditions</h5>
-                    <div class="row">
-                        <div class="columns">
-                            <label for="accept_terms">
-                                <input type="checkbox" name="accept_terms" value="yes" id="accept_terms" required />
-                                I have read and accept the <a href="{{ url_for('front.terms') }}" target="_blank">Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} Terms &amp; Conditions</a>
-                            </label>
-                        </div>
-                    </div>
-                </li>
-                <li>
                     <input type="submit" value="Buy Tickets" class="button tiny" />
                 </li>
             </ol>

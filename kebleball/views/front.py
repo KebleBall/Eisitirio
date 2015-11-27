@@ -173,6 +173,9 @@ def register():
     ):
         flashes.append('Please upload a photo')
 
+    if 'accept_terms' not in flask.request.form:
+        flashes.append('You must accept the Terms and Conditions')
+
     if flashes:
         flask.flash(
             (
