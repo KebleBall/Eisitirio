@@ -52,7 +52,6 @@ def can_buy_keblite(user):
         user.college.name == 'Keble' and
         user.affiliation.name in [
             'Student',
-            'Graduand',
             'Foreign Exchange Student',
         ] and
         user.affiliation_verified
@@ -67,6 +66,18 @@ def can_buy_keble_staff(user):
         ) and
         user.college.name == 'Keble' and
         user.affiliation.name == 'Staff/Fellow' and
+        user.affiliation_verified
+    )
+
+
+def can_buy_keble_graduand(user):
+    return (
+        (
+            app.APP.config['LIMITED_RELEASE'] or
+            app.APP.config['TICKETS_ON_SALE']
+        ) and
+        user.college.name == 'Keble' and
+        user.affiliation.name == 'Graduand' and
         user.affiliation_verified
     )
 
