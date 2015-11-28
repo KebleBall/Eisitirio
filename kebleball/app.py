@@ -6,3 +6,5 @@ from __future__ import unicode_literals
 import flask
 
 APP = flask.Flask('kebleball')
+
+APP.config.setdefault('SQLALCHEMY_TRACK_MODIFICATIONS', False)

@@ -12,6 +12,7 @@ import sys
 import sqlalchemy
 
 from kebleball import app
+from kebleball import system # pylint: disable=unused-import
 from kebleball.database import db
 from kebleball.database import models
 from kebleball.helpers import email_manager
@@ -82,33 +83,33 @@ def send_announcements():
 
 def allocate_waiting():
     """Allocate available tickets to people on the waiting list."""
-    tickets_available = APP.config['TICKETS_AVAILABLE'] - models.Ticket.count()
+    # TODO
 
-    for wait in models.Waiting.query.order_by(
-            models.Waiting.waitingsince
-    ).all():
-        if wait.waiting_for > tickets_available:
-            break
+    # tickets_available = APP.config['TICKETS_AVAILABLE'] - models.Ticket.count()
 
-        tickets = []
+    # for wait in models.Waiting.query.order_by(
+    #         models.Waiting.waitingsince
+    # ).all():
+    #     if wait.waiting_for > tickets_available:
+    #         break
 
-        # TODO
+    #     tickets = []
 
-        DB.session.add_all(tickets)
-        DB.session.delete(wait)
+    #     DB.session.add_all(tickets)
+    #     DB.session.delete(wait)
 
-        APP.email_manager.send_template(
-            wait.user.email,
-            'You have been allocated tickets',
-            'waiting_allocation.email',
-            user=wait.user,
-            num_tickets=wait.waitingfor,
-            expiry=tickets[0].expires
-        )
+    #     APP.email_manager.send_template(
+    #         wait.user.email,
+    #         'You have been allocated tickets',
+    #         'waiting_allocation.email',
+    #         user=wait.user,
+    #         num_tickets=wait.waitingfor,
+    #         expiry=tickets[0].expires
+    #     )
 
-        DB.session.commit()
+    #     DB.session.commit()
 
-        tickets_available -= wait.waiting_for
+    #     tickets_available -= wait.waiting_for
 
 def cancel_expired_tickets(now):
     """Cancel all tickets which have not been paid for in the given time."""
@@ -165,9 +166,15 @@ def generate_sales_statistics():
     # TODO: Add by ticket type
     statistics = {
         'Available':
-            APP.config['TICKETS_AVAILABLE'],
+            APP.config['GUEST_TICKETS_AVAILABLE'],
         'Ordered':
-            models.Ticket.count(),
+            models.Ticket.query.filter(
+                models.Ticket.ticket_type.in_(
+                    APP.config['GUEST_TYPE_SLUGS']
+                )
+            ).filter(
+                models.Ticket.cancelled == False
+            ).count(),
         'Paid':
             models.Ticket.query.filter(
                 models.Ticket.paid == True
@@ -198,25 +205,25 @@ def generate_sales_statistics():
 
     DB.session.commit()
 
-def generate_payment_statistics():
-    """Generate statistics for number of tickets paid for by each method."""
-    DB.session.add_all(
-        models.Statistic(
-            'Payments',
-            str(method[0]),
-            models.Ticket.query.filter(
-                models.Ticket.payment_method == method[0]
-            ).filter(
-                models.Ticket.paid == True
-            ).count()
-        ) for method in DB.session.query(
-            sqlalchemy.distinct(
-                models.Ticket.payment_method
-            )
-        ).all()
-    )
+# def generate_payment_statistics():
+#     """Generate statistics for number of tickets paid for by each method."""
+#     DB.session.add_all(
+#         models.Statistic(
+#             'Payments',
+#             str(method[0]),
+#             models.Ticket.query.filter(
+#                 models.Ticket.payment_method == method[0]
+#             ).filter(
+#                 models.Ticket.paid == True
+#             ).count()
+#         ) for method in DB.session.query(
+#             sqlalchemy.distinct(
+#                 models.Ticket.payment_method
+#             )
+#         ).all()
+#     )
 
-    DB.session.commit()
+#     DB.session.commit()
 
 def generate_college_statistics():
     """Generate statistics for number of users from each college."""
@@ -225,7 +232,7 @@ def generate_college_statistics():
             'Colleges',
             college.name,
             models.User.query.filter(
-                models.User.college_id == college.id
+                models.User.college_id == college.object_id
             ).count()
         ) for college in models.College.query.all()
     )
@@ -276,13 +283,13 @@ def run_20_minutely(now):
 
     generate_sales_statistics()
 
-    generate_payment_statistics()
+    # generate_payment_statistics()
 
     generate_college_statistics()
 
-    send_3_day_warnings(now, difference)
+    # send_3_day_warnings(now, difference)
 
-    send_1_day_warnings(now, difference)
+    # send_1_day_warnings(now, difference)
 
 def main():
     """Check the lock, do some setup and run the tasks."""

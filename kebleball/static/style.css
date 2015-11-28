@@ -1876,4 +1876,9 @@ table .button { margin: 0; }
 /* line 130, style.scss */
 td, td label { color: #000 !important; }
 
+/* line 134, style.scss */
+#register_photo { margin-bottom: 1rem; }
+/* line 136, style.scss */
+#register_photo .large-9 { padding-top: 2rem; }
+
 /*# sourceMappingURL=style.css.map */

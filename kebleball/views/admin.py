@@ -452,20 +452,11 @@ def statistics():
     if cancelled_value is None:
         cancelled_value = 0
 
-    payment_method_values = DB.session.query(
-        sqlalchemy.func.sum(models.Ticket.price), models.Ticket.payment_method
-    ).filter(
-        models.Ticket.cancelled != True
-    ).group_by(
-        models.Ticket.payment_method
-    ).all()
-
     return flask.render_template(
         'admin/statistics.html',
         total_value=total_value,
         paid_value=paid_value,
-        cancelled_value=cancelled_value,
-        payment_method_values=payment_method_values
+        cancelled_value=cancelled_value
     )
 
 @ADMIN.route('/admin/announcements', methods=['GET', 'POST'])
