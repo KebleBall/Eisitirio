@@ -70,7 +70,7 @@ def create_plot(group):
         plots[statistic.statistic]['datapoints'].append(statistic.value)
         plots[statistic.statistic]['current_value'] = statistic.value
 
-    return create_plot(  # pylint: disable=too-many-function-args
+    return render_plot(
         [
             PlotDescriptor(
                 timestamps=plot['timestamps'],
@@ -78,7 +78,7 @@ def create_plot(group):
                 line_style=plot['line_style'],
                 current_value=plot['current_value'],
                 label=label
-            ) for (label, plot) in plots
+            ) for (label, plot) in plots.iteritems()
         ],
         statistics[0].timestamp,
         statistics[-1].timestamp
