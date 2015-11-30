@@ -85,7 +85,7 @@ class LogManager(object):
                 action affected
         """
         if 'actor_id' in flask.session:
-            actor = flask.session['actor_id']
+            actor = models.User.get_by_id(flask.session['actor_id'])
         elif not login.current_user.is_anonymous:
             actor = login.current_user
         else:
