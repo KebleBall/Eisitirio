@@ -6,12 +6,12 @@
 {% block content %}
     <section id="homepage" class="columns">
         <p>
-            Welcome to the Keble Ball ticketing system. Through this system, you can
+            Welcome to the {{ template_config['BALL_NAME'] }} ticketing system. Through this system, you can
             purchase, manage, and trade tickets. If you have any problems while using
             the system, please contact <a href="mailto:tickets@kebleball.com">the ticketing officer</a>.
         </p>
         <p>
-            Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} will take place on the night of {{ template_config['START_TIME'].strftime('%B') }} {{ template_config['START_TIME'].day }}{{ get_ord(template_config['START_TIME']) }}. Tickets are available in advance only, there will be no tickets for sale on the door. To purchase a ticket, please register or log in
+            {{ template_config['TITLE'] }} will take place on the night of {{ template_config['START_TIME'].strftime('%B') }} {{ template_config['START_TIME'].day }}{{ get_ord(template_config['START_TIME']) }}. Tickets are available in advance only, there will be no tickets for sale on the door. To purchase a ticket, please register or log in
         </p>
         <div class="row">
             <section id="homepage-login" class="large-6 columns">
@@ -150,7 +150,7 @@
                         <div class="large-12 columns">
                             <label for="accept_terms">
                                 <input type="checkbox" name="accept_terms" value="yes" id="accept_terms" required />
-                                I have read and accept the <a href="{{ url_for('front.terms') }}" target="_blank">Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} Terms &amp; Conditions</a>
+                                I have read and accept the <a href="{{ url_for('front.terms') }}" target="_blank">{{ template_config['TITLE'] }} Terms &amp; Conditions</a>
                             </label>
                         </div>
                     </div>

@@ -2,9 +2,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Page Not Found - Keble Ball {{ template_config['START_TIME'].strftime('%Y') }}</title>
-        <meta name="description" content="Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} - Buy Tickets">
-        <meta name="keywords" content="Keble,Oxford,Ball,Tickets">
+        <title>Page Not Found - {{ template_config['TITLE'] }}</title>
+        <meta name="description" content="{{ template_config['TITLE'] }} - Buy Tickets">
         <meta name="author" content="Samuel Littley">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width" />
@@ -24,7 +23,7 @@
         <header class="row">
             <section id="logo" class="large-6 large-centered columns">
                 <a href="/">
-                    <h1>Keble Ball {{ template_config['START_TIME'].year }}</h1>
+                    <h1>{{ template_config['TITLE'] }}</h1>
                     <h2>{{ template_config['THEME'] }}</h2>
                     <h3>{{ template_config['START_TIME'].strftime('%d%m%Y') }}</h3>
                 </a>
@@ -37,13 +36,13 @@
         </section>
         <section id="main" class="row">
             <section id="page-not-found" class="columns">
-                <p>The page you were looking for cannot be found. If you followed a link to get here, please contact the <a href="http://www.google.com/recaptcha/mailhide/d?k=01VW2HusQat4KpnmQYJBSfhQ==&c=0pBadqH9ae41gTIaahTM78kkmPpv_-wELjktV6Zs-d0=" target="_blank">webmaster</a>, giving details of what page you were trying to find, and which page you came from.</p>
+                <p>The page you were looking for cannot be found. If you followed a link to get here, please contact the <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">webmaster</a>, giving details of what page you were trying to find, and which page you came from.</p>
                 <p>In the meantime, you may wish to go to the <a href="{{ url_for('router') }}">homepage</a>, and try to find what you need from there using the menus.</p>
             </section>
         </section>
         <footer class="row">
             <section id="copyright" class="large-8 large-centered columns">
-                <p>&copy; 2013- Keble Ball. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
+                <p>&copy; {{ current_year }} {{ template_config['BALL_NAME'] }}. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
             </section>
         </footer>
     </body>

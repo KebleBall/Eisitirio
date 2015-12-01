@@ -6,4 +6,4 @@ You should log in to the eWay Merchant gateway, find transaction {{ transaction.
 
 Best Wishes,
 
-The Keble Ball Ticketing System
+The {{ template_config['BALL_NAME'] }} Ticketing System

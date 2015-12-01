@@ -262,9 +262,7 @@ class CardTransaction(DB.Model):
             'TransactionType': 'Purchase',
             'LogoUrl': flask.url_for('static', filename='images/eway_logo.png',
                                      _external=True, _scheme='https'),
-            'HeaderText': 'Keble Ball {0}'.format(
-                APP.config['START_TIME'].strftime('%Y')
-            ),
+            'HeaderText': APP.config['TITLE'],
             'Language': 'EN',
             'CustomerReadOnly': True
         }
@@ -363,7 +361,7 @@ class CardTransaction(DB.Model):
                                 (
                                     'Your card payment was only approved for '
                                     'a partial amount. An email has been '
-                                    'sent to Keble Ball staff, and the '
+                                    'sent to {0} staff, and the '
                                     'partial payment will be reversed. After '
                                     'this, you will be contacted via email, '
                                     'and you should then reattempt payment. '
@@ -373,6 +371,8 @@ class CardTransaction(DB.Model):
                                     'and that you have no transaction '
                                     'limits. If in doubt, please pay for '
                                     'your tickets one-by-one.'
+                                ).format(
+                                    APP.config['BALL_NAME']
                                 ),
                                 'warning'
                             )
@@ -489,8 +489,10 @@ class CardTransaction(DB.Model):
                     (
                         'Your card refund was only approved for '
                         'a partial amount. An email has been '
-                        'sent to Keble Ball staff, and the '
+                        'sent to {0} staff, and the '
                         'refund will be manually completed.'
+                    ).format(
+                        APP.config['BALL_NAME']
                     ),
                     'warning'
                 )

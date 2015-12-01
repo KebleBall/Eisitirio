@@ -4,4 +4,4 @@ Your arrangement to resell tickets to {{ resale_to.full_name }} ({{ resale_to.em
 
 Best Wishes,
 
-The Keble Ball Team
+The {{ template_config['BALL_NAME'] }} Team

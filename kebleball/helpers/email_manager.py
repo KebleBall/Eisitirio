@@ -136,7 +136,7 @@ class EmailManager(object):
                 templates/emails folder, to be rendered as the email body
             kwargs: if this contains an element under the |email_from| key, this
                 is used as the sender of the email. Otherwise, all elements are
-                passed to the template rendering as tempalte parameters.
+                passed to the template rendering as template parameters.
         """
         template = self.get_template(template)
 
@@ -144,6 +144,11 @@ class EmailManager(object):
             email_from = kwargs['email_from']
         except KeyError:
             email_from = self.app.config['EMAIL_FROM']
+
+        kwargs['template_config'] = {
+            key: self.app.config[key]
+            for key in self.app.config['TEMPLATE_CONFIG_KEYS']
+        }
 
         self.send_text(
             recipient,
@@ -175,7 +180,8 @@ class EmailManager(object):
             'utf-8'
         )
 
-        message['Subject'] = ('[Keble Ball] ' + subject)
+        message['Subject'] = '[{0}] {1}'.format(self.app.config['BALL_NAME'],
+                                                subject)
         message['From'] = email_from
         message['To'] = recipient
 

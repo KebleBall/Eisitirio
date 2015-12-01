@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+import datetime
 import os
 
 from flask.ext import login
@@ -172,5 +173,6 @@ def context_processor():
         template_config={
             key: APP.config[key]
             for key in APP.config['TEMPLATE_CONFIG_KEYS']
-        }
+        },
+        current_year=datetime.datetime.utcnow().year
     )

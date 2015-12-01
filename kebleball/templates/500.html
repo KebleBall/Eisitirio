@@ -2,9 +2,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Oops! An Error Occurred - Keble Ball {{ template_config['START_TIME'].strftime('%Y') }}</title>
-        <meta name="description" content="Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} - Buy Tickets">
-        <meta name="keywords" content="Keble,Oxford,Ball,Tickets">
+        <title>Oops! An Error Occurred - {{ template_config['TITLE'] }}</title>
+        <meta name="description" content="{{ template_config['TITLE'] }} - Buy Tickets">
         <meta name="author" content="Samuel Littley">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width" />
@@ -24,7 +23,7 @@
         <header class="row">
             <section id="logo" class="large-6 large-centered columns">
                 <a href="/">
-                    <h1>Keble Ball {{ template_config['START_TIME'].year }}</h1>
+                    <h1>{{ template_config['TITLE'] }}</h1>
                     <h2>{{ template_config['THEME'] }}</h2>
                     <h3>{{ template_config['START_TIME'].strftime('%d%m%Y') }}</h3>
                 </a>
@@ -42,7 +41,7 @@
         </section>
         <footer class="row">
             <section id="copyright" class="large-8 large-centered columns">
-                <p>&copy; 2013- Keble Ball. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
+                <p>&copy; {{ current_year }} {{ template_config['BALL_NAME'] }}. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
             </section>
         </footer>
     </body>

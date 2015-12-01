@@ -4,4 +4,4 @@ The arrangement for {{ resale_from.full_name }} ({{ resale_from.email }}) to res
 
 Best Wishes,
 
-The Keble Ball Team
+The {{ template_config['BALL_NAME'] }} Team

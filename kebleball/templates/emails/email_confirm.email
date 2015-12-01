@@ -1,6 +1,6 @@
 Hi There!
 
-You, or somebody pretending to be you, has entered this email address when registering an account for the Keble Ball Ticketing System at http://www.kebleball.com/tickets/.
+You, or somebody pretending to be you, has entered this email address when registering an account for the {{ template_config['BALL_NAME'] }} Ticketing System at http://www.kebleball.com/tickets/.
 
 If this was you, please confirm your email address by visiting the following address:
 
@@ -12,4 +12,4 @@ If this was not you, you can delete the account in question by visiting the foll
 
 Best Wishes,
 
-The Keble Ball Team
+The {{ template_config['BALL_NAME'] }} Team

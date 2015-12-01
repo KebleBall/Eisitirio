@@ -1,6 +1,6 @@
 Hi There!
 
-You, or somebody pretending to be you, has entered this email address when trying to change the email address on their account for the Keble Ball Ticketing System at http://www.kebleball.com/tickets/.
+You, or somebody pretending to be you, has entered this email address when trying to change the email address on their account for the {{ template_config['BALL_NAME'] }} Ticketing System at http://www.kebleball.com/tickets/.
 
 If this was you, please confirm your email address by visiting the following address:
 
@@ -10,4 +10,4 @@ If this was not you, you do not need to do anything.
 
 Best Wishes,
 
-The Keble Ball Team
+The {{ template_config['BALL_NAME'] }} Team

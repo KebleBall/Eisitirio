@@ -2,9 +2,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>System Down For Maintenance - Keble Ball {{ template_config['START_TIME'].strftime('%Y') }}</title>
-        <meta name="description" content="Keble Ball {{ template_config['START_TIME'].strftime('%Y') }} - Buy Tickets">
-        <meta name="keywords" content="Keble,Oxford,Ball,Tickets">
+        <title>System Down For Maintenance - {{ template_config['TITLE'] }}</title>
+        <meta name="description" content="{{ template_config['TITLE'] }} - Buy Tickets">
         <meta name="author" content="Samuel Littley">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width" />
@@ -23,7 +22,7 @@
     <body>
         <header class="row">
             <section id="logo" class="large-6 large-centered columns">
-                <h1>Keble Ball {{ template_config['START_TIME'].year }}</h1>
+                <h1>{{ template_config['TITLE'] }}</h1>
                 <h2>{{ template_config['THEME'] }}</h2>
                 <h3>{{ template_config['START_TIME'].strftime('%d%m%Y') }}</h3>
             </section>
@@ -35,12 +34,12 @@
         </section>
         <section id="main" class="row">
             <section id="maintenance" class="columns">
-                <p>We apologise, the Keble Ball Ticketing System is temporarily down for maintenance. Please check back later.</p>
+                <p>We apologise, the {{ template_config['BALL_NAME'] }} Ticketing System is temporarily down for maintenance. Please check back later.</p>
             </section>
         </section>
         <footer class="row">
             <section id="copyright" class="large-8 large-centered columns">
-                <p>&copy; 2013- Keble Ball. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
+                <p>&copy; {{ current_year }} {{ template_config['BALL_NAME'] }}. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
             </section>
         </footer>
     </body>
