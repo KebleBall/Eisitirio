@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-from email.mime import text
 from kebleball import app
 from kebleball.database import db
 from kebleball.database import user

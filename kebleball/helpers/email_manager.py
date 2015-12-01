@@ -30,6 +30,7 @@ class EmailManager(object):
         atexit.register(self.shutdown)
 
     def smtp_connect(self):
+        """Open the connection to the SMTP server."""
         if self.smtp_open():
             return True
 
@@ -44,7 +45,7 @@ class EmailManager(object):
             self.log(
                 'error',
                 'Could not connect to SMTP server at {0}: {1}'.format(
-                    self.smtp_host,
+                    self.app.config['SMTP_HOST'],
                     error
                 )
             )

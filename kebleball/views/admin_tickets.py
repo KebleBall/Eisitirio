@@ -249,6 +249,42 @@ def cancel_ticket(ticket_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
+@ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/uncollect')
+@login_manager.admin_required
+def uncollect_ticket(ticket_id):
+    """Mark a ticket has having not been collected.
+
+    Removes the barcode from the ticket and marks it as not collected. This will
+    prevent the wristband with the given barcode from being used to enter the
+    ball.
+    """
+    ticket = models.Ticket.get_by_id(ticket_id)
+
+    if ticket:
+        ticket.collected = False
+        ticket.barcode = None
+        DB.session.commit()
+
+        APP.log_manager.log_event(
+            'Marked ticket as uncollected',
+            [ticket]
+        )
+
+        flask.flash(
+            u'Ticket marked as uncollected.',
+            'success'
+        )
+        return flask.redirect(flask.request.referrer or
+                              flask.url_for('admin_tickets.view_ticket',
+                                            ticket_id=ticket.object_id))
+    else:
+        flask.flash(
+            u'Could not find ticket, could not mark as uncollected.',
+            'warning'
+        )
+        return flask.redirect(flask.request.referrer or
+                              flask.url_for('admin.admin_home'))
+
 @ADMIN_TICKETS.route('/admin/ticket/validate', methods=['POST', 'GET'])
 @login_manager.admin_required
 def validate_ticket():
