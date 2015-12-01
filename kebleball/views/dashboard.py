@@ -166,7 +166,7 @@ def profile():
             login.current_user.college_id = flask.request.form['college']
             affiliation_logic.update_affiliation(
                 login.current_user,
-                flask.request.form['affiliation']
+                models.Affiliation.get_by_id(flask.request.form['affiliation'])
             )
 
             DB.session.commit()
