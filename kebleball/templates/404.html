@@ -20,30 +20,34 @@
         </script>
     </head>
     <body>
-        <header class="row">
-            <section id="logo" class="large-6 large-centered columns">
-                <a href="/">
-                    <h1>{{ template_config['TITLE'] }}</h1>
-                    <h2>{{ template_config['THEME'] }}</h2>
-                    <h3>{{ template_config['START_TIME'].strftime('%d%m%Y') }}</h3>
-                </a>
-            </section>
-        </header>
-        <section id="page-title" class="row">
-            <div class="large-12 columns">
-                <h2>Page Not Found</h2>
+        <div id="wrapper" class="row">
+            <div class="columns">
+                <header class="row">
+                    <section id="logo" class="large-12 columns">
+                        <a href="/">
+                            <h1>{{ template_config['TITLE'] }}</h1>
+                            <h2>{{ template_config['THEME'] }}</h2>
+                            <h3>{{ template_config['START_TIME'].strftime(template_config['DATE_FORMAT']) }}</h3>
+                        </a>
+                    </section>
+                </header>
+                <section id="page-title" class="row">
+                    <div class="large-12 columns">
+                        <h2>Page Not Found</h2>
+                    </div>
+                </section>
+                <section id="main" class="row">
+                    <section id="page-not-found" class="columns">
+                        <p>The page you were looking for cannot be found. If you followed a link to get here, please contact the <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">webmaster</a>, giving details of what page you were trying to find, and which page you came from.</p>
+                        <p>In the meantime, you may wish to go to the <a href="{{ url_for('router') }}">homepage</a>, and try to find what you need from there using the menus.</p>
+                    </section>
+                </section>
+                <footer class="row">
+                    <section id="copyright" class="large-8 large-centered columns">
+                        <p>&copy; {{ current_year }} {{ template_config['BALL_NAME'] }}. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
+                    </section>
+                </footer>
             </div>
-        </section>
-        <section id="main" class="row">
-            <section id="page-not-found" class="columns">
-                <p>The page you were looking for cannot be found. If you followed a link to get here, please contact the <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">webmaster</a>, giving details of what page you were trying to find, and which page you came from.</p>
-                <p>In the meantime, you may wish to go to the <a href="{{ url_for('router') }}">homepage</a>, and try to find what you need from there using the menus.</p>
-            </section>
-        </section>
-        <footer class="row">
-            <section id="copyright" class="large-8 large-centered columns">
-                <p>&copy; {{ current_year }} {{ template_config['BALL_NAME'] }}. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
-            </section>
-        </footer>
+        </div>
     </body>
 </html>

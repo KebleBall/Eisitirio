@@ -20,27 +20,31 @@
         </script>
     </head>
     <body>
-        <header class="row">
-            <section id="logo" class="large-6 large-centered columns">
-                <h1>{{ template_config['TITLE'] }}</h1>
-                <h2>{{ template_config['THEME'] }}</h2>
-                <h3>{{ template_config['START_TIME'].strftime('%d%m%Y') }}</h3>
-            </section>
-        </header>
-        <section id="page-title" class="row">
-            <div class="large-12 columns">
-                <h2>System Down For Maintenance</h2>
+        <div id="wrapper" class="row">
+            <div class="columns">
+                <header class="row">
+                    <section id="logo" class="large-12 columns">
+                        <h1>{{ template_config['TITLE'] }}</h1>
+                        <h2>{{ template_config['THEME'] }}</h2>
+                        <h3>{{ template_config['START_TIME'].strftime(template_config['DATE_FORMAT']) }}</h3>
+                    </section>
+                </header>
+                <section id="page-title" class="row">
+                    <div class="large-12 columns">
+                        <h2>System Down For Maintenance</h2>
+                    </div>
+                </section>
+                <section id="main" class="row">
+                    <section id="maintenance" class="columns">
+                        <p>We apologise, the {{ template_config['BALL_NAME'] }} Ticketing System is temporarily down for maintenance. Please check back later.</p>
+                    </section>
+                </section>
+                <footer class="row">
+                    <section id="copyright" class="large-8 large-centered columns">
+                        <p>&copy; {{ current_year }} {{ template_config['BALL_NAME'] }}. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
+                    </section>
+                </footer>
             </div>
-        </section>
-        <section id="main" class="row">
-            <section id="maintenance" class="columns">
-                <p>We apologise, the {{ template_config['BALL_NAME'] }} Ticketing System is temporarily down for maintenance. Please check back later.</p>
-            </section>
-        </section>
-        <footer class="row">
-            <section id="copyright" class="large-8 large-centered columns">
-                <p>&copy; {{ current_year }} {{ template_config['BALL_NAME'] }}. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
-            </section>
-        </footer>
+        </div>
     </body>
 </html>

@@ -1,5 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic,700italic);
-@import "scss/headline_one";
+@import url(https://fonts.googleapis.com/css?family=Abril+Fatface|Open+Sans:400,700,400italic,700italic);
 
 @import "scss/vendor/normalize";
 
@@ -14,19 +13,16 @@
 
 @import "scss/vendor/simple-slider";
 
-header, nav, #page-title, #main, footer, #flashes {
-    background-color: $white;
+#wrapper {
+    background-color: $cream;
 }
 
 a {
     font-weight: bold;
 }
 
-.headline, h1, h2, h3, h4, h5, h6 {
-    font-family: 'Headline One', sans-serif;
-    text-transform: uppercase;
-    vertical-align: -3%;
-    font-weight: normal;
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Abril Fatface', sans-serif;
 }
 
 #logo {
@@ -36,12 +32,12 @@ a {
         color: #fff;
     }
     h1 {
-        font-size: 3rem;
+        font-size: 4rem;
         margin: 2rem 0 0;
         color: #000;
     }
     h2 {
-        font-size: 5rem;
+        font-size: 3rem;
         margin: 0;
     }
     h3 {

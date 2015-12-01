@@ -1,26 +1,25 @@
 @import "vendor/foundation/functions";
 
-$cream1: #e7e2d4;
-$purple: #640325;
-$red: #950219;
-$cream2: #f3ede1;
-$white: #f6f2ed;
+$cream: #fdfae7;
+$red: #c00000;
 $black: #000;
+$blue: #0a629f;
 $grey: #333;
+$white: #fff;
 
 $rem-base: 16px;
 
-$body-bg: $cream1;
+$body-bg: url('images/background.jpg') $blue;
 $body-font-color: $black;
 $body-font-family: "Open Sans", Helvetica, sans-serif;
 $body-font-weight: lighter;
 
-$primary-color: $purple;
-$secondary-color: $cream2;
+$primary-color: $red;
+$secondary-color: $blue;
 
-$header-font-family: "Headline One", sans-serif;
+$header-font-family: "Abril Fatface", sans-serif;
 $header-font-weight: normal;
-$header-font-color: $purple;
+$header-font-color: $red;
 $header-line-height: 1em;
 $header-top-margin: 0.3em;
 $header-bottom-margin: 0.2em;
@@ -33,7 +32,7 @@ $h5-font-size: 1.4rem;
 $h6-font-size: 1rem;
 
 $anchor-font-color: $grey;
-$anchor-font-color-hover: $purple;
+$anchor-font-color-hover: $red;
 
 $button-tny: rem-calc(8);
 $button-sml: rem-calc(12);
