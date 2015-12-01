@@ -7,8 +7,11 @@ import os
 import site
 import sys
 
-site.addsitedir('/var/www/flask/lib/python2.7/site-packages/')
-sys.path.append(os.path.realpath(__file__).replace('/wsgi.py', ''))
+ROOT_DIR = os.path.realpath(__file__).replace('/wsgi.py', '')
+VENV_DIR = os.path.dirname(ROOT_DIR)
+
+site.addsitedir(os.path.join(VENV_DIR, 'lib/python2.7/site-packages/'))
+sys.path.append(ROOT_DIR)
 
 from newrelic import agent
 
@@ -16,7 +19,7 @@ from kebleball import app
 
 APP = app.APP
 
-agent.initialize('/var/www/flask/newrelic.ini')
+agent.initialize(os.path.join(VENV_DIR, 'newrelic.ini'))
 
 @agent.wsgi_application()
 def application(req_environ, start_response):
