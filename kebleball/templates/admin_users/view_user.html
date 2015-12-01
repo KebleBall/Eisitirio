@@ -116,7 +116,7 @@
                                             Paid for by {{ ticket.payment_method }}.
                                         {% endif %}
                                     {% else -%}
-                                        Awaiting {% if ticket.payment_method %}{{ ticket.payment_method }} {% endif %}payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                        Awaiting payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                     {% endif %}
                                 </td>
                                 <td>

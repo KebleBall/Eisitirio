@@ -94,6 +94,15 @@ class Transaction(DB.Model):
             item.ticket for item in self.items if item.item_type == 'Ticket'
         )
 
+    @property
+    def payment_method(self):
+        if self.battels_term is not None:
+            return "Battels"
+        elif self.card_transaction is not None:
+            return "Card"
+        else:
+            return "Unknown Payment Method"
+
     def charge_to_battels(self, term):
         self.battels_term = term
 

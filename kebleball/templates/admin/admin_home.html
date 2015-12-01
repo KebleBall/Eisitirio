@@ -288,7 +288,7 @@
                                         Paid for by {{ ticket.payment_method }}.
                                     {% endif %}
                                 {% else -%}
-                                    Awaiting {{ ticket.payment_method }} payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                    Awaiting payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
                                 {% endif %}
                             </td>
                             <td><a class="button small" href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id) }}">View Ticket</a></td>

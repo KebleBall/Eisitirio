@@ -237,12 +237,11 @@ def _to_list(*args):
 
 def create_tickets(user, ticket_info, num_tickets, ticket_names):
     """Create the ticket objects from the user's selection."""
-    tickets = []
-
-    for ticket_type, _ in ticket_info.ticket_types:
-        for _ in xrange(num_tickets[ticket_type.slug]):
-            tickets.append(models.Ticket(user, ticket_type.slug,
-                                         ticket_type.price))
+    tickets = [
+        models.Ticket(user, ticket_type.slug, ticket_type.price)
+        for ticket_type, _ in ticket_info.ticket_types
+        for _ in xrange(num_tickets[ticket_type.slug])
+    ]
 
     for i, name in enumerate(ticket_names):
         tickets[i].name = name

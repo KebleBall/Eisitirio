@@ -112,6 +112,17 @@ class Ticket(DB.Model):
             self.name if self.name else 'No Name Set'
         )
 
+    @property
+    def payment_method(self):
+        if self.price == 0:
+            return "Free"
+
+        for transaction_item in self.transaction_items:
+            if transaction_item.transaction.paid:
+                return transaction_item.transaction.payment_method
+
+        return "Unknown Payment Method"
+
     def set_price(self, price):
         """Set the price of the ticket."""
         price = max(price, 0)

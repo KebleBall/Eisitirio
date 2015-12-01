@@ -10,7 +10,9 @@ from kebleball import app
 from kebleball.database import db
 from kebleball.database import models
 from kebleball.helpers import login_manager
+from kebleball.helpers import util
 from kebleball.logic import affiliation_logic
+from kebleball.logic import purchase_logic
 
 APP = app.APP
 DB = db.DB
@@ -127,10 +129,30 @@ def give_user(user_id):
     user = models.User.get_by_id(user_id)
 
     if user:
-        price = (
-            int(flask.request.form['give_price_pounds']) * 100 +
-            int(flask.request.form['give_price_pence'])
-        )
+        try:
+            ticket_type = APP.config['TICKET_TYPES_BY_SLUG'][
+                flask.request.form['give_ticket_type']
+            ]
+        except KeyError:
+            flask.flash("Invalid/no ticket type selected", "error")
+            return flask.redirect(flask.request.referrer or
+                                  flask.url_for('admin.admin_home'))
+
+        if (
+            (
+                'give_price_pounds' not in flask.request.form or
+                flask.request.form['give_price_pounds'] == ''
+            ) and (
+                'give_price_pence' not in flask.request.form or
+                flask.request.form['give_price_pence'] == ''
+            )
+        ):
+            price = ticket_type.price
+        else:
+            price = util.parse_pounds_pence(flask.request.form,
+                                            'give_price_pounds',
+                                            'give_price_pence')
+
         num_tickets = int(flask.request.form['give_num_tickets'])
 
         if (
@@ -148,16 +170,13 @@ def give_user(user_id):
                 flask.request.form['give_reason']
             )
 
-        tickets = []
+        tickets = [
+            models.Ticket(user, ticket_type.slug, price)
+            for _ in xrange(num_tickets)
+        ]
 
-        for _ in xrange(num_tickets):
-            ticket = models.Ticket(
-                user,
-                None,
-                price
-            )
+        for ticket in tickets:
             ticket.add_note(note)
-            tickets.append(ticket)
 
         DB.session.add_all(tickets)
         DB.session.commit()

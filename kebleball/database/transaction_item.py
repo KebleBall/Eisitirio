@@ -53,7 +53,7 @@ class TransactionItem(DB.Model):
     ticket = DB.relationship(
         'Ticket',
         backref=DB.backref(
-            'transactions',
+            'transaction_items',
             lazy='dynamic'
         )
     )
