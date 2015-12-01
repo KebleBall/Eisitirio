@@ -130,20 +130,22 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="large-12 columns">
-                            <label for="photo">Upload Photo</label>
-                            <div class="row" id="register_photo">
-                                <div class="large-3 columns right">
-                                    <img src="{{ url_for('static', filename='images/passport_outline.png') }}" />
-                                </div>
-                                <div class="large-9 columns">
-                                    <input type="file" name="photo" accept="{{ template_config['IMAGE_ACCEPT_STRING'] }}" required="required" />
-                                    <p class="small">Please upload a passport style photograph of yourself.</p>
+                    {% if template_config['REQUIRE_USER_PHOTO'] %}
+                        <div class="row">
+                            <div class="large-12 columns">
+                                <label for="photo">Upload Photo</label>
+                                <div class="row" id="register_photo">
+                                    <div class="large-3 columns right">
+                                        <img src="{{ url_for('static', filename='images/passport_outline.png') }}" />
+                                    </div>
+                                    <div class="large-9 columns">
+                                        <input type="file" name="photo" accept="{{ template_config['IMAGE_ACCEPT_STRING'] }}" required="required" />
+                                        <p class="small">Please upload a passport style photograph of yourself.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                     <div class="row">
                         <div class="large-12 columns">
                             <label for="accept_terms">

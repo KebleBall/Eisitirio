@@ -9,7 +9,7 @@ from kebleball import app
 from kebleball.database import battels
 from kebleball.database import db
 from kebleball.database import ticket
-from kebleball.database import photo
+from kebleball.database import photo as photo_model # pylint: disable=unused-import
 from kebleball.helpers import util
 
 DB = db.DB
@@ -129,7 +129,7 @@ class User(DB.Model):
     photo_id = DB.Column(
         DB.Integer,
         DB.ForeignKey('photo.object_id'),
-        nullable=False
+        nullable=True
     )
     photo = DB.relationship(
         'Photo',

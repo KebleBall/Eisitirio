@@ -167,7 +167,7 @@ def register():
     ):
         flashes.append('Please select an affiliation')
 
-    if (
+    if APP.config['REQUIRE_USER_PHOTO'] and (
             'photo' not in flask.request.files or
             flask.request.files['photo'].filename == ''
     ):
@@ -194,10 +194,13 @@ def register():
             affiliations=models.Affiliation.query.all()
         )
 
-    photo = photos.save_photo(flask.request.files['photo'])
+    if APP.config['REQUIRE_USER_PHOTO']:
+        photo = photos.save_photo(flask.request.files['photo'])
 
-    DB.session.add(photo)
-    DB.session.commit()
+        DB.session.add(photo)
+        DB.session.commit()
+    else:
+        photo = None
 
     user = models.User(
         flask.request.form['email'],
