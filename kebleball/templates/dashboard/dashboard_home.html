@@ -85,7 +85,7 @@
 
 {% block javascripts %}
     <script type="text/javascript">
-        var name_change_url = '{{ url_for('ajax.change_ticket_name', ticket_id=123456789, _external=True) }}
+        var name_change_url = '{{ url_for('ajax.change_ticket_name', ticket_id=123456789, _external=True) }}';
 
         function change_ticket_name(id, form_submit) {
             if (form_submit) {
