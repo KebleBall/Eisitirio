@@ -182,7 +182,7 @@ def profile():
                 'success'
             )
 
-            login.current_user.maybe_verify_affiliation()
+            affiliation_logic.maybe_verify_affiliation(login.current_user)
 
     return flask.render_template(
         'dashboard/profile.html',
