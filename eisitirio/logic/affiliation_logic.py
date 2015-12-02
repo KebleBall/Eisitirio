@@ -44,20 +44,25 @@ def deny_affiliation(user):
 
     DB.session.commit()
 
-def update_affiliation(user, new_affiliation):
+def update_affiliation(user, new_college, new_affiliation):
     """Change the users affiliation.
 
     In order to maintain the verification of users' affiliations, when we
-    update an affiliation we must re-submit it for verification as
+    update a college/affiliation we must re-submit it for verification as
     appropriate.
     """
+    old_college = user.college
     old_affiliation = user.affiliation
 
+    user.college = new_college
     user.affiliation = new_affiliation
 
     if (
-            old_affiliation != new_affiliation and
-            user.college.name in APP.config['HOST_COLLEGES'] and
+            (
+                old_affiliation != new_affiliation or
+                old_college != new_college
+            ) and
+            new_college.name in APP.config['HOST_COLLEGES'] and
             new_affiliation.name not in [
                 'Other',
                 'None',

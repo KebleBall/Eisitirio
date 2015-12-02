@@ -163,9 +163,10 @@ def profile():
             login.current_user.forenames = flask.request.form['forenames']
             login.current_user.surname = flask.request.form['surname']
             login.current_user.phone = flask.request.form['phone']
-            login.current_user.college_id = flask.request.form['college']
+
             affiliation_logic.update_affiliation(
                 login.current_user,
+                models.College.get_by_id(flask.request.form['college']),
                 models.Affiliation.get_by_id(flask.request.form['affiliation'])
             )
 
