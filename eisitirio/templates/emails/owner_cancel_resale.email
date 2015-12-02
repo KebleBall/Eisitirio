@@ -1,7 +1,7 @@
-Hi There!
+Dear {{ name }},
 
 Your arrangement to resell tickets to {{ resale_to.full_name }} ({{ resale_to.email }}) has been cancelled. No tickets have been transferred.
 
 Best Wishes,
 
-The {{ template_config['BALL_NAME'] }} Team
+{{ template_config['EMAIL_SIGNOFF'] }}

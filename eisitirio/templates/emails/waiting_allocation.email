@@ -10,4 +10,4 @@ If you no longer want the tickets, please log in to the ticketing system, and cl
 
 Best Wishes,
 
-The {{ template_config['BALL_NAME'] }} Team
+{{ template_config['EMAIL_SIGNOFF'] }}

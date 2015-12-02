@@ -1,6 +1,6 @@
-Hi There!
+Dear {{ name }},
 
-You, or somebody pretending to be you, has entered this email address when registering an account for the {{ template_config['BALL_NAME'] }} Ticketing System at {{ template_config['EISITIRIO_URL'] }}.
+This email address has been entered when registering an account for the {{ template_config['BALL_NAME'] }} Ticketing System at {{ template_config['EISITIRIO_URL'] }}.
 
 If this was you, please confirm your email address by visiting the following address:
 
@@ -12,4 +12,4 @@ If this was not you, you can delete the account in question by visiting the foll
 
 Best Wishes,
 
-The {{ template_config['BALL_NAME'] }} Team
+{{ template_config['EMAIL_SIGNOFF'] }}

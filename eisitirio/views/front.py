@@ -226,6 +226,7 @@ def register():
         flask.request.form['email'],
         'Confirm your Email Address',
         'email_confirm.email',
+        name=user.forenames,
         confirmurl=flask.url_for(
             'front.confirm_email',
             user_id=user.object_id,
@@ -337,6 +338,7 @@ def email_confirm():
                 flask.request.form['email'],
                 'Confirm your Email Address',
                 'email_confirm.email',
+                name=user.forenames,
                 confirmurl=flask.url_for(
                     'front.confirm_email',
                     user_id=user.object_id,
@@ -412,6 +414,7 @@ def password_reset():
                 flask.request.form['email'],
                 'Confirm Password Reset',
                 'password_reset_confirm.email',
+                name=user.forenames,
                 confirmurl=flask.url_for(
                     'front.reset_password',
                     user_id=user.object_id,

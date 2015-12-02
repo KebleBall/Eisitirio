@@ -137,6 +137,7 @@ def profile():
                     flask.request.form['email'],
                     'Confirm your Email Address',
                     'email_change_confirm.email',
+                    name=user.forenames,
                     confirmurl=flask.url_for(
                         'front.confirm_email',
                         user_id=login.current_user.object_id,

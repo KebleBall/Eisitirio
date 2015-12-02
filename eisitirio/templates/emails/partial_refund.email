@@ -1,4 +1,4 @@
-Hi!
+Hello,
 
 {{ transaction.user.full_name }} has just attempted to cancel some tickets, but eWay only approved the refund for a partial amount. (The error code given was {{ ewayresponse['Errors'] }})
 
@@ -6,4 +6,4 @@ You should log in to the eWay Merchant gateway, find transaction {{ transaction.
 
 Best Wishes,
 
-The {{ template_config['BALL_NAME'] }} Ticketing System
+{{ template_config['EMAIL_SIGNOFF'] }}

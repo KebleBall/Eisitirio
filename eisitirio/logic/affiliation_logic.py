@@ -26,6 +26,7 @@ def verify_affiliation(user):
         user.email,
         'Affiliation Verified - Buy Your Tickets Now!',
         'affiliation_verified.email',
+        name=user.forenames,
         url=flask.url_for('purchase.purchase_home', _external=True)
     )
 

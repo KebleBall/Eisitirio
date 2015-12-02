@@ -1,4 +1,4 @@
-Hi There!
+Hello,
 
 This email address has been entered when attempting to verify it for an account on the {{ template_config['BALL_NAME'] }} Ticketing System at {{ template_config['EISITIRIO_URL'] }}, however no associated account exists.
 
@@ -8,4 +8,4 @@ If this was not you, there is nothing you need to do. However, if you suspect th
 
 Best Wishes,
 
-The {{ template_config['BALL_NAME'] }} Team
+{{ template_config['EMAIL_SIGNOFF'] }}
