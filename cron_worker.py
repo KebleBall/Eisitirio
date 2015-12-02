@@ -11,11 +11,11 @@ import sys
 
 import sqlalchemy
 
-from kebleball import app
-from kebleball import system # pylint: disable=unused-import
-from kebleball.database import db
-from kebleball.database import models
-from kebleball.helpers import email_manager
+from eisitirio import app
+from eisitirio import system # pylint: disable=unused-import
+from eisitirio.database import db
+from eisitirio.database import models
+from eisitirio.helpers import email_manager
 
 APP = app.APP
 DB = db.DB
@@ -293,12 +293,12 @@ def run_20_minutely(now):
 
 def main():
     """Check the lock, do some setup and run the tasks."""
-    if 'KEBLE_BALL_ENV' in os.environ:
-        if os.environ['KEBLE_BALL_ENV'] == 'PRODUCTION':
+    if 'EISITIRIO_ENV' in os.environ:
+        if os.environ['EISITIRIO_ENV'] == 'PRODUCTION':
             APP.config.from_pyfile('config/production.py')
-        elif os.environ['KEBLE_BALL_ENV'] == 'STAGING':
+        elif os.environ['EISITIRIO_ENV'] == 'STAGING':
             APP.config.from_pyfile('config/staging.py')
-        elif os.environ['KEBLE_BALL_ENV'] == 'DEVELOPMENT':
+        elif os.environ['EISITIRIO_ENV'] == 'DEVELOPMENT':
             APP.config.from_pyfile('config/development.py')
 
     lockfile = os.path.abspath(
