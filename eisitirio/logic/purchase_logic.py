@@ -229,6 +229,9 @@ def check_payment_method(flashes):
     return payment_method, payment_term
 
 def check_postage(flashes):
+    if not APP.config['ENABLE_POSTAGE']:
+        return None, None
+
     postage = None
     address = None
 
