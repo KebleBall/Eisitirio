@@ -1,5 +1,5 @@
 # coding: utf-8
-"""Database model for battels charges for Keble Students."""
+"""Database model for battels charges for current students."""
 
 from __future__ import unicode_literals
 from __future__ import division
@@ -11,7 +11,7 @@ DB = db.DB
 APP = app.APP
 
 class Battels(DB.Model):
-    """Model for battels charges for Keble Students."""
+    """Model for battels charges for current students."""
     object_id = DB.Column(
         DB.Integer(),
         primary_key=True,

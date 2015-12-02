@@ -423,17 +423,10 @@ def verify_affiliations():
     Presents a list of users who have registered but need their affiliation
     verifying with buttons for each to verify/deny the affiliation.
     """
-    users = models.User.query.filter(
-        models.User.college.has(name='Keble')
-    ).filter(
-        models.User.affiliation_verified == None
-    ).all()
-
     return flask.render_template('admin_users/verify_affiliations.html',
-                                 users=users)
+                                 users=affiliation_logic.get_unverified_users())
 
-@ADMIN_USERS.route('/admin/user/<int:user_id>/collect',
-                   methods=['GET', 'POST'])
+@ADMIN_USERS.route('/admin/user/<int:user_id>/collect', methods=['GET', 'POST'])
 @login_manager.admin_required
 def collect_tickets(user_id):
     """Display an interface to collect tickets.

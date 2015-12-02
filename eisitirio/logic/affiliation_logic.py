@@ -108,3 +108,11 @@ def maybe_verify_affiliation(user):
             ),
             'info'
         )
+
+def get_unverified_users():
+    """Get all the users who should be verified but aren't."""
+    return models.User.query.filter(
+        models.User.college.has(name='Keble')
+    ).filter(
+        models.User.affiliation_verified == None
+    ).all()

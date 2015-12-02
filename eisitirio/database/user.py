@@ -294,11 +294,11 @@ class User(DB.Model):
     def can_pay_by_battels(self):
         """Is the user able to pay by battels?
 
-        The requirement for this is that the user is a current Keble member, and
-        that it is either Michaelmas or Hilary term. The logic determining
-        whether the user is a current Keble member is carried out at
-        registration (and based on whether their email matches one in our list
-        of battelable emails). Alternately, this can be forced by an admin
+        The requirement for this is that the user is a current member of the
+        relevant college(s), and that it is either Michaelmas or Hilary term.
+        The logic determining whether the user is a current member is carried
+        out at registration (and based on whether their email matches one in our
+        list of battelable emails). Alternately, this can be forced by an admin
         through the admin interface if the user is not automatically recognised.
         Given this, it suffices to only check if the user has a defined battels
         account on the system.
