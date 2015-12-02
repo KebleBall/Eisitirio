@@ -2,6 +2,7 @@
 """Logic regarding verification of affiliations."""
 
 import flask
+import sqlalchemy
 
 from eisitirio import app
 from eisitirio.database import db
@@ -56,7 +57,7 @@ def update_affiliation(user, new_affiliation):
 
     if (
             old_affiliation != new_affiliation and
-            user.college.name == 'Keble' and
+            user.college.name in APP.config['HOST_COLLEGES'] and
             new_affiliation.name not in [
                 'Other',
                 'None',
@@ -77,7 +78,7 @@ def maybe_verify_affiliation(user):
             not APP.config['TICKETS_ON_SALE']
     ):
         if (
-                user.college.name != 'Keble' or
+                user.college.name not in APP.config['HOST_COLLEGES'] or
                 user.affiliation.name in [
                     'Other',
                     'None',
@@ -112,7 +113,10 @@ def maybe_verify_affiliation(user):
 def get_unverified_users():
     """Get all the users who should be verified but aren't."""
     return models.User.query.filter(
-        models.User.college.has(name='Keble')
+        sqlalchemy.or_(
+            models.User.college.has(name=college)
+            for college in APP.config['HOST_COLLEGES']
+        )
     ).filter(
         models.User.affiliation_verified == None
     ).all()
