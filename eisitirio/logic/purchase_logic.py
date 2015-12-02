@@ -43,61 +43,6 @@ class TicketInfo(_TicketInfo):
             ]
         })
 
-def can_buy_keblite(user):
-    return (
-        (
-            app.APP.config['LIMITED_RELEASE'] or
-            app.APP.config['TICKETS_ON_SALE']
-        ) and
-        user.college.name == 'Keble' and
-        user.affiliation.name in [
-            'Student',
-            'Foreign Exchange Student',
-        ] and
-        user.affiliation_verified
-    )
-
-
-def can_buy_keble_staff(user):
-    return (
-        (
-            app.APP.config['LIMITED_RELEASE'] or
-            app.APP.config['TICKETS_ON_SALE']
-        ) and
-        user.college.name == 'Keble' and
-        user.affiliation.name == 'Staff/Fellow' and
-        user.affiliation_verified
-    )
-
-
-def can_buy_keble_graduand(user):
-    return (
-        (
-            app.APP.config['LIMITED_RELEASE'] or
-            app.APP.config['TICKETS_ON_SALE']
-        ) and
-        user.college.name == 'Keble' and
-        user.affiliation.name == 'Graduand' and
-        user.affiliation_verified
-    )
-
-
-def can_buy_standard(user):
-    return (
-        app.APP.config['TICKETS_ON_SALE'] or
-        (
-            app.APP.config['LIMITED_RELEASE'] and
-            user.college.name == 'Keble' and
-            user.affiliation.name in [
-                'Student',
-                'Graduand',
-                'Staff/Fellow',
-                'Foreign Exchange Student',
-            ] and
-            user.affiliation_verified
-        )
-    )
-
 def _guest_tickets_available():
     """Return how many guest tickets are available."""
     guest_ticket_count = models.Ticket.query.filter(
