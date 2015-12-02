@@ -199,12 +199,10 @@ def check_payment_method(flashes):
 
     if 'payment_method' not in flask.request.form:
         flashes.append('You must select a payment method')
-    elif flask.request.form['payment_method'] not in [
-            'Card',
-            'Battels-MT',
-            'Battels-MTHT',
-            'Battels-HT',
-    ]:
+    elif (
+            flask.request.form['payment_method'] not in
+            APP.config['PAYMENT_METHODS']
+    ):
         flashes.append('That is not a valid payment method')
     elif flask.request.form['payment_method'].startswith('Battels'):
         payment_method = 'Battels'

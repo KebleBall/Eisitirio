@@ -31,7 +31,7 @@ def purchase_home():
 
     if not ticket_info.ticket_types:
         flask.flash(
-            'There are no tickets available for you to purchase.',
+            'You are not able to purchase tickets at this time.',
             'info'
         )
 
