@@ -217,7 +217,7 @@ class EmailManager(object):
                     'SMTP server at {0} refused recipients {1} refused for '
                     'message with subject {2}'
                 ).format(
-                    self.smtp_host,
+                    self.app.config['SMTP_HOST'],
                     error.recipients,
                     message['Subject']
                 )
@@ -229,7 +229,7 @@ class EmailManager(object):
                     'SMTP server at {0} did not reply properly to HELO for '
                     'message with subject {1}'
                 ).format(
-                    self.smtp_host,
+                    self.app.config['SMTP_HOST'],
                     message['Subject']
                 )
             )
@@ -240,7 +240,7 @@ class EmailManager(object):
                     'SMTP server at {0} did not allow sender {1} for '
                     'message with subject {2}'
                 ).format(
-                    self.smtp_host,
+                    self.app.config['SMTP_HOST'],
                     message['From'],
                     message['Subject']
                 )
@@ -252,7 +252,7 @@ class EmailManager(object):
                     'SMTP server at {0} responded with unexpected error code '
                     '{1} with error message {2} for message with subject {3}'
                 ).format(
-                    self.smtp_host,
+                    self.app.config['SMTP_HOST'],
                     error.smtp_code,
                     error.smtp_error,
                     message['Subject']
