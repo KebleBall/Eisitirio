@@ -6,6 +6,7 @@ import sqlalchemy
 
 from eisitirio import app
 from eisitirio.database import db
+from eisitirio.database import models
 
 APP = app.APP
 DB = db.DB
