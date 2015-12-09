@@ -18,7 +18,7 @@ class Battels(DB.Model):
         nullable=False
     )
     battelsid = DB.Column(
-        DB.Unicode(6),
+        DB.Unicode(10),
         unique=True,
         nullable=True
     )
