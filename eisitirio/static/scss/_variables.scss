@@ -1,0 +1,47 @@
+@import "vendor/foundation/functions";
+
+$cream: #fdfae7;
+$red: #c00000;
+$black: #000;
+$blue: #0a629f;
+$grey: #333;
+$white: #fff;
+
+$rem-base: 16px;
+
+$body-bg: url('images/background.jpg') $blue;
+$body-font-color: $black;
+$body-font-family: "Open Sans", Helvetica, sans-serif;
+$body-font-weight: lighter;
+
+$primary-color: $red;
+$secondary-color: $blue;
+
+$header-font-family: "Abril Fatface", sans-serif;
+$header-font-weight: normal;
+$header-font-color: $red;
+$header-line-height: 1em;
+$header-top-margin: 0.3em;
+$header-bottom-margin: 0.2em;
+
+$h1-font-size: 3rem;
+$h2-font-size: 2.6rem;
+$h3-font-size: 2.2rem;
+$h4-font-size: 1.8rem;
+$h5-font-size: 1.4rem;
+$h6-font-size: 1rem;
+
+$anchor-font-color: $grey;
+$anchor-font-color-hover: $red;
+
+$button-tny: rem-calc(8);
+$button-sml: rem-calc(12);
+$button-font-tny: rem-calc(14);
+$button-font-sml: rem-calc(14);
+
+$form-label-font-size: 1rem;
+$form-label-font-color: #222;
+
+$legend-bg: transparent;
+
+$paragraph-margin-bottom: rem-calc(5);

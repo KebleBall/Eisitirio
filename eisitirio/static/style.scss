@@ -1,0 +1,135 @@
+@import url(https://fonts.googleapis.com/css?family=Abril+Fatface|Open+Sans:400,700,400italic,700italic);
+
+@import "scss/vendor/normalize";
+
+@import "scss/variables";
+
+@import "scss/vendor/foundation/components/buttons";
+@import "scss/vendor/foundation/components/forms";
+@import "scss/vendor/foundation/components/grid";
+@import "scss/vendor/foundation/components/tables";
+@import "scss/vendor/foundation/components/type";
+@import "scss/vendor/foundation/components/visibility";
+
+@import "scss/vendor/simple-slider";
+
+#wrapper {
+    background-color: $cream;
+}
+
+a {
+    font-weight: bold;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Abril Fatface', sans-serif;
+}
+
+#logo {
+    padding-bottom: 2em;
+    text-align: center;
+    a {
+        color: #fff;
+    }
+    h1 {
+        font-size: 4rem;
+        margin: 2rem 0 0;
+        color: #000;
+    }
+    h2 {
+        font-size: 3rem;
+        margin: 0;
+    }
+    h3 {
+        font-size: 2rem;
+        margin: 0 0 2rem;
+        color: #000;
+    }
+}
+
+#user {
+    text-align: right;
+}
+
+#copyright {
+    text-align: center;
+}
+
+.message-box {
+    display: block;
+    border: 3px solid;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    background-color: $white;
+    color: $black;
+    &.error {
+        background-color: #f3afbf;
+        border: 3px solid #f31323;
+    }
+    &.warning {
+        background-color: #f3cf9f;
+        border: 3px solid #f38323;
+    }
+    &.success {
+        background-color: #83ef9f;
+        border: 3px solid #338323;
+    }
+    &.info {
+        background-color: #b3dfef;
+        border: 3px solid #1313f3;
+    }
+    p:last-child {
+        margin-bottom: 0;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: $body-font-family;
+    }
+}
+
+#flashes {
+    ul {
+        margin: 0;
+    }
+    li {
+        @extend .message-box;
+        margin: 0.5em;
+    }
+}
+
+p.small, li.small {
+    font-size: 0.75rem;
+}
+
+table .button {
+    margin: 0;
+}
+
+#give_tickets,
+#refund_transaction {
+    input {
+        display: inline;
+        &[type="number"] {
+            width: 5rem;
+        }
+        &[type="text"] {
+            width: auto;
+        }
+    }
+}
+
+#dashboard h3 .button {
+    margin: 0;
+    position: relative;
+    top: -0.25rem;
+}
+
+td, td label {
+    color: #000 !important;
+}
+
+#register_photo {
+    margin-bottom: 1rem;
+    .large-9 {
+        padding-top: 2rem;
+    }
+}

@@ -1,0 +1,13 @@
+Hi {{ user.forenames }},
+
+You have been allocated {{ num_tickets }} ticket{% if num_tickets != 1 %}s{% endif %} for {{ template_config['BALL_NAME'] }} as you were on the waiting list. If you were waiting for more tickets, these may be allocated to you at a later date.
+
+The tickets you have been allocated must be paid for by {{ expiry.strftime("%H:%M, %A %d %B %Y") }}, otherwise they will expire. If your tickets do expire, you may have to join the waiting list again (please note that this will not be done automatically).
+
+To pay for your tickets, please log in to the ticketing system, and click the "Choose payment method" button next to any of the allocated tickets
+
+If you no longer want the tickets, please log in to the ticketing system, and click the "Cancel" button next to any of the allocated tickets, to ensure that other people who do want tickets are able to get them.
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

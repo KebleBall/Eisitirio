@@ -1,0 +1,7 @@
+Dear {{ name }},
+
+Your affiliation has just been verified, and you will now be able to purchase tickets on the {{ template_config['BALL_NAME'] }} Ticketing System. Visit {{ url }} to buy your tickets now!
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

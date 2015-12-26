@@ -1,0 +1,7 @@
+Dear {{ name }},
+
+The arrangement for {{ resale_from.full_name }} ({{ resale_from.email }}) to resell tickets to you has been cancelled. No tickets have been transferred.
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

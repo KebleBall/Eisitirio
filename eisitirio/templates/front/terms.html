@@ -1,0 +1,72 @@
+<!-- front/terms.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Terms &amp; Conditions{% endblock %}
+
+{% block content %}
+    <section id="terms" class="columns">
+        <p>Last Updated 27th November 2015</p>
+
+        {% if template_config['REQUIRE_USER_PHOTOS'] %}
+            <h3>Use of Images</h3>
+
+            <p>By registering with the {{ template_config['BALL_NAME'] }} Ticketing System, and uploading a photo of yourself, you grant {{ template_config['BALL_NAME'] }} permission to use the uploaded image on the night of the ball. Your image will be deleted after the ball. If you have any queries regarding the use of your image, please email <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a>.</p>
+        {% endif %}
+
+        <h3>Ticket Terms &amp; Conditions</h3>
+
+        <p>Tickets for {{ template_config['BALL_NAME'] }} are subject to the following terms and conditions. By confirming, reserving, booking, or purchasing tickets for the ball, you agree to the following:</p>
+
+        <ol>
+            <li>You and any guests you invite are over 18 years of age on or before {{ template_config['START_TIME'].strftime('%-d') }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}.</li>
+            <li>Ball tickets are non-refundable, and must not be sold or transferred.</li>
+            <li>{{ template_config['BALL_NAME'] }} reserves the right to cancel and refund any ticket at any time before the ball.</li>
+            <li>It is your responsibility to ensure that you either arrange for your ticket and those of any guests you may bring to be posted to you, or that you collect them at one of the ticket collection sessions to be held in the week prior to the ball. If you are not able to attend at any of the given times for whatever reason, it is your responsibility to contact the {{ template_config['BALL_NAME'] }} Committee by email to discuss alternative arrangements.</li>
+            <li>You must check that you have been given the correct number of tickets when you come to collect your order. No discussion will be entered into once you have collected your tickets.</li>
+            <li>Tickets can only be collected upon presentation of photographic ID of the purchaser. Accepted forms of ID are official University ID cards, driving licenses, and passports. Other forms of ID, or ID with an expired date, will not be accepted.</li>
+            <li>{{ template_config['BALL_NAME'] }} Committee reserves the right to refuse admittance, with no refund of ticket, to any guest who they believe is intoxicated or under the influence of drugs.</li>
+            <li>You are obliged to wear the given security ID at all times and carry with you valid photo ID in order to comply with security checks at the entrance and during the event. Failure to do so may result in your expulsion from the premises, with no refund of your ticket.</li>
+            <li>{{ template_config['TITLE'] }} will operate a strict no re-admittance policy. Any guest who leaves the Ball after having been admitted, will have their security ID removed and will not be allowed to re-enter under any circumstances whatsoever.</li>
+            <li>You agree to behave in an appropriate manner throughout the event and will treat the college grounds, staff and other guests with respect.</li>
+            <li>Any person whose behaviour is judged to be unruly or offensive by {{ template_config['BALL_NAME'] }} Committee will be expelled from the Ball immediately, will not be allowed to re-enter and will not be given a refund.</li>
+            <li>The purchaser of tickets will be responsible for their own behaviour and the behaviour of any guests that they bring into the ball.</li>
+            <li>Any attendees of {{ template_config['TITLE'] }} who are found to be aiding non-ticket holders in an attempt to gain entry, will be immediately expelled from the ball, with no refund of their ticket.</li>
+            <li>You agree to follow the instructions of {{ template_config['BALL_NAME'] }} Committee throughout the ball and in the unfortunate event of an emergency, you will comply with the health and safety procedures which the {{ template_config['BALL_NAME'] }} Committee has in place.</li>
+            <li>Neither {{ template_config['BALL_NAME'] }} Committee nor {{ template_config['COLLEGE'] }} College are liable for any loss, damage or injuries sustained at the ball.</li>
+            <li>{{ template_config['BALL_NAME'] }} Committee reserves the right to amend the programme for the event at any point.</li>
+            <li>{{ template_config['BALL_NAME'] }} Committee will acccept no responsibility for tickets that have been lost between the ticket allocation session and the evening of the ball itself, {{ template_config['START_TIME'].strftime('%d') }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}. In this situation, no entry will be granted to anyone who claims to have lost their ticket and no discussion will be entered into.</li>
+            <li>Gates will close on the night at {{ template_config['GATES_CLOSE'].strftime('%I%p')|lower }}. After this hour no one will be admitted to the ball, regardless of whether they have a ticket or not.</li>
+            <li>In the unlikely event of an emergency requiring a full scale evacuation from the ball, you must comply with instructions given by {{ template_config['BALL_NAME'] }} Committee and security staff, and you will not be issued with any compensation nor a refund for your ticket.</li>
+            <li>These terms and conditions are subject to change without notice.</li>
+        </ol>
+
+        <h3>Data Protection</h3>
+
+        <p>By registering with the {{ template_config['BALL_NAME'] }} Ticketing System, you agree:</p>
+
+        <ol>
+            <li>
+                To the necessary processing of data in order for the performance of a contract to which you, the data subject, are a party.
+                <ul>
+                    <li class="small">This means you agree to let us collect and store your personal information (name, email address, phone number, photo) for the purposes of keeping track of who has bought tickets</li>
+                </ul>
+            </li>
+            <li>
+                That the processing is necessary for the purposes of legitimate interests pursued by {{ template_config['BALL_NAME'] }}, the data controller, except where the processing is unwarranted in any particular case by reason of prejudice to the rights and freedoms or legitimate interests of the data subject.
+                <ul>
+                    <li class="small">This means that the processing we do is necessary for {{ template_config['BALL_NAME'] }} to sell tickets, and that {{ template_config['BALL_NAME'] }} will not do anything with your personal information that would do harm to you.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <p>{{ template_config['BALL_NAME'] }}, the Data Controller in return will:</p>
+
+        <ol>
+            <li>Provide all information held on the data subject when a formal written request is received.</li>
+            <li>Register with the Information Commissioner as data controller if required.</li>
+            <li>Delete all personal data held on the data subject when it is no longer required.</li>
+        </ol>
+
+        <p>The terms "data controller", "data subject", "personal data", "processing" are interpreted under the definitions given in Section 1 of the Data Protection Act 1998</p>
+    </section>
+{% endblock %}
