@@ -7,10 +7,10 @@ from __future__ import unicode_literals
 from flask.ext import script
 from flask.ext import migrate
 
-from kebleball import app
-from kebleball import system
-from kebleball.database import db
-from kebleball.database import models
+from eisitirio import app
+from eisitirio import system # pylint: disable=unused-import
+from eisitirio.database import db
+from eisitirio.database import models # pylint: disable=unused-import
 
 if __name__ == '__main__':
     app.APP.config.from_pyfile('config/development.py')

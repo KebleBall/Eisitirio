@@ -181,7 +181,7 @@ class User(DB.Model):
     def set_password(self, password):
         """Set the password for the user.
 
-        Hashes the password using bcrrypt and stores the resulting hash.
+        Hashes the password using bcrypt and stores the resulting hash.
 
         Args:
             password: (str) new password for the user.
@@ -419,7 +419,7 @@ class User(DB.Model):
             )
 
         tickets_owned = self.tickets.filter(
-            ticket.Ticket.cancelled == False
+            ticket.Ticket.cancelled == False # pylint: disable=singleton-comparison
         ).count()
 
         if tickets_owned >= APP.config['MAX_TICKETS']:

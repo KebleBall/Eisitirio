@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+from flask.ext import login
 import flask
 
 from eisitirio import app
@@ -19,6 +20,7 @@ ADMIN_TICKETS = flask.Blueprint('admin_tickets', __name__)
 @ADMIN_TICKETS.route(
     '/admin/ticket/<int:ticket_id>/view/page/<int:events_page>'
 )
+@login.login_required
 @login_manager.admin_required
 def view_ticket(ticket_id, events_page=1):
     """View a ticket object."""
@@ -42,6 +44,7 @@ def view_ticket(ticket_id, events_page=1):
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/collect',
                      methods=['GET', 'POST'])
+@login.login_required
 @login_manager.admin_required
 def collect_ticket(ticket_id):
     """Mark a ticket as collected, and add a barcode.
@@ -96,6 +99,7 @@ def collect_ticket(ticket_id):
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/note',
                      methods=['GET', 'POST'])
+@login.login_required
 @login_manager.admin_required
 def note_ticket(ticket_id):
     """Set notes for a ticket."""
@@ -130,6 +134,7 @@ def note_ticket(ticket_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/markpaid')
+@login.login_required
 @login_manager.admin_required
 def mark_ticket_paid(ticket_id):
     """Mark a ticket as paid.
@@ -164,6 +169,7 @@ def mark_ticket_paid(ticket_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/autocancel')
+@login.login_required
 @login_manager.admin_required
 def auto_cancel_ticket(ticket_id):
     """Cancel and refund a ticket.
@@ -220,6 +226,7 @@ def auto_cancel_ticket(ticket_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/cancel')
+@login.login_required
 @login_manager.admin_required
 def cancel_ticket(ticket_id):
     """Cancel a ticket without refunding it."""
@@ -250,6 +257,7 @@ def cancel_ticket(ticket_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/uncollect')
+@login.login_required
 @login_manager.admin_required
 def uncollect_ticket(ticket_id):
     """Mark a ticket has having not been collected.
@@ -286,6 +294,7 @@ def uncollect_ticket(ticket_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_TICKETS.route('/admin/ticket/validate', methods=['POST', 'GET'])
+@login.login_required
 @login_manager.admin_required
 def validate_ticket():
     """Validate a ticket upon entry to the ball.

@@ -3,10 +3,11 @@
 
 from __future__ import unicode_literals
 
+import datetime
+
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import user
-import datetime
 
 APP = app.APP
 DB = db.DB
@@ -176,7 +177,7 @@ class Announcement(DB.Model):
 
         for recipient in recipient_query.all():
             if (
-                    (
+                    ( # pylint: disable=too-many-boolean-expressions
                         self.has_tickets is None or
                         recipient.has_tickets() == self.has_tickets
                     ) and

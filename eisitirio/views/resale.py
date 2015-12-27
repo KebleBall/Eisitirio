@@ -40,7 +40,7 @@ def resale_home():
         ).filter(
             models.Ticket.owner_id == login.current_user.object_id
         ).filter(
-            models.Ticket.paid == True
+            models.Ticket.paid == True # pylint: disable=singleton-comparison
         ).all()
 
         resale_to = models.User.get_by_email(flask.request.form['resale_email'])
@@ -81,7 +81,7 @@ def cancel_resale():
         ).filter(
             models.Ticket.owner_id == login.current_user.object_id
         ).filter(
-            models.Ticket.paid == True
+            models.Ticket.paid == True # pylint: disable=singleton-comparison
         ).all()
 
         for ticket in tickets:

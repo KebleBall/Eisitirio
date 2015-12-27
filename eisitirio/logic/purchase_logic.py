@@ -56,40 +56,52 @@ def _guest_tickets_available():
     )
 
 def _total_tickets_available(user):
+    """Get how many tickets are available for a user to buy."""
     return max(0, min(
         app.APP.config['MAX_TICKETS'] - user.tickets.filter(
-            models.Ticket.cancelled == False
+            models.Ticket.cancelled == False # pylint: disable=singleton-comparison
         ).count(),
         app.APP.config['MAX_TICKETS_PER_TRANSACTION']
     ))
 
 def _type_limit_per_person(user, ticket_type):
+    """Get how many tickets of a given type the user can buy.
+
+    Based on the per person limit. Returns an arbitrary excessively large number
+    if no such limit is set.
+    """
     if ticket_type.limit_per_person == -1:
         return LARGE_NUMBER
 
     return max(0, ticket_type.limit_per_person - user.tickets.filter(
         models.Ticket.ticket_type == ticket_type.slug
     ).filter(
-        models.Ticket.cancelled == False
+        models.Ticket.cancelled == False # pylint: disable=singleton-comparison
     ).count())
 
 def _type_total_limit(ticket_type):
+    """Get how many tickets of a given type the user can buy.
+
+    Based on the limit on total sales. Returns an arbitrary excessively large
+    number if no such limit is set.
+    """
     if ticket_type.total_limit == -1:
         return LARGE_NUMBER
 
     return max(0, ticket_type.total_limit - models.Ticket.query.filter(
         models.Ticket.ticket_type == ticket_type.slug
     ).filter(
-        models.Ticket.cancelled == False
+        models.Ticket.cancelled == False # pylint: disable=singleton-comparison
     ).count())
 
 def _get_ticket_limit(user, ticket_type, ticket_info):
-    """Get the number of tickets of |type| that |user| can purchase.
+    """Get the number of tickets of |ticket_type| that |user| can purchase.
 
     Args:
         user: (models.User) The user purchasing tickets.
         ticket_type: (eisitirio.helpers.ticket_type.TicketType) the type of
             ticket being purchased
+        ticket_info: (TicketInfo) Information about available tickets.
 
     Returns:
         (int) the number of |ticket_type| tickets that |user| can buy.
@@ -194,6 +206,16 @@ def create_tickets(user, ticket_info, num_tickets, ticket_names):
     return tickets
 
 def check_payment_method(flashes):
+    """Validate the payment method selected in the purchase form.
+
+    Args:
+        flashes: (list(str)) List of error messages. Mutated if an error is
+            found.
+
+    Returns:
+        (str or None, str or None) Selected payment method, and term for battels
+        payment.
+    """
     payment_method = None
     payment_term = None
 
@@ -227,6 +249,16 @@ def check_payment_method(flashes):
     return payment_method, payment_term
 
 def check_postage(flashes):
+    """Validate the postage method selected in the purchase form.
+
+    Args:
+        flashes: (list(str)) List of error messages. Mutated if an error is
+            found.
+
+    Returns:
+        (postage_option.PostageOption or None, str or None) the selected postage
+        method and address to post to.
+    """
     if not APP.config['ENABLE_POSTAGE']:
         return None, None
 

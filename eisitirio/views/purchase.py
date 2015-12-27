@@ -280,7 +280,7 @@ def complete_payment():
         ).filter(
             models.Ticket.owner_id == login.current_user.object_id
         ).filter(
-            models.Ticket.paid == False
+            models.Ticket.paid == False # pylint: disable=singleton-comparison
         ).all()
 
         if not tickets:

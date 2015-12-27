@@ -5,11 +5,7 @@ from __future__ import unicode_literals
 
 import datetime
 
-from flask.ext import login
-import flask
-
 from eisitirio import app
-from eisitirio import helpers
 from eisitirio.database import db
 
 APP = app.APP
@@ -93,11 +89,6 @@ class Ticket(DB.Model):
 
         self.set_price(price)
 
-    @property
-    def price_pounds(self):
-        price = '{0:03d}'.format(self.price)
-        return price[:-2] + '.' + price[-2:]
-
     def __repr__(self):
         return '<Ticket {0} owned by {1} ({2})>'.format(
             self.object_id,
@@ -106,7 +97,14 @@ class Ticket(DB.Model):
         )
 
     @property
+    def price_pounds(self):
+        """Get the price of this ticket as a string of pounds and pence."""
+        price = '{0:03d}'.format(self.price)
+        return price[:-2] + '.' + price[-2:]
+
+    @property
     def description(self):
+        """Get a description of the ticket with the type and guest name."""
         return '{0} Ticket ({1})'.format(
             self.ticket_type,
             self.name if self.name else 'No Name Set'
@@ -114,6 +112,7 @@ class Ticket(DB.Model):
 
     @property
     def payment_method(self):
+        """Get the payment method for this ticket."""
         if self.price == 0:
             return "Free"
 
@@ -133,6 +132,7 @@ class Ticket(DB.Model):
             self.mark_as_paid()
 
     def mark_as_paid(self):
+        """Mark the ticket as paid, and clear any expiry."""
         self.paid = True
         self.expires = None
 
@@ -147,6 +147,7 @@ class Ticket(DB.Model):
             self.note = self.note + note
 
     def can_be_cancelled(self):
+        """Check whether a ticket can be (automatically) cancelled."""
         # TODO
         return False
 
@@ -173,7 +174,7 @@ class Ticket(DB.Model):
     def count():
         """How many tickets have been sold."""
         # TODO
-        return Ticket.query.filter(Ticket.cancelled == False).count()
+        return Ticket.query.filter(Ticket.cancelled == False).count() # pylint: disable=singleton-comparison
 
     @staticmethod
     def get_by_id(object_id):

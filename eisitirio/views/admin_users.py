@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 
-from flask.ext.login import current_user, login_user
+from flask.ext import login
 import flask
 
 from eisitirio import app
@@ -12,7 +12,6 @@ from eisitirio.database import models
 from eisitirio.helpers import login_manager
 from eisitirio.helpers import util
 from eisitirio.logic import affiliation_logic
-from eisitirio.logic import purchase_logic
 
 APP = app.APP
 DB = db.DB
@@ -29,6 +28,7 @@ ADMIN_USERS = flask.Blueprint('admin_users', __name__)
 @ADMIN_USERS.route(
     '/admin/user/<int:user_id>/view/page/events/<int:events_page>'
 )
+@login.login_required
 @login_manager.admin_required
 def view_user(user_id, self_actions_page=1, actions_page=1, events_page=1):
     """Display a user's information."""
@@ -81,6 +81,7 @@ def view_user(user_id, self_actions_page=1, actions_page=1, events_page=1):
     )
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/impersonate')
+@login.login_required
 @login_manager.admin_required
 def impersonate_user(user_id):
     """Start impersonating a user.
@@ -93,9 +94,9 @@ def impersonate_user(user_id):
     user = models.User.get_by_id(user_id)
 
     if user:
-        flask.session['actor_id'] = current_user.object_id
+        flask.session['actor_id'] = login.current_user.object_id
 
-        login_user(
+        login.login_user(
             user,
             remember=False
         )
@@ -116,6 +117,7 @@ def impersonate_user(user_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/give', methods=['GET', 'POST'])
+@login.login_required
 @login_manager.admin_required
 def give_user(user_id):
     """Give the user some tickets.
@@ -139,13 +141,13 @@ def give_user(user_id):
                                   flask.url_for('admin.admin_home'))
 
         if (
-            (
-                'give_price_pounds' not in flask.request.form or
-                flask.request.form['give_price_pounds'] == ''
-            ) and (
-                'give_price_pence' not in flask.request.form or
-                flask.request.form['give_price_pence'] == ''
-            )
+                (
+                    'give_price_pounds' not in flask.request.form or
+                    flask.request.form['give_price_pounds'] == ''
+                ) and (
+                    'give_price_pence' not in flask.request.form or
+                    flask.request.form['give_price_pence'] == ''
+                )
         ):
             price = ticket_type.price
         else:
@@ -160,13 +162,13 @@ def give_user(user_id):
                 flask.request.form['give_reason'] == ''
         ):
             note = 'Given by {0} (#{1}) for no reason.'.format(
-                current_user.full_name,
-                current_user.object_id
+                login.current_user.full_name,
+                login.current_user.object_id
             )
         else:
             note = 'Given by {0} (#{1}) with reason: {2}.'.format(
-                current_user.full_name,
-                current_user.object_id,
+                login.current_user.full_name,
+                login.current_user.object_id,
                 flask.request.form['give_reason']
             )
 
@@ -209,6 +211,7 @@ def give_user(user_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/note', methods=['GET', 'POST'])
+@login.login_required
 @login_manager.admin_required
 def note_user(user_id):
     """Set the notes field for a user."""
@@ -244,6 +247,7 @@ def note_user(user_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/verify')
+@login.login_required
 @login_manager.admin_required
 def verify_user(user_id):
     """Manually mark a user as verified.
@@ -280,6 +284,7 @@ def verify_user(user_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/demote')
+@login.login_required
 @login_manager.admin_required
 def demote_user(user_id):
     """Make an admin not an admin."""
@@ -311,6 +316,7 @@ def demote_user(user_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/promote')
+@login.login_required
 @login_manager.admin_required
 def promote_user(user_id):
     """Make a user an administrator."""
@@ -342,6 +348,7 @@ def promote_user(user_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/add_manual_battels')
+@login.login_required
 @login_manager.admin_required
 def add_manual_battels(user_id):
     """Set up a battels account for a user.
@@ -378,6 +385,7 @@ def add_manual_battels(user_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/verify_affiliation')
+@login.login_required
 @login_manager.admin_required
 def verify_affiliation(user_id):
     """Mark a user's affiliation as being verified.
@@ -399,6 +407,7 @@ def verify_affiliation(user_id):
     return flask.redirect(flask.url_for('admin_users.verify_affiliations'))
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/deny_affiliation')
+@login.login_required
 @login_manager.admin_required
 def deny_affiliation(user_id):
     """Mark a user's affiliation as incorrect/invalid."""
@@ -416,6 +425,7 @@ def deny_affiliation(user_id):
     return flask.redirect(flask.url_for('admin_users.verify_affiliations'))
 
 @ADMIN_USERS.route('/admin/verify_affiliations')
+@login.login_required
 @login_manager.admin_required
 def verify_affiliations():
     """Allow an admin to verify many users' affiliations.
@@ -427,6 +437,7 @@ def verify_affiliations():
                                  users=affiliation_logic.get_unverified_users())
 
 @ADMIN_USERS.route('/admin/user/<int:user_id>/collect', methods=['GET', 'POST'])
+@login.login_required
 @login_manager.admin_required
 def collect_tickets(user_id):
     """Display an interface to collect tickets.

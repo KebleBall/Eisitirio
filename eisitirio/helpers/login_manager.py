@@ -31,18 +31,14 @@ LOGIN_MANAGER.session_protection = 'strong'
 def admin_required(func):
     """View decorator to enforce admin privileges for the view.
 
-    Crude duplicate of the login.login_required decorator, checks if
-    the user is an admin, and otherwise flashes an error message and redirects
-    them to the dashboard.
+    Checks if the user is an admin, and otherwise flashes an error message and
+    redirects them to the dashboard. Must be used inside a login_required
+    decorator.
     """
 
     @functools.wraps(func)
     def decorated_view(*args, **kwargs):
-        if flask.current_app.login_manager._login_disabled:  # pylint: disable=protected-access
-            return func(*args, **kwargs)
-        elif not login.current_user.is_authenticated:
-            return flask.current_app.login_manager.unauthorized()
-        elif not login.current_user.is_admin:
+        if not login.current_user.is_admin:
             flask.flash(
                 'You are not permitted to perform that action',
                 'error'

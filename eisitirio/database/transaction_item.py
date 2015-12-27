@@ -8,7 +8,11 @@ from eisitirio.database import db
 DB = db.DB
 
 class TransactionItem(DB.Model):
-    """Model for representing an item in a transaction."""
+    """Model for representing an item in a transaction.
+
+    Contains fields for a description and value, and a reference to a ticket.
+    Only one of the two options should be used.
+    """
     object_id = DB.Column(
         DB.Integer(),
         primary_key=True,
@@ -77,6 +81,7 @@ class TransactionItem(DB.Model):
 
     @property
     def value(self):
+        """Get the value of this item."""
         if self.ticket is not None:
             return self.ticket.price
         else:
@@ -84,6 +89,7 @@ class TransactionItem(DB.Model):
 
     @property
     def description(self):
+        """Get a description of this item."""
         if self.ticket is not None:
             return self.ticket.description
         else:

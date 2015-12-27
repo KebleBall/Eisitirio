@@ -14,6 +14,11 @@ from eisitirio.database import models
 APP = app.APP
 
 def save_photo(upload_file):
+    """Save an uploaded photo to S3.
+
+    Saves the uploaded photo to a temporary folder (as set in the config) with
+    a UUID based filename, generates a thumbnail, and uploads both images to S3.
+    """
     filename = str(uuid.uuid4()) + '.' + upload_file.filename.rsplit('.', 1)[1]
 
     upload_folder = APP.config['TEMP_UPLOAD_FOLDER']

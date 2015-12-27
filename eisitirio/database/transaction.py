@@ -86,16 +86,22 @@ class Transaction(DB.Model):
 
     @property
     def value(self):
+        """Get the total value of the transaction."""
         return sum(item.value for item in self.items)
 
     @property
     def tickets(self):
+        """Get the tickets paid for in this transaction.
+
+        Returns a list of Ticket objects.
+        """
         return list(
             item.ticket for item in self.items if item.item_type == 'Ticket'
         )
 
     @property
     def payment_method(self):
+        """Get the method used for paying for this transaction."""
         if self.battels_term is not None:
             return "Battels"
         elif self.card_transaction is not None:
@@ -104,6 +110,7 @@ class Transaction(DB.Model):
             return "Unknown Payment Method"
 
     def charge_to_battels(self, term):
+        """Charge this transaction to the user's battels account."""
         self.battels_term = term
 
         self.user.battels.charge(self.value, term)
@@ -111,11 +118,20 @@ class Transaction(DB.Model):
         self.mark_as_paid()
 
     def charge_to_card(self):
+        """Charge this transaction to a credit/debit card.
+
+        Only creates the corresponding CardTransaction object, calling code must
+        manipulate it and redirect the user to the payment gateway.
+        """
         self.card_transaction = card_transaction.CardTransaction(self.user)
 
         return self.card_transaction
 
     def mark_as_paid(self):
+        """Mark the transaction as paid for.
+
+        Marks all tickets in the transaction as paid for.
+        """
         self.paid = True
         self.completed = True
 

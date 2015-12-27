@@ -27,6 +27,7 @@ ADMIN = flask.Blueprint('admin', __name__)
 
 @ADMIN.route('/admin', methods=['GET', 'POST'])
 @ADMIN.route('/admin/page/<int:page>', methods=['GET', 'POST'])
+@login.login_required
 @login_manager.admin_required
 def admin_home(page=1):
     """Admin homepage, search for users, tickets or log entries.
@@ -312,6 +313,7 @@ def admin_home(page=1):
     )
 
 @ADMIN.route('/admin/log/<int:entry_id>/view')
+@login.login_required
 @login_manager.admin_required
 def view_log(entry_id):
     """View a log entry."""
@@ -326,6 +328,7 @@ def view_log(entry_id):
 @ADMIN.route(
     '/admin/transaction/<int:transaction_id>/view/page/<int:events_page>'
 )
+@login.login_required
 @login_manager.admin_required
 def view_transaction(transaction_id, events_page=1):
     """View a card transaction object."""
@@ -349,6 +352,7 @@ def view_transaction(transaction_id, events_page=1):
 
 @ADMIN.route('/admin/transaction/<int:transaction_id>/refund',
              methods=['GET', 'POST'])
+@login.login_required
 @login_manager.admin_required
 def refund_transaction(transaction_id):
     """Refund a transaction.
@@ -364,8 +368,8 @@ def refund_transaction(transaction_id):
 
     if transaction:
         amount = util.parse_pounds_pence(flask.request.form,
-                                            'refund_amount_pounds',
-                                            'refund_amount_pence')
+                                         'refund_amount_pounds',
+                                         'refund_amount_pence')
 
         if amount == 0:
             flask.flash(
@@ -416,6 +420,7 @@ def refund_transaction(transaction_id):
                               flask.url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/statistics')
+@login.login_required
 @login_manager.admin_required
 def statistics():
     """Display statistics about the ball.
@@ -435,7 +440,7 @@ def statistics():
     paid_value = DB.session.query(
         sqlalchemy.func.sum(models.Ticket.price)
     ).filter(
-        models.Ticket.paid == True
+        models.Ticket.paid == True # pylint: disable=singleton-comparison
     ).filter(
         models.Ticket.cancelled != True
     ).scalar()
@@ -446,7 +451,7 @@ def statistics():
     cancelled_value = DB.session.query(
         sqlalchemy.func.sum(models.Ticket.price)
     ).filter(
-        models.Ticket.cancelled == True
+        models.Ticket.cancelled == True # pylint: disable=singleton-comparison
     ).scalar()
 
     if cancelled_value is None:
@@ -461,6 +466,7 @@ def statistics():
 
 @ADMIN.route('/admin/announcements', methods=['GET', 'POST'])
 @ADMIN.route('/admin/announcements/page/<int:page>', methods=['GET', 'POST'])
+@login.login_required
 @login_manager.admin_required
 def announcements(page=1):
     """Manage announcements.
@@ -580,6 +586,7 @@ def announcements(page=1):
     )
 
 @ADMIN.route('/admin/announcement/<int:announcement_id>/delete')
+@login.login_required
 @login_manager.admin_required
 def delete_announcement(announcement_id):
     """Delete an announcement.
@@ -607,6 +614,7 @@ def delete_announcement(announcement_id):
                           flask.url_for('admin.announcements'))
 
 @ADMIN.route('/admin/announcement/<int:announcement_id>/cancel')
+@login.login_required
 @login_manager.admin_required
 def cancel_announcement_emails(announcement_id):
     """Cancel sending emails for an announcement.
@@ -636,6 +644,7 @@ def cancel_announcement_emails(announcement_id):
 
 @ADMIN.route('/admin/vouchers', methods=['GET', 'POST'])
 @ADMIN.route('/admin/vouchers/page/<int:page>', methods=['GET', 'POST'])
+@login.login_required
 @login_manager.admin_required
 def vouchers(page=1):
     """Manage vouchers.
@@ -675,12 +684,12 @@ def vouchers(page=1):
             success = False
         elif form['voucher_type'] == 'Fixed Price':
             value = util.parse_pounds_pence(flask.request.form,
-                                               'fixed_price_pounds',
-                                               'fixed_price_pence')
+                                            'fixed_price_pounds',
+                                            'fixed_price_pence')
         elif form['voucher_type'] == 'Fixed Discount':
             value = util.parse_pounds_pence(flask.request.form,
-                                               'fixed_discount_pounds',
-                                               'fixed_discount_pence')
+                                            'fixed_discount_pounds',
+                                            'fixed_discount_pence')
 
             if value == 0:
                 flask.flash(
@@ -768,6 +777,7 @@ def vouchers(page=1):
     )
 
 @ADMIN.route('/admin/voucher/<int:voucher_id>/delete')
+@login.login_required
 @login_manager.admin_required
 def delete_voucher(voucher_id):
     """Delete a discount voucher."""
@@ -790,6 +800,7 @@ def delete_voucher(voucher_id):
                           flask.url_for('admin.vouchers'))
 
 @ADMIN.route('/admin/waiting/<int:entry_id>/delete')
+@login.login_required
 @login_manager.admin_required
 def delete_waiting(entry_id):
     """Delete an entry from the waiting list."""
@@ -812,6 +823,7 @@ def delete_waiting(entry_id):
                           flask.url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/graphs/sales')
+@login.login_required
 @login_manager.admin_required
 def graph_sales():
     """Render a graph showing sales statistics
@@ -822,6 +834,7 @@ def graph_sales():
     return statistic_plots.create_plot('Sales')
 
 @ADMIN.route('/admin/graphs/colleges')
+@login.login_required
 @login_manager.admin_required
 def graph_colleges():
     """Render graph showing statistics on users' colleges.
@@ -831,6 +844,7 @@ def graph_colleges():
     return statistic_plots.create_plot('Colleges')
 
 @ADMIN.route('/admin/graphs/payments')
+@login.login_required
 @login_manager.admin_required
 def graph_payments():
     """Render graph showing payment statistics.
@@ -840,6 +854,7 @@ def graph_payments():
     return statistic_plots.create_plot('Payments')
 
 @ADMIN.route('/admin/data/<group>')
+@login.login_required
 @login_manager.admin_required
 def data(group):
     """Export statistics as CSV.

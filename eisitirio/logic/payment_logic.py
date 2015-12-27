@@ -10,6 +10,20 @@ from eisitirio.database import db
 from eisitirio.database import models
 
 def do_payment(tickets, postage, payment_method, payment_term, address=None):
+    """Run the payment process for tickets and postage.
+
+    Args:
+        tickets: (models.Ticket) The tickets the user is paying for.
+        postage: (eisitirio.helpers.postage_option.PostageOption) The postage
+            option selected by the user.
+        payment_method: (str) The payment method selected by the user.
+        payment_term: (str or None) If the user selected to pay by Battels, the
+            coded term to charge the transaction to.
+        address: (str or None) The address to post the tickets to.
+
+    Returns:
+        A flask redirect, either to the dashboard, or to the payment gateway.
+    """
     transaction = models.Transaction(login.current_user, address)
 
     db.DB.session.add(transaction)

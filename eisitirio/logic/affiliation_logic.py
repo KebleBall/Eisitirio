@@ -125,5 +125,5 @@ def get_unverified_users():
             for college in APP.config['HOST_COLLEGES']
         )
     ).filter(
-        models.User.affiliation_verified == None
+        models.User.affiliation_verified == None # pylint: disable=singleton-comparison
     ).all()

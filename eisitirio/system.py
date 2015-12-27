@@ -124,9 +124,9 @@ def context_processor():
         """Wrapper to transform a query object into a set of results."""
         return query.all()
 
-    def get_ord(datetime):
-        """Get the appropriate ordinal for a number."""
-        daymod = datetime.day % 10
+    def get_ord(date):
+        """Get the appropriate ordinal for a date."""
+        daymod = date.day % 10
         if daymod == 1:
             return 'st'
         elif daymod == 2:
