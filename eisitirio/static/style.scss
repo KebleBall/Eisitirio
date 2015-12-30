@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Abril+Fatface|Open+Sans:400,700,400italic,700italic);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic,700italic);
 
 @import "scss/vendor/normalize";
 
@@ -13,37 +13,28 @@
 
 @import "scss/vendor/simple-slider";
 
-#wrapper {
-    background-color: $cream;
+header, nav, #page-title, #main, footer, #flashes {
+    background-color: #fff;
 }
 
 a {
     font-weight: bold;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Abril Fatface', sans-serif;
-}
-
 #logo {
     padding-bottom: 2em;
     text-align: center;
-    a {
-        color: #fff;
-    }
     h1 {
-        font-size: 4rem;
+        font-size: 3rem;
         margin: 2rem 0 0;
-        color: #000;
     }
     h2 {
-        font-size: 3rem;
+        font-size: 5rem;
         margin: 0;
     }
     h3 {
         font-size: 2rem;
         margin: 0 0 2rem;
-        color: #000;
     }
 }
 
@@ -60,8 +51,8 @@ h1, h2, h3, h4, h5, h6 {
     border: 3px solid;
     padding: 0.5em;
     margin-bottom: 0.5em;
-    background-color: $white;
-    color: $black;
+    background-color: #fff;
+    color: #000;
     &.error {
         background-color: #f3afbf;
         border: 3px solid #f31323;
@@ -121,10 +112,6 @@ table .button {
     margin: 0;
     position: relative;
     top: -0.25rem;
-}
-
-td, td label {
-    color: #000 !important;
 }
 
 #register_photo {

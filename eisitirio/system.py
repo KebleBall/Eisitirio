@@ -74,6 +74,20 @@ def maintenance():
     """Display the Server Maintenance page."""
     return flask.render_template('maintenance.html'), 503
 
+@APP.route('/static/<path:filename>')
+def static(filename):
+    """Custom static file handler to support custom styles and static assets."""
+    custom_static = os.path.join(APP.root_path, 'custom_static')
+
+    cache_timeout = APP.get_send_file_max_age(filename)
+
+    if os.path.exists(os.path.join(custom_static, filename)):
+        return flask.send_from_directory(custom_static, filename,
+                                         cache_timeout=cache_timeout)
+    else:
+        return flask.send_from_directory(os.path.join(APP.root_path, 'static'),
+                                         filename, cache_timeout=cache_timeout)
+
 @APP.errorhandler(exceptions.NotFound)
 @APP.errorhandler(404)
 def error_404(_):

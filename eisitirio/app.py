@@ -5,6 +5,6 @@ from __future__ import unicode_literals
 
 import flask
 
-APP = flask.Flask('eisitirio')
+APP = flask.Flask('eisitirio', static_folder=None)
 
 APP.config.setdefault('SQLALCHEMY_TRACK_MODIFICATIONS', False)
