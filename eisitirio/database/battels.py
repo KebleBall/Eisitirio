@@ -76,11 +76,13 @@ class Battels(DB.Model):
 
     @property
     def michaelmas_charge_pounds(self):
+        """Get the amount charged in Michaelmas as a pounds/pence string."""
         michaelmas_charge = '{0:03d}'.format(self.michaelmas_charge)
         return michaelmas_charge[:-2] + '.' + michaelmas_charge[-2:]
 
     @property
     def hilary_charge_pounds(self):
+        """Get the amount charged in Hilary as a pounds/pence string."""
         hilary_charge = '{0:03d}'.format(self.hilary_charge)
         return hilary_charge[:-2] + '.' + hilary_charge[-2:]
 

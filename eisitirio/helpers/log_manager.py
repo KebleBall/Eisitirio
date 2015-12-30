@@ -42,30 +42,31 @@ class LogManager(object):
         self.purchase = logging.getLogger('purchase')
 
     def init_app(self, app):
+        """Add this instance to the app."""
         app.logger = self
 
     def log(self, module, level, message):
+        """Log a message for a given module."""
         getattr(getattr(self, module), level)(message)
 
     def __getattr__(self, name):
         components = name.split('_')
 
-        if len(components) == 2:
-            if components[1] in [
-                    'admin',
-                    'ajax',
-                    'dashboard',
-                    'database',
-                    'email',
-                    'front',
-                    'main',
-                    'purchase',
-            ]:
-                return lambda level, message: self.log(
-                    components[1],
-                    level,
-                    message
-                )
+        if len(components) == 2 and components[1] in [
+                'admin',
+                'ajax',
+                'dashboard',
+                'database',
+                'email',
+                'front',
+                'main',
+                'purchase',
+        ]:
+            return lambda level, message: self.log(
+                components[1],
+                level,
+                message
+            )
 
         raise AttributeError(
             'LogManager instance has no attribute "{0}"'.format(name)

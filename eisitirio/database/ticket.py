@@ -44,7 +44,7 @@ class Ticket(DB.Model):
         nullable=False
     )
 
-    price = DB.Column(
+    _price = DB.Column(
         DB.Integer(),
         nullable=False
     )
@@ -84,10 +84,10 @@ class Ticket(DB.Model):
     def __init__(self, owner, ticket_type, price):
         self.owner = owner
         self.ticket_type = ticket_type
+        self.price = price
+
         self.expires = (datetime.datetime.utcnow() +
                         APP.config['TICKET_EXPIRY_TIME'])
-
-        self.set_price(price)
 
     def __repr__(self):
         return '<Ticket {0} owned by {1} ({2})>'.format(
@@ -99,7 +99,7 @@ class Ticket(DB.Model):
     @property
     def price_pounds(self):
         """Get the price of this ticket as a string of pounds and pence."""
-        price = '{0:03d}'.format(self.price)
+        price = '{0:03d}'.format(self._price)
         return price[:-2] + '.' + price[-2:]
 
     @property
@@ -113,7 +113,7 @@ class Ticket(DB.Model):
     @property
     def payment_method(self):
         """Get the payment method for this ticket."""
-        if self.price == 0:
+        if self._price == 0:
             return "Free"
 
         for transaction_item in self.transaction_items:
@@ -122,13 +122,16 @@ class Ticket(DB.Model):
 
         return "Unknown Payment Method"
 
-    def set_price(self, price):
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, value):
         """Set the price of the ticket."""
-        price = max(price, 0)
+        self._price = max(value, 0)
 
-        self.price = price
-
-        if price == 0:
+        if self._price == 0:
             self.mark_as_paid()
 
     def mark_as_paid(self):

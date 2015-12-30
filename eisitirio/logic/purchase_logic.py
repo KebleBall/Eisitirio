@@ -34,6 +34,7 @@ class TicketInfo(_TicketInfo):
     """
 
     def to_json(self):
+        """Return a JSON object with useful information for JS scripts."""
         return json.dumps({
             "guest_tickets_available": self.guest_tickets_available,
             "total_tickets_available": self.total_tickets_available,

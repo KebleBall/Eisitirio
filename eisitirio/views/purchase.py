@@ -272,6 +272,10 @@ def eway_cancel(object_id):
 
 @PURCHASE.route('/purchase/complete-payment', methods=['GET', 'POST'])
 def complete_payment():
+    """Allow the user to complete payment for tickets.
+
+    Used if card payment fails, or for manually allocated tickets.
+    """
     if flask.request.method == 'POST':
         flashes = []
 

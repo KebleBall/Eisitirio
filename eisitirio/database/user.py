@@ -19,6 +19,14 @@ BCRYPT = bcrypt.Bcrypt(APP)
 
 class User(DB.Model):
     """Model for users."""
+
+    # Class level properties for Flask-Login
+    #
+    # Sessions don't expire, and no users are anonymous, so these can be hard
+    # coded
+    is_authenticated = True
+    is_anonymous = False
+
     object_id = DB.Column(
         DB.Integer,
         primary_key=True,
@@ -331,28 +339,6 @@ class User(DB.Model):
         and refers to whether the user can log in.
         """
         return self.is_verified and not self.is_deleted
-
-    @property
-    def is_authenticated(self):  # pylint: disable=no-self-use
-        """Is the user authenticated?
-
-        This method is specifically for the use of the Flask-Login extension,
-        and refers to whether the user is logged in. Because our login state has
-        no concept of session expiry, so long as we have a user object in the
-        session, that user is logged in, therefore we always return True.
-        """
-        return True
-
-    @property
-    def is_anonymous(self):  # pylint: disable=no-self-use
-        """Is the user anonymous?
-
-        This method is specifically for the use of the Flask-Login extension,
-        and refers to whether the user is identified. Because this system has no
-        use for anonymous users, we require that every user object be
-        non-anonymous, and so we always return False.
-        """
-        return False
 
     def get_id(self):
         """What is this user's ID?

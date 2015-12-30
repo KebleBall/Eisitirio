@@ -260,5 +260,6 @@ class EmailManager(object):
             )
 
     def shutdown(self):
+        """Close connection to the SMTP server when the program terminates."""
         if self.smtp_open():
             self.smtp.quit()

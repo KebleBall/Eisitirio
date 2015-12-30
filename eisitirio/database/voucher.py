@@ -169,11 +169,11 @@ class Voucher(DB.Model):
             (ticket) the mutated ticket
         """
         if self.discount_type == 'Fixed Price':
-            ticket.set_price(self.discount_value)
+            ticket.price = self.discount_value
         elif self.discount_type == 'Fixed Discount':
-            ticket.set_price(ticket.price - self.discount_value)
+            ticket.price = ticket.price - self.discount_value
         else:
-            ticket.set_price(ticket.price * (100 - self.discount_value) / 100)
+            ticket.price = ticket.price * (100 - self.discount_value) / 100
 
         ticket.add_note(
             'Used voucher {0}/{1}'.format(self.object_id, self.code)
