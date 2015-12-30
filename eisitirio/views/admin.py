@@ -149,7 +149,7 @@ def admin_home(page=1):
                 flask.request.form['ticket_min_price'] != ''
         ):
             ticket_query = ticket_query.filter(
-                models.Ticket._price >= flask.request.form['ticket_min_price']
+                models.Ticket.price_ >= flask.request.form['ticket_min_price']
             )
             has_ticket_filter = True
 
@@ -158,7 +158,7 @@ def admin_home(page=1):
                 flask.request.form['ticket_max_price'] != ''
         ):
             ticket_query = ticket_query.filter(
-                models.Ticket._price <= flask.request.form['ticket_max_price']
+                models.Ticket.price_ <= flask.request.form['ticket_max_price']
             )
             has_ticket_filter = True
 
@@ -429,7 +429,7 @@ def statistics():
     alongside graphs.
     """
     total_value = DB.session.query(
-        sqlalchemy.func.sum(models.Ticket._price)
+        sqlalchemy.func.sum(models.Ticket.price_)
     ).filter(
         models.Ticket.cancelled != True
     ).scalar()
@@ -438,7 +438,7 @@ def statistics():
         total_value = 0
 
     paid_value = DB.session.query(
-        sqlalchemy.func.sum(models.Ticket._price)
+        sqlalchemy.func.sum(models.Ticket.price_)
     ).filter(
         models.Ticket.paid == True # pylint: disable=singleton-comparison
     ).filter(
@@ -449,7 +449,7 @@ def statistics():
         paid_value = 0
 
     cancelled_value = DB.session.query(
-        sqlalchemy.func.sum(models.Ticket._price)
+        sqlalchemy.func.sum(models.Ticket.price_)
     ).filter(
         models.Ticket.cancelled == True # pylint: disable=singleton-comparison
     ).scalar()

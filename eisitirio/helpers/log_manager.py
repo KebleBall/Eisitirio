@@ -72,7 +72,8 @@ class LogManager(object):
             'LogManager instance has no attribute "{0}"'.format(name)
         )
 
-    def log_event(self, message, tickets=None, user=None, transaction=None):  # pylint: disable=no-self-use
+    @staticmethod
+    def log_event(message, tickets=None, user=None, transaction=None):
         """Log a user action to the database.
 
         Creates a log entry in the database which can be found through the admin
