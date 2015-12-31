@@ -1,0 +1,19 @@
+Dear {{ name }},
+
+{{ resale_to.full_name }} ({{ resale_to.email }}) has accepted your offer to resell {{ num_tickets }} ticket{% if num_tickets != 1 %}s{% endif %} for {{ template_config['BALL_NAME'] }} to them. You must now arrange payment for the tickets with them.
+
+Once you are satisifed that you have received appropriate recompense for the tickets, please visit the link below. The will complete the process, and the tickets will be transferred into the account of {{ resale_to.forenames }}.
+
+{{ completeurl }}
+
+If you no longer wish to resell these tickets, please visit this link to cancel the process.
+
+{{ cancelurl }}
+
+In both cases, {{ resale_to.forenames }} will be notified of your actions.
+
+Please Note: {{ template_config['BALL_NAME'] }} provide only the facility for reselling tickets, and it is the sellers and purchasers joint responsibility to arrange the exchange of any recompense for the tickets, monetary or otherwise. {{ template_config['BALL_NAME'] }} accepts no liability for any disputes resulting from the use of this facility.
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

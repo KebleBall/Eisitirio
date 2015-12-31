@@ -1,0 +1,13 @@
+Hello,
+
+This email address has been entered when trying to change the email address on an account for the {{ template_config['BALL_NAME'] }} Ticketing System at {{ template_config['EISITIRIO_URL'] }}.
+
+If this was you, please confirm your email address by visiting the following address:
+
+{{ confirmurl }}
+
+If this was not you, you do not need to do anything.
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

@@ -1,0 +1,25 @@
+{% if template_config['ENABLE_POSTAGE'] %}
+<li>
+    <h5>Postage</h5>
+
+    {% if current_user.college.name == 'Keble' and current_user.affiliation.name == 'Graduand' %}
+        <p>There is no need for you to select a postage option as your ticket(s) will be included in your Graduand pack</p>
+        <input type="hidden" name="postage" value="graduand" />
+    {% else %}
+        <p class="small"><strong>Please note</strong>: This year, there will only be three collection times preceding the Ball, at 5-7pm on 4th-6th May 2016. If you are unable to attend these collection times, please select a postage option as you will be unable to enter the Ball without your ticket.</p>
+        <div class="row">
+            <div class="columns">
+                {% for postage_option in template_config['POSTAGE_OPTIONS'].itervalues() %}
+                    <label for="postage_{{ postage_option.slug }}">
+                        <input type="radio" name="postage" value="{{ postage_option.slug }}" id="postage_{{ postage_option.slug }}" class="postage_option" required="required" {% if form and form['postage'] and form['postage'] == postage_option.slug %}checked="checked" {% endif %}/>
+                        {{ postage_option.name }} (&pound;{{ postage_option.price_pounds }}) - {{ postage_option.description }}
+                    </label>
+                {% endfor %}
+            </div>
+            <div id="postage_address" class="columns"{% if not form or not template_config['POSTAGE_OPTIONS'][form['postage']].needs_address %} style="display: none"{% endif %}>
+                <p>Send to <textarea placeholder="Address" name="address">{% if form and form['address'] and form['address'] %}{{ form['address'] }}{% endif %}</textarea></p>
+            </div>
+        </div>
+    {% endif %}
+</li>
+{% endif %}

@@ -1,0 +1,131 @@
+<!-- dashboard/dashboard_home.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <section id="dashboard" class="columns">
+        <h3>Your Tickets <a href="{{ url_for('purchase.purchase_home') }}" class="button">Buy Tickets</a></h3>
+        {% if current_user.tickets.count() > 0 %}
+            <table id="tickets_table">
+                <thead>
+                    <tr>
+                        <th>Ticket Number</th>
+                        <th>Name on Ticket</th>
+                        <th>Ticket Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in current_user.tickets %}
+                        <tr id="ticket-{{ ticket.object_id }}">
+                            <td>#{{ '%05d' % ticket.object_id }}</td>
+                            <td>
+                                {% if ticket.can_change_name() %}
+                                    <span id="ticket_name_display-{{ ticket.object_id }}"><span id="ticket_name-{{ ticket.object_id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="change_ticket_name({{ ticket.object_id }}, false)">Change</a>)</span>
+                                    <span id="ticket_name_form-{{ ticket.object_id }}" style="display: none;"><input name="ticket_name_input-{{ ticket.object_id }}" id="ticket_name_input-{{ ticket.object_id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="change_ticket_name({{ ticket.object_id }}, true)">Submit</button></span>
+                                {% else %}
+                                    {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ticket.cancelled -%}
+                                    Cancelled.
+                                {% elif ticket.collected -%}
+                                    Collected as {{ ticket.barcode }}.
+                                {% elif ticket.name == None -%}
+                                    Awaiting name.
+                                {% elif ticket.paid -%}
+                                    Paid
+                                {% else -%}
+                                    Awaiting payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not ticket.cancelled %}
+                                    {% if not ticket.paid %}
+                                        <a href="{{ url_for('purchase.complete_payment') }}" class="button tiny">Complete Payment</a>
+                                    {% endif %}
+                                    {% if ticket.can_be_cancelled() %}
+                                        <a href="{{ url_for('purchase.cancel') }}" class="button tiny">Cancel</a>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You have no tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchase_home') }}">buy some</a>?</p>
+        {% endif %}
+
+        {% if current_user.is_waiting %}
+            <h3>Waiting List</h3>
+            <p>You are currently waiting for {{ current_user.waiting_for() }} tickets.</p>
+        {% endif %}
+
+        <h3>Announcements</h3>
+            {% if current_user.announcements|count > 0 %}
+                <ul id="announcements">
+                {% for announcement in current_user.announcements %}
+                    <li>
+                        <article class="announcement">
+                            <h5>{{ announcement.subject }}</h5>
+                            {{ announcement.content | truncate(250) | markdown }}
+                            <a href="{{ url_for('dashboard.display_announcement', announcement_id=announcement.object_id) }}" class="read-more">Read More</a>
+                        </article>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>The {{ template_config['BALL_NAME'] }} committee has not posted any announcements yet. Watch this space and check your email for important information about the Ball</p>
+            {% endif %}
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        var name_change_url = '{{ url_for('ajax.change_ticket_name', ticket_id=123456789, _external=True) }}';
+
+        function change_ticket_name(id, form_submit) {
+            if (form_submit) {
+                var name_input = $('#ticket_name_input-'+id);
+                var ticket_name = $('#ticket_name-'+id);
+                jQuery.ajax(
+                    name_change_url.replace('123456789',id),
+                    {
+                        'data': {
+                            'name': name_input.val()
+                        },
+                        'type': 'POST',
+                        'dataType': 'json',
+                        'success': function(data, code, xhr) {
+                            if (data) {
+                                ticket_name.html(name_input.val())
+                                name_input.attr('value',name_input.val())
+                                $('#complete_ticket_payment-'+id).css('display', '');
+                                $('#ticket_payment_message-'+id).css('display', '');
+                                $('#ticket_name_message-'+id).css('display', 'none');
+                            } else {
+                                if (ticket_name.html() == 'Not Set') {
+                                    name_input.attr('value','')
+                                    name_input.val('')
+                                } else {
+                                    name_input.attr('value',ticket_name.html())
+                                    name_input.val(ticket_name.html())
+                                }
+                            }
+                        }
+                    }
+                );
+
+                $('#ticket_name_form-'+id).hide();
+                $('#ticket_name_display-'+id).show();
+            } else {
+                $('#ticket_name_display-'+id).hide();
+                $('#ticket_name_form-'+id).show();
+                $('#ticket_name_input-'+id).focus();
+            }
+        }
+    </script>
+{% endblock %}

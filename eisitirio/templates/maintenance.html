@@ -1,0 +1,52 @@
+<!-- maintenance.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>System Down For Maintenance - {{ template_config['TITLE'] }}</title>
+        <meta name="description" content="{{ template_config['TITLE'] }} - Buy Tickets">
+        <meta name="author" content="Samuel Littley">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+        {% if template_config['ENABLE_ANALYTICS'] %}
+            <script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+              ga('create', '{{ template_config['ANALYTICS_ID'] }}', '{{ template_config['ANALYTICS_DOMAIN'] }}');
+              ga('send', 'pageview');
+
+            </script>
+        {% endif %}
+    </head>
+    <body>
+        <div id="wrapper" class="row">
+            <div class="columns">
+                <header class="row">
+                    <section id="logo" class="large-12 columns">
+                        <h1>{{ template_config['TITLE'] }}</h1>
+                        <h2>{{ template_config['THEME'] }}</h2>
+                        <h3>{{ template_config['START_TIME'].strftime(template_config['DATE_FORMAT']) }}</h3>
+                    </section>
+                </header>
+                <section id="page-title" class="row">
+                    <div class="large-12 columns">
+                        <h2>System Down For Maintenance</h2>
+                    </div>
+                </section>
+                <section id="main" class="row">
+                    <section id="maintenance" class="columns">
+                        <p>We apologise, the {{ template_config['BALL_NAME'] }} Ticketing System is temporarily down for maintenance. Please check back later.</p>
+                    </section>
+                </section>
+                <footer class="row">
+                    <section id="copyright" class="large-8 large-centered columns">
+                        <p>&copy; {{ current_year }} {{ template_config['BALL_NAME'] }}. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
+                    </section>
+                </footer>
+            </div>
+        </div>
+    </body>
+</html>

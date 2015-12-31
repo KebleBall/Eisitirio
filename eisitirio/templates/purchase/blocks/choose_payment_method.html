@@ -1,0 +1,36 @@
+<li>
+    <h5>Choose Payment Method</h5>
+    <div class="row">
+        <div class="columns">
+            {% if current_user.can_pay_by_battels() %}
+                {% if template_config['CURRENT_TERM'] == 'MT' %}
+                    {% if 'Battels-MT' in template_config['PAYMENT_METHODS'] %}
+                        <label for="payment_method-Battels-MT">
+                            <input type="radio" name="payment_method" value="Battels-MT" id="payment_method-Battels-MT" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Battels-MT' %}checked="checked" {% endif %}/>
+                            Battels - Pay all in Michaelmas term
+                        </label>
+                    {% endif %}
+                    {% if 'Battels-MTHT' in template_config['PAYMENT_METHODS'] %}
+                        <label for="payment_method-Battels-MTHT">
+                            <input type="radio" name="payment_method" value="Battels-MTHT" id="payment_method-Battels-MTHT" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Battels-MTHT' %}checked="checked" {% endif %}/>
+                            Battels - Pay half each in Michaelmas and Hilary terms.
+                        </label>
+                    {% endif %}
+                {% else %}
+                    {% if 'Battels-HT' in template_config['PAYMENT_METHODS'] %}
+                        <label for="payment_method-Battels-HT">
+                            <input type="radio" name="payment_method" value="Battels-HT" id="payment_method-Battels-HT" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Battels-HT' %}checked="checked" {% endif %}/>
+                            Battels - Pay all in Hilary term
+                        </label>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+            {% if 'Card' in template_config['PAYMENT_METHODS'] %}
+                <label for="payment_method-Card">
+                    <input type="radio" name="payment_method" value="Card" id="payment_method-Card" required="required" {% if form and form['payment_method'] and form['payment_method'] == 'Card' %}checked="checked" {% endif %}/>
+                    Credit/Debit Card
+                </label>
+            {% endif %}
+        </div>
+    </div>
+</li>
