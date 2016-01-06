@@ -1,0 +1,202 @@
+<!-- admin/announcements.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Manage Announcements{% endblock %}
+
+{% block content %}
+    <section id="announcements" class="columns">
+        <h4>Send Announcement</h4>
+        <form action="{{ url_for('admin.announcements') }}" method="post">
+            <fieldset>
+                <div class="row">
+                    <div class="columns">
+                        <label for="subject">Subject:</label>
+                        <input type="text" name="subject" id="subject" {{ form_value(form, 'subject') }}/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="columns">
+                        <label for="message">Message:</label>
+                        <textarea name="message" id="message">{{ form['message'] }}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-4 columns">
+                        <label for="college">College:</label>
+                        <select name="college" id="college">
+                            <option value="any" {{ form_selected(form, 'college', 'any') }}>Any</option>
+                            {% for college in colleges %}
+                                <option value="{{ college.object_id }}" {{ form_selected(form, 'college', college.object_id) }}>{{ college.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="affiliation">Affiliation:</label>
+                        <select name="affiliation" id="affiliation">
+                            <option value="any" {{ form_selected(form, 'affiliation', 'any') }}>Any</option>
+                            {% for affiliation in affiliations %}
+                                <option value="{{ affiliation.object_id }}" {{ form_selected(form, 'affiliation', affiliation.object_id) }}>{{ affiliation.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="tickets">Tickets:</label>
+                        <select name="tickets" id="tickets">
+                            <option value="any" {{ form_selected(form, 'tickets', 'any') }}>Any</option>
+                            <option value="yes" {{ form_selected(form, 'tickets', 'yes') }}>Has Tickets</option>
+                            <option value="no" {{ form_selected(form, 'tickets', 'no') }}>Has No Tickets</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-4 columns">
+                        <label for="waiting">Waiting:</label>
+                        <select name="waiting" id="waiting">
+                            <option value="any" {{ form_selected(form, 'waiting', 'any') }}>Any</option>
+                            <option value="yes" {{ form_selected(form, 'waiting', 'yes') }}>Is Waiting</option>
+                            <option value="no" {{ form_selected(form, 'waiting', 'no') }}>Is Not Waiting</option>
+                        </select>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="collected">Collected:</label>
+                        <select name="collected" id="collected">
+                            <option value="any" {{ form_selected(form, 'collected', 'any') }}>Any</option>
+                            <option value="yes" {{ form_selected(form, 'collected', 'yes') }}>Has Collected Tickets</option>
+                            <option value="no" {{ form_selected(form, 'collected', 'no') }}>Has No Collected Tickets</option>
+                        </select>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="uncollected">Uncollected:</label>
+                        <select name="uncollected" id="uncollected">
+                            <option value="any" {{ form_selected(form, 'uncollected', 'any') }}>Any</option>
+                            <option value="yes" {{ form_selected(form, 'uncollected', 'yes') }}>Has Uncollected Tickets</option>
+                            <option value="no" {{ form_selected(form, 'uncollected', 'no') }}>Has No Uncollected Tickets</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-6 columns">
+                        <label for="send_emails"><input type="checkbox" id="send_emails" name="send_emails" value="yes" {{ form_checked(form, 'send_emails', 'yes') }}/> Send Emails</label>
+                    </div>
+                    <div class="large-6 columns">
+                        <input type="submit" class="button small right">
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <h4>Announcements</h4>
+        <a id="announcements"></a>
+        <p>
+            {% if announcements.has_prev %}
+                <a href="{{ url_for('admin.announcements', page=announcements.prev_num) }}#announcements" class="button small left" />Previous Page</a>
+            {% endif %}
+            {% if announcements.has_next %}
+                <a href="{{ url_for('admin.announcements', page=announcements.next_num) }}#announcements" class="button small right" />Next Page</a>
+            {% endif %}
+        </p>
+        {% if announcements.items %}
+            <table id="announcements_table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Email Status</th>
+                        <th>College</th>
+                        <th>Affiliation</th>
+                        <th>Tickets</th>
+                        <th>Waiting</th>
+                        <th>Collected</th>
+                        <th>Uncollected</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for announcement in announcements.items %}
+                        <tr>
+                            <td>{{ announcement.timestamp.strftime('%c') }}</td>
+                            <td>{{ announcement.subject }}</td>
+                            <td>
+                                {% if announcement.send_email %}
+                                    {% if not announcement.email_sent %}
+                                        {{ announcement.emails.count() }} emails remaining
+                                    {% else %}
+                                        All emails sent
+                                    {% endif %}
+                                {% else %}
+                                    Not sent by email
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if announcement.college != None %}
+                                    {{ announcement.college.name }}
+                                {% else %}
+                                    Any
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if announcement.affiliation != None %}
+                                    {{ announcement.affiliation.name }}
+                                {% else %}
+                                    Any
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if announcement.has_tickets != None %}
+                                    {% if announcement.has_tickets %}
+                                        Has Tickets
+                                    {% else %}
+                                        Has No Tickets
+                                    {% endif %}
+                                {% else %}
+                                    Any
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if announcement.is_waiting != None %}
+                                    {% if announcement.is_waiting %}
+                                        Is Waiting
+                                    {% else %}
+                                        Is Not Waiting
+                                    {% endif %}
+                                {% else %}
+                                    Any
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if announcement.has_collected != None %}
+                                    {% if announcement.has_collected %}
+                                        Has Collected Tickets
+                                    {% else %}
+                                        Has No Collected Tickets
+                                    {% endif %}
+                                {% else %}
+                                    Any
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if announcement.has_uncollected != None %}
+                                    {% if announcement.has_uncollected %}
+                                        Has Uncollected Tickets
+                                    {% else %}
+                                        Has No Uncollected Tickets
+                                    {% endif %}
+                                {% else %}
+                                    Any
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('dashboard.display_announcement', announcement_id=announcement.object_id) }}" class="button tiny">View</a>
+                                <a href="{{ url_for('admin.delete_announcement', announcement_id=announcement.object_id) }}" class="button tiny">Delete</a>
+                                {% if announcement.send_email and not announcement.email_sent %}
+                                    <a href="{{ url_for('admin.cancel_announcement_emails', announcement_id=announcement.object_id) }}" class="button tiny">Cancel Emails</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            No Announcements
+        {% endif %}
+    </section>
+{% endblock %}

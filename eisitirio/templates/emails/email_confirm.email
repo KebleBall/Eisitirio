@@ -1,0 +1,15 @@
+Dear {{ name }},
+
+This email address has been entered when registering an account for the {{ template_config['BALL_NAME'] }} Ticketing System at {{ template_config['EISITIRIO_URL'] }}.
+
+If this was you, please confirm your email address by visiting the following address:
+
+{{ confirmurl }}
+
+If this was not you, you can delete the account in question by visiting the following address:
+
+{{ destroyurl }}
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

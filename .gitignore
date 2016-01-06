@@ -11,3 +11,6 @@ share
 pip-selfcheck.json
 review.json
 .idea/*
+eisitirio/config
+eisitirio/logic/custom_logic
+eisitirio/custom_static

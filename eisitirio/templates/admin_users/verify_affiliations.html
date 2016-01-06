@@ -1,0 +1,32 @@
+<!-- admin_users/verify_affiliations.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Verify Affiliations{% endblock %}
+
+{% block content %}
+    <section id="verify_affiliations" class="columns">
+        <p>The following users have registered giving their college as {{ template_config['COLLEGE'] }}, and must be verified to allow them access to the limited release.</p>
+        <table id="affiliations_table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Affiliation</th>
+                    <th>Verify</th>
+                    <th>Deny</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr id="user-{{ user.object_id }}">
+                        <td><a href="{{ url_for('admin_users.view_user', user_id=user.object_id) }}">{{ user.full_name }}</a></td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.affiliation.name }}</td>
+                        <td><a href="{{ url_for('admin_users.verify_affiliation', user_id=user.object_id) }}" class="button tiny">Verify Affiliation</a></td>
+                        <td><a href="{{ url_for('admin_users.deny_affiliation', user_id=user.object_id) }}" class="button tiny">Deny Affiliation</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endblock %}

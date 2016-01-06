@@ -1,12 +1,13 @@
 #! /usr/bin/env python2
 # coding: utf-8
-"""Executable to run the Keble Ball Ticketing System with profiling."""
+"""Executable to run Eisitirio with profiling."""
 
 from __future__ import unicode_literals
 
 from werkzeug.contrib import profiler
 
-from kebleball import app
+from eisitirio import app
+from eisitirio import system # pylint: disable=unused-import
 
 APP = app.APP
 

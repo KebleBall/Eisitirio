@@ -1,10 +1,11 @@
 #! /usr/bin/env python2
 # coding: utf-8
-"""Executable to run the Keble Ball Ticketing System in staging mode."""
+"""Executable to run Eisitirio in staging mode."""
 
 from __future__ import unicode_literals
 
-from kebleball import app
+from eisitirio import app
+from eisitirio import system # pylint: disable=unused-import
 
 if __name__ == '__main__':
     app.APP.config.from_pyfile('config/staging.py')

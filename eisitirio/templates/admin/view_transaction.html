@@ -1,0 +1,114 @@
+<!-- admin/view_transaction.html -->
+{% extends 'layout.html' %}
+
+{% block title %}{% if not transaction %}No Transaction Found{% else %}View Transaction - #{{ '%05d' % transaction.object_id }}{% endif %}{% endblock %}
+
+{% block content %}
+    <section id="view_transaction" class="columns">
+        {% if not transaction %}
+            <p>No transaction was found with that ID.</p>
+        {% else %}
+            <h4>Transaction Details</h4>
+            <p><strong>User</strong>: <a href="{{ url_for('admin_users.view_user', user_id=transaction.user.object_id) }}">{{ transaction.user.full_name }}</a></p>
+            <p><strong>Total Value</strong>: &pound;{{ '%.2f' % (transaction.value / 100.0) }}</p>
+            <p><strong>Commenced</strong>: {{ transaction.commenced.strftime('%c') }}</p>
+            {% if transaction.completed != null %}
+                <p><strong>Completed</strong>: {{ transaction.completed.strftime('%c') }}</p>
+                <p><strong>Result Code</strong>: {{ transaction.result_code }}</p>
+                <p><strong>Message</strong>: {{ transaction.get_status()[1] }}</p>
+                <p><strong>eWay ID</strong>: {{ transaction.eway_id }}</p>
+            {% endif %}
+            <p><strong>Amount Refunded</strong>: &pound;{{ '%.2f' % (transaction.refunded / 100.0) }}</p>
+            <h4>Transaction Status</h4>
+            <ul>
+                <li>Transaction {% if transaction.completed != null %}was{% else %}is{% endif %} <strong>{{ transaction.get_success()|lower }}</strong>.</li>
+                <li>Transaction <strong>is{% if not transaction.refunded > 0 %} not{% endif %}</strong> partially refunded.</li>
+                <li>Transaction <strong>is{% if not transaction.refunded >= transaction.value %} not{% endif %}</strong> fully refunded.</li>
+                <li>Transaction <strong>was{% if not transaction.result_code == 'CX' %} not{% endif %}</strong> cancelled.</li>
+            </ul>
+            <h4>Actions</h4>
+            <ul>
+                {% if transaction.get_status()[0] %}
+                    <li><form action="{{ url_for('admin.refund_transaction', transaction_id=transaction.object_id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refund_amount_pounds" min="0" step="1" />.<input type="number" name="refund_amount_pence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
+                {% endif %}
+            </ul>
+            <h4>Transaction's Tickets</h4>
+            {% if transaction.tickets.count() > 0 %}
+                <table id="tickets_table">
+                    <thead>
+                        <tr>
+                            <th>Ticket Number</th>
+                            <th>Name on Ticket</th>
+                            <th>Ticket Status</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in transaction.tickets %}
+                            <tr id="ticket-{{ ticket.object_id }}">
+                                <td>#{{ '%05d' % ticket.object_id }}</td>
+                                <td>
+                                    {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
+                                </td>
+                                <td>
+                                    {% if ticket.cancelled -%}
+                                        Cancelled.
+                                    {% elif ticket.collected -%}
+                                        Collected as {{ ticket.barcode }}.
+                                    {% elif ticket.paid -%}
+                                        {% if ticket.payment_method == 'Free' -%}
+                                            Free Ticket.
+                                        {% else -%}
+                                            Paid for by {{ ticket.payment_method }}.
+                                        {% endif %}
+                                    {% else -%}
+                                        Awaiting payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id) }}" class="button tiny">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No tickets.</p>
+            {% endif %}
+            <a id="events"></a>
+            <h4>Events</h4>
+            {% if events.items %}
+                <table id="events_table">
+                    <thead>
+                        <tr>
+                            <th>Log ID</th>
+                            <th>Timestamp</th>
+                            <th>Actor</th>
+                            <th>Message</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in events.items %}
+                            <tr>
+                                <td>{{ '%05d' % log.object_id }}</td>
+                                <td>{{ log.timestamp.strftime('%c') }}</td>
+                                <td><a href="{{ url_for('admin_users.view_user', user_id=log.actor.object_id) }}">{{ log.actor.full_name }}</a></td>
+                                <td>{{ log.action }}</td>
+                                <td><a href="{{ url_for('admin.view_log', entry_id=log.object_id) }}" class="button tiny">View</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if events.has_prev %}
+                    <a href="{{ url_for('admin.view_transaction', transaction_id=transaction.object_id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
+                {% endif %}
+                {% if events.has_next %}
+                    <a href="{{ url_for('admin.view_transaction', transaction_id=transaction.object_id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
+                {% endif %}
+            {% else %}
+                <p>No events recorded.</p>
+            {% endif %}
+        {% endif %}
+    </section>
+{% endblock %}

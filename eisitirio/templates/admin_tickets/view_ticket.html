@@ -1,0 +1,81 @@
+<!-- admin_tickets/view_ticket.html -->
+{% extends 'layout.html' %}
+
+{% block title %}{% if not ticket %}No Ticket Found{% else %}View Ticket - #{{ '%05d' % ticket.object_id }}{% endif %}{% endblock %}
+
+{% block content %}
+    <section id="view_ticket" class="columns">
+        {% if not ticket %}
+            <p>No ticket was found with that ID.</p>
+        {% else %}
+            <h4>Ticket Details</h4>
+            <p><strong>Price</strong>: &pound;{{ '%.2f' % (ticket.price / 100.0) }}</p>
+            <p><strong>Name on ticket</strong>: {{ ticket.name }}</p>
+            <p><strong>Owner</strong>: <a href="{{ url_for('admin_users.view_user', user_id=ticket.owner_id) }}">{{ ticket.owner.full_name }}</a></p>
+            {% if ticket.collected %}
+                <p><strong>Collected as</strong>: {{ ticket.barcode }}</p>
+            {% endif %}
+            <h4>Ticket Status</h4>
+            <ul>
+                <li>Ticket <strong>is{% if not ticket.paid %} not{% endif %}</strong> paid.</li>
+                <li>Ticket <strong>is{% if not ticket.cancelled %} not{% endif %}</strong> cancelled.</li>
+                <li>Ticket <strong>is{% if not ticket.collected %} not{% endif %}</strong> collected.</li>
+            </ul>
+            <h4>Ticket Notes</h4>
+            <form action="{{ url_for('admin_tickets.note_ticket', ticket_id=ticket.object_id) }}" method="post">
+                <textarea name="notes">{% if ticket.note %}{{ ticket.note }}{% endif %}</textarea>
+                <input type="submit" class="button tiny" value="Update" />
+            </form>
+            <h4>Actions</h4>
+            <ul>
+                {% if not ticket.cancelled %}
+                    {#% if ticket.can_be_cancelled_automatically() %}
+                        TODO: Autocancel
+                        <li><a href="{{ url_for('admin_tickets.auto_cancel_ticket', ticket_id=ticket.object_id) }}" class="button tiny">Refund &amp; Cancel</a></li>
+                    {% endif %#}
+                    <li><a href="{{ url_for('admin_tickets.cancel_ticket', ticket_id=ticket.object_id) }}" class="button tiny">Cancel</a><span class="small">N.B. This does not process any refund on the ticket</span></li>
+                {% endif %}
+                {% if not ticket.paid and not ticket.cancelled %}
+                    <li><a href="{{ url_for('admin_tickets.mark_ticket_paid', ticket_id=ticket.object_id) }}" class="button tiny">Mark as Paid</a></li>
+                {% endif %}
+                {% if ticket.collected %}
+                    <li><a href="{{ url_for('admin_tickets.uncollect_ticket', ticket_id=ticket.object_id) }}" class="button tiny">Mark as Uncollected</a><span class="small">N.B. If the ticket owner has already been given a wristband they will not be able to use it to enter the ball.</span></li>
+                {% endif %}
+            </ul>
+            <a id="events"></a>
+            <h4>Events</h4>
+            {% if events.items %}
+                <table id="events_table">
+                    <thead>
+                        <tr>
+                            <th>Log ID</th>
+                            <th>Timestamp</th>
+                            <th>Actor</th>
+                            <th>Message</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in events.items %}
+                            <tr>
+                                <td>{{ '%05d' % log.object_id }}</td>
+                                <td>{{ log.timestamp.strftime('%c') }}</td>
+                                <td><a href="{{ url_for('admin_users.view_user', user_id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
+                                <td>{{ log.action }}</td>
+                                <td><a href="{{ url_for('admin.view_log', entry_id=log.object_id) }}" class="button tiny">View</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if events.has_prev %}
+                    <a href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
+                {% endif %}
+                {% if events.has_next %}
+                    <a href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
+                {% endif %}
+            {% else %}
+                <p>No events recorded.</p>
+            {% endif %}
+        {% endif %}
+    </section>
+{% endblock %}

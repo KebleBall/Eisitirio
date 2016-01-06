@@ -2,9 +2,12 @@ Flask
 Flask-Bcrypt
 Flask-Login
 Flask-Markdown
+Flask-Migrate
 Flask-SQLAlchemy
 MySQL-python
 newrelic
 python-dateutil
 requests
 matplotlib
+boto
+Pillow

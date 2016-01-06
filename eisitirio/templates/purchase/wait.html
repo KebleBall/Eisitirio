@@ -1,0 +1,53 @@
+<!-- purchase/wait.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Join Waiting List{% endblock %}
+
+{% block content %}
+    <section id="wait" class="columns">
+        <p>N.B. Tickets will be allocated in the blocks in which you request them. If you request 8 tickets at once, you will not receive any tickets until all 8 become available. If you wish for tickets to be allocated to you as soon as they become available, please join the waiting list for 1 or 2 tickets at a time.</p>
+        <form action="{{ url_for('purchase.wait') }}" method="post">
+            <ol id="purchase_steps">
+                <li>
+                    <h5>Choose Number of Tickets</h5>
+                    <div class="row">
+                        <div class="columns">
+                            <label for="num_tickets">Number of Tickets: <span id="num_tickets_display">1</span></label>
+                            <input
+                                id="num_tickets"
+                                name="num_tickets"
+                                type="number"
+                                min="1"
+                                max="{{ wait_available }}"
+                                step="1"
+                                value="{% if num_tickets -%}
+                                    {{ num_tickets }}
+                                {% else -%}
+                                    1
+                                {% endif %}"
+                                data-slider="true"
+                                data-slider-range="1,{{ wait_available }}"
+                                data-slider-snap="true"
+                                data-slider-step="1"
+                                data-slider-highlight="true"
+                            />
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <input type="submit" value="Join Waiting List" class="button tiny" />
+                </li>
+            </ol>
+        </form>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ url_for('static', filename='js/vendor/simple-slider.js') }}"></script>
+
+    <script type="text/javascript">
+        $("#num_tickets").bind("slider:changed", function (event, data) {
+            $('#num_tickets_display').html(data.value);
+        });
+    </script>
+{% endblock %}
