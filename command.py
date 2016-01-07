@@ -20,11 +20,16 @@ def get_app(config):
     """Load the appropriate config into the app."""
     config_file = os.path.join('config', '{0}.py'.format(config))
 
+    eisitirio_dir = os.path.realpath(__file__).replace('command.py',
+                                                       'eisitirio')
+
     if not (
-            os.path.exists(os.path.join('eisitirio', config_file))
+            os.path.exists(os.path.join(eisitirio_dir, config_file))
             and app.APP.config.from_pyfile(config_file)
     ):
-        print "Could not load config file."
+        print 'Could not load config file {0}'.format(
+            os.path.join(eisitirio_dir, config_file)
+        )
 
         sys.exit(-1)
 
