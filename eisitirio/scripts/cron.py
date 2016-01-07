@@ -9,6 +9,8 @@ import datetime
 import os
 import sys
 
+
+from flask.ext import script
 import sqlalchemy
 
 from eisitirio import app
@@ -291,28 +293,23 @@ def run_20_minutely(now):
 
     # send_1_day_warnings(now, difference)
 
-def main():
-    """Check the lock, do some setup and run the tasks."""
-    if 'EISITIRIO_ENV' in os.environ:
-        if os.environ['EISITIRIO_ENV'] == 'PRODUCTION':
-            APP.config.from_pyfile('config/production.py')
-        elif os.environ['EISITIRIO_ENV'] == 'STAGING':
-            APP.config.from_pyfile('config/staging.py')
-        elif os.environ['EISITIRIO_ENV'] == 'DEVELOPMENT':
-            APP.config.from_pyfile('config/development.py')
+class CronCommand(script.Command):
+    """Flask Script command for running Cron jobs."""
 
-    lockfile = os.path.abspath(
-        './{}.cron.lock'.format(APP.config['ENVIRONMENT'])
-    )
+    help = 'Run cron jobs'
 
-    with file_lock(lockfile):
-        email_manager.EmailManager(APP)
+    @staticmethod
+    def run():
+        """Check the lock, do some setup and run the tasks."""
+        lockfile = os.path.abspath(
+            './{}.cron.lock'.format(APP.config['ENVIRONMENT'])
+        )
 
-        now = datetime.datetime.utcnow()
+        with file_lock(lockfile):
+            email_manager.EmailManager(APP)
 
-        run_5_minutely(now)
+            now = datetime.datetime.utcnow()
 
-        run_20_minutely(now)
+            run_5_minutely(now)
 
-if __name__ == '__main__':
-    main()
+            run_20_minutely(now)

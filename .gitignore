@@ -2,7 +2,7 @@
 config/*
 .watsonrc
 *.sass-cache*
-cron_timestamp*
+*cron_timestamp*
 bin
 include
 lib

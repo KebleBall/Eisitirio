@@ -25,18 +25,13 @@ agent.initialize(os.path.join(VENV_DIR, 'newrelic.ini'))
 @agent.wsgi_application()
 def application(req_environ, start_response):
     """Wrapper around actual application to load config based on environment."""
-    if 'EISITIRIO_ENV' in req_environ:
-        if req_environ['EISITIRIO_ENV'] == 'DEMO':
-            APP.config.from_pyfile('config/demo.py')
-            return APP(req_environ, start_response)
-        if req_environ['EISITIRIO_ENV'] == 'DEVELOPMENT':
-            APP.config.from_pyfile('config/development.py')
-            return APP(req_environ, start_response)
-        elif req_environ['EISITIRIO_ENV'] == 'STAGING':
-            APP.config.from_pyfile('config/staging.py')
-            return APP(req_environ, start_response)
-        elif req_environ['EISITIRIO_ENV'] == 'PRODUCTION':
-            APP.config.from_pyfile('config/production.py')
-            return APP(req_environ, start_response)
-    else:
-        return APP(req_environ, start_response)
+    if (
+            'EISITIRIO_CONFIG' not in req_environ or
+            not APP.config.from_pyfile(req_environ['EISITIRIO_CONFIG'])
+    ):
+        start_response(b'500 Internal Server Error',
+                       [(b'Content-Type', b'text/plain')])
+
+        return [b'Bad Server Configuration']
+
+    return APP(req_environ, start_response)

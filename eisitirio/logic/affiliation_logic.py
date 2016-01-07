@@ -92,8 +92,7 @@ def maybe_verify_affiliation(user):
                     'Graduate/Alumnus'
                 ] or
                 (
-                    user.affiliation.name == 'Student' and
-                    user.battels_id is not None
+                    user.battels is not None
                 )
         ):
             user.affiliation_verified = True
