@@ -3,6 +3,7 @@ Flask-Bcrypt
 Flask-Login
 Flask-Markdown
 Flask-Migrate
+Flask-Script
 Flask-SQLAlchemy
 MySQL-python
 newrelic
