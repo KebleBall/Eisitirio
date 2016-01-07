@@ -111,9 +111,10 @@ def maybe_verify_affiliation(user):
             (
                 'Your affiliation must be verified before you will be '
                 'able to purchase tickets. You will receive an email when '
-                'your status has been verified.'
+                'your status has been verified. This process may take up to 24 '
+                'hours.'
             ),
-            'info'
+            'warning'
         )
 
 def get_unverified_users():
