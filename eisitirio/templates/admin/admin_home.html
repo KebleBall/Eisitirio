@@ -218,10 +218,10 @@
                     <div class="row collapse">
                         <div class="large-6 columns">
                             <select name="num_results" id="num_results">
-                                <option value="10" {% if form['num_results'] and form['num_results'] == 10 %}selected="selected"{% endif %}>10</option>
-                                <option value="20" {% if form['num_results'] and form['num_results'] == 20 %}selected="selected"{% endif %}>20</option>
-                                <option value="50" {% if form['num_results'] and form['num_results'] == 50 %}selected="selected"{% endif %}>50</option>
-                                <option value="100" {% if form['num_results'] and form['num_results'] == 100 %}selected="selected"{% endif %}>100</option>
+                                <option value="10" {% if form['num_results'] and form['num_results'] == "10" %}selected="selected"{% endif %}>10</option>
+                                <option value="20" {% if form['num_results'] and form['num_results'] == "20" %}selected="selected"{% endif %}>20</option>
+                                <option value="50" {% if form['num_results'] and form['num_results'] == "50" %}selected="selected"{% endif %}>50</option>
+                                <option value="100" {% if form['num_results'] and form['num_results'] == "100" %}selected="selected"{% endif %}>100</option>
                             </select>
                         </div>
                         <div class="large-6 columns">
