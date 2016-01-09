@@ -17,7 +17,7 @@ class Battels(DB.Model):
         primary_key=True,
         nullable=False
     )
-    battelsid = DB.Column(
+    battels_id = DB.Column(
         DB.Unicode(10),
         unique=True,
         nullable=True

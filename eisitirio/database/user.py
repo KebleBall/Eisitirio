@@ -442,3 +442,32 @@ class User(DB.Model):
             ),
             None
         )
+
+    @staticmethod
+    def write_csv_header(csv_writer):
+        csv_writer.writerow([
+            'User ID',
+            'Email',
+            'Forenames',
+            'Surname',
+            'Phone Number',
+            'Notes',
+            'Role',
+            'College',
+            'Affiliation',
+            'Battels ID',
+        ])
+
+    def write_csv_row(self, csv_writer):
+        csv_writer.writerow([
+            self.object_id,
+            self.email,
+            self.forenames,
+            self.surname,
+            self.phone,
+            self.note,
+            self.role,
+            self.college.name,
+            self.affiliation.name,
+            self.battels.battels_id if self.battels is not None else 'N/A',
+        ])

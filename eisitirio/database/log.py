@@ -118,3 +118,36 @@ class Log(DB.Model):
             return None
 
         return log
+
+    @staticmethod
+    def write_csv_header(csv_writer):
+        csv_writer.writerow([
+            'Log Entry ID',
+            'Timestamp',
+            'IP Address',
+            'Action',
+            'Actor\'s User ID',
+            'Actor\'s Name',
+            'Target\'s User ID',
+            'Target\'s Name',
+            'Relevant Ticket IDs',
+            'Relevant Card Transaction ID',
+        ])
+
+    def write_csv_row(self, csv_writer):
+        csv_writer.writerow([
+            self.object_id,
+            self.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+            self.ip_address,
+            self.action,
+            self.actor_id if self.actor_id is not None else 'N/A',
+            self.actor if self.actor is not None else 'N/A',
+            self.user_id if self.user_id is not None else 'N/A',
+            self.user if self.user is not None else 'N/A',
+            ','.join(str(ticket.object_id) for ticket in self.tickets),
+            (
+                self.card_transaction_id
+                if self.card_transaction_id is not None
+                else 'N/A'
+            ),
+        ])

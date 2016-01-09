@@ -216,7 +216,7 @@
                 <div class="large-6 columns">
                     <label for="num_results">Results per Page</label>
                     <div class="row collapse">
-                        <div class="large-6 columns">
+                        <div class="large-4 columns">
                             <select name="num_results" id="num_results">
                                 <option value="10" {% if form['num_results'] and form['num_results'] == "10" %}selected="selected"{% endif %}>10</option>
                                 <option value="20" {% if form['num_results'] and form['num_results'] == "20" %}selected="selected"{% endif %}>20</option>
@@ -224,8 +224,11 @@
                                 <option value="100" {% if form['num_results'] and form['num_results'] == "100" %}selected="selected"{% endif %}>100</option>
                             </select>
                         </div>
-                        <div class="large-6 columns">
-                            <input type="submit" action="{{ url_for('admin.admin_home') }}" value="Search" class="button postfix"/>
+                        <div class="large-4 columns">
+                            <input type="submit" action="{{ url_for('admin.admin_home') }}" name="action" value="Search" class="button postfix"/>
+                        </div>
+                        <div class="large-4 columns">
+                            <input type="submit" action="{{ url_for('admin.admin_home') }}" name="action" value="Export" class="button postfix secondary"/>
                         </div>
                     </div>
                 </div>

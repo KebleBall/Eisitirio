@@ -37,280 +37,309 @@ def admin_home(page=1):
     entries, and appropriately joins them to return the results of the requested
     type.
     """
-    results = None
+
+    if flask.request.method != 'POST':
+        return flask.render_template(
+            'admin/admin_home.html',
+            form={},
+            colleges=models.College.query.all(),
+            affiliations=models.Affiliation.query.all(),
+            results=None,
+            category=None
+        )
+
+    user_query = models.User.query
+    has_user_filter = False
+    ticket_query = models.Ticket.query
+    has_ticket_filter = False
+    log_query = models.Log.query
+    has_log_filter = False
+
+    if (
+            'user_name' in flask.request.form and
+            flask.request.form['user_name'] != ''
+    ):
+        user_query = user_query.filter(
+            models.User.full_name.like(
+                '%' + flask.request.form['user_name'] + '%'
+            )
+        )
+        has_user_filter = True
+
+    if (
+            'user_email' in flask.request.form and
+            flask.request.form['user_email'] != ''
+    ):
+        user_query = user_query.filter(
+            models.User.email == flask.request.form['user_email'])
+        has_user_filter = True
+
+    if (
+            'user_college' in flask.request.form and
+            flask.request.form['user_college'] != '' and
+            flask.request.form['user_college'] != 'Any'
+    ):
+        user_query = user_query.filter(
+            models.User.college_id ==
+            flask.request.form['user_college']
+        )
+        has_user_filter = True
+
+    if (
+            'user_affiliation' in flask.request.form and
+            flask.request.form['user_affiliation'] != '' and
+            flask.request.form['user_affiliation'] != 'Any'
+    ):
+        user_query = user_query.filter(
+            models.User.affiliation_id ==
+            flask.request.form['user_affiliation']
+        )
+        has_user_filter = True
+
+    if (
+            'user_tickets' in flask.request.form and
+            flask.request.form['user_tickets'] != '' and
+            flask.request.form['user_tickets'] != 'Any'
+    ):
+        if flask.request.form['user_tickets'] == 'Has':
+            user_query = user_query.filter(models.User.tickets.any())
+        else:
+            user_query = user_query.filter(~models.User.tickets.any())
+        has_user_filter = True
+
+    if (
+            'user_waiting' in flask.request.form and
+            flask.request.form['user_waiting'] != '' and
+            flask.request.form['user_waiting'] != 'Any'
+    ):
+        if flask.request.form['user_waiting'] == 'Is':
+            user_query = user_query.filter(models.User.waiting.any())
+        else:
+            user_query = user_query.filter(~models.User.waiting.any())
+        has_user_filter = True
+
+    if (
+            'ticket_number' in flask.request.form and
+            flask.request.form['ticket_number'] != ''
+    ):
+        ticket_query = ticket_query.filter(
+            models.Ticket.object_id == flask.request.form['ticket_number']
+        )
+        has_ticket_filter = True
+
+    if (
+            'ticket_name' in flask.request.form and
+            flask.request.form['ticket_name'] != ''
+    ):
+        ticket_query = ticket_query.filter(
+            models.Ticket.name.like(
+                '%' + flask.request.form['ticket_name'] + '%'
+            )
+        )
+        has_ticket_filter = True
+
+    if (
+            'ticket_barcode' in flask.request.form and
+            flask.request.form['ticket_barcode'] != ''
+    ):
+        ticket_query = ticket_query.filter(
+            models.Ticket.barcode == flask.request.form['ticket_barcode']
+        )
+        has_ticket_filter = True
+
+    if (
+            'ticket_min_price' in flask.request.form and
+            flask.request.form['ticket_min_price'] != ''
+    ):
+        ticket_query = ticket_query.filter(
+            models.Ticket.price_ >= flask.request.form['ticket_min_price']
+        )
+        has_ticket_filter = True
+
+    if (
+            'ticket_max_price' in flask.request.form and
+            flask.request.form['ticket_max_price'] != ''
+    ):
+        ticket_query = ticket_query.filter(
+            models.Ticket.price_ <= flask.request.form['ticket_max_price']
+        )
+        has_ticket_filter = True
+
+    if (
+            'ticket_method' in flask.request.form and
+            flask.request.form['ticket_method'] != '' and
+            flask.request.form['ticket_method'] != 'Any'
+    ):
+        ticket_query = ticket_query.filter(
+            models.Ticket.payment_method ==
+            flask.request.form['ticket_method']
+        )
+        has_ticket_filter = True
+
+    if (
+            'ticket_paid' in flask.request.form and
+            flask.request.form['ticket_paid'] != '' and
+            flask.request.form['ticket_paid'] != 'Any'
+    ):
+        ticket_query = ticket_query.filter(
+            models.Ticket.paid ==
+            (flask.request.form['ticket_paid'] == 'Is')
+        )
+        has_ticket_filter = True
+
+    if (
+            'ticket_collected' in flask.request.form and
+            flask.request.form['ticket_collected'] != '' and
+            flask.request.form['ticket_collected'] != 'Any'
+    ):
+        ticket_query = ticket_query.filter(
+            models.Ticket.collected ==
+            (flask.request.form['ticket_collected'] == 'Is')
+        )
+        has_ticket_filter = True
+
+    if (
+            'log_ip' in flask.request.form and
+            flask.request.form['log_ip'] != ''
+    ):
+        log_query = log_query.filter(
+            models.Log.ip_address == flask.request.form['log_ip']
+        )
+        has_log_filter = True
+
+    if (
+            'log_start' in flask.request.form and
+            flask.request.form['log_start'] != ''
+    ):
+        try:
+            dtstamp = parser.parse(flask.request.form['log_start'])
+            log_query = log_query.filter(models.Log.timestamp >= dtstamp)
+            has_log_filter = True
+        except (ValueError, TypeError) as _:
+            flask.flash(
+                'Could not parse start date/time, ignoring.',
+                'warning'
+            )
+
+    if (
+            'log_end' in flask.request.form and
+            flask.request.form['log_end'] != ''
+    ):
+        try:
+            dtstamp = parser.parse(flask.request.form['log_end'])
+            log_query = log_query.filter(models.Log.timestamp <= dtstamp)
+            has_log_filter = True
+        except (ValueError, TypeError) as _:
+            flask.flash(
+                'Could not parse end date/time, ignoring.',
+                'warning'
+            )
+
+    if (
+            'log_message' in flask.request.form and
+            flask.request.form['log_message'] != ''
+    ):
+        log_query = log_query.filter(
+            models.Log.action.like(
+                '%' + flask.request.form['log_message'] + '%'
+            )
+        )
+        has_log_filter = True
+
+    log_query = log_query.order_by(models.Log.timestamp.desc())
+
+    query = None
+    model = None
     category = None
-    form = {}
 
-    if flask.request.method == 'POST':
-        user_query = models.User.query
-        has_user_filter = False
-        ticket_query = models.Ticket.query
-        has_ticket_filter = False
-        log_query = models.Log.query
-        has_log_filter = False
-
-        num_per_page = int(flask.request.form['num_results'])
-        form = flask.request.form
-
-        if (
-                'user_name' in flask.request.form and
-                flask.request.form['user_name'] != ''
-        ):
-            user_query = user_query.filter(
-                models.User.full_name.like(
-                    '%' + flask.request.form['user_name'] + '%'
-                )
+    if flask.request.form['search'] == 'user':
+        if has_ticket_filter:
+            user_query = user_query.join(
+                ticket_query.subquery(),
+                models.User.tickets
             )
-            has_user_filter = True
 
-        if (
-                'user_email' in flask.request.form and
-                flask.request.form['user_email'] != ''
-        ):
-            user_query = user_query.filter(
-                models.User.email == flask.request.form['user_email'])
-            has_user_filter = True
-
-        if (
-                'user_college' in flask.request.form and
-                flask.request.form['user_college'] != '' and
-                flask.request.form['user_college'] != 'Any'
-        ):
-            user_query = user_query.filter(
-                models.User.college_id ==
-                flask.request.form['user_college']
-            )
-            has_user_filter = True
-
-        if (
-                'user_affiliation' in flask.request.form and
-                flask.request.form['user_affiliation'] != '' and
-                flask.request.form['user_affiliation'] != 'Any'
-        ):
-            user_query = user_query.filter(
-                models.User.affiliation_id ==
-                flask.request.form['user_affiliation']
-            )
-            has_user_filter = True
-
-        if (
-                'user_tickets' in flask.request.form and
-                flask.request.form['user_tickets'] != '' and
-                flask.request.form['user_tickets'] != 'Any'
-        ):
-            if flask.request.form['user_tickets'] == 'Has':
-                user_query = user_query.filter(models.User.tickets.any())
-            else:
-                user_query = user_query.filter(~models.User.tickets.any())
-            has_user_filter = True
-
-        if (
-                'user_waiting' in flask.request.form and
-                flask.request.form['user_waiting'] != '' and
-                flask.request.form['user_waiting'] != 'Any'
-        ):
-            if flask.request.form['user_waiting'] == 'Is':
-                user_query = user_query.filter(models.User.waiting.any())
-            else:
-                user_query = user_query.filter(~models.User.waiting.any())
-            has_user_filter = True
-
-        if (
-                'ticket_number' in flask.request.form and
-                flask.request.form['ticket_number'] != ''
-        ):
-            ticket_query = ticket_query.filter(
-                models.Ticket.object_id == flask.request.form['ticket_number']
-            )
-            has_ticket_filter = True
-
-        if (
-                'ticket_name' in flask.request.form and
-                flask.request.form['ticket_name'] != ''
-        ):
-            ticket_query = ticket_query.filter(
-                models.Ticket.name.like(
-                    '%' + flask.request.form['ticket_name'] + '%'
-                )
-            )
-            has_ticket_filter = True
-
-        if (
-                'ticket_barcode' in flask.request.form and
-                flask.request.form['ticket_barcode'] != ''
-        ):
-            ticket_query = ticket_query.filter(
-                models.Ticket.barcode == flask.request.form['ticket_barcode']
-            )
-            has_ticket_filter = True
-
-        if (
-                'ticket_min_price' in flask.request.form and
-                flask.request.form['ticket_min_price'] != ''
-        ):
-            ticket_query = ticket_query.filter(
-                models.Ticket.price_ >= flask.request.form['ticket_min_price']
-            )
-            has_ticket_filter = True
-
-        if (
-                'ticket_max_price' in flask.request.form and
-                flask.request.form['ticket_max_price'] != ''
-        ):
-            ticket_query = ticket_query.filter(
-                models.Ticket.price_ <= flask.request.form['ticket_max_price']
-            )
-            has_ticket_filter = True
-
-        if (
-                'ticket_method' in flask.request.form and
-                flask.request.form['ticket_method'] != '' and
-                flask.request.form['ticket_method'] != 'Any'
-        ):
-            ticket_query = ticket_query.filter(
-                models.Ticket.payment_method ==
-                flask.request.form['ticket_method']
-            )
-            has_ticket_filter = True
-
-        if (
-                'ticket_paid' in flask.request.form and
-                flask.request.form['ticket_paid'] != '' and
-                flask.request.form['ticket_paid'] != 'Any'
-        ):
-            ticket_query = ticket_query.filter(
-                models.Ticket.paid ==
-                (flask.request.form['ticket_paid'] == 'Is')
-            )
-            has_ticket_filter = True
-
-        if (
-                'ticket_collected' in flask.request.form and
-                flask.request.form['ticket_collected'] != '' and
-                flask.request.form['ticket_collected'] != 'Any'
-        ):
-            ticket_query = ticket_query.filter(
-                models.Ticket.collected ==
-                (flask.request.form['ticket_collected'] == 'Is')
-            )
-            has_ticket_filter = True
-
-        if (
-                'log_ip' in flask.request.form and
-                flask.request.form['log_ip'] != ''
-        ):
-            log_query = log_query.filter(
-                models.Log.ip_address == flask.request.form['log_ip']
-            )
-            has_log_filter = True
-
-        if (
-                'log_start' in flask.request.form and
-                flask.request.form['log_start'] != ''
-        ):
-            try:
-                dtstamp = parser.parse(flask.request.form['log_start'])
-                log_query = log_query.filter(models.Log.timestamp >= dtstamp)
-                has_log_filter = True
-            except (ValueError, TypeError) as _:
-                flask.flash(
-                    'Could not parse start date/time, ignoring.',
-                    'warning'
-                )
-
-        if (
-                'log_end' in flask.request.form and
-                flask.request.form['log_end'] != ''
-        ):
-            try:
-                dtstamp = parser.parse(flask.request.form['log_end'])
-                log_query = log_query.filter(models.Log.timestamp <= dtstamp)
-                has_log_filter = True
-            except (ValueError, TypeError) as _:
-                flask.flash(
-                    'Could not parse end date/time, ignoring.',
-                    'warning'
-                )
-
-        if (
-                'log_message' in flask.request.form and
-                flask.request.form['log_message'] != ''
-        ):
-            log_query = log_query.filter(
-                models.Log.action.like(
-                    '%' + flask.request.form['log_message'] + '%'
-                )
-            )
-            has_log_filter = True
-
-        log_query = log_query.order_by(models.Log.timestamp.desc())
-
-        if flask.request.form['search'] == 'user':
-            if has_ticket_filter:
+        if has_log_filter:
+            if flask.request.form['log_user'] == 'Actor':
                 user_query = user_query.join(
-                    ticket_query.subquery(),
-                    models.User.tickets
-                )
-
-            if has_log_filter:
-                if flask.request.form['log_user'] == 'Actor':
-                    user_query = user_query.join(
-                        log_query.subquery(),
-                        models.User.actions
-                    )
-                else:
-                    user_query = user_query.join(
-                        log_query.subquery(),
-                        models.User.events
-                    )
-
-            results = user_query.paginate(page, num_per_page)
-            category = 'User'
-        elif flask.request.form['search'] == 'ticket':
-            if has_user_filter:
-                ticket_query = ticket_query.join(
-                    user_query.subquery(),
-                    models.Ticket.owner
-                )
-
-            if has_log_filter:
-                ticket_query = ticket_query.join(
                     log_query.subquery(),
-                    models.Ticket.log_entries
+                    models.User.actions
+                )
+            else:
+                user_query = user_query.join(
+                    log_query.subquery(),
+                    models.User.events
                 )
 
-            results = ticket_query.paginate(page, num_per_page)
-            category = 'Ticket'
-        elif flask.request.form['search'] == 'log':
-            if has_user_filter:
-                if flask.request.form['log_user'] == 'Actor':
-                    log_query = log_query.join(
-                        user_query.subquery(),
-                        models.Log.actor
-                    )
-                else:
-                    log_query = log_query.join(
-                        user_query.subquery(),
-                        models.Log.user
-                    )
+        query = user_query
+        model = models.User
+        category = 'User'
+    elif flask.request.form['search'] == 'ticket':
+        if has_user_filter:
+            ticket_query = ticket_query.join(
+                user_query.subquery(),
+                models.Ticket.owner
+            )
 
-            if has_ticket_filter:
+        if has_log_filter:
+            ticket_query = ticket_query.join(
+                log_query.subquery(),
+                models.Ticket.log_entries
+            )
+
+        query = ticket_query
+        model = models.Ticket
+        category = 'Ticket'
+    elif flask.request.form['search'] == 'log':
+        if has_user_filter:
+            if flask.request.form['log_user'] == 'Actor':
                 log_query = log_query.join(
-                    ticket_query.subquery(),
-                    models.Log.tickets
+                    user_query.subquery(),
+                    models.Log.actor
+                )
+            else:
+                log_query = log_query.join(
+                    user_query.subquery(),
+                    models.Log.user
                 )
 
-            results = log_query.paginate(page, num_per_page)
-            category = 'Log'
+        if has_ticket_filter:
+            log_query = log_query.join(
+                ticket_query.subquery(),
+                models.Log.tickets
+            )
 
-    return flask.render_template(
-        'admin/admin_home.html',
-        form=form,
-        colleges=models.College.query.all(),
-        affiliations=models.Affiliation.query.all(),
-        results=results,
-        category=category
-    )
+        query = log_query
+        model = models.Log
+        category = 'Log'
+
+    if (
+            'action' in flask.request.form and
+            flask.request.form['action'] == 'Export'
+    ):
+        csvdata = StringIO.StringIO()
+        csvwriter = csv.writer(csvdata)
+
+        model.write_csv_header(csvwriter)
+
+        for result in query.all():
+            result.write_csv_row(csvwriter)
+
+        csvdata.seek(0)
+
+        return flask.send_file(csvdata, mimetype='text/csv', cache_timeout=0,
+                               attachment_filename="search_results.csv",
+                               as_attachment=True)
+    else:
+        return flask.render_template(
+            'admin/admin_home.html',
+            form=flask.request.form,
+            colleges=models.College.query.all(),
+            affiliations=models.Affiliation.query.all(),
+            results=query.paginate(page,
+                                   int(flask.request.form['num_results'])),
+            category=category
+        )
 
 @ADMIN.route('/admin/log/<int:entry_id>/view')
 @login.login_required

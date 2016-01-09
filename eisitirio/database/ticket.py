@@ -189,3 +189,40 @@ class Ticket(DB.Model):
             return None
 
         return ticket
+
+    @staticmethod
+    def write_csv_header(csv_writer):
+        csv_writer.writerow([
+            'Ticket ID',
+            'Ticket Type',
+            'Paid',
+            'Collected',
+            'Entered',
+            'Cancelled',
+            'Price (Pounds)',
+            'Holder\'s Name',
+            'Notes',
+            'Expires',
+            'Barcode',
+            'Owner\' User ID',
+            'Owner\'s Name',
+        ])
+
+    def write_csv_row(self, csv_writer):
+        csv_writer.writerow([
+            self.object_id,
+            self.ticket_type,
+            'Yes' if self.paid else 'No',
+            'Yes' if self.collected else 'No',
+            'Yes' if self.entered else 'No',
+            'Yes' if self.cancelled else 'No',
+            self.price_pounds,
+            self.name,
+            self.note,
+            self.expires.strftime(
+                '%Y-%m-%d %H:%M:%S'
+            ) if self.expires is not None else 'N/A',
+            self.barcode if self.barcode is not None else 'N/A',
+            self.owner_id,
+            self.owner.full_name,
+        ])
