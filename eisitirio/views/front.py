@@ -529,7 +529,10 @@ def destroy_account(user_id, secret_key):
                 entry.user = None
 
             DB.session.delete(user)
+            DB.session.delete(user.photo)
             DB.session.commit()
+
+            photos.delete_photo(user.photo)
 
             APP.log_manager.log_event(
                 'Deleted account with email address {0}'.format(
