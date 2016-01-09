@@ -1,24 +1,26 @@
 @import "vendor/foundation/functions";
 
-$rem-base: 16px;
+$rem-base: 16px !default;
 
-$body-font-family: "Open Sans", Helvetica, sans-serif;
-$body-font-weight: lighter;
+$body-font-family: "Open Sans", Helvetica, sans-serif !default;
+$body-font-weight: lighter !default;
 
-$h1-font-size: 3rem;
-$h2-font-size: 2.6rem;
-$h3-font-size: 2.2rem;
-$h4-font-size: 1.8rem;
-$h5-font-size: 1.4rem;
-$h6-font-size: 1rem;
+$h1-font-size: 3rem !default;
+$h2-font-size: 2.6rem !default;
+$h3-font-size: 2.2rem !default;
+$h4-font-size: 1.8rem !default;
+$h5-font-size: 1.4rem !default;
+$h6-font-size: 1rem !default;
 
-$button-tny: rem-calc(8);
-$button-sml: rem-calc(12);
-$button-font-tny: rem-calc(14);
-$button-font-sml: rem-calc(14);
+$button-tny: rem-calc(8) !default;
+$button-sml: rem-calc(12) !default;
+$button-font-tny: rem-calc(14) !default;
+$button-font-sml: rem-calc(14) !default;
 
-$form-label-font-size: 1rem;
+$form-label-font-size: 1rem !default;
 
-$legend-bg: transparent;
+$legend-bg: transparent !default;
 
-$paragraph-margin-bottom: rem-calc(5);
+$paragraph-margin-bottom: rem-calc(5) !default;
+
+$include-open-sans: false !default;
