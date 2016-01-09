@@ -13,6 +13,24 @@ from eisitirio.database import models
 
 APP = app.APP
 
+def get_bucket():
+    """Get the Boto bucket object."""
+    s3_conn = boto.connect_s3(APP.config['AWS_ACCESS_KEY_ID'],
+                              APP.config['AWS_SECRET_ACCESS_KEY'])
+
+    bucket = s3_conn.get_bucket(APP.config['S3_BUCKET'])
+
+    bucket_location = bucket.get_location()
+    if bucket_location:
+        s3_conn = boto.s3.connect_to_region(
+            bucket_location,
+            aws_access_key_id=APP.config['AWS_ACCESS_KEY_ID'],
+            aws_secret_access_key=APP.config['AWS_SECRET_ACCESS_KEY']
+        )
+        bucket = s3_conn.get_bucket(APP.config['S3_BUCKET'])
+
+    return bucket
+
 def save_photo(upload_file):
     """Save an uploaded photo to S3.
 
@@ -35,19 +53,7 @@ def save_photo(upload_file):
     im.thumbnail(APP.config['THUMBNAIL_SIZE'])
     im.save(thumb_temp_filename)
 
-    s3_conn = boto.connect_s3(APP.config['AWS_ACCESS_KEY_ID'],
-                              APP.config['AWS_SECRET_ACCESS_KEY'])
-
-    bucket = s3_conn.get_bucket(APP.config['S3_BUCKET'])
-
-    bucket_location = bucket.get_location()
-    if bucket_location:
-        s3_conn = boto.s3.connect_to_region(
-            bucket_location,
-            aws_access_key_id=APP.config['AWS_ACCESS_KEY_ID'],
-            aws_secret_access_key=APP.config['AWS_SECRET_ACCESS_KEY']
-        )
-        bucket = s3_conn.get_bucket(APP.config['S3_BUCKET'])
+    bucket = get_bucket()
 
     full_key = bucket.new_key("full/" + filename)
     with open(temp_filename) as temp_file:
@@ -62,3 +68,12 @@ def save_photo(upload_file):
     thumb_url = thumb_key.generate_url(expires_in=0, query_auth=False)
 
     return models.Photo(filename, full_url, thumb_url)
+
+def delete_photo(photo):
+    """Delete a saved photo from S3.
+
+    Used when a user's account is destroyed, or if they change their photo."""
+    bucket = get_bucket()
+
+    bucket.new_key("full/" + photo.filename).delete()
+    bucket.new_key("thumb/" + photo.filename).delete()

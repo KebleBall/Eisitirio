@@ -11,6 +11,7 @@ import flask
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
+from eisitirio.helpers import photos
 from eisitirio.helpers import util
 from eisitirio.logic import affiliation_logic
 
@@ -171,7 +172,28 @@ def profile():
                 models.Affiliation.get_by_id(flask.request.form['affiliation'])
             )
 
+            old_photo = None
+
+            if (
+                    APP.config['REQUIRE_USER_PHOTO'] and
+                    'photo' in flask.request.files and
+                    flask.request.files['photo'].filename != ''
+            ):
+                old_photo = login.current_user.photo
+
+                new_photo = photos.save_photo(flask.request.files['photo'])
+
+                login.current_user.photo = new_photo
+
+                DB.session.delete(old_photo)
+                DB.session.add(new_photo)
+
             DB.session.commit()
+
+            # We don't want to delete the photo from S3 until after the DB has
+            # been updated
+            if old_photo is not None:
+                photos.delete_photo(old_photo)
 
             APP.log_manager.log_event(
                 'Updated Details',

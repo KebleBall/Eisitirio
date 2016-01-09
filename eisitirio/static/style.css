@@ -1862,8 +1862,8 @@ table .button { margin: 0; }
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
 
 /* line 117, style.scss */
-#register_photo { margin-bottom: 1rem; }
+.upload_photo { margin-bottom: 1rem; }
 /* line 119, style.scss */
-#register_photo .large-9 { padding-top: 2rem; }
+.upload_photo .large-9 { padding-top: 2rem; }
 
 /*# sourceMappingURL=style.css.map */

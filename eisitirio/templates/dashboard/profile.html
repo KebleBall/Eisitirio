@@ -5,7 +5,7 @@
 
 {% block content %}
     <section id="profile" class="columns">
-        <form action="{{ url_for('dashboard.profile') }}" method="post">
+        <form action="{{ url_for('dashboard.profile') }}" enctype="multipart/form-data" method="post">
             <fieldset>
                 <legend>Your Details</legend>
                 <div class="row">
@@ -59,6 +59,28 @@
                         </select>
                     </div>
                 </div>
+
+                {% if template_config['REQUIRE_USER_PHOTO'] %}
+                    <div class="row">
+                        <div class="large-6 columns">
+                            <label>Current photo:</label>
+                            <p><a href="{{ current_user.photo.full_url }}"><img src="{{ current_user.photo.thumb_url }}" /></a></p>
+                        </div>
+                        <div class="large-6 columns">
+                            <label for="photo">Upload new photo:</label>
+                            <p class="small">Leave blank to keep current photo.</p>
+                            <div class="row upload_photo">
+                                <div class="large-3 columns right">
+                                    <img src="{{ url_for('static', filename='images/passport_outline.png') }}" />
+                                </div>
+                                <div class="large-9 columns">
+                                    <input type="file" name="photo" accept="{{ template_config['IMAGE_ACCEPT_STRING'] }}" required="required" />
+                                    <p class="small">Please upload a passport style photograph of yourself.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
             </fieldset>
             <fieldset>
                 <legend>Change your Password</legend>
