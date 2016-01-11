@@ -14,6 +14,7 @@ from eisitirio import app
 from eisitirio import system # pylint: disable=unused-import
 from eisitirio.database import db
 from eisitirio.scripts import cron
+from eisitirio.scripts import run_bpython
 from eisitirio.scripts import update_battels
 
 def get_app(config):
@@ -47,6 +48,7 @@ MANAGER.add_option('config', default=None,
 MANAGER.add_command('db', migrate.MigrateCommand)
 MANAGER.add_command('run', script.Server)
 MANAGER.add_command('cron', cron.CronCommand)
+MANAGER.add_command('bpython', run_bpython.BpythonCommand)
 MANAGER.add_command('update_battels', update_battels.UpdateBattelsCommand)
 
 if __name__ == '__main__':
