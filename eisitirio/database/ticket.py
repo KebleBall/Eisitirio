@@ -147,30 +147,6 @@ class Ticket(DB.Model):
         else:
             self.note = self.note + note
 
-    def can_be_cancelled(self):
-        """Check whether a ticket can be (automatically) cancelled."""
-        # TODO
-        return False
-
-    def can_be_collected(self):
-        """Check whether a ticket can be collected."""
-        # TODO
-        return (
-            self.paid and
-            not self.collected and
-            not self.cancelled and
-            self.name is not None
-        )
-
-    def can_change_name(self):
-        """Check whether a ticket's name can be changed."""
-        # TODO
-        return not (
-            APP.config['LOCKDOWN_MODE'] or
-            self.cancelled or
-            self.collected
-        )
-
     @staticmethod
     def count():
         """How many tickets have been sold."""

@@ -21,7 +21,6 @@ from eisitirio.database.card_transaction import CardTransaction
 from eisitirio.database.college import College
 from eisitirio.database.log import Log
 from eisitirio.database.photo import Photo
-from eisitirio.database.postage import Postage
 from eisitirio.database.statistic import Statistic
 from eisitirio.database.ticket import Ticket
 from eisitirio.database.transaction import Transaction

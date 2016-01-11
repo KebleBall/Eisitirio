@@ -8,7 +8,6 @@ from flask.ext import bcrypt
 from eisitirio import app
 from eisitirio.database import battels
 from eisitirio.database import db
-from eisitirio.database import ticket
 from eisitirio.database import photo as photo_model # pylint: disable=unused-import
 from eisitirio.helpers import util
 
@@ -192,87 +191,6 @@ class User(DB.Model):
         """
         self.password_hash = BCRYPT.generate_password_hash(password)
 
-    def has_tickets(self):
-        """Does the user have any tickets?"""
-        return len([x for x in self.tickets
-                    if not x.cancelled]) > 0
-
-    def has_uncollected_tickets(self):
-        """Does the user have any uncollected tickets?"""
-        return len([x for x in self.tickets
-                    if not x.cancelled and not x.collected]) > 0
-
-    def has_collected_tickets(self):
-        """Has the user collected any tickets?"""
-        return len([x for x in self.tickets
-                    if not x.cancelled and x.collected]) > 0
-
-    def has_unpaid_tickets(self, method=None):
-        """Does the user have any unpaid tickets?
-
-        Checks if the user has tickets which they haven't yet paid for,
-        potentially filtered by payment method.
-
-        Args:
-            method: (str) payment method to search for unpaid tickets by
-
-        Returns:
-            (bool) whether there are any tickets owned by the user (and with
-            the given payment method set if given) which have not been paid for
-        """
-        if method is None:
-            return len(
-                [
-                    x for x in self.tickets if (
-                        not x.paid and
-                        not x.cancelled
-                    )
-                ]
-            ) > 0
-        else:
-            return len(
-                [
-                    x for x in self.tickets if (
-                        x.payment_method == method and
-                        not x.paid and
-                        not x.cancelled
-                    )
-                ]
-            ) > 0
-
-    def has_paid_tickets(self, method=None):
-        """Does the user have any unpaid tickets?
-
-        Checks if the user has tickets which they have paid for, potentially
-        filtered by payment method.
-
-        Args:
-            method: (str) payment method to search for paid tickets by
-
-        Returns:
-            (bool) whether there are any tickets owned by the user (and with
-            the given payment method set if given) which have been paid for
-        """
-        if method is None:
-            return len(
-                [
-                    x for x in self.tickets if (
-                        x.paid and
-                        not x.cancelled
-                    )
-                ]
-            ) > 0
-        else:
-            return len(
-                [
-                    x for x in self.tickets if (
-                        x.payment_method == method and
-                        x.paid and
-                        not x.cancelled
-                    )
-                ]
-            ) > 0
-
     def promote(self):
         """Make the user an admin."""
         self.role = 'Admin'
@@ -294,23 +212,6 @@ class User(DB.Model):
     def waiting_for(self):
         """How many tickets is the user waiting for?"""
         return sum([x.waiting_for for x in self.waiting])
-
-    def can_pay_by_battels(self):
-        """Is the user able to pay by battels?
-
-        The requirement for this is that the user is a current member of the
-        relevant college(s), and that it is either Michaelmas or Hilary term.
-        The logic determining whether the user is a current member is carried
-        out at registration (and based on whether their email matches one in our
-        list of battelable emails). Alternately, this can be forced by an admin
-        through the admin interface if the user is not automatically recognised.
-        Given this, it suffices to only check if the user has a defined battels
-        account on the system.
-        """
-        return (
-            self.battels is not None and
-            APP.config['CURRENT_TERM'] != 'TT'
-        )
 
     @property
     def is_verified(self):
@@ -371,63 +272,6 @@ class User(DB.Model):
             DB.session.add(self.battels)
 
         DB.session.commit()
-
-    def can_wait(self):
-        """Can the user join the waiting list?
-
-        Performs the necessary logic to determine if the user is permitted to
-        join the waiting list for tickets
-
-        Returns:
-            (bool, int, str/None) triple of whether the user can join the
-            waiting list, how many tickets the user can wait for, and an error
-            message if the user cannot join the waiting list.
-        """
-        if not APP.config['WAITING_OPEN']:
-            return (
-                False,
-                0,
-                'the waiting list is currently closed.'
-            )
-
-        tickets_owned = self.tickets.filter(
-            ticket.Ticket.cancelled == False # pylint: disable=singleton-comparison
-        ).count()
-
-        if tickets_owned >= APP.config['MAX_TICKETS']:
-            return (
-                False,
-                0,
-                (
-                    'you have too many tickets. Please contact<a href="{0}"> '
-                    'the ticketing officer</a> if you wish to purchase more '
-                    'than {1} tickets.'
-                ).format(
-                    APP.config['TICKETS_EMAIL_LINK'],
-                    APP.config['MAX_TICKETS']
-                )
-            )
-
-        waiting_for = self.waiting_for()
-        if waiting_for >= APP.config['MAX_TICKETS_WAITING']:
-            return (
-                False,
-                0,
-                (
-                    'you are already waiting for too many tickets. Please '
-                    'rejoin the waiting list once you have been allocated the '
-                    'tickets you are currently waiting for.'
-                )
-            )
-
-        return (
-            True,
-            min(
-                APP.config['MAX_TICKETS_WAITING'] - waiting_for,
-                APP.config['MAX_TICKETS'] - tickets_owned
-            ),
-            None
-        )
 
     @staticmethod
     def write_csv_header(csv_writer):

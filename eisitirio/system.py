@@ -13,6 +13,7 @@ import flask
 import jinja2
 
 from eisitirio import app
+from eisitirio.permissions import all_permissions # pylint: disable=unused-import
 from eisitirio.views import all_views
 from eisitirio.helpers import log_manager
 from eisitirio.helpers import login_manager
