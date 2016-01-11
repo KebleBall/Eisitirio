@@ -12,11 +12,8 @@ APP = app.APP
 
 class Battels(DB.Model):
     """Model for battels charges for current students."""
-    object_id = DB.Column(
-        DB.Integer(),
-        primary_key=True,
-        nullable=False
-    )
+    __tablename__ = 'battels'
+
     battels_id = DB.Column(
         DB.Unicode(10),
         unique=True,
@@ -122,18 +119,6 @@ class Battels(DB.Model):
             raise ValueError(
                 'Can\'t refund battels tickets in the current term'
             )
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get a battels object by its database ID."""
-        battels = Battels.query.filter(
-            Battels.object_id == int(object_id)
-        ).first()
-
-        if not battels:
-            return None
-
-        return battels
 
     @staticmethod
     def get_by_battelsid(battelsid):

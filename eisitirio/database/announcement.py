@@ -44,11 +44,8 @@ EMAIL_ANNOUNCE_LINK = DB.Table(
 
 class Announcement(DB.Model):
     """Model for an announcement sent to registered users."""
-    object_id = DB.Column(
-        DB.Integer,
-        primary_key=True,
-        nullable=False
-    )
+    __tablename__ = 'announcement'
+
     timestamp = DB.Column(
         DB.DateTime(),
         nullable=False
@@ -231,15 +228,3 @@ class Announcement(DB.Model):
             DB.session.commit()
 
         return count
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get an Announcement object by its database ID."""
-        announcement = Announcement.query.filter(
-            Announcement.object_id == int(object_id)
-        ).first()
-
-        if not announcement:
-            return None
-
-        return announcement

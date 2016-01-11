@@ -11,11 +11,8 @@ DB = db.DB
 
 class Voucher(DB.Model):
     """Model for a discount voucher."""
-    object_id = DB.Column(
-        DB.Integer(),
-        primary_key=True,
-        nullable=False
-    )
+    __tablename__ = 'voucher'
+
     code = DB.Column(
         DB.Unicode(30),
         nullable=False
@@ -105,18 +102,6 @@ class Voucher(DB.Model):
 
     def __repr__(self):
         return '<Voucher: {0}/{1}>'.format(self.object_id, self.code)
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get an Voucher object by its database ID."""
-        voucher = Voucher.query.filter(
-            Voucher.object_id == int(object_id)
-        ).first()
-
-        if not voucher:
-            return None
-
-        return voucher
 
     @staticmethod
     def get_by_code(code):

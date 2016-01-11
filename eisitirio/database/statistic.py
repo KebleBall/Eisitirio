@@ -11,11 +11,8 @@ DB = db.DB
 
 class Statistic(DB.Model):
     """Model for representing a statistic in a timeseries."""
-    object_id = DB.Column(
-        DB.Integer(),
-        primary_key=True,
-        nullable=False
-    )
+    __tablename__ = 'statistic'
+
     timestamp = DB.Column(
         DB.DateTime,
         nullable=False
@@ -55,16 +52,4 @@ class Statistic(DB.Model):
             self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)'),
             self.value
         )
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get a Statistic object by its database ID."""
-        statistic = Statistic.query.filter(
-            Statistic.object_id == int(object_id)
-        ).first()
-
-        if not statistic:
-            return None
-
-        return statistic
 

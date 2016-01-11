@@ -24,11 +24,8 @@ LOG_TICKET_LINK = DB.Table(
 
 class Log(DB.Model):
     """Model for log entries persisted to the database."""
-    object_id = DB.Column(
-        DB.Integer(),
-        primary_key=True,
-        nullable=False
-    )
+    __tablename__ = 'log'
+
     timestamp = DB.Column(
         DB.DateTime,
         nullable=False
@@ -108,16 +105,6 @@ class Log(DB.Model):
             self.object_id,
             self.timestamp.strftime('%Y-%m-%d %H:%m (UTC)')
         )
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get a Log object by its database ID."""
-        log = Log.query.filter(Log.object_id == int(object_id)).first()
-
-        if not log:
-            return None
-
-        return log
 
     @staticmethod
     def write_csv_header(csv_writer):

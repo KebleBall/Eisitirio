@@ -13,11 +13,8 @@ class TransactionItem(DB.Model):
     Contains fields for a description and value, and a reference to a ticket.
     Only one of the two options should be used.
     """
-    object_id = DB.Column(
-        DB.Integer(),
-        primary_key=True,
-        nullable=False
-    )
+    __tablename__ = 'transaction_item'
+
     item_type = DB.Column(
         DB.Enum(
             'Ticket',
@@ -74,11 +71,6 @@ class TransactionItem(DB.Model):
             self._value = value
             self._description = description
 
-    def __repr__(self):
-        return '<TransactionItem({0})>'.format(
-            self.object_id
-        )
-
     @property
     def value(self):
         """Get the value of this item."""
@@ -94,15 +86,3 @@ class TransactionItem(DB.Model):
             return self.ticket.description
         else:
             return self._description
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get a TransactionItem object by its database ID."""
-        item = TransactionItem.query.filter(
-            TransactionItem.object_id == int(object_id)
-        ).first()
-
-        if not item:
-            return None
-
-        return item

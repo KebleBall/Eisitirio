@@ -13,11 +13,8 @@ DB = db.DB
 
 class Ticket(DB.Model):
     """Model for tickets."""
-    object_id = DB.Column(
-        DB.Integer(),
-        primary_key=True,
-        nullable=False
-    )
+    __tablename__ = 'ticket'
+
     ticket_type = DB.Column(
         DB.Unicode(50),
         nullable=False
@@ -179,16 +176,6 @@ class Ticket(DB.Model):
         """How many tickets have been sold."""
         # TODO
         return Ticket.query.filter(Ticket.cancelled == False).count() # pylint: disable=singleton-comparison
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get a ticket object by its database ID."""
-        ticket = Ticket.query.filter(Ticket.object_id == int(object_id)).first()
-
-        if not ticket:
-            return None
-
-        return ticket
 
     @staticmethod
     def write_csv_header(csv_writer):

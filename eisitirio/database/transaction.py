@@ -16,11 +16,8 @@ APP = app.APP
 
 class Transaction(DB.Model):
     """Model for representing a monetary exchange transaction."""
-    object_id = DB.Column(
-        DB.Integer(),
-        primary_key=True,
-        nullable=False
-    )
+    __tablename__ = 'transaction'
+
     paid = DB.Column(
         DB.Boolean,
         default=False,
@@ -143,15 +140,3 @@ class Transaction(DB.Model):
             self.tickets,
             login.current_user
         )
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get a Transaction object by its database ID."""
-        transaction = Transaction.query.filter(
-            Transaction.object_id == int(object_id)
-        ).first()
-
-        if not transaction:
-            return None
-
-        return transaction

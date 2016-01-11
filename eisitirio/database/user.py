@@ -19,6 +19,7 @@ BCRYPT = bcrypt.Bcrypt(APP)
 
 class User(DB.Model):
     """Model for users."""
+    __tablename__ = 'user'
 
     # Class level properties for Flask-Login
     #
@@ -27,11 +28,6 @@ class User(DB.Model):
     is_authenticated = True
     is_anonymous = False
 
-    object_id = DB.Column(
-        DB.Integer,
-        primary_key=True,
-        nullable=False
-    )
     email = DB.Column(
         DB.Unicode(120),
         unique=True,
@@ -348,16 +344,6 @@ class User(DB.Model):
         user, in this case their database ID.
         """
         return unicode(self.object_id)
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get a user object by its database ID."""
-        user = User.query.filter(User.object_id == int(object_id)).first()
-
-        if not user:
-            return None
-
-        return user
 
     @staticmethod
     def get_by_email(email):

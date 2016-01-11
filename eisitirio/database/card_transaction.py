@@ -18,11 +18,8 @@ DB = db.DB
 
 class CardTransaction(DB.Model):
     """Model for information about Card Transactions performed via eWay."""
-    object_id = DB.Column(
-        DB.Integer(),
-        primary_key=True,
-        nullable=False
-    )
+    __tablename__ = 'card_transaction'
+
     commenced = DB.Column(
         DB.DateTime(),
         nullable=False
@@ -501,14 +498,3 @@ class CardTransaction(DB.Model):
         else:
             APP.log_manager.log_purchase('warning', str(response))
             return False
-
-    @staticmethod
-    def get_by_id(object_id):
-        """Get a card transaction object by its database ID."""
-        transaction = CardTransaction.query.filter(
-            CardTransaction.object_id == int(object_id)).first()
-
-        if not transaction:
-            return None
-
-        return transaction
