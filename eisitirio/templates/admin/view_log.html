@@ -19,7 +19,7 @@
                 <p><strong>Actor</strong>: <a href="{{ url_for('admin_users.view_user', user_id=log.actor.object_id) }}">{{ log.actor.full_name }}</a></p>
             {% endif %}
             {% if log.card_transaction != None %}
-                <p><strong>Card Transaction</strong>: <a href="{{ url_for('admin.view_transaction', user_id=log.card_transaction.object_id) }}">#{{ '%05d' % log.card_transaction.object_id }}</a></p>
+                <p><strong>Card Transaction</strong>: <a href="{{ url_for('admin.view_transaction', transaction_id=log.card_transaction.object_id) }}">#{{ '%05d' % log.card_transaction.object_id }}</a></p>
             {% endif %}
             <h4>Related Tickets</h4>
             {% if log.tickets.count() > 0 %}
