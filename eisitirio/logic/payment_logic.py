@@ -32,7 +32,7 @@ def do_payment(tickets, postage_option, payment_method, payment_term,
         elif payment_method == 'Card':
             transaction = models.CardTransaction(login.current_user)
     else:
-        transaction = models.Transaction(login.current_user, 'Free')
+        transaction = models.FreeTransaction(login.current_user)
 
         app.APP.log_manager.log_event(
             'Performed Free Transaction',

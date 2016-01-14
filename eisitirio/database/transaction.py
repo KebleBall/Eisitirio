@@ -107,3 +107,15 @@ class Transaction(DB.Model):
         postage = self.postage
         if postage:
             postage.paid = True
+
+class FreeTransaction(Transaction):
+    __mapper_args__ = {'polymorphic_identity': 'Free'}
+
+    def __init__(self, user):
+        super(FreeTransaction, self).__init__(user, 'Free')
+
+class DummyTransaction(Transaction):
+    __mapper_args__ = {'polymorphic_identity': 'Dummy'}
+
+    def __init__(self, user):
+        super(DummyTransaction, self).__init__(user, 'Dummy')

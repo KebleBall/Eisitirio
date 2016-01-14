@@ -19,7 +19,7 @@ class MigrateTransactionsCommand(script.Command):
         """Perform the migration."""
         for transaction in models.OldTransaction.query.all():
             if transaction.value == 0:
-                new_transaction = models.Transaction(transaction.user, 'Free')
+                new_transaction = models.FreeTransaction(transaction.user)
             elif transaction.payment_method == 'Battels':
                 new_transaction = models.BattelsTransaction(transaction.user)
 
@@ -42,7 +42,7 @@ class MigrateTransactionsCommand(script.Command):
 
                 DB.session.delete(transaction.card_transaction)
             else:
-                new_transaction = models.Transaction(transaction.user, 'Dummy')
+                new_transaction = models.DummyTransaction(transaction.user)
 
             new_transaction.paid = transaction.paid
             new_transaction.created = transaction.created

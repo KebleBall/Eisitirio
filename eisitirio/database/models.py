@@ -30,6 +30,8 @@ from eisitirio.database.postage_transaction_item import PostageTransactionItem
 from eisitirio.database.statistic import Statistic
 from eisitirio.database.ticket import Ticket
 from eisitirio.database.ticket_transaction_item import TicketTransactionItem
+from eisitirio.database.transaction import DummyTransaction
+from eisitirio.database.transaction import FreeTransaction
 from eisitirio.database.transaction import Transaction
 from eisitirio.database.user import User
 from eisitirio.database.voucher import Voucher
