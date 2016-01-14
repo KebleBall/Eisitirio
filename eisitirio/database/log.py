@@ -108,6 +108,7 @@ class Log(DB.Model):
 
     @staticmethod
     def write_csv_header(csv_writer):
+        """Write the header of a CSV export file."""
         csv_writer.writerow([
             'Log Entry ID',
             'Timestamp',
@@ -122,6 +123,7 @@ class Log(DB.Model):
         ])
 
     def write_csv_row(self, csv_writer):
+        """Write this object as a row in a CSV export file."""
         csv_writer.writerow([
             self.object_id,
             self.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
