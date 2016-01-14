@@ -6,9 +6,11 @@ import collections
 
 from flask.ext import script
 
+from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
 
+APP = app.APP
 DB = db.DB
 
 DummyPostageOption = collections.namedtuple('DummyPostageOption',
@@ -30,6 +32,12 @@ class MigrateTransactionItemsCommand(script.Command):
                         transaction, item.ticket
                     ))
                 elif item.item_type == 'Postage':
+                    if (
+                            item._description ==
+                            APP.config['NO_POSTAGE_OPTION'].name
+                    ):
+                        continue
+
                     postage = models.Postage(
                         DummyPostageOption(item._description, item._value),
                         transaction.tickets,
