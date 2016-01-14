@@ -74,19 +74,6 @@ class Log(DB.Model):
         lazy='dynamic'
     )
 
-    card_transaction_id = DB.Column(
-        DB.Integer(),
-        DB.ForeignKey('old_card_transaction.object_id'),
-        nullable=True
-    )
-    card_transaction = DB.relationship(
-        'OldCardTransaction',
-        backref=DB.backref(
-            'events',
-            lazy='dynamic'
-        )
-    )
-
     transaction_id = DB.Column(
         DB.Integer(),
         DB.ForeignKey('transaction.object_id'),

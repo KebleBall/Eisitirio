@@ -361,7 +361,7 @@ def view_log(entry_id):
 @login_manager.admin_required
 def view_transaction(transaction_id, events_page=1):
     """View a card transaction object."""
-    transaction = models.CardTransaction.get_by_id(transaction_id)
+    transaction = models.Transaction.get_by_id(transaction_id)
 
     if transaction:
         events = transaction.events.paginate(

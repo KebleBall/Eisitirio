@@ -109,12 +109,23 @@ class Transaction(DB.Model):
             postage.paid = True
 
 class FreeTransaction(Transaction):
+    """Model for representing a transaction with no payment required.
+
+    This class has to exist for the polymorphic typing to work.
+    """
     __mapper_args__ = {'polymorphic_identity': 'Free'}
 
     def __init__(self, user):
         super(FreeTransaction, self).__init__(user, 'Free')
 
 class DummyTransaction(Transaction):
+    """Model for representing a dummy transaction.
+
+    This class has to exist for the polymorphic typing to work. Dummy
+    transactions are only spawned by the migration from the non-polymorphic
+    style, and so this class and the corresponding identity can be removed on
+    clean installs.
+    """
     __mapper_args__ = {'polymorphic_identity': 'Dummy'}
 
     def __init__(self, user):

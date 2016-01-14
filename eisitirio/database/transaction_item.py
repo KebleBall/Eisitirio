@@ -37,19 +37,6 @@ class TransactionItem(DB.Model):
         )
     )
 
-    old_transaction_id = DB.Column(
-        DB.Integer,
-        DB.ForeignKey('old_transaction.object_id'),
-        nullable=True
-    )
-    old_transaction = DB.relationship(
-        'OldTransaction',
-        backref=DB.backref(
-            'items',
-            lazy='dynamic'
-        )
-    )
-
     __mapper_args__ = {'polymorphic_on': item_type}
 
     def __init__(self, transaction, item_type):
