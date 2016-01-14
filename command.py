@@ -14,6 +14,7 @@ from eisitirio import app
 from eisitirio import system # pylint: disable=unused-import
 from eisitirio.database import db
 from eisitirio.scripts import cron
+from eisitirio.scripts import prefill
 from eisitirio.scripts import run_bpython
 from eisitirio.scripts import update_battels
 
@@ -45,10 +46,11 @@ MANAGER = script.Manager(get_app, with_default_commands=False)
 MANAGER.add_option('config', default=None,
                    help="Configuration file to load before running commands")
 
-MANAGER.add_command('db', migrate.MigrateCommand)
-MANAGER.add_command('run', script.Server)
-MANAGER.add_command('cron', cron.CronCommand)
 MANAGER.add_command('bpython', run_bpython.BpythonCommand)
+MANAGER.add_command('cron', cron.CronCommand)
+MANAGER.add_command('db', migrate.MigrateCommand)
+MANAGER.add_command('prefill', prefill.PrefillCommand)
+MANAGER.add_command('run', script.Server)
 MANAGER.add_command('update_battels', update_battels.UpdateBattelsCommand)
 
 if __name__ == '__main__':

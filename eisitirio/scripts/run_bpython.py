@@ -16,6 +16,9 @@ class BpythonCommand(script.Command):
 
     @staticmethod
     def run():
-        """Load the appropriate config and perform the matching."""
+        """Call the bpython main loop
+
+        Starts bpython with the app, database and models as local variables.
+        """
 
         curtsies.main([], {'APP': app.APP, 'DB': db.DB, 'models': models})

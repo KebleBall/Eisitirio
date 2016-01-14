@@ -18,7 +18,7 @@ class UpdateBattelsCommand(script.Command):
 
     @staticmethod
     def run():
-        """Load the appropriate config and perform the matching."""
+        """Perform the matching."""
 
         for user in models.User.query.all():
             if user.battels is not None:
