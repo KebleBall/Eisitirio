@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import json
 
+from flask.ext import login
 import flask
 
 from eisitirio.database import db
@@ -16,6 +17,7 @@ DB = db.DB
 AJAX = flask.Blueprint('ajax', __name__)
 
 @AJAX.route('/ajax/validate/voucher', methods=['POST'])
+@login.login_required
 def validate_voucher():
     """Validate a discount voucher.
 
@@ -29,11 +31,15 @@ def validate_voucher():
     return flask.Response(json.dumps(response), mimetype='text/json')
 
 @AJAX.route('/ajax/change/ticket/<int:ticket_id>/name', methods=['POST'])
+@login.login_required
 def change_ticket_name(ticket_id):
     """Change the name on a ticket."""
     ticket = models.Ticket.get_by_id(ticket_id)
 
-    if ticket and flask.request.form['name'] != '':
+    if ticket and flask.request.form['name'] != '' and (
+            ticket.owner == login.current_user or
+            login.current_user.is_admin
+    ):
         ticket.name = flask.request.form['name']
 
         DB.session.commit()
