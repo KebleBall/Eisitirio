@@ -14,6 +14,7 @@ from eisitirio import app
 from eisitirio import system # pylint: disable=unused-import
 from eisitirio.database import db
 from eisitirio.scripts import cron
+from eisitirio.scripts import migrate_transactions
 from eisitirio.scripts import prefill
 from eisitirio.scripts import run_bpython
 from eisitirio.scripts import update_battels
@@ -49,6 +50,7 @@ MANAGER.add_option('config', default=None,
 MANAGER.add_command('bpython', run_bpython.BpythonCommand)
 MANAGER.add_command('cron', cron.CronCommand)
 MANAGER.add_command('db', migrate.MigrateCommand)
+MANAGER.add_command('migrate', migrate_transactions.MigrateTransactionsCommand)
 MANAGER.add_command('prefill', prefill.PrefillCommand)
 MANAGER.add_command('run', script.Server)
 MANAGER.add_command('update_battels', update_battels.UpdateBattelsCommand)

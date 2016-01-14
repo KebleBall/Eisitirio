@@ -1,98 +1,29 @@
 # coding: utf-8
-"""Database model for representing a card transaction."""
+"""Database model for information about Card Transactions performed via eWay."""
 
 from __future__ import unicode_literals
 
 import datetime
 import json
+import requests
 
 from flask.ext import login
 import flask
-import requests
 
 from eisitirio import app
 from eisitirio.database import db
-from eisitirio.database import transaction
 
-DB = db.DB
 APP = app.APP
+DB = db.DB
 
-EWAY_RESULT_CODES = {
-    None: (None, 'Transaction not completed'),
-    '00': (True, 'Transaction Approved'),
-    '01': (False, 'Refer to Issuer'),
-    '02': (False, 'Refer to Issuer, special'),
-    '03': (False, 'No Merchant'),
-    '04': (False, 'Pick Up Card'),
-    '05': (False, 'Do Not Honour'),
-    '06': (False, 'Error'),
-    '07': (False, 'Pick Up Card, Special'),
-    '08': (True, 'Honour With Identification'),
-    '09': (False, 'Request In Progress'),
-    '10': (True, 'Approved For Partial Amount'),
-    '11': (True, 'Approved, VIP'),
-    '12': (False, 'Invalid Transaction'),
-    '13': (False, 'Invalid Amount'),
-    '14': (False, 'Invalid Card Number'),
-    '15': (False, 'No Issuer'),
-    '16': (True, 'Approved, Update Track 3'),
-    '19': (False, 'Re-enter Last Transaction'),
-    '21': (False, 'No Action Taken'),
-    '22': (False, 'Suspected Malfunction'),
-    '23': (False, 'Unacceptable Transaction Fee'),
-    '25': (False, 'Unable to Locate Record On File'),
-    '30': (False, 'Format Error'),
-    '31': (False, 'Bank Not Supported By Switch'),
-    '33': (False, 'Expired Card, Capture'),
-    '34': (False, 'Suspected Fraud, Retain Card'),
-    '35': (False, 'Card Acceptor, Contact Acquirer, Retain Card'),
-    '36': (False, 'Restricted Card, Retain Card'),
-    '37': (False, 'Contact Acquirer Security Department, Retain Card'),
-    '38': (False, 'PIN Tries Exceeded, Capture'),
-    '39': (False, 'No Credit Account'),
-    '40': (False, 'Function Not Supported'),
-    '41': (False, 'Lost Card'),
-    '42': (False, 'No Universal Account'),
-    '43': (False, 'Stolen Card'),
-    '44': (False, 'No Investment Account'),
-    '51': (False, 'Insufficient Funds'),
-    '52': (False, 'No Cheque Account'),
-    '53': (False, 'No Savings Account'),
-    '54': (False, 'Expired Card'),
-    '55': (False, 'Incorrect PIN'),
-    '56': (False, 'No Card Record'),
-    '57': (False, 'Function Not Permitted to Cardholder'),
-    '58': (False, 'Function Not Permitted to Terminal'),
-    '59': (False, 'Suspected Fraud'),
-    '60': (False, 'Acceptor Contact Acquirer'),
-    '61': (False, 'Exceeds Withdrawal Limit'),
-    '62': (False, 'Restricted Card'),
-    '63': (False, 'Security Violation'),
-    '64': (False, 'Original Amount Incorrect'),
-    '66': (False, 'Acceptor Contact Acquirer, Security'),
-    '67': (False, 'Capture Card'),
-    '75': (False, 'PIN Tries Exceeded'),
-    '82': (False, 'CVV Validation Error'),
-    '90': (False, 'Cutoff In Progress'),
-    '91': (False, 'Card Issuer Unavailable'),
-    '92': (False, 'Unable To Route Transaction'),
-    '93': (False, 'Cannot Complete, Violation Of The Law'),
-    '94': (False, 'Duplicate Transaction'),
-    '96': (False, 'System Error'),
-    'CX': (False, 'Customer Cancelled Transaction')
-}
+class OldCardTransaction(DB.Model):
+    """Model for information about Card Transactions performed via eWay."""
+    __tablename__ = 'old_card_transaction'
 
-class CardTransaction(transaction.Transaction):
-    """Model for representing a card transaction."""
-    __tablename__ = 'card_transaction'
-    __mapper_args__ = {'polymorphic_identity': 'Card'}
-
-    object_id = DB.Column(
-        DB.Integer(),
-        DB.ForeignKey('transaction.object_id'),
-        primary_key=True
+    commenced = DB.Column(
+        DB.DateTime(),
+        nullable=False
     )
-
     completed = DB.Column(
         DB.DateTime(),
         nullable=True
@@ -115,16 +46,40 @@ class CardTransaction(transaction.Transaction):
         default=0
     )
 
+    user_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
+        nullable=False
+    )
+    user = DB.relationship(
+        'User',
+        backref=DB.backref(
+            'card_transactions',
+            lazy='dynamic'
+        )
+    )
+
     def __init__(self, user):
-        super(CardTransaction, self).__init__(user, 'Card')
+        self.user = user
+        self.commenced = datetime.datetime.utcnow()
 
     def __repr__(self):
-        return '<{0} CardTransaction {1}: {2}, {3} item(s)>'.format(
-            self.get_success(),
+        status = self.get_status()
+        if status[0] is None:
+            status_str = 'Uncompleted'
+        else:
+            status_str = 'Successful' if status[0] else 'Failed'
+
+        return '<{0} CardTransaction: {1}, {2}>'.format(
+            status_str,
             self.object_id,
-            self.get_status()[1],
-            self.items.count()
+            status[1]
         )
+
+    @property
+    def value(self):
+        """Get the total value of the transaction."""
+        return self.transaction.value
 
     def get_status(self):
         """Get a better representation of the status of this transaction.
@@ -137,7 +92,71 @@ class CardTransaction(transaction.Transaction):
             (bool, str) pair of success value and explanation
         """
         try:
-            return EWAY_RESULT_CODES[self.result_code]
+            return {
+                None: (None, 'Transaction not completed'),
+                '00': (True, 'Transaction Approved'),
+                '01': (False, 'Refer to Issuer'),
+                '02': (False, 'Refer to Issuer, special'),
+                '03': (False, 'No Merchant'),
+                '04': (False, 'Pick Up Card'),
+                '05': (False, 'Do Not Honour'),
+                '06': (False, 'Error'),
+                '07': (False, 'Pick Up Card, Special'),
+                '08': (True, 'Honour With Identification'),
+                '09': (False, 'Request In Progress'),
+                '10': (True, 'Approved For Partial Amount'),
+                '11': (True, 'Approved, VIP'),
+                '12': (False, 'Invalid Transaction'),
+                '13': (False, 'Invalid Amount'),
+                '14': (False, 'Invalid Card Number'),
+                '15': (False, 'No Issuer'),
+                '16': (True, 'Approved, Update Track 3'),
+                '19': (False, 'Re-enter Last Transaction'),
+                '21': (False, 'No Action Taken'),
+                '22': (False, 'Suspected Malfunction'),
+                '23': (False, 'Unacceptable Transaction Fee'),
+                '25': (False, 'Unable to Locate Record On File'),
+                '30': (False, 'Format Error'),
+                '31': (False, 'Bank Not Supported By Switch'),
+                '33': (False, 'Expired Card, Capture'),
+                '34': (False, 'Suspected Fraud, Retain Card'),
+                '35': (False, 'Card Acceptor, Contact Acquirer, Retain Card'),
+                '36': (False, 'Restricted Card, Retain Card'),
+                '37': (False,
+                       'Contact Acquirer Security Department, Retain Card'),
+                '38': (False, 'PIN Tries Exceeded, Capture'),
+                '39': (False, 'No Credit Account'),
+                '40': (False, 'Function Not Supported'),
+                '41': (False, 'Lost Card'),
+                '42': (False, 'No Universal Account'),
+                '43': (False, 'Stolen Card'),
+                '44': (False, 'No Investment Account'),
+                '51': (False, 'Insufficient Funds'),
+                '52': (False, 'No Cheque Account'),
+                '53': (False, 'No Savings Account'),
+                '54': (False, 'Expired Card'),
+                '55': (False, 'Incorrect PIN'),
+                '56': (False, 'No Card Record'),
+                '57': (False, 'Function Not Permitted to Cardholder'),
+                '58': (False, 'Function Not Permitted to Terminal'),
+                '59': (False, 'Suspected Fraud'),
+                '60': (False, 'Acceptor Contact Acquirer'),
+                '61': (False, 'Exceeds Withdrawal Limit'),
+                '62': (False, 'Restricted Card'),
+                '63': (False, 'Security Violation'),
+                '64': (False, 'Original Amount Incorrect'),
+                '66': (False, 'Acceptor Contact Acquirer, Security'),
+                '67': (False, 'Capture Card'),
+                '75': (False, 'PIN Tries Exceeded'),
+                '82': (False, 'CVV Validation Error'),
+                '90': (False, 'Cutoff In Progress'),
+                '91': (False, 'Card Issuer Unavailable'),
+                '92': (False, 'Unable To Route Transaction'),
+                '93': (False, 'Cannot Complete, Violation Of The Law'),
+                '94': (False, 'Duplicate Transaction'),
+                '96': (False, 'System Error'),
+                'CX': (False, 'Customer Cancelled Transaction')
+            }[self.result_code]
         except KeyError as err:
             return (False, 'Unknown response: {0}'.format(err.args[0]))
 
@@ -145,7 +164,7 @@ class CardTransaction(transaction.Transaction):
         """Get whether the transaction was completed successfully."""
         success = self.get_status()[0]
         if success is None:
-            return 'Uncompleted'
+            return 'Incomplete'
         elif success:
             return 'Successful'
         else:
@@ -224,8 +243,9 @@ class CardTransaction(transaction.Transaction):
             },
             'Payment': {
                 'TotalAmount': self.value,
-                'InvoiceReference': 'Trans{0:05d}'.format(
-                    self.object_id
+                'InvoiceReference': 'Trans{0:05d}/{1:05d}'.format(
+                    self.object_id,
+                    self.transaction.object_id
                 ),
                 'CurrencyCode': 'GBP'
             },
@@ -252,7 +272,7 @@ class CardTransaction(transaction.Transaction):
 
             APP.log_manager.log_event(
                 'Started Card Payment',
-                self.tickets,
+                self.transaction.tickets,
                 login.current_user,
                 self
             )
@@ -354,13 +374,13 @@ class CardTransaction(transaction.Transaction):
                                 'warning'
                             )
                     else:
-                        self.mark_as_paid()
+                        self.transaction.mark_as_paid()
 
                         DB.session.commit()
 
                         APP.log_manager.log_event(
                             'Completed Card Payment',
-                            self.tickets,
+                            self.transaction.tickets,
                             self.user,
                             self
                         )
@@ -407,7 +427,7 @@ class CardTransaction(transaction.Transaction):
 
         APP.log_manager.log_event(
             'Cancelled Card Payment',
-            self.tickets,
+            self.transaction.tickets,
             self.user,
             self
         )
@@ -478,4 +498,3 @@ class CardTransaction(transaction.Transaction):
         else:
             APP.log_manager.log_purchase('warning', str(response))
             return False
-

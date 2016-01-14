@@ -26,7 +26,21 @@ def do_payment(tickets, postage_option, payment_method, payment_term,
     Returns:
         A flask redirect, either to the dashboard, or to the payment gateway.
     """
-    transaction = models.Transaction(login.current_user)
+    if any(ticket.price > 0 for ticket in tickets) or postage_option.price > 0:
+        if payment_method == 'Battels':
+            transaction = models.BattelsTransaction(login.current_user)
+        elif payment_method == 'Card':
+            transaction = models.CardTransaction(login.current_user)
+    else:
+        transaction = models.Transaction(login.current_user, 'Free')
+
+        app.APP.log_manager.log_event(
+            'Performed Free Transaction',
+            tickets,
+            login.current_user,
+            transaction,
+            False
+        )
 
     items = [
         models.TicketTransactionItem(transaction, ticket)
@@ -40,26 +54,20 @@ def do_payment(tickets, postage_option, payment_method, payment_term,
             models.PostageTransactionItem(transaction, postage)
         )
 
+        db.DB.session.add(postage)
+
     db.DB.session.add(transaction)
-    db.DB.session.add(postage)
     db.DB.session.add_all(items)
     db.DB.session.commit()
 
     if payment_method == 'Battels':
-        transaction.charge_to_battels(payment_term)
+        transaction.charge(payment_term)
 
         db.DB.session.commit()
-
-        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
-    else:
-        card_transaction = transaction.charge_to_card()
-
-        eway_url = card_transaction.get_eway_url()
+    elif payment_method == 'Card':
+        eway_url = transaction.get_eway_url()
 
         if eway_url:
-            db.DB.session.add(card_transaction)
-            db.DB.session.commit()
-
             return flask.redirect(eway_url)
-        else:
-            return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+
+    return flask.redirect(flask.url_for('dashboard.dashboard_home'))

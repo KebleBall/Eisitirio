@@ -73,7 +73,8 @@ class LogManager(object):
         )
 
     @staticmethod
-    def log_event(message, tickets=None, user=None, transaction=None):
+    def log_event(message, tickets=None, user=None, transaction=None,
+                  commit=True):
         """Log a user action to the database.
 
         Creates a log entry in the database which can be found through the admin
@@ -83,8 +84,8 @@ class LogManager(object):
             message: (str) The message to be logged
             tickets: (list(models.Ticket) or None) tickets the action affected
             user: (models.User or None) user this action affected
-            transaction: (models.CardTransaction or None) transaction this
-                action affected
+            transaction: (models.Transaction or None) transaction this action
+                affected
         """
         if 'actor_id' in flask.session:
             actor = models.User.get_by_id(flask.session['actor_id'])
@@ -109,4 +110,6 @@ class LogManager(object):
         )
 
         DB.session.add(entry)
-        DB.session.commit()
+
+        if commit:
+            DB.session.commit()

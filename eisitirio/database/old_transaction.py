@@ -9,23 +9,14 @@ from flask.ext import login
 
 from eisitirio import app
 from eisitirio.database import db
+from eisitirio.database import card_transaction
 
 DB = db.DB
 APP = app.APP
 
-class Transaction(DB.Model):
+class OldTransaction(DB.Model):
     """Model for representing a monetary exchange transaction."""
-    __tablename__ = 'transaction'
-
-    payment_method = DB.Column(
-        DB.Enum(
-            'Battels',
-            'Card',
-            'Free',
-            'Dummy'
-        ),
-        nullable=False
-    )
+    __tablename__ = 'old_transaction'
 
     paid = DB.Column(
         DB.Boolean,
@@ -45,17 +36,32 @@ class Transaction(DB.Model):
     user = DB.relationship(
         'User',
         backref=DB.backref(
-            'transactions',
+            'old_transactions',
             lazy='dynamic'
         )
     )
 
-    __mapper_args__ = {'polymorphic_on': payment_method}
+    battels_term = DB.Column(
+        DB.Unicode(4),
+        nullable=True
+    )
 
-    def __init__(self, user, payment_method):
+    card_transaction_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('old_card_transaction.object_id'),
+        nullable=True
+    )
+    card_transaction = DB.relationship(
+        'OldCardTransaction',
+        backref=DB.backref(
+            'transaction',
+            lazy=False,
+            uselist=False
+        )
+    )
+
+    def __init__(self, user):
         self.user = user
-        self.payment_method = payment_method
-
         self.created = datetime.datetime.utcnow()
 
     def __repr__(self):
@@ -94,6 +100,34 @@ class Transaction(DB.Model):
         except IndexError:
             return None
 
+    @property
+    def payment_method(self):
+        """Get the method used for paying for this transaction."""
+        if self.battels_term is not None:
+            return "Battels"
+        elif self.card_transaction is not None:
+            return "Card"
+        else:
+            return "Unknown Payment Method"
+
+    def charge_to_battels(self, term):
+        """Charge this transaction to the user's battels account."""
+        self.battels_term = term
+
+        self.user.battels.charge(self.value, term)
+
+        self.mark_as_paid()
+
+    def charge_to_card(self):
+        """Charge this transaction to a credit/debit card.
+
+        Only creates the corresponding CardTransaction object, calling code must
+        manipulate it and redirect the user to the payment gateway.
+        """
+        self.card_transaction = card_transaction.CardTransaction(self.user)
+
+        return self.card_transaction
+
     def mark_as_paid(self):
         """Mark the transaction as paid for.
 
@@ -107,3 +141,9 @@ class Transaction(DB.Model):
         postage = self.postage
         if postage:
             postage.paid = True
+
+        APP.log_manager.log_event(
+            'Completed Payment',
+            self.tickets,
+            login.current_user
+        )

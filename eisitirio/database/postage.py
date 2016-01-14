@@ -58,3 +58,6 @@ class Postage(DB.Model):
         self.price = postage_option.price
         self.address = address
         self.tickets = tickets
+
+        if self.price == 0:
+            self.paid = True

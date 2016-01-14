@@ -11,7 +11,7 @@
             <h4>Transaction Details</h4>
             <p><strong>User</strong>: <a href="{{ url_for('admin_users.view_user', user_id=transaction.user.object_id) }}">{{ transaction.user.full_name }}</a></p>
             <p><strong>Total Value</strong>: &pound;{{ '%.2f' % (transaction.value / 100.0) }}</p>
-            <p><strong>Commenced</strong>: {{ transaction.commenced.strftime('%c') }}</p>
+            <p><strong>Created</strong>: {{ transaction.created.strftime('%c') }}</p>
             {% if transaction.completed != None %}
                 <p><strong>Completed</strong>: {{ transaction.completed.strftime('%c') }}</p>
                 <p><strong>Result Code</strong>: {{ transaction.result_code }}</p>

@@ -76,11 +76,24 @@ class Log(DB.Model):
 
     card_transaction_id = DB.Column(
         DB.Integer(),
-        DB.ForeignKey('card_transaction.object_id'),
+        DB.ForeignKey('old_card_transaction.object_id'),
         nullable=True
     )
     card_transaction = DB.relationship(
-        'CardTransaction',
+        'OldCardTransaction',
+        backref=DB.backref(
+            'events',
+            lazy='dynamic'
+        )
+    )
+
+    transaction_id = DB.Column(
+        DB.Integer(),
+        DB.ForeignKey('transaction.object_id'),
+        nullable=True
+    )
+    transaction = DB.relationship(
+        'Transaction',
         backref=DB.backref(
             'events',
             lazy='dynamic'
@@ -88,7 +101,7 @@ class Log(DB.Model):
     )
 
     def __init__(self, ip_address, action, actor, user, tickets=None,
-                 card_transaction=None):
+                 transaction=None):
         if tickets is None:
             tickets = []
 
@@ -98,7 +111,7 @@ class Log(DB.Model):
         self.actor = actor
         self.user = user
         self.tickets = tickets
-        self.card_transaction = card_transaction
+        self.transaction = transaction
 
     def __repr__(self):
         return '<Log {0}: {1}>'.format(
@@ -119,7 +132,7 @@ class Log(DB.Model):
             'Target\'s User ID',
             'Target\'s Name',
             'Relevant Ticket IDs',
-            'Relevant Card Transaction ID',
+            'Relevant Transaction ID',
         ])
 
     def write_csv_row(self, csv_writer):
@@ -135,8 +148,8 @@ class Log(DB.Model):
             self.user if self.user is not None else 'N/A',
             ','.join(str(ticket.object_id) for ticket in self.tickets),
             (
-                self.card_transaction_id
-                if self.card_transaction_id is not None
+                self.transaction_id
+                if self.transaction_id is not None
                 else 'N/A'
             ),
         ])

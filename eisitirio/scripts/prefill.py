@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # coding: utf-8
-"""Script to update matching from users to Battels accounts."""
+"""Script to prefill the database with colleges and affiliations."""
 
 from flask.ext import script
 

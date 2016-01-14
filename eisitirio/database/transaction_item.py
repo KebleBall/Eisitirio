@@ -27,10 +27,23 @@ class TransactionItem(DB.Model):
     transaction_id = DB.Column(
         DB.Integer,
         DB.ForeignKey('transaction.object_id'),
-        nullable=False
+        nullable=True
     )
     transaction = DB.relationship(
         'Transaction',
+        backref=DB.backref(
+            'items',
+            lazy='dynamic'
+        )
+    )
+
+    old_transaction_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('old_transaction.object_id'),
+        nullable=True
+    )
+    old_transaction = DB.relationship(
+        'OldTransaction',
         backref=DB.backref(
             'items',
             lazy='dynamic'
