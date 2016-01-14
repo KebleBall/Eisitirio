@@ -71,7 +71,7 @@ class CustomModel(flask_sqlalchemy.Model):
         elif name.startswith('has_'):
             return functools.partial(self.has, name[4:])
 
-        return super(CustomModel, self).__getattr__(name)
+        return getattr(super(CustomModel, self), name)
 
     @classmethod
     def get_by_id(cls, object_id):
