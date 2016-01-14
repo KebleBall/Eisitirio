@@ -70,15 +70,15 @@ class Transaction(DB.Model):
         nullable=True
     )
 
-    def __init__(self, user, address):
+    def __init__(self, user):
         self.user = user
         self.created = datetime.datetime.utcnow()
-        self.address = address
+        self.address = None
 
     def __repr__(self):
         return '<Transaction {0}: {1} item(s)>'.format(
             self.object_id,
-            len(self.items)
+            self.items.count()
         )
 
     @property
@@ -95,6 +95,21 @@ class Transaction(DB.Model):
         return list(
             item.ticket for item in self.items if item.item_type == 'Ticket'
         )
+
+    @property
+    def postage(self):
+        """Get the postage paid for in this transaction.
+
+        Returns a single Postage object, or None.
+        """
+        try:
+            return list(
+                item.postage
+                for item in self.items
+                if item.item_type == 'Postage'
+            )[0]
+        except IndexError:
+            return None
 
     @property
     def payment_method(self):
@@ -134,6 +149,10 @@ class Transaction(DB.Model):
 
         for ticket in self.tickets:
             ticket.mark_as_paid()
+
+        postage = self.postage
+        if postage:
+            postage.paid = True
 
         APP.log_manager.log_event(
             'Completed Payment',

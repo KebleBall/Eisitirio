@@ -100,14 +100,6 @@ class Ticket(DB.Model):
         return price[:-2] + '.' + price[-2:]
 
     @property
-    def description(self):
-        """Get a description of the ticket with the type and guest name."""
-        return '{0} Ticket ({1})'.format(
-            self.ticket_type,
-            self.name if self.name else 'No Name Set'
-        )
-
-    @property
     def payment_method(self):
         """Get the payment method for this ticket."""
         if self.price == 0:

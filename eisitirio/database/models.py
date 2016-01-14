@@ -19,13 +19,16 @@ from eisitirio.database.announcement import Announcement
 from eisitirio.database.battels import Battels
 from eisitirio.database.card_transaction import CardTransaction
 from eisitirio.database.college import College
+from eisitirio.database.generic_transaction_item import GenericTransactionItem
 from eisitirio.database.log import Log
+from eisitirio.database.old_transaction_item import OldTransactionItem
 from eisitirio.database.photo import Photo
 from eisitirio.database.postage import Postage
+from eisitirio.database.postage_transaction_item import PostageTransactionItem
 from eisitirio.database.statistic import Statistic
 from eisitirio.database.ticket import Ticket
+from eisitirio.database.ticket_transaction_item import TicketTransactionItem
 from eisitirio.database.transaction import Transaction
-from eisitirio.database.transaction_item import TransactionItem
 from eisitirio.database.user import User
 from eisitirio.database.voucher import Voucher
 from eisitirio.database.waiting import Waiting

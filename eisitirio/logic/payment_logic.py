@@ -6,16 +6,18 @@ from __future__ import unicode_literals
 from flask.ext import login
 import flask
 
+from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
 
-def do_payment(tickets, postage, payment_method, payment_term, address=None):
+def do_payment(tickets, postage_option, payment_method, payment_term,
+               address=None):
     """Run the payment process for tickets and postage.
 
     Args:
         tickets: (models.Ticket) The tickets the user is paying for.
-        postage: (eisitirio.helpers.postage_option.PostageOption) The postage
-            option selected by the user.
+        postage_option: (eisitirio.helpers.postage_option.PostageOption) The
+            postage option selected by the user.
         payment_method: (str) The payment method selected by the user.
         payment_term: (str or None) If the user selected to pay by Battels, the
             coded term to charge the transaction to.
@@ -24,19 +26,22 @@ def do_payment(tickets, postage, payment_method, payment_term, address=None):
     Returns:
         A flask redirect, either to the dashboard, or to the payment gateway.
     """
-    transaction = models.Transaction(login.current_user, address)
+    transaction = models.Transaction(login.current_user)
 
-    db.DB.session.add(transaction)
-    db.DB.session.commit()
+    items = [
+        models.TicketTransactionItem(transaction, ticket)
+        for ticket in tickets
+    ]
 
-    items = [models.TransactionItem(transaction, ticket) for ticket in tickets]
+    if postage_option is not app.APP.config['NO_POSTAGE_OPTION']:
+        postage = models.Postage(postage_option, tickets, address)
 
-    if postage:
         items.append(
-            models.TransactionItem(transaction, None, 'Postage', postage.price,
-                                   postage.name)
+            models.PostageTransactionItem(transaction, postage)
         )
 
+    db.DB.session.add(transaction)
+    db.DB.session.add(postage)
     db.DB.session.add_all(items)
     db.DB.session.commit()
 

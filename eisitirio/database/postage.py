@@ -24,6 +24,11 @@ class Postage(DB.Model):
     """Model for representing postage for one or more tickets."""
     __tablename__ = 'postage'
 
+    paid = DB.Column(
+        DB.Boolean(),
+        default=False,
+        nullable=False
+    )
     postage_type = DB.Column(
         DB.Unicode(50),
         nullable=False
