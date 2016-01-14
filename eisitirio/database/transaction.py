@@ -23,11 +23,6 @@ class Transaction(DB.Model):
         default=False,
         nullable=False
     )
-    completed = DB.Column(
-        DB.Boolean,
-        default=False,
-        nullable=False
-    )
     created = DB.Column(
         DB.DateTime(),
         nullable=False
@@ -65,15 +60,9 @@ class Transaction(DB.Model):
         )
     )
 
-    address = DB.Column(
-        DB.Unicode(200),
-        nullable=True
-    )
-
     def __init__(self, user):
         self.user = user
         self.created = datetime.datetime.utcnow()
-        self.address = None
 
     def __repr__(self):
         return '<Transaction {0}: {1} item(s)>'.format(
@@ -145,7 +134,6 @@ class Transaction(DB.Model):
         Marks all tickets in the transaction as paid for.
         """
         self.paid = True
-        self.completed = True
 
         for ticket in self.tickets:
             ticket.mark_as_paid()
