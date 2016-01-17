@@ -152,27 +152,23 @@
             {% else %}
                 <p>Not Waiting.</p>
             {% endif %}
-            <h4>User's Card Transactions</h4>
-            {% if user.card_transactions.count() > 0 %}
+            <h4>User's Transactions</h4>
+            {% if user.transactions.count() > 0 %}
                 <table id="transaction_table">
                     <thead>
                         <tr>
                             <th>Transaction ID</th>
-                            <th>eWay ID</th>
-                            <th>Commenced</th>
-                            <th>Success</th>
-                            <th>Status</th>
+                            <th>Transaction Type</th>
+                            <th>Created</th>
                             <th>View</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for transaction in user.card_transactions %}
+                        {% for transaction in user.transactions %}
                             <tr>
                                 <td>{{ '%05d' % transaction.object_id }}</td>
-                                <td>{% if transaction.eway_id != None %}{{ transaction.eway_id }}{% else %}N/A{% endif %}
-                                <td>{{ transaction.commenced.strftime('%c') }}</td>
-                                <td>{{ transaction.get_success() }}</td>
-                                <td>{{ transaction.get_status()[1] }}</td>
+                                <td>{{ transaction.payment_method }}
+                                <td>{{ transaction.created.strftime('%c') }}</td>
                                 <td><a href="{{ url_for('admin.view_transaction', transaction_id=transaction.object_id) }}" class="button tiny">View</a></td>
                             </tr>
                         {% endfor %}
