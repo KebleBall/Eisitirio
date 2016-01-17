@@ -31,11 +31,12 @@ class Until(object):
         assert len(self._values) == len(self._times) + 1
         assert all(isinstance(dt, datetime.datetime) for dt in self._times)
 
-    def get(self):
+    def get(self, now=None):
         """Return the appropriate value based on the current time."""
         left = 0
         right = len(self._times)
-        now = datetime.datetime.utcnow()
+        if now is None:
+            now = datetime.datetime.utcnow()
 
         while left != right:
             mid = (left + right) // 2
@@ -47,10 +48,10 @@ class Until(object):
         return self._values[left]
 
 
-def parse_until(value):
+def parse_until(value, now=None):
     """If the config value is an Until object, call its get() method."""
     if isinstance(value, Until):
-        return value.get()
+        return value.get(now)
     else:
         return value
 
@@ -66,4 +67,7 @@ def augment_config(app):
 
     old_get = app.config.get
 
-    app.config.get = (lambda k, d=None: parse_until(old_get(k, d)))
+    def new_get(key, default=None, now=None):
+        return parse_until(old_get(key, default), now)
+
+    app.config.get = new_get

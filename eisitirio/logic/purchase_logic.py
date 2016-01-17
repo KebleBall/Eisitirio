@@ -2,6 +2,7 @@
 """Various business logic functions for the purchase flow."""
 
 import collections
+import datetime
 import json
 
 import flask
@@ -56,13 +57,13 @@ def _guest_tickets_available():
         app.APP.config['GUEST_TICKETS_AVAILABLE'] - guest_ticket_count
     )
 
-def _total_tickets_available(user):
+def _total_tickets_available(user, now):
     """Get how many tickets are available for a user to buy."""
     return max(0, min(
-        app.APP.config['MAX_TICKETS'] - user.tickets.filter(
+        app.APP.config.get('MAX_TICKETS', now=now) - user.tickets.filter(
             models.Ticket.cancelled == False # pylint: disable=singleton-comparison
         ).count(),
-        app.APP.config['MAX_TICKETS_PER_TRANSACTION']
+        app.APP.config.get('MAX_TICKETS_PER_TRANSACTION', now=now)
     ))
 
 def _type_limit_per_person(user, ticket_type):
@@ -123,14 +124,52 @@ def get_ticket_info(user):
     """Get information about what tickets |user| can purchase online."""
 
     ticket_info = TicketInfo(
-        _guest_tickets_available(),
-        _total_tickets_available(user),
+        LARGE_NUMBER,
+        _total_tickets_available(user, datetime.datetime.utcnow()),
         []
     )
 
     for ticket_type in app.APP.config['TICKET_TYPES']:
         if ticket_type.can_buy(user):
             ticket_limit = _get_ticket_limit(user, ticket_type, ticket_info)
+
+            if ticket_limit > 0:
+                ticket_info.ticket_types.append((ticket_type, ticket_limit))
+
+    return ticket_info
+
+def _get_group_ticket_limit(user, ticket_type, ticket_info):
+    """Get how many |ticket_type| tickets |user| can purchase in a group.
+
+    Args:
+        user: (models.User) The user purchasing tickets.
+        ticket_type: (eisitirio.helpers.ticket_type.TicketType) the type of
+            ticket being purchased
+        ticket_info: (TicketInfo) Information about available tickets.
+
+    Returns:
+        (int) the number of |ticket_type| tickets that |user| can buy.
+    """
+
+    return min(
+        _type_limit_per_person(user, ticket_type),
+        ticket_info.total_tickets_available
+    )
+
+def get_group_ticket_info(user):
+    """Get information about what tickets |user| can purchase online."""
+
+    ticket_info = TicketInfo(
+        LARGE_NUMBER,
+        _total_tickets_available(user,
+                                 app.APP.config['GENERAL_RELEASE_STARTS']),
+        []
+    )
+
+    for ticket_type in app.APP.config['TICKET_TYPES']:
+        if ticket_type.can_buy(user, True):
+            ticket_limit = _get_group_ticket_limit(user, ticket_type,
+                                                   ticket_info)
 
             if ticket_limit > 0:
                 ticket_info.ticket_types.append((ticket_type, ticket_limit))

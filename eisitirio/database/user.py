@@ -168,6 +168,24 @@ class User(DB.Model):
         return '<User {0}: {1} {2}>'.format(
             self.object_id, self.forenames, self.surname)
 
+    @property
+    def purchase_group(self):
+        """Get the purchase group the user either leads or is a member of."""
+        if self._purchase_group is not None:
+            return self._purchase_group
+        elif self.group_purchase_requests:
+            return self.group_purchase_requests[0].purchase_group
+        else:
+            return None
+
+    def group_purchase_requested(self, ticket_type_slug):
+        """Get how many of a given ticket type the user has requested."""
+        for request in self.group_purchase_requests:
+            if request.ticket_type_slug == ticket_type_slug:
+                return request.number_requested
+
+        return 0
+
     def check_password(self, candidate):
         """Check if a password matches the hash stored for the user.
 
