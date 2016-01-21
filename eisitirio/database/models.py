@@ -20,11 +20,13 @@ from eisitirio.database.battels import Battels
 from eisitirio.database.battels_transaction import BattelsTransaction
 from eisitirio.database.card_transaction import CardTransaction
 from eisitirio.database.college import College
+from eisitirio.database.group_purchase_request import GroupPurchaseRequest
 from eisitirio.database.generic_transaction_item import GenericTransactionItem
 from eisitirio.database.log import Log
 from eisitirio.database.photo import Photo
 from eisitirio.database.postage import Postage
 from eisitirio.database.postage_transaction_item import PostageTransactionItem
+from eisitirio.database.purchase_group import PurchaseGroup
 from eisitirio.database.statistic import Statistic
 from eisitirio.database.ticket import Ticket
 from eisitirio.database.ticket_transaction_item import TicketTransactionItem

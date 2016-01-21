@@ -3,5 +3,6 @@
 
 # pylint: disable=unused-import
 
+from eisitirio.permissions import purchase_group
 from eisitirio.permissions import ticket
 from eisitirio.permissions import user

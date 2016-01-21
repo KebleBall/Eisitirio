@@ -27,6 +27,8 @@ class GroupPurchaseRequest(DB.Model):
     )
     purchase_group = DB.relationship(
         'PurchaseGroup',
+        single_parent=True,
+        cascade="all, delete, delete-orphan",
         backref=DB.backref(
             'requests',
             lazy='dynamic'
