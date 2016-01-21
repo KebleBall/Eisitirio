@@ -75,10 +75,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="large-6 columns">
+                    <div class="large-4 columns">
                         <label for="send_emails"><input type="checkbox" id="send_emails" name="send_emails" value="yes" {{ form_checked(form, 'send_emails', 'yes') }}/> Send Emails</label>
                     </div>
-                    <div class="large-6 columns">
+                    <div class="large-4 columns">
+                        <label for="use_noreply"><input type="checkbox" id="use_noreply" name="use_noreply" value="yes" {{ form_checked(form, 'use_noreply', 'yes') }}/> Use noreply@ email as sender</label>
+                    </div>
+                    <div class="large-4 columns">
                         <input type="submit" class="button small right">
                     </div>
                 </div>

@@ -63,6 +63,11 @@ class Announcement(DB.Model):
         default=True,
         nullable=False
     )
+    use_noreply = DB.Column(
+        DB.Boolean,
+        default=False,
+        nullable=False
+    )
     email_sent = DB.Column(
         DB.Boolean,
         default=False,
@@ -147,12 +152,14 @@ class Announcement(DB.Model):
                  has_tickets=None,
                  is_waiting=None,
                  has_collected=None,
-                 has_uncollected=None):
+                 has_uncollected=None,
+                 use_noreply=False):
         self.timestamp = datetime.datetime.utcnow()
         self.subject = subject
         self.content = content
         self.sender = sender
         self.send_email = send_email
+        self.use_noreply = use_noreply
         self.college = college
         self.affiliation = affiliation
         self.has_tickets = has_tickets
@@ -213,13 +220,18 @@ class Announcement(DB.Model):
             (int) How much of the original limit is remaining (i.e. |count|
             minus the nuber of emails sent)
         """
+        if self.use_noreply:
+            sender = APP.config['EMAIL_FROM']
+        else:
+            sender = self.sender.email
+
         try:
             for recipient in self.emails:
                 if count <= 0:
                     break
 
                 APP.email_manager.send_text(recipient.email, self.subject,
-                                            self.content, self.sender.email)
+                                            self.content, sender)
 
                 self.emails.remove(recipient)
                 count = count - 1

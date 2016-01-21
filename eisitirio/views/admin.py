@@ -582,6 +582,7 @@ def announcements(page=1):
                     has_uncollected = False
 
             send_email = 'send_emails' in form and form['send_emails'] == 'yes'
+            use_noreply = 'use_noreply' in form and form['use_noreply'] == 'yes'
 
             announcement = models.Announcement(
                 form['subject'],
@@ -593,7 +594,8 @@ def announcements(page=1):
                 has_tickets,
                 is_waiting,
                 has_collected,
-                has_uncollected
+                has_uncollected,
+                use_noreply
             )
 
             DB.session.add(announcement)
