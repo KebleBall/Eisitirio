@@ -119,13 +119,3 @@ class Battels(DB.Model):
             raise ValueError(
                 'Can\'t refund battels tickets in the current term'
             )
-
-    @staticmethod
-    def get_by_battelsid(battelsid):
-        """Get a college object by its college battels ID."""
-        battels = Battels.query.filter(Battels.battelsid == battelsid).first()
-
-        if not battels:
-            return None
-
-        return battels
