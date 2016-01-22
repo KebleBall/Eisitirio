@@ -1,0 +1,7 @@
+Dear {{ name }},
+
+{{ group_leader }} has just reserved your tickets for {{ template_config['BALL_NAME'] }}. You must now proceed to {{ url }} to pay for your tickets. If you do not pay for your tickets within {{ expiry_time }} they will be cancelled.
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

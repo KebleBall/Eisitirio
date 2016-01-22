@@ -5,206 +5,152 @@
 
 {% block content %}
     <section id="group_purchase_dashboard" class="columns">
-        {% if not login.current_user.purchase_group %}
+        {% if not current_user.purchase_group %}
             <p>Group purchase allows you and your friends to ensure that you all get the tickets you want, when one person cannot acquire enough tickets for everybody (during general release, there is a limit of {{ template_config['GENERAL_RELEASE_MAX_TICKETS'] }} tickets per person).</p>
             <p>By setting up/joining a purchase group, you and your friends can pool your ticket allowances to get all the tickets you need, whilst ensuring that nobody gets left without a ticket.</p>
-            <p>When the general release starts, the leader of your group will be responsible for visiting the purchase page and reserving the tickets requested by everybody in the group.</p>
+            <p>When the general release starts, the leader of your group will be responsible for visiting the purchase page and reserving the tickets requested by everybody in the group. The tickets will then be allocated to each group member as appropriate for individual payment. Please note that tickets will expire if not paid for within {{ format_timedelta(template_config['TICKET_EXPIRY_TIME']) }}.</p>
             <p>If you are a member of a purchase group, you will be unable to purchase tickets individually.</p>
             <p>There is a limit of {{ template_config['MAX_GROUP_MEMBERS'] }} members in each purchase group.</p>
-            <div class="row collapse">
-                <div class="large-6 columns">
-                    <ul class="pricing-table">
-                        <li class="title">Create Group</li>
-                        <li class="description">If you will be leading the group, and will purchase the tickets after the general release, you should create the group. You'll then be given a code for you to pass on to your friends so that they can join the group.</li>
-                        <li class="cta-button"><a class="button" href="{{ url_for('group_purchase.create') }}">Create Group</a></li>
-                    </ul>
-                </div>
-                <div class="large-6 columns">
-                    <form action="{{ url_for('group_purchase.create') }}" method="post">
-                        <ul class="pricing-table">
-                            <li class="title">Join Group</li>
-                            <li class="description">If somebody else has already created a group, they'll have a code for you to join. Enter it below.</li>
-                            <li class="bullet-item"><input type="text" name="code" placeholder="Group code" /></li>
-                            <li class="cta-button"><button>Join Group</button></li>
-                        </ul>
-                    </form>
-                </div>
-            </div>
+            <ul class="pricing-table">
+                <li class="title">Create Group</li>
+                <li class="description">If you will be leading the group, and will purchase the tickets after the general release, you should create the group. You'll then be given a code for you to pass on to your friends so that they can join the group.</li>
+                <li class="cta-button"><a class="button" href="{{ url_for('group_purchase.create') }}">Create Group</a></li>
+            </ul>
+            <form action="{{ url_for('group_purchase.join') }}" method="post">
+                <ul class="pricing-table">
+                    <li class="title">Join Group</li>
+                    <li class="description">If somebody else has already created a group, they'll have a code for you to join. Enter it below.</li>
+                    <li class="cta-button">
+                        <input type="text" name="code" placeholder="Group Code" style="text-align: center" />
+                        <button>Join Group</button>
+                    </li>
+                </ul>
+            </form>
+        {% elif current_user.purchase_group.purchased %}
+            <p>The tickets have been purchased for this purchase group.</p>
+            {% if current_user == current_user.purchase_group.leader %}
+                <p>To disband this group, <a href="{{ url_for('group_purchase.disband') }}">click here</a>.</p>
+            {% else %}
+                <p>To leave this group, <a href="{{ url_for('group_purchase.leave') }}">click here</a>.</p>
+            {% endif %}
         {% else %}
-            {% if login.current_user == login.current_user.purchase_group.leader %}
-                <p>You are leading this purchase group. To invite people to join your group, direct them to <a href="{{ url_for('group_purchase.dashboard') }}">{{ url_for('group_purchase.dashboard') }}</a> and give them the following code to join with: <span id="join_group_code">login.current_user.purchase_group</span></p>
-                <p>To disband this group, <a href="{{ url_for('group_purchase.disband', group_id=login.current_user.purchase_group.object_id) }}">click here</a>.</p>
+            {% if current_user == current_user.purchase_group.leader %}
+                <p>You are leading this purchase group. To invite people to join your group, direct them to <a href="{{ url_for('group_purchase.dashboard', _external=true) }}">{{ url_for('group_purchase.dashboard', _external=true) }}</a> and give them the following code to join with: <span id="join_group_code">{{ current_user.purchase_group.code }}</span></p>
+                <p>To disband this group, <a href="{{ url_for('group_purchase.disband') }}">click here</a>.</p>
                 <h2>Group Members</h2>
                 <ul>
-                    {% for member in login.current_user.purchase_group.members %}
+                    {% for member in current_user.purchase_group.members %}
                         <li>{{ member.full_name }}</li>
                     {% endfor %}
-                <ul>
+                </ul>
+                <h2>Tickets Requested</h2>
+                <table>
+                    <thead>
+                        <th>Ticket type</th>
+                        <th>Price per ticket</th>
+                        <th>Number</th>
+                        <th>Requested by</th>
+                        <th>Total value of request</th>
+                    </thead>
+                    {% for request in current_user.purchase_group.requests %}
+                        <tr>
+                            <td>{{ request.ticket_type.name }}</td>
+                            <td>&pound;{{ request.ticket_type.price_pounds }}</td>
+                            <td>{{ request.number_requested }}</td>
+                            <td>{{ request.requester.full_name }}</td>
+                            <td>&pound;{{ request.value_pounds }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>Total:</td>
+                        <td></td>
+                        <td>{{ current_user.purchase_group.total_requested }}</td>
+                        <td></td>
+                        <td>&pound;{{ current_user.purchase_group.total_value_pounds }}</td>
+                    </tr>
+                </table>
             {% else %}
-                <p>You are a member of a purchase group run by {{ login.current_user.purchase_group.leader.full_name }}.</p>
-                <p>To leave this group, <a href="{{ url_for('group_purchase.leave', group_id=login.current_user.purchase_group.object_id) }}">click here</a>.</p>
+                <p>You are a member of a purchase group run by {{ current_user.purchase_group.leader.full_name }}.</p>
+                <p>To leave this group, <a href="{{ url_for('group_purchase.leave') }}">click here</a>.</p>
             {% endif %}
             <h2>Update your ticket request:</h2>
-            <form action="{{ url_for('purchase.purchase_home') }}" id="purchase_form" method="post">
-                <ol id="purchase_steps">
-                    <li>
-                        <h5>Choose Number of Tickets</h5>
-                        <table id="ticket_type_table">
-                            <thead>
-                                <th>Ticket type</th>
-                                <th>Price</th>
-                                <th>Number</th>
-                            </thead>
-                            {% for ticket_type, limit in ticket_info.ticket_types %}
-                                <tr>
-                                    <td>{{ ticket_type.name }}</td>
-                                    <td>&pound;{{ ticket_type.price_pounds }}</td>
-                                    <td><input type="number" name="num_tickets_{{ ticket_type.slug }}" id="num_tickets_{{ ticket_type.slug }}" class="num_ticket_input" min="0" max="{{ limit }}" value="{{ num_tickets[ticket_type.slug] }}" /></td>
-                                </tr>
-                            {% endfor %}
-                            <tr>
-                                <td>Total:</td>
-                                <td id="total_value">&pound;0.00</td>
-                                <td id="total_tickets">0</td>
-                        </table>
-                    </li>
-                    <li>
-                        <h5>Enter Names for Tickets</h5>
-                        <p>You must set the full name of the guest holding each ticket you purchase. If you do not know who will be accompanying you at this point, leave the field blank, but you must set the name on the ticket in order to be allowed entry to the Ball. Setting/changing ticket names after {{ template_config['LOCKDOWN_STARTS'].strftime('%-d') }}{{ get_ord(template_config['LOCKDOWN_STARTS']) }} {{ template_config['LOCKDOWN_STARTS'].strftime('%B %Y') }} will incur a fee.</p>
-                        <div class="row" id="ticket_names">
-                            {% for ticket_name in ticket_names %}
-                            <div class="columns large-3 end">
-                                <input type="text" name="ticket_name[]" value="{{ ticket_name }}" />
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </li>
-                    <li>
-                        <h5>Apply voucher code</h5>
-                        <p>If you have been given a discount code, please enter it here. If you do not have a code, leave this field blank. Only one discount code may be used per order</p>
-                        <div class="row">
-                            <div class="columns">
-                                <label for="voucher_code">Discount Code:</label>
-                                <input type="text" name="voucher_code" id="voucher_code" {% if form and form['voucher_code'] %}value="{{ form['voucher_code'] }}" {% endif %}/>
-                                <div id="voucher_message" style="display: none;"></div>
-                            </div>
-                        </div>
-                    </li>
-                    {% include 'purchase/blocks/choose_postage_method.html' %}
-                    {% include 'purchase/blocks/choose_payment_method.html' %}
-                    <li>
-                        <input type="submit" value="Buy Tickets" class="button tiny" />
-                    </li>
-                </ol>
+            <form action="{{ url_for('group_purchase.update_request') }}" id="purchase_form" method="post">
+                <table id="ticket_type_table">
+                    <thead>
+                        <th>Ticket type</th>
+                        <th>Price</th>
+                        <th>Number</th>
+                    </thead>
+                    {% for ticket_type, limit in ticket_info.ticket_types %}
+                        <tr>
+                            <td>{{ ticket_type.name }}</td>
+                            <td>&pound;{{ ticket_type.price_pounds }}</td>
+                            <td><input type="number" name="num_tickets_{{ ticket_type.slug }}" id="num_tickets_{{ ticket_type.slug }}" class="num_ticket_input" min="0" max="{{ limit }}" value="{{ current_user.group_purchase_requested(ticket_type.slug) }}" /></td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>Total:</td>
+                        <td id="total_value">&pound;{{ current_user.total_group_purchase_value }}</td>
+                        <td id="total_tickets">{{ current_user.total_group_purchase_requested }}</td>
+                    </tr>
+                </table>
+                <input type="submit" value="Update Request" class="button tiny" />
             </form>
         {% endif %}
     </section>
 {% endblock %}
 
 {% block javascripts %}
-    <script type="text/javascript">
-        String.prototype.toInt = function(){
-            return parseInt(this, 10);
-        }
-
-        var ticket_info = {{ ticket_info.to_json()|safe }};
-
-        var num_ticket_inputs = $(".num_ticket_input")
-
-        num_ticket_inputs.on("change", function () {
-            var guest_tickets_ordered = 0;
-            var total_tickets_ordered = 0;
-            var total_value = 0;
-
-            $(ticket_info.ticket_types).each(function(_, ticket_type) {
-                var input = $("#num_tickets_" + ticket_type.slug);
-
-                var ordered = input.val().toInt();
-                var max = input.attr("max").toInt();
-
-                if (ordered > max) {
-                    ordered = max;
-                    input.val(max);
-                }
-
-                if (ticket_type.counts_towards_guest_limit)
-                    guest_tickets_ordered = guest_tickets_ordered + ordered;
-
-                total_tickets_ordered = total_tickets_ordered + ordered;
-
-                total_value = total_value + ordered * ticket_type.price;
-            });
-
-            var price_str = total_value + "";
-            while (price_str.length < 3) price_str = "0" + price_str;
-
-            $("#total_value").html("&pound;" + price_str.slice(0, -2) + "." + price_str.slice(-2));
-            $("#total_tickets").html(total_tickets_ordered);
-
-            var guest_tickets_available = ticket_info.guest_tickets_available - guest_tickets_ordered;
-            var total_tickets_available = ticket_info.total_tickets_available - total_tickets_ordered;
-
-            var name_fields = document.getElementById("ticket_names");
-            var name_fields_count = name_fields.childElementCount;
-
-            if (total_tickets_ordered > name_fields_count) {
-                var e = document.createElement("div")
-                e.innerHTML = "<div class=\"columns large-3 end\"><input type=\"text\" name=\"ticket_name[]\" /></div>".repeat(total_tickets_ordered - name_fields_count);
-
-                while (e.firstChild) name_fields.appendChild(e.firstChild);
-            } else {
-                for (var i = 0; i < name_fields_count - total_tickets_ordered; i++)
-                    name_fields.removeChild(name_fields.lastChild);
+    {% if current_user.purchase_group %}
+        <script type="text/javascript">
+            String.prototype.toInt = function(){
+                return parseInt(this, 10);
             }
 
-            $(ticket_info.ticket_types).each(function(_, ticket_type) {
-                var input = $("#num_tickets_" + ticket_type.slug);
+            var ticket_info = {{ ticket_info.to_json()|safe }};
 
-                var ordered = input.val().toInt();
-                var limit = Math.min(
-                    ticket_type.purchase_limit,
-                    ordered + total_tickets_available
-                );
+            var num_ticket_inputs = $(".num_ticket_input")
 
-                if (ticket_type.counts_towards_guest_limit)
-                    limit = Math.min(limit, ordered + guest_tickets_available)
+            num_ticket_inputs.on("change", function () {
+                var total_tickets_ordered = 0;
+                var total_value = 0;
 
-                input.attr("max", Math.max(0, limit));
-            });
-        });
-    </script>
-    <script type="text/javascript">
-        var voucher_code = $("#voucher_code");
-        var voucher_message = $("#voucher_message");
+                $(ticket_info.ticket_types).each(function(_, ticket_type) {
+                    var input = $("#num_tickets_" + ticket_type.slug);
 
-        voucher_code.on("blur", function() {
-            if (voucher_code.val() != '') {
-                jQuery.ajax(
-                    '{{ url_for('ajax.validate_voucher', _external=True) }}',
-                    {
-                        'data': {
-                            'code': voucher_code.val()
-                        },
-                        'type': 'POST',
-                        'dataType': 'json',
-                        'success': function(data, code, xhr) {
-                            voucher_message.attr(
-                                "class",
-                                data.class
-                            );
-                            voucher_message.html(data.message);
-                            voucher_message.show(0);
-                        }
+                    var ordered = input.val().toInt();
+                    var max = input.attr("max").toInt();
+
+                    if (ordered > max) {
+                        ordered = max;
+                        input.val(max);
                     }
-                );
-            } else {
-                voucher_message.hide(0);
-            }
-        });
 
-        voucher_code.on("change", function() {
-            voucher_message.hide(0);
-        });
-    </script>
-    {% include 'purchase/blocks/script_show_postage_address.html' %}
+                    total_tickets_ordered = total_tickets_ordered + ordered;
+
+                    total_value = total_value + ordered * ticket_type.price;
+                });
+
+                var price_str = total_value + "";
+                while (price_str.length < 3) price_str = "0" + price_str;
+
+                $("#total_value").html("&pound;" + price_str.slice(0, -2) + "." + price_str.slice(-2));
+                $("#total_tickets").html(total_tickets_ordered);
+
+                var total_tickets_available = ticket_info.total_tickets_available - total_tickets_ordered;
+
+                $(ticket_info.ticket_types).each(function(_, ticket_type) {
+                    var input = $("#num_tickets_" + ticket_type.slug);
+
+                    var ordered = input.val().toInt();
+                    var limit = Math.min(
+                        ticket_type.purchase_limit,
+                        ordered + total_tickets_available
+                    );
+
+                    input.attr("max", Math.max(0, limit));
+                });
+            });
+        </script>
+    {% endif %}
 {% endblock %}

@@ -12,5 +12,6 @@ from eisitirio.views.admin_users import ADMIN_USERS
 from eisitirio.views.ajax import AJAX
 from eisitirio.views.dashboard import DASHBOARD
 from eisitirio.views.front import FRONT
+from eisitirio.views.group_purchase import GROUP_PURCHASE
 from eisitirio.views.purchase import PURCHASE
 from eisitirio.views.resale import RESALE

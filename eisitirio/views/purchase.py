@@ -25,6 +25,33 @@ def purchase_home():
 
     Checks if the user can purchase tickets, and processes the purchase form.
     """
+    if login.current_user.purchase_group:
+        if login.current_user == login.current_user.purchase_group.leader:
+            if APP.config['TICKETS_ON_SALE']:
+                return flask.redirect(flask.url_for('group_purchase.checkout'))
+            else:
+                flask.flash(
+                    (
+                        'You cannot currently purchase tickets because you are '
+                        'leading a purchase group. You will be able to '
+                        'purchase tickets on behalf of your group when general '
+                        'release starts.'
+                    ),
+                    'info'
+                )
+                return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+        else:
+            flask.flash(
+                (
+                    'You cannot currently purchase tickets because you are a '
+                    'member of a purchase group. Your group leader {0} will be '
+                    'able to purchase tickets on behalf of your group when '
+                    'general release starts.'
+                ).format(login.current_user.purchase_group.leader.full_name),
+                'info'
+            )
+            return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+
     ticket_info = purchase_logic.get_ticket_info(
         login.current_user
     )

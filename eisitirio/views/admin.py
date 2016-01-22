@@ -284,7 +284,7 @@ def admin_home(page=1):
         if has_log_filter:
             ticket_query = ticket_query.join(
                 log_query.subquery(),
-                models.Ticket.log_entries
+                models.Ticket.events
             )
 
         query = ticket_query
@@ -912,3 +912,29 @@ def data(group):
 
     csvdata.seek(0)
     return flask.send_file(csvdata, mimetype='text/csv', cache_timeout=900)
+
+@ADMIN.route('/admin/purchase_group/<int:group_id>/view')
+@ADMIN.route(
+    '/admin/purchase_group/<int:group_id>/view/page/<int:events_page>'
+)
+@login.login_required
+@login_manager.admin_required
+def view_purchase_group(group_id, events_page=1):
+    """View a ticket object."""
+    purchase_group = models.PurchaseGroup.get_by_id(group_id)
+
+    if purchase_group:
+        events = purchase_group.events.paginate(
+            events_page,
+            10,
+            True
+        )
+    else:
+        events = None
+
+    return flask.render_template(
+        'admin/view_purchase_group.html',
+        purchase_group=purchase_group,
+        events=events,
+        events_page=events_page
+    )

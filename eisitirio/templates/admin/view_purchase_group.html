@@ -1,0 +1,83 @@
+<!-- admin/view_purchase_group.html -->
+{% extends 'layout.html' %}
+
+{% block title %}View Purchase Group{% endblock %}
+
+{% block content %}
+    <section id="view_purchase_group" class="columns">
+        {% if not purchase_group %}
+            <p>No purchase group was found with that ID.</p>
+        {% else %}
+            <h4>Group Details</h4>
+            <p><strong>Leader</strong>: <a href="{{ url_for('admin_users.view_user', user_id=purchase_group.leader.object_id) }}">{{ purchase_group.leader.full_name }}</a></p>
+            <p>This group <strong>has{% if not purchase_group.disbanded %} not{% endif %}</strong> been disbanded.</p>
+            <p>Tickets <strong>have{% if not purchase_group.purchased %} not{% endif %}</strong> been purchased for this group.</p>
+            <h4>Group Members</h4>
+            <ul>
+                {% for member in purchase_group.members %}
+                    <li><a href="{{ url_for('admin_users.view_user', user_id=member.object_id) }}">{{ member.full_name }}</a></li>
+                {% endfor %}
+            </ul>
+            <h4>Tickets Requested</h4>
+            <table id="ticket_type_table">
+                <thead>
+                    <th>Ticket type</th>
+                    <th>Price per ticket</th>
+                    <th>Number</th>
+                    <th>Requested by</th>
+                    <th>Total value of request</th>
+                </thead>
+                {% for request in purchase_group.requests %}
+                    <tr>
+                        <td>{{ request.ticket_type.name }}</td>
+                        <td>&pound;{{ request.ticket_type.price_pounds }}</td>
+                        <td>{{ request.number_requested }}</td>
+                        <td><a href="{{ url_for('admin_users.view_user', user_id=request.requester.object_id) }}">{{ request.requester.full_name }}</a></td>
+                        <td>&pound;{{ request.value_pounds }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td>Total:</td>
+                    <td></td>
+                    <td id="total_tickets">{{ purchase_group.total_requested }}</td>
+                    <td></td>
+                    <td id="total_value">&pound;{{ purchase_group.total_value_pounds }}</td>
+                </tr>
+            </table>
+            <a id="events"></a>
+            <h4>Events</h4>
+            {% if events.items %}
+                <table id="events_table">
+                    <thead>
+                        <tr>
+                            <th>Log ID</th>
+                            <th>Timestamp</th>
+                            <th>Actor</th>
+                            <th>Message</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in events.items %}
+                            <tr>
+                                <td>{{ '%05d' % log.object_id }}</td>
+                                <td>{{ log.timestamp.strftime('%c') }}</td>
+                                <td><a href="{{ url_for('admin_users.view_user', user_id=log.actor_id) }}">{{ log.actor.full_name }}</a></td>
+                                <td>{{ log.action }}</td>
+                                <td><a href="{{ url_for('admin.view_log', entry_id=log.object_id) }}" class="button tiny">View</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if events.has_prev %}
+                    <a href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id, events_page=(events_page-1)) }}#events" class="button tiny">Previous Page</a>
+                {% endif %}
+                {% if events.has_next %}
+                    <a href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id, events_page=(events_page+1)) }}#events" class="button tiny">Next Page</a>
+                {% endif %}
+            {% else %}
+                <p>No events recorded.</p>
+            {% endif %}
+        {% endif %}
+    </section>
+{% endblock %}

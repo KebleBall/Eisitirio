@@ -1,0 +1,45 @@
+<!-- group_purchase/checkout.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Group Purchase - Checkout{% endblock %}
+
+{% block content %}
+    <section id="group_purchase_checkout" class="columns">
+        <p>You are reserving tickets on behalf of your purchase group.</p>
+        <h2>Group Members</h2>
+        <ul>
+            {% for member in current_user.purchase_group.members %}
+                <li>{{ member.full_name }}</li>
+            {% endfor %}
+        </ul>
+        <h2>Tickets Requested</h2>
+        <table id="ticket_type_table">
+            <thead>
+                <th>Ticket type</th>
+                <th>Price per ticket</th>
+                <th>Number</th>
+                <th>Requested by</th>
+                <th>Total value of request</th>
+            </thead>
+            {% for request in current_user.purchase_group.requests %}
+                <tr>
+                    <td>{{ request.ticket_type.name }}</td>
+                    <td>&pound;{{ request.ticket_type.price_pounds }}</td>
+                    <td>{{ request.number_requested }}</td>
+                    <td>{{ request.requester.full_name }}</td>
+                    <td>&pound;{{ request.value_pounds }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>Total:</td>
+                <td></td>
+                <td id="total_tickets">{{ current_user.purchase_group.total_requested }}</td>
+                <td></td>
+                <td id="total_value">&pound;{{ current_user.purchase_group.total_value_pounds }}</td>
+            </tr>
+        </table>
+        <form action="{{ url_for('group_purchase.checkout') }}" method="post">
+            <input type="submit" value="Buy Tickets" class="button tiny" />
+        </form>
+    </section>
+{% endblock %}

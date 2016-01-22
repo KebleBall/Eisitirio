@@ -74,7 +74,7 @@ class LogManager(object):
 
     @staticmethod
     def log_event(message, tickets=None, user=None, transaction=None,
-                  commit=True):
+                  purchase_group=None, commit=True):
         """Log a user action to the database.
 
         Creates a log entry in the database which can be found through the admin
@@ -106,7 +106,8 @@ class LogManager(object):
             actor,
             user,
             tickets,
-            transaction
+            transaction,
+            purchase_group
         )
 
         DB.session.add(entry)

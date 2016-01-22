@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+from eisitirio import app
 from eisitirio.database import db
 
 DB = db.DB
@@ -27,10 +28,10 @@ class GroupPurchaseRequest(DB.Model):
     )
     purchase_group = DB.relationship(
         'PurchaseGroup',
-        single_parent=True,
-        cascade="all, delete, delete-orphan",
         backref=DB.backref(
             'requests',
+            single_parent=True,
+            cascade="all, delete, delete-orphan",
             lazy='dynamic'
         )
     )
@@ -41,11 +42,7 @@ class GroupPurchaseRequest(DB.Model):
         nullable=False
     )
     requester = DB.relationship(
-        'User',
-        backref=DB.backref(
-            'group_purchase_requests',
-            lazy='dynamic'
-        )
+        'User'
     )
 
     def __init__(self, ticket_type_slug, number_requested, purchase_group,
@@ -54,3 +51,27 @@ class GroupPurchaseRequest(DB.Model):
         self.number_requested = number_requested
         self.purchase_group = purchase_group
         self.requester = requester
+
+    def __repr__(self):
+        return '<GroupPurchaseRequest({0}): {1} {2} tickets>'.format(
+            self.object_id,
+            self.number_requested,
+            self.ticket_type_slug
+        )
+
+    @property
+    def value(self):
+        """Get the value of this request in pence."""
+        return self.number_requested * self.ticket_type.price
+
+    @property
+    def value_pounds(self):
+        """Get the value of this request as a string in pounds and pence."""
+        value = '{0:03d}'.format(self.value)
+
+        return value[:-2] + '.' + value[-2:]
+
+    @property
+    def ticket_type(self):
+        """Get the ticket type object for this request."""
+        return app.APP.config['TICKET_TYPES_BY_SLUG'][self.ticket_type_slug]

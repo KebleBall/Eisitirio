@@ -168,6 +168,13 @@ class User(DB.Model):
         return '<User {0}: {1} {2}>'.format(
             self.object_id, self.forenames, self.surname)
 
+    @property
+    def group_purchase_requests(self):
+        if self.purchase_group:
+            for request in self.purchase_group.requests:
+                if request.requester == self:
+                    yield request
+
     def group_purchase_requested(self, ticket_type_slug):
         """Get how many of a given ticket type the user has requested."""
         for request in self.group_purchase_requests:
@@ -175,6 +182,24 @@ class User(DB.Model):
                 return request.number_requested
 
         return 0
+
+    @property
+    def total_group_purchase_requested(self):
+        """Get the total number of tickets requested by this user."""
+        return sum(
+            request.number_requested
+            for request in self.group_purchase_requests
+        )
+
+    @property
+    def total_group_purchase_value(self):
+        """Get the total number of tickets requested by this user."""
+        value = '{0:03d}'.format(sum(
+            request.value
+            for request in self.group_purchase_requests
+        ))
+
+        return value[:-2] + '.' + value[-2:]
 
     def check_password(self, candidate):
         """Check if a password matches the hash stored for the user.

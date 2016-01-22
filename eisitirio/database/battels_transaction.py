@@ -48,5 +48,5 @@ class BattelsTransaction(transaction.Transaction):
             self.tickets,
             self.user,
             self,
-            False
+            commit=False
         )

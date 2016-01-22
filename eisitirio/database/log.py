@@ -68,7 +68,7 @@ class Log(DB.Model):
         'Ticket',
         secondary=LOG_TICKET_LINK,
         backref=DB.backref(
-            'log_entries',
+            'events',
             lazy='dynamic'
         ),
         lazy='dynamic'
@@ -87,8 +87,21 @@ class Log(DB.Model):
         )
     )
 
+    purchase_group_id = DB.Column(
+        DB.Integer(),
+        DB.ForeignKey('purchase_group.object_id'),
+        nullable=True
+    )
+    purchase_group = DB.relationship(
+        'PurchaseGroup',
+        backref=DB.backref(
+            'events',
+            lazy='dynamic'
+        )
+    )
+
     def __init__(self, ip_address, action, actor, user, tickets=None,
-                 transaction=None):
+                 transaction=None, purchase_group=None):
         if tickets is None:
             tickets = []
 
@@ -99,6 +112,7 @@ class Log(DB.Model):
         self.user = user
         self.tickets = tickets
         self.transaction = transaction
+        self.purchase_group = purchase_group
 
     def __repr__(self):
         return '<Log {0}: {1}>'.format(

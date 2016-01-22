@@ -19,6 +19,7 @@ from eisitirio.helpers import log_manager
 from eisitirio.helpers import login_manager
 from eisitirio.helpers import email_manager
 from eisitirio.helpers import timed_config
+from eisitirio.helpers import util
 
 APP = app.APP
 
@@ -59,6 +60,7 @@ APP.register_blueprint(all_views.ADMIN_TICKETS)
 APP.register_blueprint(all_views.AJAX)
 APP.register_blueprint(all_views.DASHBOARD)
 APP.register_blueprint(all_views.FRONT)
+APP.register_blueprint(all_views.GROUP_PURCHASE)
 APP.register_blueprint(all_views.PURCHASE)
 APP.register_blueprint(all_views.RESALE)
 
@@ -189,5 +191,6 @@ def context_processor():
             key: APP.config[key]
             for key in APP.config['TEMPLATE_CONFIG_KEYS']
         },
-        current_year=datetime.datetime.utcnow().year
+        current_year=datetime.datetime.utcnow().year,
+        format_timedelta=util.format_timedelta
     )

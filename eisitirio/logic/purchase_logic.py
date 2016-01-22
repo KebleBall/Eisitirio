@@ -45,7 +45,7 @@ class TicketInfo(_TicketInfo):
             ]
         })
 
-def _guest_tickets_available():
+def guest_tickets_available():
     """Return how many guest tickets are available."""
     guest_ticket_count = models.Ticket.query.filter(
         models.Ticket.ticket_type in app.APP.config['GUEST_TYPE_SLUGS'] and

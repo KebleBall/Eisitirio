@@ -25,6 +25,9 @@
                 <p><strong>MT Battels Charge</strong>: &pound;{{ user.battels.michaelmas_charge_pounds }}</p>
                 <p><strong>HT Battels Charge</strong>: &pound;{{ user.battels.hilary_charge_pounds }}</p>
             {% endif %}
+            {% if user.purchase_group != None %}
+                <p><strong>Purchase Group</strong>: <a href="{{ url_for('admin.view_purchase_group', group_id=user.purchase_group.object_id) }}">#{{ '%05d' % user.purchase_group.object_id }}</a></p>
+            {% endif %}
             <h4>User Status</h4>
             <ul>
                 <li>User <strong>is{% if not user.verified %} not{% endif %}</strong> verified.</li>
@@ -43,6 +46,7 @@
                 {% else %}
                     <li>User's affiliation was <strong>verified</strong>.</li>
                 {% endif %}
+                <li>User <strong>is{% if user.purchase_group == None %} not{% endif %}</strong> a member of a purchase group.</li>
             </ul>
             <h4>User Notes</h4>
             <form action="{{ url_for('admin_users.note_user', user_id=user.object_id) }}" method="post">

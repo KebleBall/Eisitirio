@@ -3,8 +3,6 @@
 
 from __future__ import unicode_literals
 
-import collections
-
 from eisitirio.database import db
 from eisitirio.helpers import util
 
@@ -54,25 +52,54 @@ class PurchaseGroup(DB.Model):
         lazy='dynamic'
     )
 
+    disbanded = DB.Column(
+        DB.Boolean(),
+        default=False,
+        nullable=False
+    )
+    purchased = DB.Column(
+        DB.Boolean(),
+        default=False,
+        nullable=False
+    )
+
     def __init__(self, leader):
         self.leader = leader
         self.members = [leader]
 
         self.code = util.generate_key(10)
 
+    def __repr__(self):
+        return '<PurchaseGroup({0}): {1} tickets, £{2}>'.format(
+            self.object_id,
+            self.total_requested,
+            self.total_value_pounds
+        )
+
+    @property
+    def total_value(self):
+        """Get the total value of tickets requested by this group in pence."""
+        return sum(request.value for request in self.requests)
+
+    @property
+    def total_value_pounds(self):
+        """Get the total value of this group in pounds and pence."""
+        value = '{0:03d}'.format(self.total_value)
+
+        return value[:-2] + '.' + value[-2:]
+
     @property
     def total_requested(self):
+        """Get the total number of tickets requested by this group."""
         return sum(request.number_requested for request in self.requests)
 
     @property
-    def requested(self):
-        """Get the total number of each type of ticket requested."""
-        requests = collections.defaultdict(int)
-
-        for request in self.requests:
-            requests[request.ticket_type_slug] += request.number_requested
-
-        return requests
+    def total_guest_tickets_requested(self):
+        return sum(
+            request.number_requested
+            for request in self.requests
+            if request.ticket_type.counts_towards_guest_limit
+        )
 
     @staticmethod
     def get_by_code(code):

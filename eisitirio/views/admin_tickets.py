@@ -27,7 +27,7 @@ def view_ticket(ticket_id, events_page=1):
     ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket:
-        events = ticket.log_entries.paginate(
+        events = ticket.events.paginate(
             events_page,
             10,
             True

@@ -21,6 +21,9 @@
             {% if log.transaction != None %}
                 <p><strong>Transaction</strong>: <a href="{{ url_for('admin.view_transaction', transaction_id=log.transaction.object_id) }}">#{{ '%05d' % log.transaction.object_id }}</a></p>
             {% endif %}
+            {% if log.purchase_group != None %}
+                <p><strong>Purchase Group</strong>: <a href="{{ url_for('admin.view_purchase_group', group_id=log.purchase_group.object_id) }}">#{{ '%05d' % log.purchase_group.object_id }}</a></p>
+            {% endif %}
             <h4>Related Tickets</h4>
             {% if log.tickets.count() > 0 %}
                 <table id="tickets_table">
