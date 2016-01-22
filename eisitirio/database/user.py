@@ -170,6 +170,11 @@ class User(DB.Model):
 
     @property
     def group_purchase_requests(self):
+        """Get this user's group purchase requests.
+
+        Not just a database backref so that old requests can hang around when
+        the user leaves a group.
+        """
         if self.purchase_group:
             for request in self.purchase_group.requests:
                 if request.requester == self:

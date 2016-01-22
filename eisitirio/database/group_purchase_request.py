@@ -44,6 +44,7 @@ class GroupPurchaseRequest(DB.Model):
     requester = DB.relationship(
         'User'
     )
+    # No backref so that requests can hang around if the user leaves a group.
 
     def __init__(self, ticket_type_slug, number_requested, purchase_group,
                  requester):

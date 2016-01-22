@@ -95,6 +95,7 @@ class PurchaseGroup(DB.Model):
 
     @property
     def total_guest_tickets_requested(self):
+        """Get the total number of guest tickets requested by this group."""
         return sum(
             request.number_requested
             for request in self.requests

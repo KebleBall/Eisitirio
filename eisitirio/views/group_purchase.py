@@ -70,14 +70,23 @@ def join():
             group = models.PurchaseGroup.get_by_code(flask.request.form['code'])
 
         if group:
-            group.members.append(login.current_user)
-            DB.session.commit()
+            if login.current_user.can_join_group(group):
+                group.members.append(login.current_user)
+                DB.session.commit()
 
-            APP.log_manager.log_event(
-                'Joined Purchase Group',
-                user=login.current_user,
-                purchase_group=group
-            )
+                APP.log_manager.log_event(
+                    'Joined Purchase Group',
+                    user=login.current_user,
+                    purchase_group=group
+                )
+            else:
+                flask.flash(
+                    (
+                        'You cannot join this group as it has the maximum '
+                        'number of members'
+                    ),
+                    'error'
+                )
         else:
             flask.flash('Could not join group', 'error')
 

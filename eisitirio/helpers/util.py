@@ -53,6 +53,7 @@ def parse_pounds_pence(form, pounds_key, pence_key):
 
 
 def format_timedelta(td):
+    """Format a timedelta into a human readable format."""
     weeks, days = divmod(td.days, 7)
 
     minutes, seconds = divmod(td.seconds, 60)
