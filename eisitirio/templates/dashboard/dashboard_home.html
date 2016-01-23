@@ -61,7 +61,7 @@
 
         {% if current_user.is_waiting %}
             <h3>Waiting List</h3>
-            <p>You are currently waiting for {{ current_user.waiting_for() }} tickets.</p>
+            <p>You are currently waiting for {{ current_user.waiting_for }} tickets.</p>
         {% endif %}
 
         <h3>Announcements</h3>

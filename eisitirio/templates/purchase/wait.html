@@ -10,29 +10,27 @@
             <ol id="purchase_steps">
                 <li>
                     <h5>Choose Number of Tickets</h5>
-                    <div class="row">
-                        <div class="columns">
-                            <label for="num_tickets">Number of Tickets: <span id="num_tickets_display">1</span></label>
-                            <input
-                                id="num_tickets"
-                                name="num_tickets"
-                                type="number"
-                                min="1"
-                                max="{{ wait_available }}"
-                                step="1"
-                                value="{% if num_tickets -%}
-                                    {{ num_tickets }}
-                                {% else -%}
-                                    1
-                                {% endif %}"
-                                data-slider="true"
-                                data-slider-range="1,{{ wait_available }}"
-                                data-slider-snap="true"
-                                data-slider-step="1"
-                                data-slider-highlight="true"
-                            />
-                        </div>
-                    </div>
+                    <label for="num_tickets">
+                        Number of Tickets: <span id="num_tickets_display">1</span>
+                        <input
+                            id="num_tickets"
+                            name="num_tickets"
+                            type="number"
+                            min="1"
+                            max="{{ wait_available }}"
+                            step="1"
+                            value="{% if num_tickets -%}
+                                {{ num_tickets }}
+                            {% else -%}
+                                1
+                            {% endif %}"
+                            data-slider="true"
+                            data-slider-range="1,{{ wait_available }}"
+                            data-slider-snap="true"
+                            data-slider-step="1"
+                            data-slider-highlight="true"
+                        />
+                    </label>
                 </li>
                 <li>
                     <input type="submit" value="Join Waiting List" class="button tiny" />

@@ -62,8 +62,7 @@ def purchase_home():
             'info'
         )
 
-        (waiting_permitted, _, _) = login.current_user.can_wait()
-        if waiting_permitted:
+        if purchase_logic.wait_available(login.current_user):
             flask.flash(
                 (
                     'Please join the waiting list, and you will be allocated '
@@ -185,84 +184,72 @@ def wait():
     Checks if the user can join the waiting list, and processes the form to
     create the requisite waiting list entry.
     """
-    (
-        wait_permitted,
-        wait_available,
-        can_wait_message
-    ) = login.current_user.can_wait()
+    wait_available = purchase_logic.wait_available(login.current_user)
 
-    if not wait_permitted:
-        flask.flash(
-            (
-                'You cannot join the waiting list at this time because ' +
-                can_wait_message
-            ),
-            'info'
-        )
-        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
-
-    if flask.request.method == 'POST':
-        valid = True
-        flashes = []
-
-        num_tickets = int(flask.request.form['num_tickets'])
-
-        if num_tickets > wait_available:
-            valid = False
-            flashes.append('You cannot wait for that many tickets')
-        elif num_tickets < 1:
-            valid = False
-            flashes.append('You must wait for at least 1 ticket')
-
-        if not valid:
-            flask.flash(
-                (
-                    'There were errors in your order. Please fix '
-                    'these and try again'
-                ),
-                'error'
-            )
-            for msg in flashes:
-                flask.flash(msg, 'warning')
-
-            return flask.render_template(
-                'purchase/wait.html',
-                form=flask.request.form,
-                num_tickets=num_tickets,
-                wait_available=wait_available
-            )
-
-        DB.session.add(
-            models.Waiting(
-                login.current_user,
-                num_tickets
-            )
-        )
-        DB.session.commit()
-
-        APP.log_manager.log_event(
-            'Joined waiting list for {0} tickets'.format(
-                num_tickets
-            ),
-            user=login.current_user
-        )
-
-        flask.flash(
-            (
-                'You have been added to the waiting list for {0} ticket{1}.'
-            ).format(
-                num_tickets,
-                '' if num_tickets == 1 else 's'
-            ),
-            'success'
-        )
+    if not wait_available:
+        flask.flash('You cannot join the waiting list at this time.', 'info')
 
         return flask.redirect(flask.url_for('dashboard.dashboard_home'))
-    else:
+
+    if flask.request.method != 'POST':
         return flask.render_template(
             'purchase/wait.html',
             wait_available=wait_available
         )
+
+    flashes = []
+
+    num_tickets = int(flask.request.form['num_tickets'])
+
+    if num_tickets > wait_available:
+        flashes.append('You cannot wait for that many tickets')
+    elif num_tickets < 1:
+        flashes.append('You must wait for at least 1 ticket')
+
+    if flashes:
+        flask.flash(
+            (
+                'There were errors in your order. Please fix '
+                'these and try again'
+            ),
+            'error'
+        )
+
+        for msg in flashes:
+            flask.flash(msg, 'warning')
+
+        return flask.render_template(
+            'purchase/wait.html',
+            num_tickets=num_tickets,
+            wait_available=wait_available
+        )
+
+    DB.session.add(
+        models.Waiting(
+            login.current_user,
+            num_tickets
+        )
+    )
+    DB.session.commit()
+
+    APP.log_manager.log_event(
+        'Joined waiting list for {0} tickets'.format(
+            num_tickets
+        ),
+        user=login.current_user
+    )
+
+    flask.flash(
+        (
+            'You have been added to the waiting list for {0} ticket{1}.'
+        ).format(
+            num_tickets,
+            '' if num_tickets == 1 else 's'
+        ),
+        'success'
+    )
+
+    return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
 @PURCHASE.route('/purchase/eway-success/<int:object_id>')
 def eway_success(object_id):

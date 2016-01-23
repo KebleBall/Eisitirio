@@ -9,6 +9,7 @@ from eisitirio import app
 from eisitirio.database import battels
 from eisitirio.database import db
 from eisitirio.database import photo as photo_model # pylint: disable=unused-import
+from eisitirio.database import ticket
 from eisitirio.helpers import util
 
 DB = db.DB
@@ -247,6 +248,19 @@ class User(DB.Model):
         """Is the user on the waiting list?"""
         return self.waiting.count() > 0
 
+    @property
+    def active_tickets(self):
+        """Get the active tickets owned by the user."""
+        return self.tickets.filter(
+            ticket.Ticket.cancelled == False # pylint: disable=singleton-comparison
+        )
+
+    @property
+    def active_ticket_count(self):
+        """How many active tickets does the user own?"""
+        return self.active_tickets.count()
+
+    @property
     def waiting_for(self):
         """How many tickets is the user waiting for?"""
         return sum([x.waiting_for for x in self.waiting])

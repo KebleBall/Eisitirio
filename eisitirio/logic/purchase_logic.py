@@ -48,8 +48,9 @@ class TicketInfo(_TicketInfo):
 def guest_tickets_available():
     """Return how many guest tickets are available."""
     guest_ticket_count = models.Ticket.query.filter(
-        models.Ticket.ticket_type in app.APP.config['GUEST_TYPE_SLUGS'] and
-        not models.Ticket.cancelled
+        models.Ticket.ticket_type.in_(app.APP.config['GUEST_TYPE_SLUGS'])
+    ).filter(
+        models.Ticket.cancelled == False  # pylint: disable=singleton-comparison
     ).count()
 
     return max(
@@ -60,9 +61,7 @@ def guest_tickets_available():
 def _total_tickets_available(user, now):
     """Get how many tickets are available for a user to buy."""
     return max(0, min(
-        app.APP.config.get('MAX_TICKETS', now=now) - user.tickets.filter(
-            models.Ticket.cancelled == False # pylint: disable=singleton-comparison
-        ).count(),
+        app.APP.config.get('MAX_TICKETS', now=now) - user.active_ticket_count,
         app.APP.config.get('MAX_TICKETS_PER_TRANSACTION', now=now)
     ))
 
@@ -75,10 +74,8 @@ def _type_limit_per_person(user, ticket_type):
     if ticket_type.limit_per_person == -1:
         return LARGE_NUMBER
 
-    return max(0, ticket_type.limit_per_person - user.tickets.filter(
+    return max(0, ticket_type.limit_per_person - user.active_tickets.filter(
         models.Ticket.ticket_type == ticket_type.slug
-    ).filter(
-        models.Ticket.cancelled == False # pylint: disable=singleton-comparison
     ).count())
 
 def _type_total_limit(ticket_type):
@@ -124,7 +121,7 @@ def get_ticket_info(user):
     """Get information about what tickets |user| can purchase online."""
 
     ticket_info = TicketInfo(
-        LARGE_NUMBER,
+        guest_tickets_available(),
         _total_tickets_available(user, datetime.datetime.utcnow()),
         []
     )
@@ -331,3 +328,12 @@ def check_postage(flashes):
             address = flask.request.form['address']
 
     return postage, address
+
+def wait_available(user):
+    """How many tickets can the user join the waiting list for."""
+    return max(0, min(
+        app.APP.config['MAX_TICKETS'] - user.active_ticket_count,
+        _type_limit_per_person(user, app.APP.config['DEFAULT_TICKET_TYPE']),
+        _type_total_limit(app.APP.config['DEFAULT_TICKET_TYPE']),
+        app.APP.config['MAX_TICKETS_WAITING'] - user.waiting_for
+    ))

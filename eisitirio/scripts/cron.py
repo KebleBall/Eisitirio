@@ -18,6 +18,7 @@ from eisitirio import system # pylint: disable=unused-import
 from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.helpers import email_manager
+from eisitirio.logic import purchase_logic
 
 APP = app.APP
 DB = db.DB
@@ -85,33 +86,40 @@ def send_announcements():
 
 def allocate_waiting():
     """Allocate available tickets to people on the waiting list."""
-    # TODO
+    tickets_available = purchase_logic.guest_tickets_available()
 
-    # tickets_available = APP.config['TICKETS_AVAILABLE'] - models.Ticket.count()
+    ticket_type = APP.config['DEFAULT_TICKET_TYPE']
 
-    # for wait in models.Waiting.query.order_by(
-    #         models.Waiting.waitingsince
-    # ).all():
-    #     if wait.waiting_for > tickets_available:
-    #         break
+    for wait in models.Waiting.query.order_by(
+            models.Waiting.waiting_since
+    ).all():
+        if wait.waiting_for > tickets_available:
+            break
 
-    #     tickets = []
+        tickets = [
+            models.Ticket(
+                wait.user,
+                ticket_type.slug,
+                ticket_type.price
+            )
+            for _ in xrange(wait.waiting_for)
+        ]
 
-    #     DB.session.add_all(tickets)
-    #     DB.session.delete(wait)
+        DB.session.add_all(tickets)
+        DB.session.delete(wait)
 
-    #     APP.email_manager.send_template(
-    #         wait.user.email,
-    #         'You have been allocated tickets',
-    #         'waiting_allocation.email',
-    #         user=wait.user,
-    #         num_tickets=wait.waitingfor,
-    #         expiry=tickets[0].expires
-    #     )
+        APP.email_manager.send_template(
+            wait.user.email,
+            'You have been allocated tickets',
+            'waiting_allocation.email',
+            user=wait.user,
+            num_tickets=wait.waiting_for,
+            expiry=tickets[0].expires
+        )
 
-    #     DB.session.commit()
+        DB.session.commit()
 
-    #     tickets_available -= wait.waiting_for
+        tickets_available -= wait.waiting_for
 
 def cancel_expired_tickets(now):
     """Cancel all tickets which have not been paid for in the given time."""
@@ -120,9 +128,9 @@ def cancel_expired_tickets(now):
     ).filter(
         models.Ticket.expires < now
     ).filter(
-        models.Ticket.cancelled == False
+        models.Ticket.cancelled == False # pylint: disable=singleton-comparison
     ).filter(
-        models.Ticket.paid == False
+        models.Ticket.paid == False # pylint: disable=singleton-comparison
     ).all()
 
     for ticket in expired:

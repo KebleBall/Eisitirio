@@ -4,7 +4,7 @@ You have been allocated {{ num_tickets }} ticket{% if num_tickets != 1 %}s{% end
 
 The tickets you have been allocated must be paid for by {{ expiry.strftime("%H:%M, %A %d %B %Y") }}, otherwise they will expire. If your tickets do expire, you may have to join the waiting list again (please note that this will not be done automatically).
 
-To pay for your tickets, please log in to the ticketing system, and click the "Choose payment method" button next to any of the allocated tickets
+To pay for your tickets, please log in to the ticketing system, and click the "Complete Payment" button next to any of the allocated tickets.
 
 If you no longer want the tickets, please log in to the ticketing system, and click the "Cancel" button next to any of the allocated tickets, to ensure that other people who do want tickets are able to get them.
 
