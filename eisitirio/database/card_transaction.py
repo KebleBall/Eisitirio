@@ -183,9 +183,7 @@ class CardTransaction(transaction.Transaction):
                     endpoint,
                     exc
                 ),
-                [],
-                None,
-                self
+                transaction=self
             )
             return (False, None)
 
@@ -199,9 +197,7 @@ class CardTransaction(transaction.Transaction):
                     endpoint,
                     request.status_code
                 ),
-                [],
-                None,
-                self
+                transaction=self
             )
             return (False, None)
 
@@ -252,9 +248,9 @@ class CardTransaction(transaction.Transaction):
 
             APP.log_manager.log_event(
                 'Started Card Payment',
-                self.tickets,
-                login.current_user,
-                self
+                tickets=self.tickets,
+                user=login.current_user,
+                transaction=self
             )
 
             return response['SharedPaymentUrl']
@@ -300,9 +296,9 @@ class CardTransaction(transaction.Transaction):
                                 self.object_id,
                                 response['TotalAmount']
                             ),
-                            self.tickets,
-                            login.current_user,
-                            self
+                            tickets=self.tickets,
+                            user=login.current_user,
+                            transaction=self
                         )
 
                         refund_success = self.process_refund(
@@ -360,9 +356,9 @@ class CardTransaction(transaction.Transaction):
 
                         APP.log_manager.log_event(
                             'Completed Card Payment',
-                            self.tickets,
-                            self.user,
-                            self
+                            tickets=self.tickets,
+                            user=self.user,
+                            transaction=self
                         )
 
                         flask.flash(
@@ -407,9 +403,9 @@ class CardTransaction(transaction.Transaction):
 
         APP.log_manager.log_event(
             'Cancelled Card Payment',
-            self.tickets,
-            self.user,
-            self
+            tickets=self.tickets,
+            user=self.user,
+            transaction=self
         )
 
     def process_refund(self, amount):
@@ -446,9 +442,8 @@ class CardTransaction(transaction.Transaction):
                 'Refunded £{0:.02f}'.format(
                     refunded_amount / 100.0
                 ),
-                [],
-                login.current_user,
-                self
+                user=login.current_user,
+                transaction=self
             )
 
             if refunded_amount != amount:

@@ -197,8 +197,7 @@ def profile():
 
             APP.log_manager.log_event(
                 'Updated Details',
-                [],
-                login.current_user
+                user=login.current_user
             )
 
             flask.flash(

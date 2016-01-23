@@ -36,10 +36,10 @@ def do_payment(tickets, postage_option, payment_method, payment_term,
 
         app.APP.log_manager.log_event(
             'Performed Free Transaction',
-            tickets,
-            login.current_user,
-            transaction,
-            False
+            tickets=tickets,
+            user=login.current_user,
+            transaction=transaction,
+            commit=False
         )
 
     items = [

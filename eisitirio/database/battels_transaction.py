@@ -45,8 +45,8 @@ class BattelsTransaction(transaction.Transaction):
 
         APP.log_manager.log_event(
             'Completed Battels Payment',
-            self.tickets,
-            self.user,
-            self,
+            tickets=self.tickets,
+            user=self.user,
+            transaction=self,
             commit=False
         )

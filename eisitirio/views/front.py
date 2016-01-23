@@ -45,16 +45,13 @@ def do_login():
         if user:
             APP.log_manager.log_event(
                 'Failed login attempt - invalid password',
-                [],
-                user
+                user=user
             )
         else:
             APP.log_manager.log_event(
                 'Failed login attempt - invalid email {0}'.format(
                     flask.request.form['email']
-                ),
-                [],
-                None
+                )
             )
 
         flask.flash(
@@ -66,8 +63,7 @@ def do_login():
     if not user.verified:
         APP.log_manager.log_event(
             'Failed login attempt - not verified',
-            [],
-            user
+            user=user
         )
         flask.flash(
             'Could not complete log in. Email address is not confirmed.',
@@ -85,8 +81,7 @@ def do_login():
 
     APP.log_manager.log_event(
         'Logged in',
-        [],
-        user
+        user=user
     )
 
     flask.flash('Logged in successfully.', 'success')
@@ -218,8 +213,7 @@ def register():
 
     APP.log_manager.log_event(
         'Registered',
-        [],
-        user
+        user=user
     )
 
     APP.email_manager.send_template(
@@ -278,8 +272,7 @@ def confirm_email(user_id, secret_key):
 
         APP.log_manager.log_event(
             'Confirmed email',
-            [],
-            user
+            user=user
         )
 
         if login.current_user.is_anonymous:
@@ -330,8 +323,7 @@ def email_confirm():
 
             APP.log_manager.log_event(
                 'Requested email confirm',
-                [],
-                user
+                user=user
             )
 
             APP.email_manager.send_template(
@@ -406,8 +398,7 @@ def password_reset():
 
             APP.log_manager.log_event(
                 'Started password reset',
-                [],
-                user
+                user=user
             )
 
             APP.email_manager.send_template(
@@ -488,8 +479,7 @@ def reset_password(user_id, secret_key):
 
             APP.log_manager.log_event(
                 'Completed password reset',
-                [],
-                user
+                user=user
             )
 
             flask.flash('Your password has been reset, please log in.',
@@ -544,8 +534,7 @@ def destroy_account(user_id, secret_key):
         else:
             APP.log_manager.log_event(
                 'Attempted deletion of verified account',
-                [],
-                user
+                user=user
             )
 
             flask.flash('Could not delete user account.', 'warning')
@@ -572,8 +561,7 @@ def logout():
     if 'actor_id' in flask.session:
         APP.log_manager.log_event(
             'Finished impersonating user',
-            [],
-            login.current_user
+            user=login.current_user
         )
 
         actor = models.User.get_by_id(flask.session['actor_id'])
@@ -589,8 +577,7 @@ def logout():
 
     APP.log_manager.log_event(
         'Logged Out',
-        [],
-        login.current_user
+        user=login.current_user
     )
 
     login.logout_user()

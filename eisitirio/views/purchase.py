@@ -158,8 +158,8 @@ def purchase_home():
 
         APP.log_manager.log_event(
             'Purchased Tickets',
-            tickets,
-            login.current_user
+            tickets=tickets,
+            user=login.current_user
         )
 
         return payment_logic.do_payment(
@@ -244,8 +244,7 @@ def wait():
             'Joined waiting list for {0} tickets'.format(
                 num_tickets
             ),
-            [],
-            login.current_user
+            user=login.current_user
         )
 
         flask.flash(

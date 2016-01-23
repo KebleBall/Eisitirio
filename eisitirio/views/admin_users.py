@@ -103,8 +103,7 @@ def impersonate_user(user_id):
 
         APP.log_manager.log_event(
             'Started impersonating user',
-            [],
-            user
+            user=user
         )
 
         return flask.redirect(flask.url_for('dashboard.dashboard_home'))
@@ -187,8 +186,8 @@ def give_user(user_id):
             'Gave {0} tickets'.format(
                 num_tickets
             ),
-            tickets,
-            user
+            tickets=tickets,
+            user=user
         )
 
         flask.flash(
@@ -227,8 +226,7 @@ def note_user(user_id):
 
         APP.log_manager.log_event(
             'Updated notes',
-            [],
-            user
+            user=user
         )
 
         flask.flash(
@@ -264,8 +262,7 @@ def verify_user(user_id):
 
         APP.log_manager.log_event(
             'Verified email',
-            [],
-            user
+            user=user
         )
 
         flask.flash(
@@ -296,8 +293,7 @@ def demote_user(user_id):
 
         APP.log_manager.log_event(
             'Demoted user',
-            [],
-            user
+            user=user
         )
 
         flask.flash(
@@ -328,8 +324,7 @@ def promote_user(user_id):
 
         APP.log_manager.log_event(
             'Promoted user',
-            [],
-            user
+            user=user
         )
 
         flask.flash(
@@ -365,8 +360,7 @@ def add_manual_battels(user_id):
 
         APP.log_manager.log_event(
             'Manually set up battels',
-            [],
-            user
+            user=user
         )
 
         flask.flash(
@@ -400,8 +394,7 @@ def verify_affiliation(user_id):
 
         APP.log_manager.log_event(
             'Verified affiliation',
-            [],
-            user
+            user=user
         )
 
     return flask.redirect(flask.url_for('admin_users.verify_affiliations'))
@@ -418,8 +411,7 @@ def deny_affiliation(user_id):
 
         APP.log_manager.log_event(
             'Denied affiliation',
-            [],
-            user
+            user=user
         )
 
     return flask.redirect(flask.url_for('admin_users.verify_affiliations'))

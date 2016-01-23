@@ -77,7 +77,7 @@ def collect_ticket(ticket_id):
 
         APP.log_manager.log_event(
             'Collected',
-            [ticket]
+            tickets=[ticket]
         )
 
         flask.flash(
@@ -115,7 +115,7 @@ def note_ticket(ticket_id):
 
         APP.log_manager.log_event(
             'Updated notes',
-            [ticket]
+            tickets=[ticket]
         )
 
         flask.flash(
@@ -150,7 +150,7 @@ def mark_ticket_paid(ticket_id):
 
         APP.log_manager.log_event(
             'Marked as paid',
-            [ticket]
+            tickets=[ticket]
         )
 
         flask.flash(
@@ -207,7 +207,7 @@ def auto_cancel_ticket(ticket_id):
 
         APP.log_manager.log_event(
             'Cancelled and refunded ticket',
-            [ticket]
+            tickets=[ticket]
         )
 
         flask.flash(
@@ -238,7 +238,7 @@ def cancel_ticket(ticket_id):
 
         APP.log_manager.log_event(
             'Marked ticket as cancelled',
-            [ticket]
+            tickets=[ticket]
         )
 
         flask.flash(
@@ -275,7 +275,7 @@ def uncollect_ticket(ticket_id):
 
         APP.log_manager.log_event(
             'Marked ticket as uncollected',
-            [ticket]
+            tickets=[ticket]
         )
 
         flask.flash(
