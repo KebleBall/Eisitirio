@@ -23,22 +23,24 @@ def cancel_tickets(tickets, quiet=False):
     transaction for each transaction used for payment.
     """
     if quiet:
-        def flash(_, __):
+        def flash(_, unused):
+            """No-op flash function for admin cancellations."""
             pass
     else:
         flash = flask.flash
 
     transactions = collections.defaultdict(list)
 
+    cancelled = []
+
     for ticket in tickets:
         if not ticket.paid or ticket.payment_method == 'Free':
             ticket.cancelled = True
+            cancelled.append(ticket)
         elif ticket.payment_method in ['Card', 'Battels']:
             transactions[ticket.transaction].append(ticket)
 
     DB.session.commit()
-
-    cancelled = []
 
     for transaction, tickets in transactions.iteritems():
         if transaction.payment_method == 'Card':
