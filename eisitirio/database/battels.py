@@ -86,7 +86,10 @@ class Battels(DB.Model):
     def charge(self, amount, term):
         """Apply a charge to this battels account."""
         if term == 'MTHT':
-            half = amount // 2
+            # Integer division fails for negative numbers (i.e. refunds), as the
+            # number is rounded the wrong way. Instead, we do floating point
+            # division, and truncate.
+            half = int(amount / 2.0)
 
             self.michaelmas_charge += half
             self.hilary_charge += amount - half

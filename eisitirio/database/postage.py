@@ -41,6 +41,11 @@ class Postage(DB.Model):
         DB.Unicode(200),
         nullable=True
     )
+    cancelled = DB.Column(
+        DB.Boolean(),
+        default=False,
+        nullable=False
+    )
 
     tickets = DB.relationship(
         'Ticket',

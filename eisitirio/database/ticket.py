@@ -100,21 +100,44 @@ class Ticket(DB.Model):
         return price[:-2] + '.' + price[-2:]
 
     @property
-    def payment_method(self):
-        """Get the payment method for this ticket."""
-        if self.price == 0:
-            return "Free"
-
+    def transaction(self):
+        """Get the transaction this ticket was paid for in."""
         for transaction_item in self.transaction_items:
             if transaction_item.transaction.paid:
-                return transaction_item.transaction.payment_method
+                return transaction_item.transaction
 
-        return "Unknown Payment Method"
+        return None
+
+    @property
+    def payment_method(self):
+        """Get the payment method for this ticket."""
+        transaction = self.transaction
+
+        if transaction:
+            return transaction.payment_method
+        else:
+            return 'Unknown Payment Method'
 
     @property
     def price(self):
         """Get the price of the ticket."""
         return self.price_
+
+    @property
+    def status(self):
+        """Get the status of this ticket."""
+        if self.cancelled:
+            return 'Cancelled.'
+        elif self.collected:
+            return 'Collected as {0}.'.format(self.barcode)
+        elif self.name is None:
+            return 'Awaiting name.'
+        elif self.paid:
+            return 'Paid'
+        else:
+            return 'Awaiting payment. Expires {0}.'.format(
+                self.expires.strftime('%H:%M %d/%m/%Y')
+            )
 
     @price.setter
     def price(self, value):

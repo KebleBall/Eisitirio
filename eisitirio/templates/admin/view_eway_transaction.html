@@ -1,0 +1,57 @@
+<!-- admin/view_transaction.html -->
+{% extends 'layout.html' %}
+
+{% block title %}{% if not eway_transaction %}No Transaction Found{% else %}View Eway Transaction - #{{ '%05d' % eway_transaction.object_id }}{% endif %}{% endblock %}
+
+{% block content %}
+    <section id="view_transaction" class="columns">
+        {% if not eway_transaction %}
+            <p>No transaction was found with that ID.</p>
+        {% else %}
+            <h4>Transaction Details</h4>
+            <p><strong>Access Code</strong>: <pre style="overflow: scroll">{{ eway_transaction.access_code }}</pre></p>
+            {% if eway_transaction.completed != None %}
+                <p><strong>Completed</strong>: {{ eway_transaction.completed.strftime('%c') }}</p>
+                <p><strong>Result Code</strong>: {{ eway_transaction.result_code }}</p>
+                <p><strong>Message</strong>: {{ eway_transaction.status[1] }}</p>
+                <p><strong>eWay ID</strong>: {{ eway_transaction.eway_id }}</p>
+                <p><strong>Amount Charged</strong>: &pound;{{ '%.2f' % (eway_transaction.charged / 100.0) }}</p>
+                <p><strong>Amount Refunded</strong>: &pound;{{ '%.2f' % (eway_transaction.refunded / 100.0) }}</p>
+                <h4>Transaction Status</h4>
+                <ul>
+                    <li>Transaction {% if eway_transaction.completed != None %}was{% else %}is{% endif %} <strong>{{ eway_transaction.success|lower }}</strong>.</li>
+                    <li>Transaction <strong>is{% if not eway_transaction.refunded > 0 %} not{% endif %}</strong> partially refunded.</li>
+                    <li>Transaction <strong>is{% if not eway_transaction.refunded >= eway_transaction.charged %} not{% endif %}</strong> fully refunded.</li>
+                    <li>Transaction <strong>was{% if not eway_transaction.result_code == 'CX' %} not{% endif %}</strong> cancelled.</li>
+                </ul>
+                {% if eway_transaction.status[0] %}
+                    <h4>Actions</h4>
+                    <ul>
+                        <li><form action="{{ url_for('admin.refund_transaction', eway_transaction_id=eway_transaction.object_id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refund_amount_pounds" min="0" step="1" />.<input type="number" name="refund_amount_pence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
+                    </ul>
+                {% endif %}
+            {% else %}
+                <p>Transaction <strong>is not</strong> completed.</p>
+            {% endif %}
+            <h4>Transactions</h4>
+            <table id="transactions_table">
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Created</th>
+                        <th>Transaction Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in eway_transaction.transactions %}
+                        <tr>
+                            <td><a href="{{ url_for('admin.view_transaction', transaction_id=transaction.object_id) }}">#{{ '%05d' % transaction.object_id }}</a></td>
+                            <td>{{ transaction.created.strftime('%c') }}</td>
+                            <td>&pound;{{ transaction.value_pounds }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </section>
+{% endblock %}

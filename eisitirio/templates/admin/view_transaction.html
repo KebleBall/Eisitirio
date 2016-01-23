@@ -11,29 +11,10 @@
             <h4>Transaction Details</h4>
             <p><strong>User</strong>: <a href="{{ url_for('admin_users.view_user', user_id=transaction.user.object_id) }}">{{ transaction.user.full_name }}</a></p>
             <p><strong>Payment Method</strong>: {{ transaction.payment_method }}</p>
-            <p><strong>Total Value</strong>: &pound;{{ '%.2f' % (transaction.value / 100.0) }}</p>
+            <p><strong>Total Value</strong>: &pound;{{ transaction.value_pounds }}</p>
             <p><strong>Created</strong>: {{ transaction.created.strftime('%c') }}</p>
-            {% if transaction.payment_method == 'Card' %}
-                {% if transaction.completed != None %}
-                    <p><strong>Completed</strong>: {{ transaction.completed.strftime('%c') }}</p>
-                    <p><strong>Result Code</strong>: {{ transaction.result_code }}</p>
-                    <p><strong>Message</strong>: {{ transaction.get_status()[1] }}</p>
-                    <p><strong>eWay ID</strong>: {{ transaction.eway_id }}</p>
-                {% endif %}
-                <p><strong>Amount Refunded</strong>: &pound;{{ '%.2f' % (transaction.refunded / 100.0) }}</p>
-                <h4>Transaction Status</h4>
-                <ul>
-                    <li>Transaction {% if transaction.completed != None %}was{% else %}is{% endif %} <strong>{{ transaction.get_success()|lower }}</strong>.</li>
-                    <li>Transaction <strong>is{% if not transaction.refunded > 0 %} not{% endif %}</strong> partially refunded.</li>
-                    <li>Transaction <strong>is{% if not transaction.refunded >= transaction.value %} not{% endif %}</strong> fully refunded.</li>
-                    <li>Transaction <strong>was{% if not transaction.result_code == 'CX' %} not{% endif %}</strong> cancelled.</li>
-                </ul>
-                <h4>Actions</h4>
-                <ul>
-                    {% if transaction.get_status()[0] %}
-                        <li><form action="{{ url_for('admin.refund_transaction', transaction_id=transaction.object_id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refund_amount_pounds" min="0" step="1" />.<input type="number" name="refund_amount_pence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
-                    {% endif %}
-                </ul>
+            {% if transaction.payment_method == 'Card' and transaction.eway_transaction != None %}
+                <p><strong>Eway Transaction</strong>: <a href="{{ url_for('admin.view_eway_transaction', eway_transaction_id=transaction.eway_transaction.object_id) }}">#{{ '%05d' % transaction.eway_transaction.object_id }}</a></p>
             {% elif transaction.payment_method == 'Battels' %}
                 <p><strong>Battels Term</strong>: {{ transaction.battels_term }}</p>
             {% endif %}

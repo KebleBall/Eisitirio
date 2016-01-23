@@ -28,19 +28,7 @@
                                     {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
                                 {% endif %}
                             </td>
-                            <td>
-                                {% if ticket.cancelled -%}
-                                    Cancelled.
-                                {% elif ticket.collected -%}
-                                    Collected as {{ ticket.barcode }}.
-                                {% elif ticket.name == None -%}
-                                    Awaiting name.
-                                {% elif ticket.paid -%}
-                                    Paid
-                                {% else -%}
-                                    Awaiting payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
-                                {% endif %}
-                            </td>
+                            <td>{{ ticket.status }}</td>
                             <td>
                                 {% if not ticket.cancelled %}
                                     {% if not ticket.paid %}

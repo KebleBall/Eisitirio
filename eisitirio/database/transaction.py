@@ -21,6 +21,7 @@ class Transaction(DB.Model):
         DB.Enum(
             'Battels',
             'Card',
+            'OldCard',
             'Free',
             'Dummy'
         ),
@@ -68,6 +69,13 @@ class Transaction(DB.Model):
     def value(self):
         """Get the total value of the transaction."""
         return sum(item.value for item in self.items)
+
+    @property
+    def value_pounds(self):
+        """Get the total value of the transaction."""
+        value_str = "{0:03d}".format(self.value)
+
+        return value_str[:-2] + '.' + value_str[-2:]
 
     @property
     def tickets(self):

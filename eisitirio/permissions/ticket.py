@@ -7,8 +7,22 @@ from eisitirio.database import models
 @models.Ticket.permission()
 def be_cancelled(ticket):
     """Check whether a ticket can be (automatically) cancelled."""
-    # TODO
-    return False
+    if ticket.cancelled:
+        return False
+    elif app.APP.config['LOCKDOWN_MODE']:
+        return False
+    elif ticket.collected:
+        return False
+    elif not ticket.paid:
+        return True
+    elif ticket.payment_method == 'Card':
+        return True
+    elif ticket.payment_method == 'Battels':
+        return app.APP.config['CURRENT_TERM'] != 'TT'
+    elif ticket.payment_method == 'Free':
+        return True
+    else:
+        return False
 
 @models.Ticket.permission()
 def be_collected(ticket):

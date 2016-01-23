@@ -10,6 +10,7 @@ from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.helpers import login_manager
+from eisitirio.logic import cancellation_logic
 
 APP = app.APP
 DB = db.DB
@@ -171,7 +172,7 @@ def mark_ticket_paid(ticket_id):
 @ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/autocancel')
 @login.login_required
 @login_manager.admin_required
-def auto_cancel_ticket(ticket_id):
+def refund_ticket(ticket_id):
     """Cancel and refund a ticket.
 
     Marks a ticket as cancelled, and refunds the money to the owner via the
@@ -180,7 +181,7 @@ def auto_cancel_ticket(ticket_id):
     ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket:
-        if not ticket.can_be_cancelled_automatically():
+        if not ticket.can_be_cancelled():
             flask.flash(
                 'Could not automatically cancel ticket.',
                 'warning'
@@ -189,31 +190,11 @@ def auto_cancel_ticket(ticket_id):
                                   flask.url_for('admin_tickets.view_ticket',
                                                 ticket_id=ticket.object_id))
 
-        if ticket.payment_method == 'Battels':
-            ticket.battels.cancel(ticket)
-        elif ticket.payment_method == 'Card':
-            refund_result = ticket.card_transaction.process_refund(ticket.price)
-            if not refund_result:
-                flask.flash(
-                    'Could not process card refund.',
-                    'warning'
-                )
-                return flask.redirect(flask.request.referrer or
-                                      flask.url_for('admin_tickets.view_ticket',
-                                                    ticket_id=ticket.object_id))
+        if cancellation_logic.cancel_tickets([ticket], quiet=True):
+            flask.flash('Ticket was cancelled and refunded.', 'success')
+        else:
+            flask.flash('Ticket could not be cancelled/refunded.', 'error')
 
-        ticket.cancelled = True
-        DB.session.commit()
-
-        APP.log_manager.log_event(
-            'Cancelled and refunded ticket',
-            tickets=[ticket]
-        )
-
-        flask.flash(
-            'Ticket cancelled successfully.',
-            'success'
-        )
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin_tickets.view_ticket',
                                             ticket_id=ticket.object_id))

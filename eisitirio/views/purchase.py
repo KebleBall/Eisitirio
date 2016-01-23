@@ -10,6 +10,8 @@ from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.helpers import validators
+from eisitirio.logic import cancellation_logic
+from eisitirio.logic import eway_logic
 from eisitirio.logic import purchase_logic
 from eisitirio.logic import payment_logic
 
@@ -262,9 +264,7 @@ def eway_success(object_id):
     Has the transaction object process the result of the transaction, and
     redirects to the dashboard.
     """
-    transaction = models.CardTransaction.get_by_id(object_id)
-
-    transaction.process_eway_payment()
+    eway_logic.process_payment(models.CardTransaction.get_by_id(object_id))
 
     return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
@@ -277,9 +277,7 @@ def eway_cancel(object_id):
 
     Marks the transaction as cancelled and redirects to the dashboard.
     """
-    transaction = models.CardTransaction.get_by_id(object_id)
-
-    transaction.cancel_eway_payment()
+    eway_logic.cancel_payment(models.CardTransaction.get_by_id(object_id))
 
     return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
@@ -334,3 +332,21 @@ def complete_payment():
         return flask.render_template(
             'purchase/complete_payment.html'
         )
+
+@PURCHASE.route('/purchase/cancel', methods=['GET', 'POST'])
+def cancel():
+    """Allow the user to cancel tickets."""
+    if flask.request.method == 'POST':
+        cancellation_logic.cancel_tickets(
+            models.Ticket.query.filter(
+                models.Ticket.object_id.in_(
+                    flask.request.form.getlist('tickets[]')
+                )
+            ).filter(
+                models.Ticket.owner_id == login.current_user.object_id
+            ).filter(
+                models.Ticket.cancelled == False # pylint: disable=singleton-comparison
+            ).all()
+        )
+
+    return flask.render_template('purchase/cancel.html')

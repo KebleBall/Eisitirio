@@ -9,6 +9,7 @@ import flask
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
+from eisitirio.logic import eway_logic
 
 def do_payment(tickets, postage_option, payment_method, payment_term,
                address=None):
@@ -65,9 +66,9 @@ def do_payment(tickets, postage_option, payment_method, payment_term,
 
         db.DB.session.commit()
     elif payment_method == 'Card':
-        eway_url = transaction.get_eway_url()
+        payment_url = eway_logic.get_payment_url(transaction)
 
-        if eway_url:
-            return flask.redirect(eway_url)
+        if payment_url:
+            return flask.redirect(payment_url)
 
     return flask.redirect(flask.url_for('dashboard.dashboard_home'))
