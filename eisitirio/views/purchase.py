@@ -337,15 +337,116 @@ def cancel():
     """Allow the user to cancel tickets."""
     if flask.request.method == 'POST':
         cancellation_logic.cancel_tickets(
-            models.Ticket.query.filter(
+            login.current_user.active_tickets.filter(
                 models.Ticket.object_id.in_(
                     flask.request.form.getlist('tickets[]')
                 )
-            ).filter(
-                models.Ticket.owner_id == login.current_user.object_id
-            ).filter(
-                models.Ticket.cancelled == False # pylint: disable=singleton-comparison
             ).all()
         )
 
     return flask.render_template('purchase/cancel.html')
+
+@PURCHASE.route('/resell', methods=['GET', 'POST'])
+@login.login_required
+def resell():
+    """Allow the user to resell tickets.
+
+    Resell here actually means that the reseller's tickets will be cancelled,
+    and new tickets created in the account of the recipient.
+    """
+    if flask.request.method != 'POST':
+        return flask.render_template('purchase/resell.html')
+
+    tickets = login.current_user.active_tickets.filter(
+        models.Ticket.object_id.in_(flask.request.form.getlist('tickets[]'))
+    ).all()
+
+    resell_to = models.User.get_by_email(flask.request.form['resell_to'])
+
+    flashes = []
+
+    if not tickets:
+        flashes.append("You haven't selected any tickets.")
+
+    if not resell_to:
+        flashes.append('No user with that email exists')
+    elif resell_to == login.current_user:
+        flashes.append('You can\'t resell tickets to yourself')
+
+    if flashes:
+        for flash in flashes:
+            flask.flash(flash, 'error')
+
+        return flask.render_template('purchase/resell.html')
+
+    if cancellation_logic.cancel_tickets(tickets, quiet=True):
+        found_uncancelled = False
+
+        new_tickets = []
+
+        ticket_type = APP.config['DEFAULT_TICKET_TYPE']
+
+        for ticket in tickets:
+            if ticket.cancelled:
+                new_tickets.append(models.Ticket(
+                    resell_to,
+                    ticket_type.slug,
+                    ticket_type.price
+                ))
+            else:
+                found_uncancelled = True
+
+        DB.session.add_all(new_tickets)
+        DB.session.commit()
+
+        APP.email_manager.send_template(
+            resell_to.email,
+            'You have been resold tickets',
+            'resale.email',
+            reseller=login.current_user,
+            resell_to=resell_to,
+            num_tickets=len(new_tickets),
+            expiry=new_tickets[0].expires
+        )
+
+        APP.log_manager.log_event(
+            'Cancelled tickets for resale',
+            tickets=tickets,
+            user=login.current_user
+        )
+
+        APP.log_manager.log_event(
+            'Created tickets from resale',
+            tickets=new_tickets,
+            user=resell_to
+        )
+
+        if found_uncancelled:
+            flask.flash('The resale was partially successful.', 'success')
+            flask.flash(
+                (
+                    'Some of your tickets could not be automatically '
+                    'cancelled, and so could not be resold. You can try again '
+                    'later, but if this problem continues to occur, you should '
+                    'contact <a href="{0}">the ticketing officer</a>'
+                ).format(
+                    APP.config['TICKETS_EMAIL_LINK']
+                ),
+                'warning'
+            )
+        else:
+            flask.flash('The resale was successful.', 'success')
+    else:
+        flask.flash(
+            (
+                'None of your tickets could be automatically cancelled, and so '
+                'they could not be resold. You can try again later, but if '
+                'this problem continues to occur, you should contact '
+                '<a href="{0}">the ticketing officer</a>'
+            ).format(
+                APP.config['TICKETS_EMAIL_LINK']
+            ),
+            'error'
+        )
+
+    return flask.render_template('purchase/resell.html')

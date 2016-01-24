@@ -1,0 +1,89 @@
+<!-- purchase/resell.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Resell Tickets{% endblock %}
+
+{% block content %}
+    <section id="resell" class="columns">
+        <p>If you have bought tickets, and no longer require them, you can resell them to another person. Your tickets will be cancelled and refunded, and new tickets will be allocated to your chosen recipient. The process happens instantaneously, and cannot be reversed. If your chosen recipient does not pay for the tickets within {{ format_timedelta(template_config['TICKET_EXPIRY_TIME']) }}, the tickets will expire, and be reallocated to the waiting list.</p>
+        <p>Your chosen recipient must have an account on the {{ template_config['BALL_NAME'] }} ticketing system before you can resell tickets to them.</p>
+        <p>Please note that any discounts you were given when purchasing your tickets will not be applied to the tickets given to your chosen recipient.</p>
+        <p><strong>{{ template_config['BALL_NAME'] }} accepts no liability for any disputes resulting from the use of this facility.</strong></p>
+        <h3>Your Tickets</h3>
+        <form action="{{ url_for('purchase.resell') }}" method="post">
+            <table id="tickets_table">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Ticket Number</th>
+                        <th>Name on Ticket</th>
+                        <th>Value of Ticket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in current_user.tickets %}
+                        {% if ticket.can_be_cancelled() %}
+                            <tr id="ticket-{{ ticket.object_id }}">
+                                <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" /></td>
+                                <td><label for="ticket_select-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                                <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
+                                <td><label for="ticket_select-{{ ticket.object_id }}">&pound;{{ '%.2f' % (ticket.price / 100.0) }}</label></td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h5>Who are you reselling these tickets to?</h5>
+            <div class="row">
+                <div class="columns">
+                    <label for="resell_to">Email Address</label>
+                    <input type="email" name="resell_to" id="resell_to" />
+                    <div id="resale_message" style="display: none;"></div>
+                    <p class="small">The person you are reselling to must have an account on the {{ template_config['BALL_NAME'] }} Ticketing System</p>
+                </div>
+            </div>
+            <div class="message-box error">
+                <p>
+                    <strong>Warning:</strong> Your tickets will be cancelled immediately you click the button below. Double check that you have selected the correct tickets, as this process cannot be reversed.
+                </p>
+            </div>
+            <input type="submit" value="Resell Tickets" class="button small" />
+        </form>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        var resell_to = $("#resell_to");
+        var resale_message = $("#resale_message");
+
+        resell_to.on("blur", function() {
+            if (resell_to.val() != '') {
+                jQuery.ajax(
+                    '{{ url_for('ajax.validate_resale_email', _external=True) }}',
+                    {
+                        'data': {
+                            'email': resell_to.val()
+                        },
+                        'type': 'POST',
+                        'dataType': 'json',
+                        'success': function(data, code, xhr) {
+                            resale_message.attr(
+                                "class",
+                                data.class
+                            );
+                            resale_message.html(data.message);
+                            resale_message.show(0);
+                        }
+                    }
+                );
+            } else {
+                resale_message.hide(0);
+            }
+        });
+
+        resell_to.on("change", function() {
+            resale_message.hide(0);
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,13 @@
+Dear {{ resell_to.forenames }},
+
+{{ reseller.full_name }} has resold {{ num_tickets }} ticket{% if num_tickets != 1 %}s{% endif %} for {{ template_config['BALL_NAME'] }} to you.
+
+The tickets you have received must be paid for by {{ expiry.strftime("%H:%M, %A %d %B %Y") }}, otherwise they will expire.
+
+To pay for your tickets, please log in to the ticketing system at {{ template_config['EISITIRIO_URL'] }}, and click the "Complete Payment" button next to any of the unpaid tickets.
+
+If you no longer want the tickets, please log in to the ticketing system, and click the "Cancel" button next to any of the unpaid tickets, to ensure that other people who do want tickets are able to get them.
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

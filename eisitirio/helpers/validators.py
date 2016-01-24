@@ -85,3 +85,62 @@ def validate_voucher(code):
             )
 
     return result
+
+def validate_resale_email(email, current_user):
+    """Validate a user to resell tickets to.
+
+    Check that the user referred to exists, and that it is not the current user.
+
+    Args:
+        email: (str) the email address entered as recipient.
+        current_user: (models.User) the currently logged in user who is
+            reselling tickets
+
+    Returns:
+        (bool, dict(class:str, message:str), User or None) returns whether
+        the email is associated with a valid user, a dict containing components
+        of a message to be flashed, and if valid the user itself or otherwise
+        None.
+    """
+    user = models.User.get_by_email(email)
+
+    if user:
+        if user == current_user:
+            result = (
+                False,
+                {
+                    'class': 'info',
+                    'message': (
+                        'There is very little point, if any, in reselling '
+                        'tickets to yourself...'
+                    )
+                },
+                None
+            )
+        else:
+            result = (
+                True,
+                {
+                    'class': 'success',
+                    'message': (
+                        '{0} will receive an email to confirm the resale.'
+                    ).format(user.forenames)
+                },
+                None
+            )
+    else:
+        result = (
+            False,
+            {
+                'class': 'warning',
+                'message': (
+                    'No user with that email address was found, have you '
+                    'entered it correctly? The person who you are reselling '
+                    'to must have an account before they can buy tickets from '
+                    'you.'
+                )
+            },
+            None
+        )
+
+    return result
