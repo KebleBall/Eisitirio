@@ -126,7 +126,7 @@ class EwayTransaction(DB.Model):
     @property
     def success(self):
         """Get whether the transaction was completed successfully."""
-        success = self.get_status()[0]
+        success = self.status[0]
         if success is None:
             return 'Uncompleted'
         elif success:

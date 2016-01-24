@@ -156,7 +156,7 @@ def process_payment(transaction):
         eway.charged = response['TotalAmount']
         DB.session.commit()
 
-        if eway.status:
+        if eway.status[0]:
             if eway.result_code == '10':
                 APP.log_manager.log_event(
                     (
