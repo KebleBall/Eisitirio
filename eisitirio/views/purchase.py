@@ -57,21 +57,11 @@ def purchase_home():
     ticket_info = purchase_logic.get_ticket_info(
         login.current_user
     )
-
-    people_waiting = models.Waiting.query.count() > 0
-
-    if people_waiting or not ticket_info.ticket_types:
-        if people_waiting:
-            flask.flash(
-                'You are not able to purchase tickets at this time, as there '
-                'are people on the waiting list.',
-                'info'
-            )
-        else:
-            flask.flash(
-                'You are not able to purchase tickets at this time.',
-                'info'
-            )
+    if models.Waiting.query.count() > 0 or not ticket_info.ticket_types:
+        flask.flash(
+            'You are not able to purchase tickets at this time.',
+            'info'
+        )
 
         if purchase_logic.wait_available(login.current_user):
             flask.flash(
