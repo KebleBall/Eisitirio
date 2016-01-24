@@ -331,6 +331,9 @@ def check_postage(flashes):
 
 def wait_available(user):
     """How many tickets can the user join the waiting list for."""
+    if not app.APP.config['WAITING_OPEN']:
+        return 0
+
     return max(0, min(
         app.APP.config['MAX_TICKETS'] - user.active_ticket_count,
         _type_limit_per_person(user, app.APP.config['DEFAULT_TICKET_TYPE']),

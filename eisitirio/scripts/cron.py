@@ -86,6 +86,9 @@ def send_announcements():
 
 def allocate_waiting():
     """Allocate available tickets to people on the waiting list."""
+    if not APP.config['TICKETS_ON_SALE']:
+        return
+
     tickets_available = purchase_logic.guest_tickets_available()
 
     ticket_type = APP.config['DEFAULT_TICKET_TYPE']

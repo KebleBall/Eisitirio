@@ -251,6 +251,27 @@ def checkout():
 
     guest_tickets_available = purchase_logic.guest_tickets_available()
 
+    if models.Waiting.query.count() > 0:
+        flask.flash(
+            (
+                'You are unable to purchase tickets for your group as there '
+                'are people on the waiting list.'
+            ),
+            'info'
+        )
+
+        if purchase_logic.wait_available(login.current_user):
+            flask.flash(
+                (
+                    'If you and your group members still want to try to obtain '
+                    'tickets, you should all join the waiting list.'
+                ),
+                'info'
+            )
+            return flask.redirect(flask.url_for('purchase.wait'))
+        else:
+            return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+
     if (
             guest_tickets_available <
             login.current_user.purchase_group.total_guest_tickets_requested
