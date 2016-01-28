@@ -21,10 +21,12 @@ from eisitirio import system # pylint: disable=unused-import
 
 APP = app.APP
 
-agent.initialize(os.path.join(VENV_DIR, 'newrelic.ini'))
+agent.initialize(os.path.join(VENV_DIR, 'newrelic.ini'),
+                 log_level=logging.WARNING)
 
 logging.getLogger('boto').setLevel(logging.WARNING)
 logging.getLogger('newrelic').setLevel(logging.WARNING)
+logging.getLogger('newrelic.config').setLevel(logging.WARNING)
 logging.getLogger('requests').setLevel(logging.WARNING)
 
 @agent.wsgi_application()
