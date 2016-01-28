@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+import logging
 import os
 import site
 import sys
@@ -21,6 +22,10 @@ from eisitirio import system # pylint: disable=unused-import
 APP = app.APP
 
 agent.initialize(os.path.join(VENV_DIR, 'newrelic.ini'))
+
+logging.getLogger('boto').setLevel(logging.WARNING)
+logging.getLogger('newrelic').setLevel(logging.WARNING)
+logging.getLogger('requests').setLevel(logging.WARNING)
 
 @agent.wsgi_application()
 def application(req_environ, start_response):
