@@ -128,16 +128,16 @@ class Ticket(DB.Model):
         """Get the status of this ticket."""
         if self.cancelled:
             return 'Cancelled.'
+        elif not self.paid:
+            return 'Awaiting payment. Expires {0}.'.format(
+                self.expires.strftime('%H:%M %d/%m/%Y')
+            )
         elif self.collected:
             return 'Collected as {0}.'.format(self.barcode)
         elif self.name is None:
             return 'Awaiting name.'
-        elif self.paid:
-            return 'Paid'
         else:
-            return 'Awaiting payment. Expires {0}.'.format(
-                self.expires.strftime('%H:%M %d/%m/%Y')
-            )
+            return 'Paid'
 
     @price.setter
     def price(self, value):

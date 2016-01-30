@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # coding: utf-8
-"""Script to update matching from users to Battels accounts."""
+"""Script to run bpython with the appropriate env."""
 
 from flask.ext import script
 from bpython import curtsies

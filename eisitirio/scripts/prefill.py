@@ -4,6 +4,7 @@
 
 from flask.ext import script
 
+from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import static
 
@@ -15,7 +16,7 @@ class PrefillCommand(script.Command):
     @staticmethod
     def run():
         """Prefill the database."""
-
-        db.DB.session.add_all(static.COLLEGES)
-        db.DB.session.add_all(static.AFFILIATIONS)
-        db.DB.session.commit()
+        with app.APP.app_context():
+            db.DB.session.add_all(static.COLLEGES)
+            db.DB.session.add_all(static.AFFILIATIONS)
+            db.DB.session.commit()

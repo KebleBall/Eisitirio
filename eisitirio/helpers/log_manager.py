@@ -74,7 +74,7 @@ class LogManager(object):
 
     @staticmethod
     def log_event(message, tickets=None, user=None, transaction=None,
-                  purchase_group=None, commit=True):
+                  purchase_group=None, commit=True, in_app=True):
         """Log a user action to the database.
 
         Creates a log entry in the database which can be found through the admin
@@ -87,12 +87,17 @@ class LogManager(object):
             transaction: (models.Transaction or None) transaction this action
                 affected
         """
-        if 'actor_id' in flask.session:
-            actor = models.User.get_by_id(flask.session['actor_id'])
-        elif not login.current_user.is_anonymous:
-            actor = login.current_user
+        actor = None
+
+        if in_app:
+            if 'actor_id' in flask.session:
+                actor = models.User.get_by_id(flask.session['actor_id'])
+            elif not login.current_user.is_anonymous:
+                actor = login.current_user
+
+            ip_address = flask.request.remote_addr
         else:
-            actor = None
+            ip_address = 'interactive'
 
         if isinstance(user, login.AnonymousUserMixin):
             user = None
@@ -101,7 +106,7 @@ class LogManager(object):
             tickets = []
 
         entry = models.Log(
-            flask.request.remote_addr,
+            ip_address,
             message,
             actor,
             user,

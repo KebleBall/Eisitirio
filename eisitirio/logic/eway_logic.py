@@ -134,14 +134,26 @@ def get_payment_url(transaction):
         )
         return None
 
-def process_payment(transaction):
+def process_payment(transaction, in_app=True, success_only=False):
     """Check if the transaction has been completed, and update the database.
 
     Intended to be called by the eWay callback, queries the eWay API for the
     result of the transaction (whether payment was completed) and updates
     the persisted state of this transaction object and related ticket
-    objects
+    objects.
+
+    Can also be called interactively or scripted, to allow checking if
+    transactions have been completed. In this case, |in_app| should be false (to
+    prevent trying to use flask.flash outside of the request context), and
+    |success_only| should be True - the function will only commit to the
+    database if the transaction is considered successful (to deal with eWay
+    returning a 05 Transaction Failure code for incomplete transactions).
     """
+    if in_app:
+        flash = flask.flash
+    else:
+        flash = lambda *a, **kw: None
+
     eway = transaction.eway_transaction
 
     data = {'AccessCode': eway.access_code}
@@ -154,7 +166,12 @@ def process_payment(transaction):
         eway.result_code = response['ResponseCode']
         eway.eway_id = response['TransactionID']
         eway.charged = response['TotalAmount']
-        DB.session.commit()
+
+        if success_only and not eway.status[0]:
+            DB.session.rollback()
+            return None
+        else:
+            DB.session.commit()
 
         if eway.status[0]:
             if eway.result_code == '10':
@@ -168,14 +185,16 @@ def process_payment(transaction):
                     ),
                     tickets=transaction.tickets,
                     user=transaction.user,
-                    transaction=transaction
+                    transaction=transaction,
+                    in_app=in_app
                 )
 
                 refund_success = process_refund(transaction,
-                                                response['TotalAmount'])
+                                                response['TotalAmount'],
+                                                in_app)
 
                 if refund_success:
-                    flask.flash(
+                    flash(
                         (
                             'Your card payment was only authorised '
                             'for a partial amount, and has '
@@ -200,7 +219,7 @@ def process_payment(transaction):
                         transaction=transaction,
                         ewayresponse=response
                     )
-                    flask.flash(
+                    flash(
                         (
                             'Your card payment was only approved for '
                             'a partial amount. An email has been '
@@ -228,22 +247,23 @@ def process_payment(transaction):
                     'Completed Card Payment',
                     tickets=transaction.tickets,
                     user=transaction.user,
-                    transaction=transaction
+                    transaction=transaction,
+                    in_app=in_app
                 )
 
-                flask.flash(
+                flash(
                     'Your payment has completed successfully',
                     'success'
                 )
         else:
-            flask.flash(
+            flash(
                 'The card payment failed. You have not been charged.',
                 'error'
             )
 
         return eway.status[0]
     else:
-        flask.flash(
+        flash(
             (
                 'There is a problem with our payment provider, '
                 'please contact <a href="{0}">the treasurer</a> '
@@ -276,7 +296,7 @@ def cancel_payment(transaction):
         transaction=transaction
     )
 
-def process_refund(transaction, amount):
+def process_refund(transaction, amount, in_app=True):
     """Refund some amount of money to the customer.
 
     Sends a request to the eWay API requesting that the given amount is
@@ -310,7 +330,8 @@ def process_refund(transaction, amount):
                 refunded_amount / 100.0
             ),
             user=login.current_user,
-            transaction=transaction
+            transaction=transaction,
+            in_app=in_app
         )
 
         if refunded_amount != amount:
@@ -325,17 +346,17 @@ def process_refund(transaction, amount):
                 ewayresponse=response
             )
 
-            flask.flash(
-                (
-                    'Your card refund was only approved for '
-                    'a partial amount. An email has been '
-                    'sent to {0} staff, and the '
-                    'refund will be manually completed.'
-                ).format(
-                    APP.config['BALL_NAME']
-                ),
-                'warning'
-            )
+            if in_app:
+                flask.flash(
+                    (
+                        'Your card refund was only approved for a partial '
+                        'amount. An email has been sent to {0} staff, and the '
+                        'refund will be manually completed.'
+                    ).format(
+                        APP.config['BALL_NAME']
+                    ),
+                    'warning'
+                )
 
         return True
     else:
