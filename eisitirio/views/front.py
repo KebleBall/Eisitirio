@@ -365,6 +365,11 @@ def terms():
     """Display the terms and conditions."""
     return flask.render_template('front/terms.html')
 
+@FRONT.route('/faqs')
+def faqs():
+    """Display the frequently asked questions."""
+    return flask.render_template('front/faqs.html')
+
 @FRONT.route('/passwordreset', methods=['GET', 'POST'])
 def password_reset():
     """Display a form to start the password reset process.
