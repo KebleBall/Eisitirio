@@ -152,7 +152,8 @@ def process_payment(transaction, in_app=True, success_only=False):
     if in_app:
         flash = flask.flash
     else:
-        flash = lambda *a, **kw: None
+        def flash(*_, **unused):
+            pass
 
     eway = transaction.eway_transaction
 
