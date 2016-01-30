@@ -281,6 +281,7 @@ def eway_cancel(object_id):
     return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
 @PURCHASE.route('/purchase/complete-payment', methods=['GET', 'POST'])
+@login.login_required
 def complete_payment():
     """Allow the user to complete payment for tickets.
 
@@ -333,6 +334,7 @@ def complete_payment():
         )
 
 @PURCHASE.route('/purchase/cancel', methods=['GET', 'POST'])
+@login.login_required
 def cancel():
     """Allow the user to cancel tickets."""
     if flask.request.method == 'POST':
