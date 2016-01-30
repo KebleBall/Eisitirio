@@ -153,6 +153,7 @@ def process_payment(transaction, in_app=True, success_only=False):
         flash = flask.flash
     else:
         def flash(*_, **unused):
+            """Use a dummy flash function to avoid using the request context."""
             pass
 
     eway = transaction.eway_transaction
