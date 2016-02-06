@@ -241,6 +241,7 @@ def _get_ticket_sales(query):
     ])
 
 def _get_waiting():
+    """Get statistics of number of users/tickets on the waiting list."""
     return collections.OrderedDict([
         (
             'Users Waiting',
