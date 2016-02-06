@@ -4,8 +4,10 @@
 from __future__ import unicode_literals
 
 import collections
+import warnings
 
 import sqlalchemy
+from sqlalchemy import exc as sqlalchemy_exceptions
 
 from eisitirio import app
 from eisitirio.database import db
@@ -124,28 +126,34 @@ def _get_college_users():
 
 def _get_payment_methods():
     """Get the number of tickets paid for with each payment method."""
-    return collections.OrderedDict([
-        (
-            name,
-            models.Ticket.query.join(
-                models.TicketTransactionItem.query.join(
-                    models.Transaction.query.filter(
-                        models.Transaction.payment_method == payment_method
-                    ).filter(
-                        models.Transaction.paid == True
-                    ).subquery(),
-                    models.TicketTransactionItem.transaction
-                ).subquery(reduce_columns=True),
-                models.Ticket.transaction_items
-            ).count()
+    with warnings.catch_warnings():
+        warnings.simplefilter(
+            "ignore",
+            category=sqlalchemy_exceptions.SAWarning
         )
-        for name, payment_method in collections.OrderedDict([
-            ('Battels', 'Battels'),
-            ('Card', 'Card'),
-            ('Free', 'Free'),
-            ('Unknown', 'Dummy'),
-        ]).iteritems()
-    ])
+
+        return collections.OrderedDict([
+            (
+                name,
+                models.Ticket.query.join(
+                    models.TicketTransactionItem.query.join(
+                        models.Transaction.query.filter(
+                            models.Transaction.payment_method == payment_method
+                        ).filter(
+                            models.Transaction.paid == True
+                        ).subquery(),
+                        models.TicketTransactionItem.transaction
+                    ).subquery(reduce_columns=True),
+                    models.Ticket.transaction_items
+                ).count()
+            )
+            for name, payment_method in collections.OrderedDict([
+                ('Battels', 'Battels'),
+                ('Card', 'Card'),
+                ('Free', 'Free'),
+                ('Unknown', 'Dummy'),
+            ]).iteritems()
+        ])
 
 def _get_ticket_types():
     """Get the number of active tickets by type."""
