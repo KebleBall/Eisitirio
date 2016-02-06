@@ -54,7 +54,7 @@ def create_plot(group):
 
     style_index = 0
 
-    plots = {}
+    plots = collections.OrderedDict()
 
     for statistic in statistics:
         if statistic.statistic not in plots:
@@ -110,7 +110,6 @@ def render_plot(plots, x_lim_min, x_lim_max):
             label=(plot.label + ' - ' + str(plot.current_value)),
             markevery=18
         )
-
 
     axes.set_xlim(x_lim_min, x_lim_max)
     axes.grid(True, 'major', 'y')

@@ -13,3 +13,4 @@ we have this module for accessing all the constants.
 
 from eisitirio.database.affiliation import AFFILIATIONS
 from eisitirio.database.college import COLLEGES
+from eisitirio.database.statistic import STATISTIC_GROUPS

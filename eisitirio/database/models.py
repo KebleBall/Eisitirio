@@ -34,6 +34,7 @@ from eisitirio.database.ticket_transaction_item import TicketTransactionItem
 from eisitirio.database.transaction import DummyTransaction
 from eisitirio.database.transaction import FreeTransaction
 from eisitirio.database.transaction import Transaction
+from eisitirio.database.transaction_item import TransactionItem
 from eisitirio.database.user import User
 from eisitirio.database.voucher import Voucher
 from eisitirio.database.waiting import Waiting

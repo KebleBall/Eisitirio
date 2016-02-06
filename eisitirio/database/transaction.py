@@ -21,7 +21,6 @@ class Transaction(DB.Model):
         DB.Enum(
             'Battels',
             'Card',
-            'OldCard',
             'Free',
             'Dummy'
         ),

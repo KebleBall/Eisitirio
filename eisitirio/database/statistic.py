@@ -3,11 +3,21 @@
 
 from __future__ import unicode_literals
 
+import collections
 import datetime
 
 from eisitirio.database import db
 
 DB = db.DB
+
+STATISTIC_GROUPS = collections.OrderedDict([
+    ('college_users', 'Registered Users by College'),
+    ('total_ticket_sales', 'Total Tickets by State'),
+    ('guest_ticket_sales', 'Guest Tickets by State'),
+    ('ticket_types', 'Active Tickets by Ticket Type'),
+    ('payment_methods', 'Paid Tickets by Payment Method'),
+    ('waiting', 'Waiting List'),
+])
 
 class Statistic(DB.Model):
     """Model for representing a statistic in a timeseries."""
@@ -18,11 +28,7 @@ class Statistic(DB.Model):
         nullable=False
     )
     group = DB.Column(
-        DB.Enum(
-            'Colleges',
-            'Payments',
-            'Sales'
-        ),
+        DB.Enum(*STATISTIC_GROUPS.keys()),
         nullable=False
     )
     statistic = DB.Column(
@@ -35,7 +41,7 @@ class Statistic(DB.Model):
     )
 
     def __init__(self, group, statistic, value):
-        if group not in ['Colleges', 'Payments', 'Sales']:
+        if group not in STATISTIC_GROUPS:
             raise ValueError(
                 '{0} is not a valid statistic group'.format(group)
             )

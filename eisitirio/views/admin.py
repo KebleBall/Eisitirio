@@ -11,13 +11,14 @@ import StringIO
 from dateutil import parser
 from flask.ext import login
 import flask
-import sqlalchemy
 
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
+from eisitirio.database import static
 from eisitirio.helpers import login_manager
 from eisitirio.helpers import statistic_plots
+from eisitirio.helpers import statistics
 from eisitirio.helpers import util
 from eisitirio.logic import eway_logic
 
@@ -483,46 +484,21 @@ def refund_transaction(eway_transaction_id):
 @ADMIN.route('/admin/statistics')
 @login.login_required
 @login_manager.admin_required
-def statistics():
+def view_statistics():
     """Display statistics about the ball.
 
     Computes a number of statistics about the ball (live), and displays them
     alongside graphs.
     """
-    total_value = DB.session.query(
-        sqlalchemy.func.sum(models.Ticket.price_)
-    ).filter(
-        models.Ticket.cancelled != True
-    ).scalar()
-
-    if total_value is None:
-        total_value = 0
-
-    paid_value = DB.session.query(
-        sqlalchemy.func.sum(models.Ticket.price_)
-    ).filter(
-        models.Ticket.paid == True # pylint: disable=singleton-comparison
-    ).filter(
-        models.Ticket.cancelled != True
-    ).scalar()
-
-    if paid_value is None:
-        paid_value = 0
-
-    cancelled_value = DB.session.query(
-        sqlalchemy.func.sum(models.Ticket.price_)
-    ).filter(
-        models.Ticket.cancelled == True # pylint: disable=singleton-comparison
-    ).scalar()
-
-    if cancelled_value is None:
-        cancelled_value = 0
-
     return flask.render_template(
         'admin/statistics.html',
-        total_value=total_value,
-        paid_value=paid_value,
-        cancelled_value=cancelled_value
+        statistic_groups=static.STATISTIC_GROUPS,
+        revenue=statistics.get_revenue(),
+        num_postage=models.Postage.query.filter(
+            models.Postage.paid == True # pylint: disable=singleton-comparison
+        ).filter(
+            models.Postage.cancelled == False # pylint: disable=singleton-comparison
+        ).count()
     )
 
 @ADMIN.route('/admin/announcements', methods=['GET', 'POST'])
@@ -885,36 +861,12 @@ def delete_waiting(entry_id):
     return flask.redirect(flask.request.referrer or
                           flask.url_for('admin.admin_home'))
 
-@ADMIN.route('/admin/graphs/sales')
+@ADMIN.route('/admin/graphs/<group>')
 @login.login_required
 @login_manager.admin_required
-def graph_sales():
-    """Render a graph showing sales statistics
-
-    Shows statistics for number of tickets Available, Ordered, Paid, Collected,
-    and Cancelled, plus the length of the waiting list.
-    """
-    return statistic_plots.create_plot('Sales')
-
-@ADMIN.route('/admin/graphs/colleges')
-@login.login_required
-@login_manager.admin_required
-def graph_colleges():
-    """Render graph showing statistics on users' colleges.
-
-    Shows how many users are registered from each college.
-    """
-    return statistic_plots.create_plot('Colleges')
-
-@ADMIN.route('/admin/graphs/payments')
-@login.login_required
-@login_manager.admin_required
-def graph_payments():
-    """Render graph showing payment statistics.
-
-    Shows how many tickets have been paid for by each payment method.
-    """
-    return statistic_plots.create_plot('Payments')
+def graph(group):
+    """Render graph showing statistics for the given statistic group."""
+    return statistic_plots.create_plot(group)
 
 @ADMIN.route('/admin/data/<group>')
 @login.login_required

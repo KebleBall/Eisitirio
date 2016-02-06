@@ -11,13 +11,14 @@ import sys
 
 
 from flask.ext import script
-import sqlalchemy
 
 from eisitirio import app
 from eisitirio import system # pylint: disable=unused-import
 from eisitirio.database import db
 from eisitirio.database import models
+from eisitirio.database import static
 from eisitirio.helpers import email_manager
+from eisitirio.helpers import statistics
 from eisitirio.logic import purchase_logic
 
 APP = app.APP
@@ -167,90 +168,18 @@ def delete_old_statistics(now):
 
     DB.session.commit()
 
-def generate_sales_statistics():
-    """Generate statistics for number of tickets available, sold etc."""
-    def maybe_int(value):
-        """Convert the result of an sqlalchemy scalar to an int."""
-        if value is None:
-            return 0
-        else:
-            return int(value)
+def generate_statistics():
+    """Generate statistics all groups."""
+    for group in static.STATISTIC_GROUPS:
+        DB.session.add_all(
+            models.Statistic(
+                group,
+                name,
+                value
+            ) for name, value in statistics.get(group).iteritems()
+        )
 
-    # TODO: Add by ticket type
-    statistics = {
-        'Available':
-            APP.config['GUEST_TICKETS_AVAILABLE'],
-        'Ordered':
-            models.Ticket.query.filter(
-                models.Ticket.ticket_type.in_(
-                    APP.config['GUEST_TYPE_SLUGS']
-                )
-            ).filter(
-                models.Ticket.cancelled == False
-            ).count(),
-        'Paid':
-            models.Ticket.query.filter(
-                models.Ticket.paid == True
-            ).filter(
-                models.Ticket.cancelled == False
-            ).count(),
-        'Cancelled':
-            models.Ticket.query.filter(models.Ticket.cancelled == True).count(),
-        'Collected':
-            models.Ticket.query.filter(models.Ticket.collected == True).count(),
-        'Waiting':
-            maybe_int(
-                DB.session.query(
-                    sqlalchemy.func.sum(
-                        models.Waiting.waiting_for
-                    )
-                ).scalar()
-            ),
-    }
-
-    DB.session.add_all(
-        models.Statistic(
-            'Sales',
-            name,
-            value
-        ) for name, value in statistics.iteritems()
-    )
-
-    DB.session.commit()
-
-# def generate_payment_statistics():
-#     """Generate statistics for number of tickets paid for by each method."""
-#     DB.session.add_all(
-#         models.Statistic(
-#             'Payments',
-#             str(method[0]),
-#             models.Ticket.query.filter(
-#                 models.Ticket.payment_method == method[0]
-#             ).filter(
-#                 models.Ticket.paid == True
-#             ).count()
-#         ) for method in DB.session.query(
-#             sqlalchemy.distinct(
-#                 models.Ticket.payment_method
-#             )
-#         ).all()
-#     )
-
-#     DB.session.commit()
-
-def generate_college_statistics():
-    """Generate statistics for number of users from each college."""
-    DB.session.add_all(
-        models.Statistic(
-            'Colleges',
-            college.name,
-            models.User.query.filter(
-                models.User.college_id == college.object_id
-            ).count()
-        ) for college in models.College.query.all()
-    )
-
-    DB.session.commit()
+        DB.session.commit()
 
 def run_5_minutely(now):
     """Run tasks which need to be run every 5 minutes.
@@ -294,15 +223,7 @@ def run_20_minutely(now):
 
     delete_old_statistics(now)
 
-    generate_sales_statistics()
-
-    # generate_payment_statistics()
-
-    generate_college_statistics()
-
-    # send_3_day_warnings(now, difference)
-
-    # send_1_day_warnings(now, difference)
+    generate_statistics()
 
 class CronCommand(script.Command):
     """Flask Script command for running Cron jobs."""
