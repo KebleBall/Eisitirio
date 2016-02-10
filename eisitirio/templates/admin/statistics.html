@@ -18,6 +18,8 @@
         {% for title, value in revenue.iteritems() %}
             <p>{{ title }}: &pound;{{ '%.2f' % (value / 100) }}</p>
         {% endfor %}
-        <p>Total postage orders: {{ num_postage }}
+        <p>Total postage orders: {{ num_postage }}</p>
+
+        <a class="button" href="{{ url_for('admin.dietary_requirements') }}">Download Dietary Requirements</a>
     </section>
 {% endblock %}

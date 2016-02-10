@@ -897,6 +897,44 @@ def data(group):
     csvdata.seek(0)
     return flask.send_file(csvdata, mimetype='text/csv', cache_timeout=900)
 
+@ADMIN.route('/admin/dietary_requirements')
+@login.login_required
+@login_manager.admin_required
+def dietary_requirements():
+    """Export dietary requirements as a csv."""
+    requirements = models.DietaryRequirements.query.all()
+
+    csvdata = StringIO.StringIO()
+    csvwriter = csv.writer(csvdata)
+
+    csvwriter.writerow([
+        'Pescetarian',
+        'Vegetarian',
+        'Vegan',
+        'Gluten free',
+        'Nut free',
+        'Dairy free',
+        'Egg free',
+        'Seafood free',
+        'Other',
+    ])
+
+    for requirement in requirements:
+        csvwriter.writerow([
+            'Yes' if requirement.pescetarian else 'No',
+            'Yes' if requirement.vegetarian else 'No',
+            'Yes' if requirement.vegan else 'No',
+            'Yes' if requirement.gluten_free else 'No',
+            'Yes' if requirement.nut_free else 'No',
+            'Yes' if requirement.dairy_free else 'No',
+            'Yes' if requirement.egg_free else 'No',
+            'Yes' if requirement.seafood_free else 'No',
+            requirement.other
+        ])
+
+    csvdata.seek(0)
+    return flask.send_file(csvdata, mimetype='text/csv', cache_timeout=900)
+
 @ADMIN.route('/admin/purchase_group/<int:group_id>/view')
 @ADMIN.route(
     '/admin/purchase_group/<int:group_id>/view/page/<int:events_page>'

@@ -74,7 +74,7 @@
                                     <img src="{{ url_for('static', filename='images/passport_outline.png') }}" />
                                 </div>
                                 <div class="large-9 columns">
-                                    <input type="file" name="photo" accept="{{ template_config['IMAGE_ACCEPT_STRING'] }}" required="required" />
+                                    <input type="file" name="photo" accept="{{ template_config['IMAGE_ACCEPT_STRING'] }}" />
                                     <p class="small">Please upload a passport style photograph of yourself.</p>
                                 </div>
                             </div>
@@ -97,6 +97,83 @@
                     <div class="large-4 columns">
                         <label for="confirm">Confirm New Password</label>
                         <input type="password" name="confirm" id="confirm" />
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Change your Password</legend>
+                <p class="small">Leave blank to keep current password</p>
+                <div class="row">
+                    <div class="large-4 columns">
+                        <label for="oldpassword">Old Password</label>
+                        <input type="password" name="oldpassword" id="oldpassword" />
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="password">New Password</label>
+                        <input type="password" name="password" id="password" />
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="confirm">Confirm New Password</label>
+                        <input type="password" name="confirm" id="confirm" />
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Dietary Requirements</legend>
+                <div class="row">
+                    <div class="large-4 columns">
+                        <label for="pescetarian">
+                            <input type="checkbox" name="pescetarian" id="pescetarian" value="Yes" {% if current_user.dietary_requirements.pescetarian %} checked="checked"{% endif %} />
+                            Pescetarian
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="vegetarian">
+                            <input type="checkbox" name="vegetarian" id="vegetarian" value="Yes" {% if current_user.dietary_requirements.vegetarian %} checked="checked"{% endif %} />
+                            Vegetarian
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="vegan">
+                            <input type="checkbox" name="vegan" id="vegan" value="Yes" {% if current_user.dietary_requirements.vegan %} checked="checked"{% endif %} />
+                            Vegan
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="gluten_free">
+                            <input type="checkbox" name="gluten_free" id="gluten_free" value="Yes" {% if current_user.dietary_requirements.gluten_free %} checked="checked"{% endif %} />
+                            Gluten free
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="nut_free">
+                            <input type="checkbox" name="nut_free" id="nut_free" value="Yes" {% if current_user.dietary_requirements.nut_free %} checked="checked"{% endif %} />
+                            Nut free
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="dairy_free">
+                            <input type="checkbox" name="dairy_free" id="dairy_free" value="Yes" {% if current_user.dietary_requirements.dairy_free %} checked="checked"{% endif %} />
+                            Dairy free
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="egg_free">
+                            <input type="checkbox" name="egg_free" id="egg_free" value="Yes" {% if current_user.dietary_requirements.egg_free %} checked="checked"{% endif %} />
+                            Egg free
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="seafood_free">
+                            <input type="checkbox" name="seafood_free" id="seafood_free" value="Yes" {% if current_user.dietary_requirements.seafood_free %} checked="checked"{% endif %} />
+                            Seafood free
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="columns">
+                        <label for="other">Other Requirement(s)</label>
+                        <input type="text" name="other" id="other" length="200" {% if current_user.dietary_requirements.other != None %} value="{{ current_user.dietary_requirements.other }}"{% endif %} />
                     </div>
                 </div>
             </fieldset>

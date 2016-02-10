@@ -36,6 +36,10 @@ def profile():
 
     Displays a form and processes it to update the users details.
     """
+    if not login.current_user.dietary_requirements:
+        DB.session.add(models.DietaryRequirements(login.current_user))
+        DB.session.commit()
+
     if flask.request.method == 'POST':
         valid = True
         flashes = []
@@ -187,6 +191,34 @@ def profile():
 
                 DB.session.delete(old_photo)
                 DB.session.add(new_photo)
+
+            dietary_requirements = login.current_user.dietary_requirements
+
+            for requirement in [
+                    'pescetarian',
+                    'vegetarian',
+                    'vegan',
+                    'gluten_free',
+                    'nut_free',
+                    'dairy_free',
+                    'egg_free',
+                    'seafood_free',
+            ]:
+                if (
+                        requirement in flask.request.form and
+                        flask.request.form[requirement] == 'Yes'
+                ):
+                    setattr(dietary_requirements, requirement, True)
+                else:
+                    setattr(dietary_requirements, requirement, False)
+
+            if (
+                    'other' in flask.request.form and
+                    flask.request.form['other'] != ''
+            ):
+                dietary_requirements.other = flask.request.form['other']
+            else:
+                dietary_requirements.other = None
 
             DB.session.commit()
 

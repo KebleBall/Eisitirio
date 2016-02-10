@@ -20,6 +20,7 @@ from eisitirio.database.battels import Battels
 from eisitirio.database.battels_transaction import BattelsTransaction
 from eisitirio.database.card_transaction import CardTransaction
 from eisitirio.database.college import College
+from eisitirio.database.dietary_requirements import DietaryRequirements
 from eisitirio.database.eway_transaction import EwayTransaction
 from eisitirio.database.group_purchase_request import GroupPurchaseRequest
 from eisitirio.database.generic_transaction_item import GenericTransactionItem

@@ -270,6 +270,71 @@ def _get_waiting():
         )
     ])
 
+def _get_dietary_requirements():
+    """Get statistics of number of users who have dietary requirements."""
+    return collections.OrderedDict([
+        (
+            'Vegan',
+            models.DietaryRequirements.query.filter(
+                models.DietaryRequirements.vegan == True
+            ).count(),
+        ),
+        (
+            'Vegetarian',
+            models.DietaryRequirements.query.filter(
+                models.DietaryRequirements.vegan == False
+            ).filter(
+                models.DietaryRequirements.vegetarian == True
+            ).count(),
+        ),
+        (
+            'Pescetarian',
+            models.DietaryRequirements.query.filter(
+                models.DietaryRequirements.vegan == False
+            ).filter(
+                models.DietaryRequirements.vegetarian == False
+            ).filter(
+                models.DietaryRequirements.pescetarian == True
+            ).count(),
+        ),
+        (
+            'Gluten Free',
+            models.DietaryRequirements.query.filter(
+                models.DietaryRequirements.gluten_free == True
+            ).count(),
+        ),
+        (
+            'Nut Free',
+            models.DietaryRequirements.query.filter(
+                models.DietaryRequirements.nut_free == True
+            ).count(),
+        ),
+        (
+            'Dairy Free',
+            models.DietaryRequirements.query.filter(
+                models.DietaryRequirements.dairy_free == True
+            ).count(),
+        ),
+        (
+            'Egg Free',
+            models.DietaryRequirements.query.filter(
+                models.DietaryRequirements.egg_free == True
+            ).count(),
+        ),
+        (
+            'Seafood Free',
+            models.DietaryRequirements.query.filter(
+                models.DietaryRequirements.seafood_free == True
+            ).count(),
+        ),
+        (
+            'Other',
+            models.DietaryRequirements.query.filter(
+                models.DietaryRequirements.other != None
+            ).count(),
+        ),
+    ])
+
 def _maybe_int(value):
     """Convert the result of an sqlalchemy scalar to an int."""
     if value is None:

@@ -17,6 +17,7 @@ STATISTIC_GROUPS = collections.OrderedDict([
     ('ticket_types', 'Active Tickets by Ticket Type'),
     ('payment_methods', 'Paid Tickets by Payment Method'),
     ('waiting', 'Waiting List'),
+    ('dietary_requirements', 'Dietary Requirements'),
 ])
 
 class Statistic(DB.Model):
