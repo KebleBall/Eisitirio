@@ -1,0 +1,7 @@
+Dear {{ name }},
+
+The photo you submitted to the {{ template_config['BALL_NAME'] }} Ticketing System has been reviewed by staff and found to be inappropriate. Please visit {{ url }} to update your photo. Your photo must be a passport style photo which clearly identifies you (and does not feature any other person).
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

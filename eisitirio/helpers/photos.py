@@ -9,9 +9,11 @@ import boto
 from PIL import Image
 
 from eisitirio import app
+from eisitirio.database import db
 from eisitirio.database import models
 
 APP = app.APP
+DB = db.DB
 
 def get_bucket():
     """Get the Boto bucket object."""
@@ -56,16 +58,17 @@ def save_photo(upload_file):
     bucket = get_bucket()
 
     full_key = bucket.new_key("full/" + filename)
-    with open(temp_filename) as temp_file:
-        full_key.set_contents_from_file(temp_file)
+    full_key.set_contents_from_filename(temp_filename)
     full_key.set_acl('public-read')
     full_url = full_key.generate_url(expires_in=0, query_auth=False)
 
     thumb_key = bucket.new_key("thumb/" + filename)
-    with open(thumb_temp_filename) as thumb_temp_file:
-        thumb_key.set_contents_from_file(thumb_temp_file)
+    thumb_key.set_contents_from_filename(thumb_temp_filename)
     thumb_key.set_acl('public-read')
     thumb_url = thumb_key.generate_url(expires_in=0, query_auth=False)
+
+    os.unlink(temp_filename)
+    os.unlink(thumb_temp_filename)
 
     return models.Photo(filename, full_url, thumb_url)
 
@@ -77,3 +80,38 @@ def delete_photo(photo):
 
     bucket.new_key("full/" + photo.filename).delete()
     bucket.new_key("thumb/" + photo.filename).delete()
+
+def rotate_photo(photo, degrees):
+    """Rotate a user's photo so that they're the right way up."""
+    bucket = get_bucket()
+
+    full_key = bucket.new_key("full/" + photo.filename)
+    thumb_key = bucket.new_key("thumb/" + photo.filename)
+
+    upload_folder = APP.config['TEMP_UPLOAD_FOLDER']
+
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
+
+    temp_filename = os.path.join(upload_folder, photo.filename)
+    thumb_temp_filename = os.path.join(upload_folder, "thumb-" + photo.filename)
+
+    full_key.get_contents_to_filename(temp_filename)
+
+    im = Image.open(temp_filename).rotate(degrees)
+    im.save(temp_filename)
+    im.thumbnail(APP.config['THUMBNAIL_SIZE'])
+    im.save(thumb_temp_filename)
+
+    full_key.set_contents_from_filename(temp_filename)
+    full_key.set_acl('public-read')
+    photo.full_url = full_key.generate_url(expires_in=0, query_auth=False)
+
+    thumb_key.set_contents_from_filename(thumb_temp_filename)
+    thumb_key.set_acl('public-read')
+    photo.thumb_url = thumb_key.generate_url(expires_in=0, query_auth=False)
+
+    os.unlink(temp_filename)
+    os.unlink(thumb_temp_filename)
+
+    DB.session.commit()

@@ -24,6 +24,11 @@ class Photo(DB.Model):
         nullable=False
     )
 
+    verified = DB.Column(
+        DB.Boolean,
+        nullable=True
+    )
+
     def __init__(self, filename, full_url, thumb_url):
         self.filename = filename
         self.full_url = full_url
