@@ -62,7 +62,9 @@ APP.register_blueprint(all_views.DASHBOARD)
 APP.register_blueprint(all_views.FRONT)
 APP.register_blueprint(all_views.GROUP_PURCHASE)
 APP.register_blueprint(all_views.PURCHASE)
-APP.register_blueprint(all_views.RESALE)
+
+if APP.config['ENABLE_RESALE']:
+    APP.register_blueprint(all_views.RESALE)
 
 @APP.route('/')
 def router():

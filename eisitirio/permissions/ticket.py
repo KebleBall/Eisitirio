@@ -25,6 +25,10 @@ def be_cancelled(ticket):
         return False
 
 @models.Ticket.permission()
+def be_resold(ticket):
+    return app.APP.config['ENABLE_RESALE'] and be_cancelled(ticket)
+
+@models.Ticket.permission()
 def be_collected(ticket):
     """Check whether a ticket can be collected."""
     # TODO

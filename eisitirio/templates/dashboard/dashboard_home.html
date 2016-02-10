@@ -36,6 +36,8 @@
                                     {% endif %}
                                     {% if ticket.can_be_cancelled() %}
                                         <a href="{{ url_for('purchase.cancel') }}" class="button tiny">Cancel</a>
+                                    {% endif %}
+                                    {% if ticket.can_be_resold() %}
                                         <a href="{{ url_for('purchase.resell') }}" class="button tiny">Resell</a>
                                     {% endif %}
                                 {% endif %}
