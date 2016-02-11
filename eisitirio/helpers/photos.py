@@ -98,7 +98,7 @@ def rotate_photo(photo, degrees):
 
     full_key.get_contents_to_filename(temp_filename)
 
-    im = Image.open(temp_filename).rotate(degrees)
+    im = Image.open(temp_filename).rotate(degrees, expand=True)
     im.save(temp_filename)
     im.thumbnail(APP.config['THUMBNAIL_SIZE'])
     im.save(thumb_temp_filename)
