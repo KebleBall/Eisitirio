@@ -969,6 +969,14 @@ def verify_photos():
     """Allow an admin to verify photos."""
     photo = models.Photo.query.filter(
         models.Photo.verified == None # pylint: disable=singleton-comparison
+    ).join(
+        models.User.query.join(
+            models.Ticket.query.filter(
+                models.Ticket.cancelled == False # pylint: disable=singleton-comparison
+            ).subquery(),
+            models.User.tickets
+        ).subquery(),
+        models.Photo.user
     ).first()
 
     if not photo:
