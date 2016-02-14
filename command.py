@@ -31,7 +31,7 @@ def get_app(config):
         if filename.startswith(config)
     ]
 
-    if len(config_files) == 0:
+    if not config_files:
         print 'No matching config file.'
     elif len(config_files) > 1:
         print 'Ambiguous config argument. Candidates: {0}'.format(
