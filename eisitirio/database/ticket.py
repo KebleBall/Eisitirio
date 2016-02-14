@@ -114,7 +114,7 @@ class Ticket(DB.Model):
         self.claim_code = '-'.join(
             util.generate_key(5, string.digits)
             for _ in xrange(3)
-        )
+        ).decode('utf-8')
 
     def __repr__(self):
         return '<Ticket {0} owned by {1} ({2})>'.format(

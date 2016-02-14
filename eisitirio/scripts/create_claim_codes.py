@@ -28,6 +28,6 @@ class CreateClaimCodesCommand(script.Command):
                 ticket.claim_code = '-'.join(
                     util.generate_key(5, string.digits)
                     for _ in xrange(3)
-                )
+                ).decode('utf-8')
 
                 db.DB.session.commit()
