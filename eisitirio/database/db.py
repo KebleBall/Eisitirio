@@ -16,6 +16,6 @@ DB.Model = declarative.declarative_base(
     cls=custom_model.CustomModel,
     name='Model',
     metadata=None,
-    metaclass=sqlalchemy._BoundDeclarativeMeta # pylint: disable=protected-access
+    metaclass=custom_model.CustomModelMeta
 )
 DB.Model.query = sqlalchemy._QueryProperty(DB) # pylint: disable=protected-access

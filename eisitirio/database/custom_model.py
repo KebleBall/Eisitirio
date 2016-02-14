@@ -14,6 +14,46 @@ import sqlalchemy
 
 from eisitirio.helpers import permissions
 
+class CustomModelMeta(flask_sqlalchemy._BoundDeclarativeMeta): # pylint: disable=protected-access
+    """Metaclass for the custom model to magically create get_by methods."""
+
+    def __getattr__(cls, name): # this is a metaclass, pylint: disable=E0213
+        if name.startswith('get_by_'):
+            return functools.partial(cls.get_by, name[7:])
+
+        return getattr(super(CustomModelMeta, cls), name)
+
+    def get_by(cls, field_name, value): # this is a metaclass, pylint: disable=E0213
+        """Get an object by the value of some field."""
+        try:
+            field = getattr(cls, field_name)
+        except AttributeError:
+            # Rewrite exception message to be nicer
+            raise AttributeError(
+                'Class \'{0}\' does not have a \'{1}\' field.'.format(
+                    cls.__name__,
+                    field_name
+                )
+            )
+
+        if not isinstance(
+                field,
+                sqlalchemy.orm.attributes.InstrumentedAttribute
+        ):
+            raise AttributeError(
+                'Class \'{0}\' does not have a \'{1}\' field.'.format(
+                    cls.__name__,
+                    field_name
+                )
+            )
+
+        item = cls.query.filter(field == value).first()
+
+        if not item:
+            return None
+
+        return item
+
 class CustomModel(flask_sqlalchemy.Model):
     """Base table schema to reduce duplication."""
     __tablename__ = None
