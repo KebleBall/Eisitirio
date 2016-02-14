@@ -5,14 +5,41 @@
 
 {% block content %}
     <section id="dashboard" class="columns">
-        <h3>Your Tickets <a href="{{ url_for('purchase.purchase_home') }}" class="button">Buy Tickets</a></h3>
+        <h3>Your ticket</h3>
+        {% if current_user.has_held_ticket() %}
+            <p>You will use the following ticket for entry into the ball.</p>
+            <table id="tickets_table">
+                <thead>
+                    <tr>
+                        <th>Ticket Number</th>
+                        <th>Ticket Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="ticket-{{ current_user.held_ticket.object_id }}">
+                        <td>#{{ '%05d' % current_user.held_ticket.object_id }}</td>
+                        <td>{{ current_user.held_ticket.status }}</td>
+                        <td><a href="{{ url_for('dashboard.relinquish_ticket') }}" class="button tiny">Relinquish</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        {% else %}
+            <p>You do not have a ticket for entering the ball. If you have been given a claim code by somebody who has bought a ticket on your behalf, enter it below to claim the ticket and attach it to your account.</p>
+            <p>Please note that once you have claimed a ticket, you will not be able to change your personal details or photo. Please ensure that your details and photo are correct before claiming a ticket.</p>
+            <form action="{{ url_for('dashboard.claim_ticket') }}" method="post">
+                <input type="text" name="claim_code" placeholder="Ticket Claim Code (xxxxx-xxxxx-xxxxx)" style="text-align: center" pattern="\d{5}-\d{5}-\d{5}" />
+                <input type="submit" value="Claim Ticket" class="button postfix" />
+            </form>
+        {% endif %}
+        <h3>Tickets You Own <a href="{{ url_for('purchase.purchase_home') }}" class="button">Buy Tickets</a></h3>
         {% if current_user.tickets.count() > 0 %}
             <table id="tickets_table">
                 <thead>
                     <tr>
                         <th>Ticket Number</th>
-                        <th>Name on Ticket</th>
                         <th>Ticket Status</th>
+                        <th>Ticket Claim Code</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -20,15 +47,23 @@
                     {% for ticket in current_user.tickets %}
                         <tr id="ticket-{{ ticket.object_id }}">
                             <td>#{{ '%05d' % ticket.object_id }}</td>
-                            <td>
+                            {#<td>
                                 {% if ticket.can_change_name() %}
                                     <span id="ticket_name_display-{{ ticket.object_id }}"><span id="ticket_name-{{ ticket.object_id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="change_ticket_name({{ ticket.object_id }}, false)">Change</a>)</span>
                                     <span id="ticket_name_form-{{ ticket.object_id }}" style="display: none;"><input name="ticket_name_input-{{ ticket.object_id }}" id="ticket_name_input-{{ ticket.object_id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="change_ticket_name({{ ticket.object_id }}, true)">Submit</button></span>
                                 {% else %}
                                     {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
                                 {% endif %}
-                            </td>
+                            </td>#}
                             <td>{{ ticket.status }}</td>
+                            <td>
+                                {% if not ticket.cancelled %}
+                                    {% if ticket.holder == None %}
+                                        {{ ticket.claim_code }}
+                                    {% else %}
+                                        Ticket has been claimed by {{ ticket.holder.full_name }}.
+                                    {% endif %}
+                                {% endif %}
                             <td>
                                 {% if not ticket.cancelled %}
                                     {% if not ticket.paid %}
@@ -39,6 +74,14 @@
                                     {% endif %}
                                     {% if ticket.can_be_resold() %}
                                         <a href="{{ url_for('purchase.resell') }}" class="button tiny">Resell</a>
+                                    {% endif %}
+                                    {% if ticket.holder == None %}
+                                        <form action="{{ url_for('dashboard.claim_ticket') }}" method="post">
+                                            <input type="hidden" name="claim_code" value="{{ ticket.claim_code }}" />
+                                            <input type="submit" value="Claim" class="button postfix" />
+                                        </form>
+                                    {% else %}
+                                        <a href="{{ url_for('dashboard.reclaim_ticket', ticket_id=ticket.object_id) }}" class="button tiny">Reclaim</a>
                                     {% endif %}
                                 {% endif %}
                             </td>

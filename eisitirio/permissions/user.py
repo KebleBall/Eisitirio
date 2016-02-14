@@ -107,3 +107,13 @@ def pay_by_battels(user):
         user.battels is not None and
         app.APP.config['CURRENT_TERM'] != 'TT'
     )
+
+@models.User.possession()
+def held_ticket(user):
+    """Does the user hold a ticket for entry."""
+    return user.held_ticket is not None
+
+@models.User.permission()
+def claim_ticket(user):
+    """Can the user claim a ticket for entry."""
+    return not user.has_held_ticket()

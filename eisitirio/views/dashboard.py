@@ -268,3 +268,86 @@ def display_announcement(announcement_id):
             'dashboard/announcement.html',
             announcement=announcement
         )
+
+@DASHBOARD.route('/dashboard/ticket/claim', methods=['GET', 'POST'])
+@login.login_required
+def claim_ticket():
+    """Allow a user to claim a ticket for entry."""
+    if flask.request.method != 'POST':
+        return flask.redirect(flask.request.referrer or
+                              flask.url_for('dashboard.dashboard_home'))
+
+    if not login.current_user.can_claim_ticket():
+        flask.flash('You are not eligible to claim a ticket.', 'error')
+        return flask.redirect(flask.request.referrer or
+                              flask.url_for('dashboard.dashboard_home'))
+
+    if (
+            'claim_code' not in flask.request.form or
+            flask.request.form['claim_code'] == ''
+    ):
+        flask.flash('Invalid claim code.', 'error')
+        return flask.redirect(flask.request.referrer or
+                              flask.url_for('dashboard.dashboard_home'))
+
+    ticket = models.Ticket.get_by_claim_code(flask.request.form['claim_code'])
+
+    if not ticket:
+        flask.flash('No ticket with given claim code.', 'error')
+    elif ticket.claims_made >= APP.config['MAX_TICKET_CLAIMS']:
+        flask.flash(
+            flask.Markup(
+                (
+                    'That ticket has been claimed too many times. Please '
+                    'contact <a href="{0}">the ticketing officer</a> for '
+                    'assistance.'
+                ).format(
+                    APP.config['TICKETS_EMAIL_LINK']
+                )
+            ),
+            'error'
+        )
+    else:
+        ticket.holder = login.current_user
+        ticket.claims_made += 1
+
+        DB.session.commit()
+
+        flask.flash('Ticket claimed.', 'success')
+
+    return flask.redirect(flask.request.referrer or
+                          flask.url_for('dashboard.dashboard_home'))
+
+@DASHBOARD.route('/dashboard/ticket/relinquish')
+@login.login_required
+def relinquish_ticket():
+    """Allow a ticket holder to relinquish their ticket."""
+    if not login.current_user.has_held_ticket():
+        flask.flash('You do not hold a ticket to relinquish.', 'error')
+    else:
+        login.current_user.held_ticket.holder = None
+        DB.session.commit()
+
+        flask.flash('Ticket relinquished.', 'success')
+
+    return flask.redirect(flask.request.referrer or
+                          flask.url_for('dashboard.dashboard_home'))
+
+@DASHBOARD.route('/dashboard/ticket/<int:ticket_id>/reclaim')
+@login.login_required
+def reclaim_ticket(ticket_id):
+    """Allow a ticket owner to reclaim a claimed ticket."""
+    ticket = models.Ticket.get_by_id(ticket_id)
+
+    if not ticket:
+        flask.flash('No such ticket.', 'error')
+    elif ticket.holder is None:
+        flask.flash('That ticket has not been claimed.', 'error')
+    else:
+        ticket.holder = None
+        DB.session.commit()
+
+        flask.flash('Ticket reclaimed.', 'success')
+
+    return flask.redirect(flask.request.referrer or
+                          flask.url_for('dashboard.dashboard_home'))

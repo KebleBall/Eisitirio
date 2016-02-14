@@ -4,9 +4,11 @@
 from __future__ import unicode_literals
 
 import datetime
+import string
 
 from eisitirio import app
 from eisitirio.database import db
+from eisitirio.helpers import util
 
 APP = app.APP
 DB = db.DB
@@ -62,6 +64,15 @@ class Ticket(DB.Model):
         unique=True,
         nullable=True
     )
+    claim_code = DB.Column(
+        DB.Unicode(17), # 3 groups of 5 digits separated by dashes
+        nullable=True
+    )
+    claims_made = DB.Column(
+        DB.Integer,
+        nullable=False,
+        default=0
+    )
 
     owner_id = DB.Column(
         DB.Integer,
@@ -78,6 +89,20 @@ class Ticket(DB.Model):
         foreign_keys=[owner_id]
     )
 
+    holder_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
+        nullable=True
+    )
+    holder = DB.relationship(
+        'User',
+        backref=DB.backref(
+            'held_ticket',
+            uselist=False
+        ),
+        foreign_keys=[holder_id]
+    )
+
     def __init__(self, owner, ticket_type, price):
         self.owner = owner
         self.ticket_type = ticket_type
@@ -85,6 +110,11 @@ class Ticket(DB.Model):
 
         self.expires = (datetime.datetime.utcnow() +
                         APP.config['TICKET_EXPIRY_TIME'])
+
+        self.claim_code = '-'.join(
+            util.generate_key(5, string.digits)
+            for _ in xrange(3)
+        )
 
     def __repr__(self):
         return '<Ticket {0} owned by {1} ({2})>'.format(
