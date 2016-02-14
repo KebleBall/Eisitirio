@@ -5,38 +5,32 @@
 
 {% block content %}
     <section id="profile" class="columns">
-        <form action="{{ url_for('dashboard.profile') }}" enctype="multipart/form-data" method="post">
+        <form action="{{ url_for('dashboard.update_profile') }}" method="post">
             <fieldset>
-                <legend>Your Details</legend>
+                <legend>Update your details.</legend>
+                {% if not current_user.can_update_details() %}
+                    <div class="message-box info">
+                        <p>You cannot currently update your details. Please contact <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a> for assistance.</p>
+                    </div>
+                {% endif %}
                 <div class="row">
-                    <div class="large-6 columns">
+                    <div class="large-4 columns">
                         <label for="forenames">Forename(s)</label>
-                        <input type="text" name="forenames" id="forenames" value="{{ current_user.forenames }}" />
+                        <input type="text" name="forenames" id="forenames" value="{{ current_user.forenames }}"{% if not current_user.can_update_details() %} disabled="disabled"{% endif %} />
                     </div>
-                    <div class="large-6 columns">
+                    <div class="large-4 columns">
                         <label for="surname">Surname</label>
-                        <input type="text" name="surname" id="surname" value="{{ current_user.surname }}" />
+                        <input type="text" name="surname" id="surname" value="{{ current_user.surname }}"{% if not current_user.can_update_details() %} disabled="disabled"{% endif %} />
                     </div>
-                </div>
-                <div class="row">
-                    <div class="large-6 columns">
-                        <label for="email">Email Address</label>
-                        <input type="email" name="email" id="email" value="{{ current_user.email }}" />
-                    </div>
-                    <div class="large-6 columns">
+                    <div class="large-4 columns">
                         <label for="phone">Phone Number</label>
-                        <input type="text" name="phone" id="phone" value="{{ current_user.phone }}" />
+                        <input type="text" name="phone" id="phone" value="{{ current_user.phone }}"{% if not current_user.can_update_details() %} disabled="disabled"{% endif %} />
                     </div>
-                    {% if current_user.new_email != None %}
-                        <div class="large-12 columns">
-                            <div class="message-box info">Awaiting verification of new email address {{ current_user.new_email }}</div>
-                        </div>
-                    {% endif %}
                 </div>
                 <div class="row">
                     <div class="large-6 columns">
                         <label for="college">College</label>
-                        <select name="college" id="college">
+                        <select name="college" id="college"{% if not current_user.can_update_details() %} disabled="disabled"{% endif %}>
                             {% for college in colleges %}
                                 {% if current_user.college_id == college.object_id %}
                                     <option value="{{ college.object_id }}" selected="selected">{{ college.name }}</option>
@@ -48,7 +42,7 @@
                     </div>
                     <div class="large-6 columns">
                         <label for="affiliation">Affiliation</label>
-                        <select name="affiliation" id="affiliation">
+                        <select name="affiliation" id="affiliation"{% if not current_user.can_update_details() %} disabled="disabled"{% endif %}>
                             {% for affiliation in affiliations %}
                                 {% if current_user.affiliation_id == affiliation.object_id %}
                                     <option value="{{ affiliation.object_id }}" selected="selected">{{ affiliation.name }}</option>
@@ -59,65 +53,12 @@
                         </select>
                     </div>
                 </div>
-
-                {% if template_config['REQUIRE_USER_PHOTO'] %}
-                    <div class="row">
-                        <div class="large-6 columns">
-                            <label>Current photo:</label>
-                            <p><a href="{{ current_user.photo.full_url }}"><img src="{{ current_user.photo.thumb_url }}" /></a></p>
-                        </div>
-                        <div class="large-6 columns">
-                            <label for="photo">Upload new photo:</label>
-                            <p class="small">Leave blank to keep current photo.</p>
-                            <div class="row upload_photo">
-                                <div class="large-3 columns right">
-                                    <img src="{{ url_for('static', filename='images/passport_outline.png') }}" />
-                                </div>
-                                <div class="large-9 columns">
-                                    <input type="file" name="photo" accept="{{ template_config['IMAGE_ACCEPT_STRING'] }}" />
-                                    <p class="small">Please upload a passport style photograph of yourself.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {% if current_user.can_update_details() %}
+                    <input type="submit" value="Update your details" class="button small" />
                 {% endif %}
             </fieldset>
-            <fieldset>
-                <legend>Change your Password</legend>
-                <p class="small">Leave blank to keep current password</p>
-                <div class="row">
-                    <div class="large-4 columns">
-                        <label for="oldpassword">Old Password</label>
-                        <input type="password" name="oldpassword" id="oldpassword" />
-                    </div>
-                    <div class="large-4 columns">
-                        <label for="password">New Password</label>
-                        <input type="password" name="password" id="password" />
-                    </div>
-                    <div class="large-4 columns">
-                        <label for="confirm">Confirm New Password</label>
-                        <input type="password" name="confirm" id="confirm" />
-                    </div>
-                </div>
-            </fieldset>
-            <fieldset>
-                <legend>Change your Password</legend>
-                <p class="small">Leave blank to keep current password</p>
-                <div class="row">
-                    <div class="large-4 columns">
-                        <label for="oldpassword">Old Password</label>
-                        <input type="password" name="oldpassword" id="oldpassword" />
-                    </div>
-                    <div class="large-4 columns">
-                        <label for="password">New Password</label>
-                        <input type="password" name="password" id="password" />
-                    </div>
-                    <div class="large-4 columns">
-                        <label for="confirm">Confirm New Password</label>
-                        <input type="password" name="confirm" id="confirm" />
-                    </div>
-                </div>
-            </fieldset>
+        </form>
+        <form action="{{ url_for('dashboard.update_dietary_requirements') }}" method="post">
             <fieldset>
                 <legend>Dietary Requirements</legend>
                 <div class="row">
@@ -176,12 +117,81 @@
                         <input type="text" name="other" id="other" length="200" {% if current_user.dietary_requirements.other != None %} value="{{ current_user.dietary_requirements.other }}"{% endif %} />
                     </div>
                 </div>
+                <input type="submit" value="Update your dietary requirements" class="button small" />
             </fieldset>
-            <div class="row">
-                <div class="large-12 columns">
-                    <input type="submit" value="Update Details" class="button small" />
+        </form>
+        {% if template_config['REQUIRE_USER_PHOTO'] %}
+            <form action="{{ url_for('dashboard.update_photo') }}" enctype="multipart/form-data" method="post">
+                <fieldset>
+                    <legend>Update your photo.</legend>
+                    {% if not current_user.can_update_photo() %}
+                        <div class="message-box info">
+                            <p>You cannot currently update your photo. Please contact <a href="{{ template_config['TICKETS_EMAIL_LINK'] }}">the ticketing officer</a> for assistance.</p>
+                        </div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="large-6 columns">
+                            <label>Current photo:</label>
+                            <p><a href="{{ current_user.photo.full_url }}"><img src="{{ current_user.photo.thumb_url }}" /></a></p>
+                        </div>
+                        {% if current_user.can_update_photo() %}
+                            <div class="large-6 columns">
+                                <label for="photo">Upload new photo:</label>
+                                <p class="small">Leave blank to keep current photo.</p>
+                                <div class="row upload_photo">
+                                    <div class="large-3 columns right">
+                                        <img src="{{ url_for('static', filename='images/passport_outline.png') }}" />
+                                    </div>
+                                    <div class="large-9 columns">
+                                        <input type="file" name="photo" accept="{{ template_config['IMAGE_ACCEPT_STRING'] }}" />
+                                        <p class="small">Please upload a passport style photograph of yourself.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if current_user.can_update_photo() %}
+                        <input type="submit" value="Update your photo" class="button small" />
+                    {% endif %}
+                </fieldset>
+            </form>
+        {% endif %}
+        <form action="{{ url_for('dashboard.update_email') }}" method="post">
+            <fieldset>
+                <legend>Update your email address.</legend>
+                <div class="row">
+                    <div class="columns">
+                        <label for="email">Email Address</label>
+                        <input type="email" name="email" id="email" value="{{ current_user.email }}" />
+                    </div>
+                    {% if current_user.new_email != None %}
+                        <div class="large-12 columns">
+                            <div class="message-box info">Awaiting verification of new email address {{ current_user.new_email }}</div>
+                        </div>
+                    {% endif %}
                 </div>
-            </div>
+                <input type="submit" value="Update your email address" class="button small" />
+            </fieldset>
+        </form>
+        <form action="{{ url_for('dashboard.update_password') }}" method="post">
+            <fieldset>
+                <legend>Change your Password</legend>
+                <div class="row">
+                    <div class="large-4 columns">
+                        <label for="oldpassword">Old Password</label>
+                        <input type="password" name="oldpassword" id="oldpassword" />
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="password">New Password</label>
+                        <input type="password" name="password" id="password" />
+                    </div>
+                    <div class="large-4 columns">
+                        <label for="confirm">Confirm New Password</label>
+                        <input type="password" name="confirm" id="confirm" />
+                    </div>
+                </div>
+                <input type="submit" value="Change your password" class="button small" />
+            </fieldset>
         </form>
     </section>
 {% endblock %}

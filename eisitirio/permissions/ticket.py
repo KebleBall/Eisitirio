@@ -13,6 +13,8 @@ def be_cancelled(ticket):
         return False
     elif ticket.collected:
         return False
+    elif ticket.holder is not None:
+        return False
     elif not ticket.paid:
         return True
     elif ticket.payment_method == 'Card':

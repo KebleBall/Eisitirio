@@ -117,3 +117,19 @@ def held_ticket(user):
 def claim_ticket(user):
     """Can the user claim a ticket for entry."""
     return not user.has_held_ticket()
+
+@models.User.permission()
+def update_details(user):
+    """Can the user change their personal details."""
+    return not user.has_held_ticket() and not app.APP.config['LOCKDOWN_MODE']
+
+@models.User.permission()
+def update_photo(user):
+    """Can the user change their photo."""
+    if user.photo.verified == False: # verified can be None, pylint: disable=singleton-comparison
+        return True
+    else:
+        return (
+            not user.has_held_ticket() and
+            not app.APP.config['LOCKDOWN_MODE']
+        )
