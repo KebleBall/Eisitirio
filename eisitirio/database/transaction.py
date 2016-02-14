@@ -5,8 +5,6 @@ from __future__ import unicode_literals
 
 import datetime
 
-from flask.ext import login
-
 from eisitirio import app
 from eisitirio.database import db
 

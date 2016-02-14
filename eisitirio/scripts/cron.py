@@ -74,9 +74,9 @@ def send_announcements():
     emails_count = APP.config['EMAILS_BATCH']
 
     announcements = models.Announcement.query.filter(
-        models.Announcement.send_email == True
+        models.Announcement.send_email == True # pylint: disable=singleton-comparison
     ).filter(
-        models.Announcement.email_sent == False
+        models.Announcement.email_sent == False # pylint: disable=singleton-comparison
     ).all()
 
     for announcement in announcements:

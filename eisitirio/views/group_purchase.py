@@ -101,7 +101,7 @@ def disband():
     """
     if (
             not login.current_user.purchase_group or
-            not login.current_user == login.current_user.purchase_group.leader
+            login.current_user != login.current_user.purchase_group.leader
     ):
         flask.flash('You are not the leader of any purchase group', 'error')
     else:

@@ -12,6 +12,7 @@ def permission(model, name=None):
     If |name| is not given, defaults to the name of the decorated function
     """
     def decorator(func):
+        """Add the permission function to the store."""
         PERMISSIONS[model][name or func.__name__] = func
 
         return func
@@ -23,6 +24,7 @@ def possession(model, name=None):
 
     """
     def decorator(func):
+        """Add the posession function to the store."""
         POSSESSIONS[model][name or func.__name__] = func
 
         return func
