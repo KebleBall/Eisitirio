@@ -20,24 +20,33 @@ from eisitirio.scripts import prefill
 from eisitirio.scripts import run_bpython
 from eisitirio.scripts import update_battels
 
+EISITIRIO_DIR = os.path.realpath(__file__).replace('command.py',
+                                                   'eisitirio')
+
 def get_app(config):
     """Load the appropriate config into the app."""
-    config_file = os.path.join('config', '{0}.py'.format(config))
+    config_files = [
+        filename
+        for filename in os.listdir(os.path.join(EISITIRIO_DIR, 'config'))
+        if filename.startswith(config)
+    ]
 
-    eisitirio_dir = os.path.realpath(__file__).replace('command.py',
-                                                       'eisitirio')
-
-    if not (
-            os.path.exists(os.path.join(eisitirio_dir, config_file))
-            and app.APP.config.from_pyfile(config_file)
+    if len(config_files) == 0:
+        print 'No matching config file.'
+    elif len(config_files) > 1:
+        print 'Ambiguous config argument. Candidates: {0}'.format(
+            ', '.join(filename[:-3] for filename in config_files)
+        )
+    elif not app.APP.config.from_pyfile(
+            os.path.join(EISITIRIO_DIR, 'config', config_files[0])
     ):
         print 'Could not load config file {0}'.format(
-            os.path.join(eisitirio_dir, config_file)
+            os.path.join(EISITIRIO_DIR, 'config', config_files[0])
         )
+    else:
+        return app.APP
 
-        sys.exit(-1)
-
-    return app.APP
+    sys.exit(-1)
 
 script.Server.help = 'Run the development server'
 
