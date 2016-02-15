@@ -155,6 +155,13 @@ def context_processor():
         else:
             return 'th'
 
+    def get_plural(number):
+        """Get the potentitally plural suffix for some number of objects."""
+        if number == 1:
+            return ''
+        else:
+            return 's'
+
     def raise_exception():
         """Raise an exception for easy access to template debugger."""
         raise Exception
@@ -185,6 +192,7 @@ def context_processor():
     return dict(
         get_all=get_all,
         get_ord=get_ord,
+        get_plural=get_plural,
         raise_exception=raise_exception,
         form_value=form_value,
         form_selected=form_selected,
