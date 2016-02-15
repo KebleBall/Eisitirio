@@ -444,6 +444,8 @@ def claim_ticket():
 
     if not ticket:
         flask.flash('No ticket with given claim code.', 'error')
+    elif ticket.holder is not None:
+        flask.flash('That ticket has already been claimed.', 'error')
     elif ticket.claims_made >= APP.config['MAX_TICKET_CLAIMS']:
         flask.flash(
             flask.Markup(
