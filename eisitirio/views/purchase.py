@@ -452,3 +452,47 @@ def resell():
         )
 
     return flask.render_template('purchase/resell.html')
+
+@PURCHASE.route('/purchase/postage', methods=['GET', 'POST'])
+@login.login_required
+def buy_postage():
+    """Allow the user to buy postage for tickets."""
+    if flask.request.method == 'POST':
+        flashes = []
+
+        tickets = login.current_user.active_tickets.filter(
+            models.Ticket.object_id.in_(flask.request.form.getlist('tickets[]'))
+        ).all()
+
+        if not tickets:
+            flashes.append('You have not selected any tickets to pay for.')
+
+        method, term = purchase_logic.check_payment_method(flashes)
+
+        postage, address = purchase_logic.check_postage(flashes)
+
+        if flashes:
+            flask.flash(
+                (
+                    'There were errors in your order. Please fix '
+                    'these and try again'
+                ),
+                'error'
+            )
+            for msg in flashes:
+                flask.flash(msg, 'warning')
+
+            return flask.render_template(
+                'purchase/buy_postage.html',
+                form=flask.request.form
+            )
+
+        return payment_logic.buy_postage(
+            tickets,
+            postage,
+            method,
+            term,
+            address
+        )
+
+    return flask.render_template('purchase/buy_postage.html')

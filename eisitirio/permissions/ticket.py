@@ -50,3 +50,13 @@ def change_name(ticket):
         ticket.cancelled or
         ticket.collected
     )
+
+@models.Ticket.permission()
+def buy_postage(ticket):
+    return (
+        ticket.paid and
+        not ticket.cancelled and
+        not ticket.collected and
+        ticket.postage is None and
+        not app.APP.config['LOCKDOWN_MODE']
+    )

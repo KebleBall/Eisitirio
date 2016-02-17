@@ -4,6 +4,9 @@
 {% if current_user.has_unpaid_tickets() %}
 <li><a href="{{ url_for('purchase.complete_payment') }}">Complete Ticket Payment</a></li>
 {% endif %}
+{% if template_config['ENABLE_POSTAGE'] %}
+<li><a href="{{ url_for('purchase.buy_postage') }}">Buy Postage</a></li>
+{% endif %}
 {% if template_config['ENABLE_GROUP_PURCHASE'] %}
 <li><a href="{{ url_for('group_purchase.dashboard') }}">Group Purchase</a></li>
 {% endif %}

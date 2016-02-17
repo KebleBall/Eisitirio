@@ -16,7 +16,6 @@
                     <tr>
                         <th>Select</th>
                         <th>Ticket Number</th>
-                        <th>Name on Ticket</th>
                         <th>Value of Ticket</th>
                     </tr>
                 </thead>
@@ -26,7 +25,6 @@
                             <tr id="ticket-{{ ticket.object_id }}">
                                 <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" /></td>
                                 <td><label for="ticket_select-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
-                                <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.name | default('Not Set') }}</label></td>
                                 <td><label for="ticket_select-{{ ticket.object_id }}">&pound;{{ '%.2f' % (ticket.price / 100.0) }}</label></td>
                             </tr>
                         {% endif %}
