@@ -53,6 +53,7 @@ def change_name(ticket):
 
 @models.Ticket.permission()
 def buy_postage(ticket):
+    """Check whether postage can be bought for this ticket."""
     return (
         ticket.paid and
         not ticket.cancelled and
