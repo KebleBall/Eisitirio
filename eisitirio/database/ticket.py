@@ -162,12 +162,14 @@ class Ticket(DB.Model):
             return 'Awaiting payment. Expires {0}.'.format(
                 self.expires.strftime('%H:%M %d/%m/%Y')
             )
+        elif self.entered:
+            return 'Used for entry.'
         elif self.collected:
             return 'Collected as {0}.'.format(self.barcode)
-        elif self.name is None:
-            return 'Awaiting name.'
+        elif self.holder is None:
+            return 'Awaiting ticket holder.'
         else:
-            return 'Paid'
+            return 'Held by {0}.'.format(self.holder.full_name)
 
     @price.setter
     def price(self, value):

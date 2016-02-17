@@ -975,6 +975,10 @@ def verify_photos():
                 models.Ticket.cancelled == False # pylint: disable=singleton-comparison
             ).subquery(),
             models.User.tickets
+        ).union(
+            models.User.query.filter(
+                models.User.held_ticket != None
+            )
         ).subquery(),
         models.Photo.user
     ).first()
