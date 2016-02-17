@@ -556,11 +556,11 @@ def announcements(page=1):
         if success:
             college = None
             if 'college' in form and form['college'] != 'any':
-                college = int(form['college'])
+                college = models.College.get_by_id(form['college'])
 
             affiliation = None
             if 'affiliation' in form and form['affiliation'] != 'any':
-                affiliation = int(form['affiliation'])
+                affiliation = models.Affiliation.get_by_id(form['affiliation'])
 
             has_tickets = None
             if 'tickets' in form:
@@ -598,8 +598,8 @@ def announcements(page=1):
                 form['message'],
                 login.current_user,
                 send_email,
-                models.College.get_by_id(college),
-                models.Affiliation.get_by_id(affiliation),
+                college,
+                affiliation,
                 has_tickets,
                 is_waiting,
                 has_collected,
