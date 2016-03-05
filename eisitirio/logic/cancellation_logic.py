@@ -34,6 +34,8 @@ def cancel_tickets(tickets, quiet=False):
     cancelled = []
 
     for ticket in tickets:
+        if not ticket.can_be_cancelled():
+            continue
         if not ticket.paid or ticket.payment_method == 'Free':
             ticket.cancelled = True
             cancelled.append(ticket)
@@ -87,7 +89,13 @@ def cancel_tickets(tickets, quiet=False):
             success = eway_logic.process_refund(refund_transaction,
                                                 0 - refund_transaction.value)
         else:
-            refund_transaction.charge(transaction.battels_term)
+            if (
+                    transaction.battels_term == 'MTHT' and
+                    app.APP.config['CURRENT_TERM']
+            ):
+                refund_transaction.charge('MTHT')
+            else:
+                refund_transaction.charge(app.APP.config['CURRENT_TERM'])
 
             success = True
 
