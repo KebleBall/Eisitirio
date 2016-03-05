@@ -328,7 +328,7 @@ class User(DB.Model):
 
         if not self.battels:
             self.battels = battels.Battels(None, self.email, None,
-                                           self.forenames, self.surname, True)
+                                           self.surname, self.forenames, True)
             DB.session.add(self.battels)
 
         DB.session.commit()
