@@ -444,15 +444,12 @@ def claim_ticket():
 
     if not ticket:
         flask.flash('No ticket with given claim code.', 'error')
-    elif ticket.holder is not None:
-        flask.flash('That ticket has already been claimed.', 'error')
-    elif ticket.claims_made >= APP.config['MAX_TICKET_CLAIMS']:
+    elif not ticket.can_be_claimed():
         flask.flash(
             flask.Markup(
                 (
-                    'That ticket has been claimed too many times. Please '
-                    'contact <a href="{0}">the ticketing officer</a> for '
-                    'assistance.'
+                    'That ticket can not be claimed. Please contact '
+                    '<a href="{0}">the ticketing officer</a> for assistance.'
                 ).format(
                     APP.config['TICKETS_EMAIL_LINK']
                 )
@@ -462,6 +459,12 @@ def claim_ticket():
     else:
         ticket.holder = login.current_user
         ticket.claims_made += 1
+
+        APP.log_manager.log_event(
+            'Claimed ticket',
+            user=login.current_user,
+            tickets=[ticket]
+        )
 
         DB.session.commit()
 

@@ -30,23 +30,6 @@ def validate_voucher():
 
     return flask.Response(json.dumps(response), mimetype='text/json')
 
-@AJAX.route('/ajax/change/ticket/<int:ticket_id>/name', methods=['POST'])
-@login.login_required
-def change_ticket_name(ticket_id):
-    """Change the name on a ticket."""
-    ticket = models.Ticket.get_by_id(ticket_id)
-
-    if ticket and flask.request.form['name'] != '' and (
-            ticket.owner == login.current_user or
-            login.current_user.is_admin
-    ):
-        ticket.name = flask.request.form['name']
-
-        DB.session.commit()
-        return flask.Response(json.dumps(True), mimetype='text/json')
-    else:
-        return flask.Response(json.dumps(False), mimetype='text/json')
-
 @AJAX.route('/ajax/validate/resale-email', methods=['POST'])
 def validate_resale_email():
     """Validate a user for reselling tickets.

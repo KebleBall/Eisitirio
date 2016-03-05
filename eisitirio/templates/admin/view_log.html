@@ -30,7 +30,6 @@
                     <thead>
                         <tr>
                             <th>Ticket Number</th>
-                            <th>Name on Ticket</th>
                             <th>Ticket Status</th>
                             <th>View</th>
                         </tr>
@@ -39,24 +38,7 @@
                         {% for ticket in log.tickets %}
                             <tr id="ticket-{{ ticket.object_id }}">
                                 <td>#{{ '%05d' % ticket.object_id }}</td>
-                                <td>
-                                    {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
-                                </td>
-                                <td>
-                                    {% if ticket.cancelled -%}
-                                        Cancelled.
-                                    {% elif ticket.collected -%}
-                                    Collected as {{ ticket.barcode }}.
-                                    {% elif ticket.paid -%}
-                                        {% if ticket.payment_method == 'Free' -%}
-                                            Free Ticket.
-                                        {% else -%}
-                                            Paid for by {{ ticket.payment_method }}.
-                                        {% endif %}
-                                    {% else -%}
-                                        Awaiting payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
-                                    {% endif %}
-                                </td>
+                                <td>{{ ticket.status }}</td>
                                 <td>
                                     <a href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id) }}" class="button tiny">View</a>
                                 </td>

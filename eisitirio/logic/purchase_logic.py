@@ -173,7 +173,7 @@ def get_group_ticket_info(user):
 
     return ticket_info
 
-def validate_tickets(ticket_info, num_tickets, ticket_names):
+def validate_tickets(ticket_info, num_tickets):
     """Validate the number of tickets selected by the user and the names."""
     flashes = []
 
@@ -212,9 +212,6 @@ def validate_tickets(ticket_info, num_tickets, ticket_names):
     if total_ticket_count == 0:
         flashes.append("You haven't ordered any tickets.")
 
-    if len(ticket_names) > total_ticket_count:
-        flashes.append("You have entered too many ticket names.")
-
     return flashes
 
 def _to_list(*args):
@@ -229,16 +226,13 @@ def _to_list(*args):
     else:
         return "{0}, or {1}".format(", ".join(args[:-1]), args[-1])
 
-def create_tickets(user, ticket_info, num_tickets, ticket_names):
+def create_tickets(user, ticket_info, num_tickets):
     """Create the ticket objects from the user's selection."""
     tickets = [
         models.Ticket(user, ticket_type.slug, ticket_type.price)
         for ticket_type, _ in ticket_info.ticket_types
         for _ in xrange(num_tickets[ticket_type.slug])
     ]
-
-    for i, name in enumerate(ticket_names):
-        tickets[i].name = name
 
     return tickets
 

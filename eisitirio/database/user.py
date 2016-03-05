@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 
 from flask.ext import bcrypt
+import flask
 
 from eisitirio import app
 from eisitirio.database import battels
@@ -240,8 +241,15 @@ class User(DB.Model):
 
     @property
     def is_admin(self):
-        """Check if the user is an admin"""
-        return self.role == 'Admin'
+        """Check if the user is an admin, or is currently being impersonated.
+
+        For future-proofing purposes, the role of the impersonating user is also
+        checked.
+        """
+        return self.role == 'Admin' or (
+            'actor_id' in flask.session and
+            User.get_by_id(flask.session['actor_id']).role == 'Admin'
+        )
 
     @property
     def is_waiting(self):

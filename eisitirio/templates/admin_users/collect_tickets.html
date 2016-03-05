@@ -7,31 +7,59 @@
     <section id="collect_tickets" class="columns">
         <p>To process a ticket collection, place your cursor into the text field for the relevant ticket and scan the barcode on the wristband (then press "Collect Ticket" if the form does not submit automatically).</p>
         <p>Tickets must be paid for and have a name set before they can be marked as collected.</p>
-        <h3>{{ user.full_name }}'s Tickets</h3>
-        <table id="tickets_table">
-            <thead>
-                <tr>
-                    <th>Ticket Number</th>
-                    <th>Name on Ticket</th>
-                    <th>Barcode</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ticket in user.tickets %}
-                    {% if ticket.can_be_collected() %}
-                        <tr id="ticket-{{ ticket.object_id }}">
-                            <td><label for="ticket_barcode-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
-                            <td><label for="ticket_barcode-{{ ticket.object_id }}">{{ ticket.name }}</label></td>
-                            <td>
-                                <form action="{{ url_for('admin_tickets.collect_ticket', ticket_id=ticket.object_id) }}" method="post">
-                                    <input type="text" name="barcode" id="ticket_barcode-{{ ticket.object_id }}" />
-                                    <input type="submit" class="button tiny" value="Collect Ticket" />
-                                </form>
-                            </td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
+        {% if any(ticket.can_be_collected() for ticket in user.tickets) %}
+            <h3>Tickets owned by {{ user.full_name }}</h3>
+            <table id="tickets_table">
+                <thead>
+                    <tr>
+                        <th>Ticket Number</th>
+                        <th>Ticket Holder</th>
+                        <th>Barcode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in user.tickets %}
+                        {% if ticket.can_be_collected() %}
+                            <tr id="ticket-{{ ticket.object_id }}">
+                                <td><label for="ticket_barcode-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                                <td><label for="ticket_barcode-{{ ticket.object_id }}">{{ ticket.holder.full_name }}</label></td>
+                                <td>
+                                    <form action="{{ url_for('admin_tickets.collect_ticket', ticket_id=ticket.object_id) }}" method="post">
+                                        <input type="text" name="barcode" id="ticket_barcode-{{ ticket.object_id }}" />
+                                        <input type="submit" class="button tiny" value="Collect Ticket" />
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h3>{{ user.full_name }} does not own any collectable tickets.</h3>
+        {% endif %}
+        {% if user.held_ticket and user.held_ticket.can_be_collected() %}
+            <h3>Ticket held by {{ user.full_name }}</h3>
+            <table id="tickets_table">
+                <thead>
+                    <tr>
+                        <th>Ticket Number</th>
+                        <th>Barcode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="ticket-{{ user.held_ticket.object_id }}">
+                        <td><label for="ticket_barcode-{{ user.held_ticket.object_id }}">#{{ '%05d' % user.held_ticket.object_id }}</label></td>
+                        <td>
+                            <form action="{{ url_for('admin_tickets.collect_ticket', ticket_id=user.held_ticket.object_id) }}" method="post">
+                                <input type="text" name="barcode" id="ticket_barcode-{{ user.held_ticket.object_id }}" />
+                                <input type="submit" class="button tiny" value="Collect Ticket" />
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        {% else %}
+            <h3>{{ user.full_name }} does not hold a collectable ticket.</h3>
+        {% endif %}
     </section>
 {% endblock %}

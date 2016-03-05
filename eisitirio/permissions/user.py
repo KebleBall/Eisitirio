@@ -37,24 +37,16 @@ def unpaid_tickets(user, method=None):
         the given payment method set if given) which have not been paid for
     """
     if method is None:
-        return len(
-            [
-                x for x in user.tickets if (
-                    not x.paid and
-                    not x.cancelled
-                )
-            ]
-        ) > 0
+        return any(
+            ticket.can_be_paid_for()
+            for ticket in user.tickets
+        )
     else:
-        return len(
-            [
-                x for x in user.tickets if (
-                    x.payment_method == method and
-                    not x.paid and
-                    not x.cancelled
-                )
-            ]
-        ) > 0
+        return any(
+            ticket.can_be_paid_for()
+            for ticket in user.tickets
+            if ticket.payment_method == method
+        )
 
 @models.User.possession()
 def paid_tickets(user, method=None):
@@ -121,7 +113,11 @@ def claim_ticket(user):
 @models.User.permission()
 def update_details(user):
     """Can the user change their personal details."""
-    return not user.has_held_ticket() and not app.APP.config['LOCKDOWN_MODE']
+    return user.is_admin or (
+        not user.has_held_ticket() and
+        not app.APP.config['LOCKDOWN_MODE'] and
+        app.APP.config['ENABLE_CHANGING_DETAILS']
+    )
 
 @models.User.permission()
 def update_photo(user):
@@ -129,7 +125,8 @@ def update_photo(user):
     if user.photo.verified == False: # verified can be None, pylint: disable=singleton-comparison
         return True
     else:
-        return (
+        return user.is_admin or (
             not user.has_held_ticket() and
-            not app.APP.config['LOCKDOWN_MODE']
+            not app.APP.config['LOCKDOWN_MODE'] and
+            app.APP.config['ENABLE_CHANGING_PHOTOS']
         )

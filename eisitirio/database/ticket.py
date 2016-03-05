@@ -47,10 +47,6 @@ class Ticket(DB.Model):
         DB.Integer(),
         nullable=False
     )
-    name = DB.Column(
-        DB.Unicode(120),
-        nullable=True
-    )
     note = DB.Column(
         DB.UnicodeText(),
         nullable=True
@@ -229,7 +225,7 @@ class Ticket(DB.Model):
             'Yes' if self.entered else 'No',
             'Yes' if self.cancelled else 'No',
             self.price_pounds,
-            self.name,
+            self.holder.full_name if self.holder is not None else 'N/A',
             self.note,
             self.expires.strftime(
                 '%Y-%m-%d %H:%M:%S'

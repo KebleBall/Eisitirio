@@ -301,14 +301,14 @@ def validate_ticket():
                 'Ticket has already been used for '
                 'entry. Check ID against {0} (owned by {1})'
             ).format(
-                ticket.name,
+                ticket.holder.full_name,
                 ticket.owner.full_name
             )
         else:
             ticket.entered = True
             DB.session.commit()
             valid = True
-            message = 'Permit entry for {0}'.format(ticket.name)
+            message = 'Permit entry for {0}'.format(ticket.holder.full_name)
 
     return flask.render_template(
         'admin_tickets/validate_ticket.html',

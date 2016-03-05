@@ -10,8 +10,11 @@
         {% else %}
             <h4>Ticket Details</h4>
             <p><strong>Price</strong>: &pound;{{ '%.2f' % (ticket.price / 100.0) }}</p>
-            <p><strong>Name on ticket</strong>: {{ ticket.name }}</p>
             <p><strong>Owner</strong>: <a href="{{ url_for('admin_users.view_user', user_id=ticket.owner_id) }}">{{ ticket.owner.full_name }}</a></p>
+            {% if ticket.has_holder() %}
+                <p><strong>Holder</strong>: <a href="{{ url_for('admin_users.view_user', user_id=ticket.holder_id) }}">{{ ticket.holder.full_name }}</a></p>
+            {% endif %}
+            <p><strong>Claims made</strong>: {{ ticket.claims_made }}</p>
             {% if ticket.collected %}
                 <p><strong>Collected as</strong>: {{ ticket.barcode }}</p>
             {% endif %}

@@ -80,24 +80,15 @@ def purchase_home():
         for ticket_type, _ in ticket_info.ticket_types
     }
 
-    ticket_names = []
-
     if flask.request.method == 'POST':
         for ticket_type, _ in ticket_info.ticket_types:
             num_tickets[ticket_type.slug] = int(
                 flask.request.form['num_tickets_{0}'.format(ticket_type.slug)]
             )
 
-        ticket_names = [
-            name
-            for name in flask.request.form.getlist('ticket_name[]')
-            if name
-        ]
-
         flashes = purchase_logic.validate_tickets(
             ticket_info,
-            num_tickets,
-            ticket_names
+            num_tickets
         )
 
         payment_method, payment_term = purchase_logic.check_payment_method(
@@ -135,7 +126,6 @@ def purchase_home():
             return flask.render_template(
                 'purchase/purchase_home.html',
                 form=flask.request.form,
-                ticket_names=ticket_names,
                 num_tickets=num_tickets,
                 ticket_info=ticket_info
             )
@@ -143,8 +133,7 @@ def purchase_home():
         tickets = purchase_logic.create_tickets(
             login.current_user,
             ticket_info,
-            num_tickets,
-            ticket_names
+            num_tickets
         )
 
         if voucher is not None:
@@ -173,7 +162,6 @@ def purchase_home():
         return flask.render_template(
             'purchase/purchase_home.html',
             num_tickets=num_tickets,
-            ticket_names=ticket_names,
             ticket_info=ticket_info
         )
 

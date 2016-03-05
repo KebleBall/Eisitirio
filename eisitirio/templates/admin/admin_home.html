@@ -105,12 +105,6 @@
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticket_name">Name on Ticket</label>
-                            <input type="text" name="ticket_name" id="ticket_name" {% if form['ticket_name'] %}value="{{ form['ticket_name'] }}" {% endif %}/>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="columns">
                             <label for="ticket_barcode">Ticket Barcode</label>
                             <input type="text" name="ticket_barcode" id="ticket_barcode" {% if form['ticket_barcode'] %}value="{{ form['ticket_barcode'] }}" {% endif %}/>
                         </div>
@@ -269,7 +263,6 @@
                 <thead>
                     <tr>
                         <th>Ticket Number</th>
-                        <th>Name on Ticket</th>
                         <th>Ticket Status</th>
                         <th>Actions</th>
                     </tr>
@@ -278,22 +271,7 @@
                     {% for ticket in results.items %}
                         <tr id="ticket-{{ ticket.object_id }}">
                             <td>#{{ '%05d' % ticket.object_id }}</td>
-                            <td>{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</td>
-                            <td>
-                                {% if ticket.cancelled -%}
-                                    Cancelled.
-                                {% elif ticket.collected -%}
-                                    Collected as {{ ticket.barcode }}.
-                                {% elif ticket.paid -%}
-                                    {% if ticket.payment_method == 'Free' -%}
-                                        Free Ticket.
-                                    {% else -%}
-                                        Paid for by {{ ticket.payment_method }}.
-                                    {% endif %}
-                                {% else -%}
-                                    Awaiting payment. Expires {{ ticket.expires.strftime('%H:%M %d/%m/%Y') }}
-                                {% endif %}
-                            </td>
+                            <td>{{ ticket.status }}</td>
                             <td><a class="button small" href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id) }}">View Ticket</a></td>
                         </tr>
                     {% endfor %}

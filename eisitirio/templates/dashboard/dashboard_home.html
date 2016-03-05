@@ -20,7 +20,11 @@
                     <tr id="ticket-{{ current_user.held_ticket.object_id }}">
                         <td>#{{ '%05d' % current_user.held_ticket.object_id }}</td>
                         <td>{{ current_user.held_ticket.status }}</td>
-                        <td><a href="{{ url_for('dashboard.relinquish_ticket') }}" class="button tiny">Relinquish</a></td>
+                        <td>
+                            {% if current_user.held_ticket.can_be_reclaimed() %}
+                                <a href="{{ url_for('dashboard.relinquish_ticket') }}" class="button tiny">Relinquish</a>
+                            {% endif %}
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -47,14 +51,6 @@
                     {% for ticket in current_user.tickets %}
                         <tr id="ticket-{{ ticket.object_id }}">
                             <td>#{{ '%05d' % ticket.object_id }}</td>
-                            {#<td>
-                                {% if ticket.can_change_name() %}
-                                    <span id="ticket_name_display-{{ ticket.object_id }}"><span id="ticket_name-{{ ticket.object_id }}">{% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}</span> (<a onclick="change_ticket_name({{ ticket.object_id }}, false)">Change</a>)</span>
-                                    <span id="ticket_name_form-{{ ticket.object_id }}" style="display: none;"><input name="ticket_name_input-{{ ticket.object_id }}" id="ticket_name_input-{{ ticket.object_id }}" {% if ticket.name != None %}value="{{ ticket.name }}" {% endif %}/><button class="tiny" onclick="change_ticket_name({{ ticket.object_id }}, true)">Submit</button></span>
-                                {% else %}
-                                    {% if ticket.name == None %}Not Set{% else %}{{ ticket.name }}{% endif %}
-                                {% endif %}
-                            </td>#}
                             <td>{{ ticket.status }}</td>
                             <td>
                                 {% if not ticket.cancelled %}
@@ -75,12 +71,13 @@
                                     {% if ticket.can_be_resold() %}
                                         <a href="{{ url_for('purchase.resell') }}" class="button tiny">Resell</a>
                                     {% endif %}
-                                    {% if ticket.holder == None %}
+                                    {% if ticket.can_be_claimed() %}
                                         <form action="{{ url_for('dashboard.claim_ticket') }}" method="post">
                                             <input type="hidden" name="claim_code" value="{{ ticket.claim_code }}" />
-                                            <input type="submit" value="Claim" class="button postfix" />
+                                            <input type="submit" value="Claim" class="button tiny" />
                                         </form>
-                                    {% else %}
+                                    {% endif %}
+                                    {% if ticket.can_be_reclaimed() %}
                                         <a href="{{ url_for('dashboard.reclaim_ticket', ticket_id=ticket.object_id) }}" class="button tiny">Reclaim</a>
                                     {% endif %}
                                 {% endif %}
@@ -115,51 +112,4 @@
                 <p>The {{ template_config['BALL_NAME'] }} committee has not posted any announcements yet. Watch this space and check your email for important information about the Ball</p>
             {% endif %}
     </section>
-{% endblock %}
-
-{% block javascripts %}
-    <script type="text/javascript">
-        var name_change_url = '{{ url_for('ajax.change_ticket_name', ticket_id=123456789, _external=True) }}';
-
-        function change_ticket_name(id, form_submit) {
-            if (form_submit) {
-                var name_input = $('#ticket_name_input-'+id);
-                var ticket_name = $('#ticket_name-'+id);
-                jQuery.ajax(
-                    name_change_url.replace('123456789',id),
-                    {
-                        'data': {
-                            'name': name_input.val()
-                        },
-                        'type': 'POST',
-                        'dataType': 'json',
-                        'success': function(data, code, xhr) {
-                            if (data) {
-                                ticket_name.html(name_input.val())
-                                name_input.attr('value',name_input.val())
-                                $('#complete_ticket_payment-'+id).css('display', '');
-                                $('#ticket_payment_message-'+id).css('display', '');
-                                $('#ticket_name_message-'+id).css('display', 'none');
-                            } else {
-                                if (ticket_name.html() == 'Not Set') {
-                                    name_input.attr('value','')
-                                    name_input.val('')
-                                } else {
-                                    name_input.attr('value',ticket_name.html())
-                                    name_input.val(ticket_name.html())
-                                }
-                            }
-                        }
-                    }
-                );
-
-                $('#ticket_name_form-'+id).hide();
-                $('#ticket_name_display-'+id).show();
-            } else {
-                $('#ticket_name_display-'+id).hide();
-                $('#ticket_name_form-'+id).show();
-                $('#ticket_name_input-'+id).focus();
-            }
-        }
-    </script>
 {% endblock %}

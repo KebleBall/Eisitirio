@@ -131,17 +131,6 @@ def admin_home(page=1):
         has_ticket_filter = True
 
     if (
-            'ticket_name' in flask.request.form and
-            flask.request.form['ticket_name'] != ''
-    ):
-        ticket_query = ticket_query.filter(
-            models.Ticket.name.like(
-                '%' + flask.request.form['ticket_name'] + '%'
-            )
-        )
-        has_ticket_filter = True
-
-    if (
             'ticket_barcode' in flask.request.form and
             flask.request.form['ticket_barcode'] != ''
     ):

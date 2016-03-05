@@ -1,19 +1,18 @@
 # coding: utf-8
 """Permissions/possessions for tickets."""
 
+from flask.ext import login
+
 from eisitirio import app
 from eisitirio.database import models
 
-@models.Ticket.permission()
-def be_cancelled(ticket):
-    """Check whether a ticket can be (automatically) cancelled."""
+def _ticket_is_cancellable(ticket):
+    """Check whether a ticket can be automatically cancelled and refunded."""
     if ticket.cancelled:
-        return False
-    elif app.APP.config['LOCKDOWN_MODE']:
         return False
     elif ticket.collected:
         return False
-    elif ticket.holder is not None:
+    elif ticket.has_holder():
         return False
     elif not ticket.paid:
         return True
@@ -26,29 +25,44 @@ def be_cancelled(ticket):
     else:
         return False
 
+
+@models.Ticket.permission()
+def be_cancelled(ticket):
+    """Check whether a user can cancel a ticket."""
+    if not _ticket_is_cancellable(ticket):
+        return False
+    elif login.current_user.is_admin:
+        return True
+    elif app.APP.config['LOCKDOWN_MODE']:
+        return False
+    elif not app.APP.config['ENABLE_CANCELLATION']:
+        return False
+    else:
+        return True
+
 @models.Ticket.permission()
 def be_resold(ticket):
-    return app.APP.config['ENABLE_RESALE'] and be_cancelled(ticket)
+    """Check whether a user can resell a ticket."""
+    if not _ticket_is_cancellable(ticket):
+        return False
+    elif login.current_user.is_admin:
+        return True
+    elif app.APP.config['LOCKDOWN_MODE']:
+        return False
+    elif not app.APP.config['ENABLE_RESALE']:
+        return False
+    else:
+        return True
 
 @models.Ticket.permission()
 def be_collected(ticket):
     """Check whether a ticket can be collected."""
-    # TODO
     return (
         ticket.paid and
         not ticket.collected and
         not ticket.cancelled and
-        ticket.name is not None
-    )
-
-@models.Ticket.permission()
-def change_name(ticket):
-    """Check whether a ticket's name can be changed."""
-    # TODO
-    return not (
-        app.APP.config['LOCKDOWN_MODE'] or
-        ticket.cancelled or
-        ticket.collected
+        ticket.has_holder() and
+        ticket.holder.photo.verified
     )
 
 @models.Ticket.permission()
@@ -59,5 +73,31 @@ def buy_postage(ticket):
         not ticket.cancelled and
         not ticket.collected and
         ticket.postage is None and
-        not app.APP.config['LOCKDOWN_MODE']
+        not app.APP.config['LOCKDOWN_MODE'] and
+        app.APP.config['ENABLE_SEPARATE_POSTAGE']
+    )
+
+@models.Ticket.permission()
+def be_paid_for(ticket):
+    """Check whether this ticket can be paid for."""
+    return not ticket.paid and not ticket.cancelled
+
+@models.Ticket.permission()
+def be_reclaimed(ticket):
+    return ticket.has_holder() and (
+        login.current_user.is_admin or (
+            not app.APP.config['LOCKDOWN_MODE'] and
+            app.APP.config['ENABLE_RECLAIMING_TICKETS']
+        )
+    )
+
+@models.Ticket.possession()
+def holder(ticket):
+    return ticket.holder is not None
+
+@models.Ticket.permission()
+def be_claimed(ticket):
+    return not ticket.has_holder() and (
+        login.current_user.is_admin or
+        ticket.claims_made < app.APP.config['MAX_TICKET_CLAIMS']
     )
