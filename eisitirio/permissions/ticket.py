@@ -84,6 +84,7 @@ def be_paid_for(ticket):
 
 @models.Ticket.permission()
 def be_reclaimed(ticket):
+    """Can the user reclaim/relinquish a ticket."""
     return ticket.has_holder() and (
         login.current_user.is_admin or (
             not app.APP.config['LOCKDOWN_MODE'] and
@@ -93,10 +94,12 @@ def be_reclaimed(ticket):
 
 @models.Ticket.possession()
 def holder(ticket):
+    """Is this ticket held by a user."""
     return ticket.holder is not None
 
 @models.Ticket.permission()
 def be_claimed(ticket):
+    """Can this ticket be claimed."""
     return not ticket.has_holder() and (
         login.current_user.is_admin or
         ticket.claims_made < app.APP.config['MAX_TICKET_CLAIMS']

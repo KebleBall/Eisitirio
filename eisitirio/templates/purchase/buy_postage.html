@@ -28,6 +28,13 @@
                                     </tr>
                                 {% endif %}
                             {% endfor %}
+                            {% if current_user.has_held_ticket() and current_user.held_ticket.can_buy_postage() %}
+                                <tr id="ticket-{{ current_user.held_ticket.object_id }}">
+                                    <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ current_user.held_ticket.object_id }}" value="{{ current_user.held_ticket.object_id }}" {% if tickets and current_user.held_ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
+                                    <td><label for="ticket_select-{{ current_user.held_ticket.object_id }}">#{{ '%05d' % current_user.held_ticket.object_id }}</label></td>
+                                    <td><label for="ticket_select-{{ current_user.held_ticket.object_id }}">{{ current_user.held_ticket.status }}</label></td>
+                                </tr>
+                            {% endif %}
                         </tbody>
                     </table>
                 </li>
