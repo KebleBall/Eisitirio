@@ -5,6 +5,7 @@ Flask-Markdown
 Flask-Migrate
 Flask-Script
 Flask-SQLAlchemy
+Flask-WTF
 MySQL-python
 newrelic
 python-dateutil
@@ -12,3 +13,4 @@ requests
 matplotlib
 boto
 Pillow
+WTForms-Components
