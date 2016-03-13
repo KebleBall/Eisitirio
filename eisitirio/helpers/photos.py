@@ -2,8 +2,10 @@
 
 from __future__ import unicode_literals
 
+import logging
 import uuid
 import os
+import sys
 
 import boto
 from PIL import Image
@@ -14,6 +16,8 @@ from eisitirio.database import models
 
 APP = app.APP
 DB = db.DB
+
+LOG = logging.getLogger(__name__)
 
 def get_bucket():
     """Get the Boto bucket object."""
@@ -57,7 +61,10 @@ def save_photo(upload_file):
         im.load()
     except IOError:
         # Mildly hacky fix to work around truncated files.
-        pass
+        LOG.warning(
+            "Ignoring IOError when loading image.",
+            exc_info=sys.exc_info()
+        )
 
     im.thumbnail(APP.config['THUMBNAIL_SIZE'])
     im.save(thumb_temp_filename)
