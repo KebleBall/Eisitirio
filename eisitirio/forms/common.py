@@ -10,6 +10,7 @@ class BlankIsZeroIntegerField(wtforms_components.IntegerField):
     """Integer field which treats a blank input as 0."""
 
     def process_formdata(self, valuelist):
+        """Coerce the user input to an integer."""
         if valuelist:
             if valuelist[0] == '':
                 self.data = 0

@@ -24,6 +24,7 @@ DB.Model.query = flask_sqlalchemy._QueryProperty(DB) # pylint: disable=protected
 
 @sqlalchemy.event.listens_for(sqlalchemy.Table, "column_reflect")
 def column_reflect(_, unused, column_info):
+    """Change the presented types of columns to avoid confusing alembic."""
     if isinstance(column_info['type'], mysql.TINYINT):
         column_info['type'] = sqlalchemy.Boolean()
 

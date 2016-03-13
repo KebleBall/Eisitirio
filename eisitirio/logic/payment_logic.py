@@ -123,6 +123,7 @@ def buy_postage(tickets, postage_option, payment_method, payment_term,
     return complete_payment(transaction, payment_term)
 
 def pay_admin_fee(admin_fee, payment_method, payment_term):
+    """Run the payment process for an admin fee."""
     transaction = get_transaction(payment_method, admin_fee=admin_fee)
 
     db.DB.session.add(transaction)
