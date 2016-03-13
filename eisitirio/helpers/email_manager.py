@@ -51,6 +51,34 @@ class EmailManager(object):
             )
             return False
 
+        if self.app.config['SMTP_STARTTLS']:
+            try:
+                self.smtp.starttls()
+            except smtplib.SMTPHeloError as error:
+                self.log(
+                    'error',
+                    (
+                        'SMTP server at {0} did not reply properly to HELO at '
+                        'login: {1}'
+                    ).format(
+                        self.app.config['SMTP_HOST'],
+                        error
+                    )
+                )
+                return False
+            except smtplib.SMTPException as error:
+                self.log(
+                    'error',
+                    (
+                        'No suitable authentication method found for SMTP '
+                        'server at {0}: {1}'
+                    ).format(
+                        self.app.config['SMTP_HOST'],
+                        error
+                    )
+                )
+                return False
+
         if self.app.config['SMTP_LOGIN']:
             try:
                 self.smtp.login(self.app.config['SMTP_USER'],
