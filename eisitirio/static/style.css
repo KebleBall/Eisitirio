@@ -1657,7 +1657,7 @@ blockquote cite:before { content: "\2014 \0020"; }
 blockquote cite a, blockquote cite a:visited { color: #555555; }
 
 /* line 342, scss/vendor/foundation/components/_type.scss */
-blockquote, blockquote p { line-height: 1.6; color: #6f6f6f; }
+blockquote, blockquote p { line-height: 1.6; color: #000; }
 
 /* line 349, scss/vendor/foundation/components/_type.scss */
 .vcard { display: inline-block; margin: 0 0 1.25rem 0; border: 1px solid #ddd; padding: 0.625rem 0.75rem; }

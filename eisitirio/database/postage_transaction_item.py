@@ -1,5 +1,5 @@
 # coding: utf-8
-"""Database model for representing a ticket in a transaction."""
+"""Database model for representing postage in a transaction."""
 
 from __future__ import unicode_literals
 
@@ -9,7 +9,7 @@ from eisitirio.database import transaction_item
 DB = db.DB
 
 class PostageTransactionItem(transaction_item.TransactionItem):
-    """Model for representing a ticket in a transaction."""
+    """Model for representing postage in a transaction."""
     __tablename__ = 'postage_transaction_item'
     __mapper_args__ = {'polymorphic_identity': 'Postage'}
 
@@ -54,7 +54,7 @@ class PostageTransactionItem(transaction_item.TransactionItem):
 
     @property
     def description(self):
-        """Get a description of the ticket with the type and guest name."""
+        """Get a description of transaction item."""
         return '{0}{1} Postage'.format(
             'Refund of ' if self.is_refund else '',
             self.postage.postage_type

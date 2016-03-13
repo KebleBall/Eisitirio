@@ -484,3 +484,53 @@ def buy_postage():
         )
 
     return flask.render_template('purchase/buy_postage.html')
+
+@PURCHASE.route(
+    '/purchase/admin_fee/<int:admin_fee_id>',
+    methods=['GET', 'POST']
+)
+@login.login_required
+def pay_admin_fee(admin_fee_id):
+    """Allow the user to pay an admin fee."""
+    admin_fee = models.AdminFee.get_by_id(admin_fee_id)
+
+    if not admin_fee:
+        flask.flash('Admin Fee not found', 'warning')
+    elif admin_fee.charged_to != login.current_user:
+        flask.flash('That is not your admin fee to pay.', 'warning')
+    elif admin_fee.paid:
+        flask.flash('That admin fee has been paid.', 'warning')
+    else:
+        if flask.request.method == 'POST':
+            flashes = []
+
+            payment_method, payment_term = purchase_logic.check_payment_method(
+                flashes
+            )
+
+            if flashes:
+                flask.flash(
+                    (
+                        'There were errors in your input. Please fix '
+                        'these and try again'
+                    ),
+                    'error'
+                )
+                for msg in flashes:
+                    flask.flash(msg, 'warning')
+
+                return flask.render_template(
+                    'purchase/pay_admin_fee.html',
+                    fee=admin_fee
+                )
+
+            return payment_logic.pay_admin_fee(admin_fee, payment_method,
+                                               payment_term)
+        else:
+            return flask.render_template(
+                'purchase/pay_admin_fee.html',
+                fee=admin_fee
+            )
+
+    return flask.redirect(flask.request.referrer or
+                          flask.url_for('dashboard.dashboard_home'))

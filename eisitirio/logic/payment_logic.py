@@ -11,25 +11,26 @@ from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.logic import eway_logic
 
-def get_transaction(tickets, postage_option, payment_method):
+def get_transaction(payment_method, tickets=None, postage_option=None,
+                    admin_fee=None):
     """Get a new transaction object for the given items."""
-    if any(ticket.price > 0 for ticket in tickets) or postage_option.price > 0:
-        if payment_method == 'Battels':
-            transaction = models.BattelsTransaction(login.current_user)
-        elif payment_method == 'Card':
-            transaction = models.CardTransaction(login.current_user)
-    else:
-        transaction = models.FreeTransaction(login.current_user)
+    is_free = True
 
-        app.APP.log_manager.log_event(
-            'Performed Free Transaction',
-            tickets=tickets,
-            user=login.current_user,
-            transaction=transaction,
-            commit=False
-        )
+    if tickets is not None and any(ticket.price > 0 for ticket in tickets):
+        is_free = False
 
-    return transaction
+    if postage_option is not None and postage_option.price > 0:
+        is_free = False
+
+    if admin_fee is not None:
+        is_free = False
+
+    if is_free:
+        return models.FreeTransaction(login.current_user)
+    elif payment_method == 'Battels':
+        return models.BattelsTransaction(login.current_user)
+    elif payment_method == 'Card':
+        return models.CardTransaction(login.current_user)
 
 def create_postage(transaction, tickets, postage_option, address):
     """Create a postage object and corresponding transaction item."""
@@ -40,13 +41,23 @@ def create_postage(transaction, tickets, postage_option, address):
 
         db.DB.session.add(models.PostageTransactionItem(transaction, postage))
 
-def complete_payment(transaction, payment_method, payment_term):
+def complete_payment(transaction, payment_term):
     """Do the payment, or redirect the user to eWay."""
-    if payment_method == 'Battels':
+    if transaction.payment_method == 'Free':
+        transaction.mark_as_paid()
+
+        app.APP.log_manager.log_event(
+            'Performed Free Transaction',
+            user=login.current_user,
+            transaction=transaction
+        )
+    elif transaction.payment_method == 'Battels':
         transaction.charge(payment_term)
 
         db.DB.session.commit()
-    elif payment_method == 'Card':
+
+        flask.flash('Battels payment completed.', 'success')
+    elif transaction.payment_method == 'Card':
         payment_url = eway_logic.get_payment_url(transaction)
 
         if payment_url:
@@ -70,7 +81,7 @@ def do_payment(tickets, postage_option, payment_method, payment_term,
     Returns:
         A flask redirect, either to the dashboard, or to the payment gateway.
     """
-    transaction = get_transaction(tickets, postage_option, payment_method)
+    transaction = get_transaction(payment_method, tickets, postage_option)
 
     db.DB.session.add(transaction)
 
@@ -83,7 +94,7 @@ def do_payment(tickets, postage_option, payment_method, payment_term,
 
     db.DB.session.commit()
 
-    return complete_payment(transaction, payment_method, payment_term)
+    return complete_payment(transaction, payment_term)
 
 def buy_postage(tickets, postage_option, payment_method, payment_term,
                 address=None):
@@ -101,7 +112,7 @@ def buy_postage(tickets, postage_option, payment_method, payment_term,
     Returns:
         A flask redirect, either to the dashboard, or to the payment gateway.
     """
-    transaction = get_transaction([], postage_option, payment_method)
+    transaction = get_transaction(payment_method, postage_option=postage_option)
 
     db.DB.session.add(transaction)
 
@@ -109,4 +120,14 @@ def buy_postage(tickets, postage_option, payment_method, payment_term,
 
     db.DB.session.commit()
 
-    return complete_payment(transaction, payment_method, payment_term)
+    return complete_payment(transaction, payment_term)
+
+def pay_admin_fee(admin_fee, payment_method, payment_term):
+    transaction = get_transaction(payment_method, admin_fee=admin_fee)
+
+    db.DB.session.add(transaction)
+    db.DB.session.add(models.AdminFeeTransactionItem(transaction, admin_fee))
+
+    db.DB.session.commit()
+
+    return complete_payment(transaction, payment_term)

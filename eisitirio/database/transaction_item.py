@@ -11,7 +11,7 @@ class TransactionItem(DB.Model):
     """Model for representing an item in a transaction.
 
     Not used directly, use GenericTransactionItem, TicketTransactionItem,
-    PostageTransactionItem subtypes instead.
+    PostageTransactionItem, AdminFeeTransactionItem subtypes instead.
     """
     __tablename__ = 'transaction_item'
 
@@ -19,7 +19,8 @@ class TransactionItem(DB.Model):
         DB.Enum(
             'Ticket',
             'Generic',
-            'Postage'
+            'Postage',
+            'AdminFee',
         ),
         nullable=False
     )

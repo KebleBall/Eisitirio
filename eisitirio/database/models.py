@@ -14,6 +14,8 @@ name that is less likely to conflict.
 #
 # pylint: disable=unused-import
 
+from eisitirio.database.admin_fee import AdminFee
+from eisitirio.database.admin_fee_transaction_item import AdminFeeTransactionItem
 from eisitirio.database.affiliation import Affiliation
 from eisitirio.database.announcement import Announcement
 from eisitirio.database.battels import Battels

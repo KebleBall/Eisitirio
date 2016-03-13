@@ -1,0 +1,51 @@
+<!-- admin_users/charge_admin_fee.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Charge an Admin Fee - {{ user.full_name }} (#{{ "{0:05d}".format(user.object_id) }}){% endblock %}
+
+{% block content %}
+    <section id="charge_admin_fee" class="columns">
+        <p>To charge an admin fee, enter the reason and amount below. {{ user.forenames }} will be sent an email asking them to pay the fee, and you will be sent an email once they have paid.</p>
+        <p>Please note that the reason you give below will be included in the email sent to {{ user.forenames }}.</p>
+        <form method="post" action="{{ url_for('admin_users.charge_admin_fee', user_id=user.object_id) }}">
+            {{ form.hidden_tag() }}
+            <fieldset>
+                <div class="row">
+                    <div class="columns">
+                        {{ form.reason.label }}
+                        {% for error in form.reason.errors %}
+                            <p class="message-box hideable error">{{ error }}</p>
+                        {% endfor %}
+                        {{ form.reason() }}
+                    </div>
+                    <div class="columns large-6">
+                        {{ form.amount.label }}
+                        {% for error in form.amount.pounds.errors %}
+                            <p class="message-box hideable error">{{ error }}</p>
+                        {% endfor %}
+                        {% for error in form.amount.pence.errors %}
+                            <p class="message-box hideable error">{{ error }}</p>
+                        {% endfor %}
+                        <div class="row collapse">
+                            <div class="columns small-2">
+                                <span class="prefix">&pound;</span>
+                            </div>
+                            <div class="columns small-4">
+                                {{ form.amount.pounds() }}
+                            </div>
+                            <div class="columns small-2">
+                                <span class="prefix postfix">.</span>
+                            </div>
+                            <div class="columns small-4">
+                                {{ form.amount.pence() }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns large-6">
+                        <input type="submit" class="button small expand" value="Charge Admin Fee" />
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </section>
+{% endblock %}

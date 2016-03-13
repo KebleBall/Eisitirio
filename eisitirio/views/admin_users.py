@@ -9,6 +9,7 @@ import flask
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
+from eisitirio.forms import admin_users
 from eisitirio.helpers import login_manager
 from eisitirio.helpers import util
 from eisitirio.logic import affiliation_logic
@@ -453,3 +454,63 @@ def collect_tickets(user_id):
         return flask.redirect(flask.request.referrer or
                               flask.url_for('admin.admin_home'))
 
+@ADMIN_USERS.route(
+    '/admin/user/<int:user_id>/charge_admin_fee',
+    methods=['GET', 'POST']
+)
+@login.login_required
+@login_manager.admin_required
+def charge_admin_fee(user_id):
+    """Display an interface to create an admin fee for the user to pay."""
+    user = models.User.get_by_id(user_id)
+
+    if not user:
+        flask.flash(
+            'Could not find user, could not process ticket collection.',
+            'warning'
+        )
+        return flask.redirect(flask.request.referrer or
+                              flask.url_for('admin.admin_home'))
+
+    form = admin_users.AdminFeeForm()
+
+    if form.validate_on_submit():
+        admin_fee = models.AdminFee(
+            form.amount.pounds.data * 100 + form.amount.pence.data,
+            form.reason.data,
+            user,
+            login.current_user
+        )
+
+        DB.session.add(admin_fee)
+        DB.session.commit()
+
+        APP.log_manager.log_event(
+            'Created admin fee',
+            user=login.current_user,
+            admin_fee=admin_fee
+        )
+
+        APP.email_manager.send_template(
+            user.email,
+            'Please pay an administration fee.',
+            'admin_fee.email',
+            fee=admin_fee,
+            payment_url=flask.url_for(
+                'purchase.pay_admin_fee',
+                admin_fee_id=admin_fee.object_id,
+                _external=True
+            )
+        )
+
+        flask.flash('Admin fee created.', 'success')
+
+        return flask.redirect(
+            flask.url_for('admin_users.view_user', user_id=user_id)
+        )
+
+    return flask.render_template(
+        'admin_users/charge_admin_fee.html',
+        user=user,
+        form=form
+    )

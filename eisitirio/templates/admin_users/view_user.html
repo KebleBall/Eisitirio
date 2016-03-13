@@ -70,6 +70,7 @@
                 {% if user.battels == None %}
                     <li><a href="{{ url_for('admin_users.add_manual_battels', user_id=user.object_id) }}" class="button tiny">Manually setup battelling</a></li>
                 {% endif %}
+                <li><a href="{{ url_for('admin_users.charge_admin_fee', user_id=user.object_id) }}" class="button tiny">Charge admin fee</a></li>
                 <li>
                     <form action="{{ url_for('admin_users.give_user', user_id=user.object_id) }}" method="post" id="give_tickets">
                         Give user
@@ -268,6 +269,31 @@
                 {% endif %}
             {% else %}
                 <p>No events performed by user on others.</p>
+            {% endif %}
+            <h4>User's Admin Fees</h4>
+            {% if user.admin_fees_charged.count() %}
+                <table id="admin_fees_table">
+                    <thead>
+                        <tr>
+                            <th>Fee ID</th>
+                            <th>Fee Amount</th>
+                            <th>Fee Reason</th>
+                            <th>Fee Paid?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fee in user.admin_fees_charged %}
+                            <tr>
+                                <td>{{ '%05d' % fee.object_id }}</td>
+                                <td>&pound;{{ fee.amount_pounds }}</td>
+                                <td>{{ fee.reason }}</td>
+                                <td>{{ "Paid" if fee.paid else "Unpaid" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No admin fees.</p>
             {% endif %}
         {% endif %}
     </section>

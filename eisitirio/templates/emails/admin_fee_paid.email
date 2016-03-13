@@ -1,0 +1,9 @@
+Dear {{ fee.charged_by.forenames }},
+
+An administration fee has been paid by {{ fee.charged_to.full_name }}. You should now carry out the action for which you charged the administration fee. For reference, the reason you gave for the fee was:
+
+{{ fee.reason }}
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

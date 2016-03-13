@@ -1,0 +1,12 @@
+Dear {{ fee.charged_to.forenames }},
+
+
+You have been requested to pay an administration fee of £{{ fee.amount_pounds }} for an action on the {{ template_config['BALL_NAME'] }} Ticketing System. The reason given by the member of staff who requested the fee was:
+
+{{ fee.reason }}
+
+Please visit {{ payment_url }} to pay this fee.
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}

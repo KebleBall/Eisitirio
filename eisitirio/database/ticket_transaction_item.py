@@ -54,7 +54,7 @@ class TicketTransactionItem(transaction_item.TransactionItem):
 
     @property
     def description(self):
-        """Get a description of the ticket with the type and guest name."""
+        """Get a description of the transaction item."""
         return '{0}{1} Ticket ({2:05d})'.format(
             'Refund of ' if self.is_refund else '',
             self.ticket_type,

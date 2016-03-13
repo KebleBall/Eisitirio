@@ -100,8 +100,21 @@ class Log(DB.Model):
         )
     )
 
+    admin_fee_id = DB.Column(
+        DB.Integer(),
+        DB.ForeignKey('admin_fee.object_id'),
+        nullable=True
+    )
+    admin_fee = DB.relationship(
+        'AdminFee',
+        backref=DB.backref(
+            'events',
+            lazy='dynamic'
+        )
+    )
+
     def __init__(self, ip_address, action, actor, user, tickets=None,
-                 transaction=None, purchase_group=None):
+                 transaction=None, purchase_group=None, admin_fee=None):
         if tickets is None:
             tickets = []
 
@@ -113,6 +126,7 @@ class Log(DB.Model):
         self.tickets = tickets
         self.transaction = transaction
         self.purchase_group = purchase_group
+        self.admin_fee = admin_fee
 
     def __repr__(self):
         return '<Log {0}: {1}>'.format(
@@ -134,6 +148,8 @@ class Log(DB.Model):
             'Target\'s Name',
             'Relevant Ticket IDs',
             'Relevant Transaction ID',
+            'Relevant Purchase Group ID',
+            'Relevant Admin Fee ID',
         ])
 
     def write_csv_row(self, csv_writer):
@@ -151,6 +167,16 @@ class Log(DB.Model):
             (
                 self.transaction_id
                 if self.transaction_id is not None
+                else 'N/A'
+            ),
+            (
+                self.purchase_group_id
+                if self.purchase_group_id is not None
+                else 'N/A'
+            ),
+            (
+                self.admin_fee_id
+                if self.admin_fee_id is not None
                 else 'N/A'
             ),
         ])

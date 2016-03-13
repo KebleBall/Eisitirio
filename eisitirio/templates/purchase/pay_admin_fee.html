@@ -1,0 +1,22 @@
+<!-- purchase/pay_admin_fee.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Pay Administration Fee{% endblock %}
+
+{% block content %}
+    <section id="pay_admin_fee" class="columns">
+        <p>You have been requested to pay an administration fee of &pound;{{ fee.amount_pounds }}. The reason given was:</p>
+        <blockquote>
+            {{ fee.reason }}
+        </blockquote>
+        <p>To pay the fee, select the payment method below and click "Pay Fee".</p>
+        <form action="{{ url_for('purchase.pay_admin_fee', admin_fee_id=fee.object_id) }}" id="admin_fee_form" method="post">
+            <ol>
+                {% include 'purchase/blocks/choose_payment_method.html' %}
+                <li>
+                    <input type="submit" value="Pay Fee" class="button tiny" />
+                </li>
+            </ul>
+        </form>
+    </section>
+{% endblock %}

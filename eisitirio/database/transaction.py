@@ -99,6 +99,21 @@ class Transaction(DB.Model):
         except IndexError:
             return None
 
+    @property
+    def admin_fee(self):
+        """Get the admin_fee paid for in this transaction.
+
+        Returns a single AdminFee object, or None.
+        """
+        try:
+            return list(
+                item.admin_fee
+                for item in self.items
+                if item.item_type == 'AdminFee'
+            )[0]
+        except IndexError:
+            return None
+
     def mark_as_paid(self):
         """Mark the transaction as paid for.
 
@@ -112,6 +127,10 @@ class Transaction(DB.Model):
         postage = self.postage
         if postage:
             postage.paid = True
+
+        admin_fee = self.admin_fee
+        if admin_fee:
+            admin_fee.mark_as_paid()
 
 class FreeTransaction(Transaction):
     """Model for representing a transaction with no payment required.
