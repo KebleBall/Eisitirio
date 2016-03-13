@@ -488,6 +488,9 @@ def view_statistics():
             models.Postage.paid == True # pylint: disable=singleton-comparison
         ).filter(
             models.Postage.cancelled == False # pylint: disable=singleton-comparison
+        ).filter(
+            models.Postage.postage_type !=
+            APP.config['GRADUAND_POSTAGE_OPTION'].name
         ).count()
     )
 

@@ -299,13 +299,7 @@ def check_postage(flashes):
     if 'postage' not in flask.request.form:
         flashes.append('You must select a postage option')
     elif flask.request.form['postage'] == 'graduand':
-        return postage_option.PostageOption(
-            'Tickets included in Graduand pack',
-            'graduand',
-            0,
-            'Your tickets will be included in your Graduand pack.',
-            False
-        ), None
+        return APP.config['GRADUAND_POSTAGE_OPTION'], None
     elif flask.request.form['postage'] not in app.APP.config['POSTAGE_OPTIONS']:
         flashes.append('That is not a valid postage option')
     else:
