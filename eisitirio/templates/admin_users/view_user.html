@@ -216,7 +216,7 @@
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
                                 <td>
                                     {% if log.actor %}
-                                        <a href="url_for('admin_users.view_user', user_id=log.actor_id) }}">{{ log.actor.full_name }}</a>
+                                        <a href="{{ url_for('admin_users.view_user', user_id=log.actor_id) }}">{{ log.actor.full_name }}</a>
                                     {% else %}
                                         Unknown Actor
                                     {% endif %}
@@ -254,7 +254,7 @@
                             <tr>
                                 <td>{{ '%05d' % log.object_id }}</td>
                                 <td>{{ log.timestamp.strftime('%c') }}</td>
-                                <td><a href="url_for('admin_users.view_user', user_id=log.user_id) }}">{{ log.user.full_name }}</a></td>
+                                <td><a href="{{ url_for('admin_users.view_user', user_id=log.user_id) }}">{{ log.user.full_name }}</a></td>
                                 <td>{{ log.action }}</td>
                                 <td><a href="{{ url_for('admin.view_log', entry_id=log.object_id) }}" class="button tiny">View</a></td>
                             </tr>
