@@ -22,12 +22,14 @@ class Affiliation(DB.Model):
     def __repr__(self):
         return '<Affiliation {0}: {1}>'.format(self.object_id, self.name)
 
-AFFILIATIONS = [
-    Affiliation('Student'),
-    Affiliation('Graduand'),
-    Affiliation('Graduate/Alumnus'),
-    Affiliation('Staff/Fellow'),
-    Affiliation('Foreign Exchange Student'),
-    Affiliation('Other'),
-    Affiliation('None'),
-]
+def get_static():
+    """Get static instances of the Affiliation model."""
+    return [
+        Affiliation('Student'),
+        Affiliation('Graduand'),
+        Affiliation('Graduate/Alumnus'),
+        Affiliation('Staff/Fellow'),
+        Affiliation('Foreign Exchange Student'),
+        Affiliation('Other'),
+        Affiliation('None'),
+    ]

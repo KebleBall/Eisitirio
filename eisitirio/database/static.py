@@ -11,6 +11,9 @@ we have this module for accessing all the constants.
 #
 # pylint: disable=unused-import
 
-from eisitirio.database.affiliation import AFFILIATIONS
-from eisitirio.database.college import COLLEGES
+from eisitirio.database import affiliation
+from eisitirio.database import college
 from eisitirio.database.statistic import STATISTIC_GROUPS
+
+AFFILIATIONS = affiliation.get_static()
+COLLEGES = college.get_static()
