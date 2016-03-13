@@ -52,6 +52,13 @@ def save_photo(upload_file):
     upload_file.save(temp_filename)
 
     im = Image.open(temp_filename)
+
+    try:
+        im.load()
+    except IOError:
+        # Mildly hacky fix to work around truncated files.
+        pass
+
     im.thumbnail(APP.config['THUMBNAIL_SIZE'])
     im.save(thumb_temp_filename)
 
