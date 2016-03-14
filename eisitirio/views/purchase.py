@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 from flask.ext import login
 import flask
+from sqlalchemy import or_
 
 from eisitirio import app
 from eisitirio.database import db
@@ -448,12 +449,19 @@ def buy_postage():
     if flask.request.method == 'POST':
         flashes = []
 
-        tickets = login.current_user.active_tickets.filter(
+        tickets = models.Ticket.query.filter(
             models.Ticket.object_id.in_(flask.request.form.getlist('tickets[]'))
-        ).all()
+        ).filter(
+            models.Ticket.cancelled == False # pylint: disable=singleton-comparison
+        ).filter(or_(
+            models.Ticket.owner == login.current_user,
+            models.Ticket.holder == login.current_user
+        )).all()
 
         if not tickets:
-            flashes.append('You have not selected any tickets to pay for.')
+            flashes.append(
+                'You have not selected any tickets to buy postage for.'
+            )
 
         method, term = purchase_logic.check_payment_method(flashes)
 
