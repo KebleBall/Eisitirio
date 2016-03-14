@@ -72,7 +72,10 @@ def buy_postage(ticket):
         ticket.paid and
         not ticket.cancelled and
         not ticket.collected and
-        ticket.postage is None and
+        (
+            ticket.postage is None or
+            not ticket.postage.paid
+        ) and
         not app.APP.config['LOCKDOWN_MODE'] and
         app.APP.config['ENABLE_SEPARATE_POSTAGE']
     )
