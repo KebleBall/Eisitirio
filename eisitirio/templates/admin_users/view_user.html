@@ -47,6 +47,11 @@
                     <li>User's affiliation was <strong>verified</strong>.</li>
                 {% endif %}
                 <li>User <strong>is{% if user.purchase_group == None %} not{% endif %}</strong> a member of a purchase group.</li>
+                {% if user.held_ticket != None %}
+                    <li>User holds ticket <a href="{{ url_for('admin_tickets.view_ticket', ticket_id=user.held_ticket.object_id) }}">#{{ '%05d' % user.held_ticket.object_id }}</a></li>
+                {% else %}
+                    <li>User <strong>does not</strong> hold a ticket.</li>
+                {% endif %}
             </ul>
             <h4>User Notes</h4>
             <form action="{{ url_for('admin_users.note_user', user_id=user.object_id) }}" method="post">
