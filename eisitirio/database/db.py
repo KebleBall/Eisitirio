@@ -18,7 +18,7 @@ DB = flask_sqlalchemy.SQLAlchemy(app.APP)
 # be used once v3.0 is released as stable.
 DB.Model = declarative.declarative_base(
     cls=custom_model.CustomModel,
-    name='Model',
+    name='Model'.encode('us-ascii'),
     metadata=None,
     metaclass=custom_model.CustomModelMeta
 )
