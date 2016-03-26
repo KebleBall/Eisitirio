@@ -43,61 +43,6 @@ def view_ticket(ticket_id, events_page=1):
         events_page=events_page
     )
 
-@ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/collect',
-                     methods=['GET', 'POST'])
-@login.login_required
-@login_manager.admin_required
-def collect_ticket(ticket_id):
-    """Mark a ticket as collected, and add a barcode.
-
-    Performs the requisite logic to check the barcode submitted for a ticket,
-    and marks the ticket as collected.
-    """
-    if flask.request.method != 'POST':
-        return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.admin_home'))
-
-    existing = models.Ticket.query.filter(
-        models.Ticket.barcode == flask.request.form['barcode']
-    ).count()
-
-    if existing > 0:
-        flask.flash(
-            'Barcode has already been used for a ticket.',
-            'warning'
-        )
-        return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.admin_home'))
-
-    ticket = models.Ticket.get_by_id(ticket_id)
-
-    if ticket:
-        ticket.barcode = flask.request.form['barcode']
-        ticket.collected = True
-        DB.session.commit()
-
-        APP.log_manager.log_event(
-            'Collected',
-            tickets=[ticket]
-        )
-
-        flask.flash(
-            'Ticket marked as collected with barcode number {0}.'.format(
-                flask.request.form['barcode']
-            ),
-            'success'
-        )
-        return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin_users.collect_tickets',
-                                            ticket_id=ticket.owner_id))
-    else:
-        flask.flash(
-            'Could not find ticket, could mark as collected.',
-            'warning'
-        )
-        return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.admin_home'))
-
 @ADMIN_TICKETS.route('/admin/ticket/<int:ticket_id>/note',
                      methods=['GET', 'POST'])
 @login.login_required

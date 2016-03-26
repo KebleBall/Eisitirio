@@ -1,13 +1,15 @@
 <!-- admin_users/collect_tickets.html -->
 {% extends 'layout.html' %}
 
+{% from 'macros/collect_ticket.html' import collect_ticket_form %}
+
 {% block title %}Ticket Collection{% endblock %}
 
 {% block content %}
     <section id="collect_tickets" class="columns">
         <p>To process a ticket collection, place your cursor into the text field for the relevant ticket and scan the barcode on the wristband (then press "Collect Ticket" if the form does not submit automatically).</p>
         <p>Tickets must be paid for and have a name set before they can be marked as collected.</p>
-        {% if any(ticket.can_be_collected() for ticket in user.tickets) %}
+        {% if user.has_collectable_tickets() %}
             <h3>Tickets owned by {{ user.full_name }}</h3>
             <table id="tickets_table">
                 <thead>
@@ -23,12 +25,7 @@
                             <tr id="ticket-{{ ticket.object_id }}">
                                 <td><label for="ticket_barcode-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
                                 <td><label for="ticket_barcode-{{ ticket.object_id }}">{{ ticket.holder.full_name }}</label></td>
-                                <td>
-                                    <form action="{{ url_for('admin_tickets.collect_ticket', ticket_id=ticket.object_id) }}" method="post">
-                                        <input type="text" name="barcode" id="ticket_barcode-{{ ticket.object_id }}" />
-                                        <input type="submit" class="button tiny" value="Collect Ticket" />
-                                    </form>
-                                </td>
+                                <td>{{ collect_ticket_form(ticket.object_id) }}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}
@@ -38,28 +35,29 @@
             <h3>{{ user.full_name }} does not own any collectable tickets.</h3>
         {% endif %}
         {% if user.held_ticket and user.held_ticket.can_be_collected() %}
-            <h3>Ticket held by {{ user.full_name }}</h3>
-            <table id="tickets_table">
-                <thead>
-                    <tr>
-                        <th>Ticket Number</th>
-                        <th>Barcode</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr id="ticket-{{ user.held_ticket.object_id }}">
-                        <td><label for="ticket_barcode-{{ user.held_ticket.object_id }}">#{{ '%05d' % user.held_ticket.object_id }}</label></td>
-                        <td>
-                            <form action="{{ url_for('admin_tickets.collect_ticket', ticket_id=user.held_ticket.object_id) }}" method="post">
-                                <input type="text" name="barcode" id="ticket_barcode-{{ user.held_ticket.object_id }}" />
-                                <input type="submit" class="button tiny" value="Collect Ticket" />
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            {% if user.held_ticket.owner != user %}
+                <h3>Ticket held by {{ user.full_name }}</h3>
+                <table id="tickets_table">
+                    <thead>
+                        <tr>
+                            <th>Ticket Number</th>
+                            <th>Barcode</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="ticket-{{ user.held_ticket.object_id }}">
+                            <td><label for="ticket_barcode-{{ user.held_ticket.object_id }}">#{{ '%05d' % user.held_ticket.object_id }}</label></td>
+                            <td>{{ collect_ticket_form(user.held_ticket.object_id) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% endif %}
         {% else %}
             <h3>{{ user.full_name }} does not hold a collectable ticket.</h3>
         {% endif %}
     </section>
+{% endblock %}
+
+{% block javascripts %}
+    {% include 'scripts/collect_ticket.html' %}
 {% endblock %}

@@ -9,7 +9,10 @@ from flask.ext import login
 import flask
 
 from eisitirio.database import db
+from eisitirio.database import models
+from eisitirio.helpers import login_manager
 from eisitirio.helpers import validators
+from eisitirio.logic import collection_logic
 
 DB = db.DB
 
@@ -42,5 +45,39 @@ def validate_resale_email():
 
     response['class'] = 'message-box ' + response['class']
     response['message'] = '<p>' + response['message'] + '</p>'
+
+    return flask.Response(json.dumps(response), mimetype='text/json')
+
+@AJAX.route('/ajax/ticket/<int:ticket_id>/collect', methods=['POST'])
+@login.login_required
+@login_manager.admin_required
+def collect_ticket(ticket_id):
+    """Mark a ticket as collected, and add a barcode.
+
+    Performs the requisite logic to check the barcode submitted for a ticket,
+    and marks the ticket as collected.
+    """
+    ticket = models.Ticket.get_by_id(ticket_id)
+
+    if not ticket:
+        response = {
+            'success': False,
+            'message': 'Could not load ticket.'
+        }
+    else:
+        error = collection_logic.collect_ticket(
+            ticket,
+            flask.request.form['barcode']
+        )
+
+        if error is None:
+            response = {
+                'success': True,
+            }
+        else:
+            response = {
+                'success': False,
+                'message': error
+            }
 
     return flask.Response(json.dumps(response), mimetype='text/json')

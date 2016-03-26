@@ -15,14 +15,17 @@ def tickets(user):
 @models.User.possession()
 def uncollected_tickets(user):
     """Does the user have any uncollected tickets?"""
-    return len([x for x in user.tickets
-                if not x.cancelled and not x.collected]) > 0
+    return any(not x.cancelled and not x.collected for x in user.tickets)
 
 @models.User.possession()
 def collected_tickets(user):
     """Has the user collected any tickets?"""
-    return len([x for x in user.tickets
-                if not x.cancelled and x.collected]) > 0
+    return any(not x.cancelled and x.collected for x in user.tickets)
+
+@models.User.possession()
+def collectable_tickets(user):
+    """Does the user own any tickets that can be collected?"""
+    return any(ticket.can_be_collected() for ticket in user.tickets)
 
 @models.User.possession()
 def unpaid_tickets(user, method=None):

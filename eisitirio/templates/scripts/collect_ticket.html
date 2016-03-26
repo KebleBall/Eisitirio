@@ -1,0 +1,38 @@
+<script type="text/javascript">
+    var collect_ticket_ajax_url = "{{ url_for('ajax.collect_ticket', ticket_id='1234567890', _external=True) }}";
+
+    function collect_ticket(ticket_id) {
+        var barcode_field = $("#ticket-barcode-" + ticket_id);
+        var barcode = barcode_field.val();
+
+        jQuery.ajax(
+            collect_ticket_ajax_url.replace('1234567890', ticket_id),
+            {
+                'data': {
+                    'barcode': barcode
+                },
+                'type': 'POST',
+                'dataType': 'json',
+                'success': function(data, code, xhr) {
+                    var ticket_form = $("#collect-ticket-" + ticket_id + "-form");
+
+                    if (data.success) {
+                        ticket_form.html("<p>Ticket collected as " + barcode + ".</p>");
+                    } else {
+                        barcode_field.val("").focus();
+
+                        $("#collect-ticket-" + ticket_id + "-message").html(data.message).show(0);
+                    }
+                }
+            }
+        );
+    }
+
+    function collect_ticket_keypress(ticket_id) {
+        if (event.keyCode == 13) {
+            event.preventDefault();
+
+            collect_ticket(ticket_id);
+        }
+    }
+</script>
