@@ -1,6 +1,8 @@
 # coding: utf-8
 """Various business logic functions for the purchase flow."""
 
+from __future__ import unicode_literals
+
 import collections
 import datetime
 import json

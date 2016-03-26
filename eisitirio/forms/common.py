@@ -1,6 +1,8 @@
 # coding: utf-8
 """Common components of forms."""
 
+from __future__ import unicode_literals
+
 import wtforms
 import wtforms_components
 from wtforms import validators

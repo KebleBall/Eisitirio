@@ -9,6 +9,8 @@ To avoid this, this module provides a quick way to access all the models with a
 name that is less likely to conflict.
 """
 
+from __future__ import unicode_literals
+
 # We make an exception to the usual rule of only importing modules here for
 # neatness.
 #

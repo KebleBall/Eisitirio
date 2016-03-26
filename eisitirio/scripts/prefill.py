@@ -1,6 +1,7 @@
-#!/usr/bin/env python2
 # coding: utf-8
 """Script to prefill the database with colleges and affiliations."""
+
+from __future__ import unicode_literals
 
 from flask.ext import script
 

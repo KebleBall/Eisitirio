@@ -1,6 +1,7 @@
-#!/usr/bin/env python2
 # coding: utf-8
 """Script to check if eWay payments have been completed."""
+
+from __future__ import unicode_literals
 
 from flask.ext import script
 

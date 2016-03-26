@@ -1,6 +1,8 @@
 # coding: utf-8
 """Logic regarding verification of affiliations."""
 
+from __future__ import unicode_literals
+
 import flask
 import sqlalchemy
 

@@ -1,6 +1,7 @@
-#!/usr/bin/env python2
 # coding: utf-8
 """Script to run bpython with the appropriate env."""
+
+from __future__ import unicode_literals
 
 from flask.ext import script
 from bpython import curtsies

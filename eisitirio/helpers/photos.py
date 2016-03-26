@@ -1,3 +1,4 @@
+# coding: utf-8
 """Utilities for uploading photos to S3."""
 
 from __future__ import unicode_literals

@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 # coding: utf-8
 """Worker to run repeated tasks on a schedule."""
 
@@ -8,7 +7,6 @@ import contextlib
 import datetime
 import os
 import sys
-
 
 from flask.ext import script
 

@@ -1,6 +1,8 @@
 # coding: utf-8
 """Permissions/possessions for tickets."""
 
+from __future__ import unicode_literals
+
 from flask.ext import login
 
 from eisitirio import app

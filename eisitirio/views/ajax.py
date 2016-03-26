@@ -9,7 +9,6 @@ from flask.ext import login
 import flask
 
 from eisitirio.database import db
-from eisitirio.database import models
 from eisitirio.helpers import validators
 
 DB = db.DB

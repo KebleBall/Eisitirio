@@ -1,6 +1,8 @@
 # coding: utf-8
 """Permissions/possessions related to purchase groups."""
 
+from __future__ import unicode_literals
+
 from eisitirio import app
 from eisitirio.database import models
 

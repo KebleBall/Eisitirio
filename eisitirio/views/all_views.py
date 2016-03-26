@@ -1,6 +1,8 @@
 # coding: utf-8
 """Helper giving access to all the views."""
 
+from __future__ import unicode_literals
+
 # We make an exception to the usual rule of only importing modules here for
 # neatness.
 #

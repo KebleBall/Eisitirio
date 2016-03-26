@@ -1,6 +1,7 @@
-#!/usr/bin/env python2
 # coding: utf-8
 """Script to create claim codes for tickets."""
+
+from __future__ import unicode_literals
 
 import string
 
