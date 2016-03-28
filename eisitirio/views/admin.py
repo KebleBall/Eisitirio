@@ -4,8 +4,6 @@
 from __future__ import unicode_literals
 
 import csv
-import datetime
-import re
 import StringIO
 
 from dateutil import parser
