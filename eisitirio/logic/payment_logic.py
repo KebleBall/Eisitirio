@@ -35,7 +35,12 @@ def get_transaction(payment_method, tickets=None, postage_option=None,
 def create_postage(transaction, tickets, postage_option, address):
     """Create a postage object and corresponding transaction item."""
     if postage_option is not app.APP.config['NO_POSTAGE_OPTION']:
-        postage = models.Postage(postage_option, tickets, address)
+        postage = models.Postage(
+            login.current_user,
+            postage_option,
+            tickets,
+            address
+        )
 
         db.DB.session.add(postage)
 

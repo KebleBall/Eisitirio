@@ -63,7 +63,21 @@ class Postage(DB.Model):
         lazy='dynamic'
     )
 
-    def __init__(self, postage_option, tickets, address=None):
+    owner_id = DB.Column(
+        DB.Integer,
+        DB.ForeignKey('user.object_id'),
+        nullable=True
+    )
+    owner = DB.relationship(
+        'User',
+        backref=DB.backref(
+            'postage_entries',
+            lazy='dynamic'
+        )
+    )
+
+    def __init__(self, owner, postage_option, tickets, address=None):
+        self.owner = owner
         self.postage_type = postage_option.name
         self.price = postage_option.price
         self.address = address
