@@ -55,8 +55,9 @@ markdown.Markdown(APP)
 LOG = APP.log_manager.log_main
 
 APP.register_blueprint(all_views.ADMIN)
-APP.register_blueprint(all_views.ADMIN_USERS)
+APP.register_blueprint(all_views.ADMIN_PHOTOS)
 APP.register_blueprint(all_views.ADMIN_TICKETS)
+APP.register_blueprint(all_views.ADMIN_USERS)
 APP.register_blueprint(all_views.AJAX)
 APP.register_blueprint(all_views.DASHBOARD)
 APP.register_blueprint(all_views.FRONT)
