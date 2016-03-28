@@ -46,6 +46,11 @@ class Postage(DB.Model):
         default=False,
         nullable=False
     )
+    posted = DB.Column(
+        DB.Boolean(),
+        default=False,
+        nullable=False
+    )
 
     tickets = DB.relationship(
         'Ticket',
