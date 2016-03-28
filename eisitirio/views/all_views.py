@@ -14,6 +14,7 @@ from eisitirio.views.admin_data import ADMIN_DATA
 from eisitirio.views.admin_photos import ADMIN_PHOTOS
 from eisitirio.views.admin_tickets import ADMIN_TICKETS
 from eisitirio.views.admin_users import ADMIN_USERS
+from eisitirio.views.admin_vouchers import ADMIN_VOUCHERS
 from eisitirio.views.ajax import AJAX
 from eisitirio.views.dashboard import DASHBOARD
 from eisitirio.views.front import FRONT

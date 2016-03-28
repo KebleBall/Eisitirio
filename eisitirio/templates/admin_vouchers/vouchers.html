@@ -1,4 +1,4 @@
-<!-- admin/vouchers.html -->
+<!-- admin_vouchers/vouchers.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Vouchers{% endblock %}
@@ -6,7 +6,7 @@
 {% block content %}
     <section id="vouchers" class="columns">
         <h4>Create Voucher(s)</h4>
-        <form action="{{ url_for('admin.vouchers') }}" method="post">
+        <form action="{{ url_for('admin_vouchers.vouchers') }}" method="post">
             <div class="row">
                 <div class="large-6 columns">
                     <label for="voucher_prefix">Voucher Prefix</label>
@@ -102,13 +102,13 @@
         <div class="row">
             <div class="large-3 columns">
                 {% if vouchers.has_prev %}
-                    <a href="{{ url_for('admin.vouchers', page=vouchers.prev_num) }}{% if 'search' in request.args %}?{{ request.args['search'] }}{% endif %}" class="button small">Previous</a>
+                    <a href="{{ url_for('admin_vouchers.vouchers', page=vouchers.prev_num) }}{% if 'search' in request.args %}?{{ request.args['search'] }}{% endif %}" class="button small">Previous</a>
                 {% else %}
                     &nbsp;
                 {% endif %}
             </div>
             <div class="large-6 columns">
-                <form action="{{ url_for('admin.vouchers') }}" method="get">
+                <form action="{{ url_for('admin_vouchers.vouchers') }}" method="get">
                     <div class="row collapse">
                         <div class="large-9 columns">
                             <input type="text" name="search" {% if 'search' in request.args %}value="{{ request.args['search'] }}" {% endif %}/>
@@ -121,7 +121,7 @@
             </div>
             <div class="large-3 columns">
                 {% if vouchers.has_next %}
-                    <a href="{{ url_for('admin.vouchers', page=vouchers.next_num) }}{% if 'search' in request.args %}?{{ request.args['search'] }}{% endif %}" class="button small">Next</a>
+                    <a href="{{ url_for('admin_vouchers.vouchers', page=vouchers.next_num) }}{% if 'search' in request.args %}?{{ request.args['search'] }}{% endif %}" class="button small">Next</a>
                 {% else %}
                     &nbsp;
                 {% endif %}
@@ -171,7 +171,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('admin.delete_voucher', voucher_id=voucher.object_id) }}" class="button small">
+                                <a href="{{ url_for('admin_vouchers.delete_voucher', voucher_id=voucher.object_id) }}" class="button small">
                                     Delete
                                 </a>
                             </td>
