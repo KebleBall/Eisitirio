@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 # pylint: disable=unused-import
 
 from eisitirio.views.admin import ADMIN
+from eisitirio.views.admin_data import ADMIN_DATA
 from eisitirio.views.admin_photos import ADMIN_PHOTOS
 from eisitirio.views.admin_tickets import ADMIN_TICKETS
 from eisitirio.views.admin_users import ADMIN_USERS

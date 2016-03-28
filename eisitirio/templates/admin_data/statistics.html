@@ -1,4 +1,4 @@
-<!-- admin/statistics.html -->
+<!-- admin_data/statistics.html -->
 {% extends 'layout.html' %}
 
 {% block title %}Data and Statistics{% endblock %}
@@ -6,10 +6,10 @@
 {% block content %}
     <section id="admin_home" class="columns">
         {% for group, group_name in statistic_groups.iteritems() %}
-            <h4>{{ group_name }} (<a href="{{ url_for('admin.data', group=group) }}" target="_blank">Raw Data</a>)</h4>
+            <h4>{{ group_name }} (<a href="{{ url_for('admin_data.data', group=group) }}" target="_blank">Raw Data</a>)</h4>
             <p class="small">Click on graph to view full size</p>
-            <a href="{{ url_for('admin.graph', group=group) }}" target="_blank">
-                <img src="{{ url_for('admin.graph', group=group) }}" />
+            <a href="{{ url_for('admin_data.graph', group=group) }}" target="_blank">
+                <img src="{{ url_for('admin_data.graph', group=group) }}" />
             </a>
         {% endfor %}
 
@@ -20,6 +20,6 @@
         {% endfor %}
         <p>Total postage orders: {{ num_postage }}</p>
 
-        <a class="button" href="{{ url_for('admin.dietary_requirements') }}">Download Dietary Requirements</a>
+        <a class="button" href="{{ url_for('admin_data.dietary_requirements') }}">Download Dietary Requirements</a>
     </section>
 {% endblock %}
