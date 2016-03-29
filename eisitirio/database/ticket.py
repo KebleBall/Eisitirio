@@ -164,6 +164,8 @@ class Ticket(DB.Model):
             return 'Collected as {0}.'.format(self.barcode)
         elif self.holder is None:
             return 'Awaiting ticket holder.'
+        elif not self.holder.photo.verified:
+            return 'Awaiting verification of holder photo.'
         else:
             return 'Held by {0}.'.format(self.holder.full_name)
 
