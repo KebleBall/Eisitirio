@@ -1,15 +1,17 @@
 <!-- admin_postage/postage_dashboard.html -->
 {% extends 'layout.html' %}
 
+{% from 'macros/collect_ticket.html' import collect_ticket_form %}
+
 {% block title %}Postage/Graduand Dashboard{% endblock %}
 
 {% block content %}
     <section id="postage_dashboard" class="columns">
         <h3>Postage types to show</h3>
         <p>
-            <a class="button tiny{% if postage_type == None %}secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard') }}">All</a>
-            <a class="button tiny{% if postage_type == 'graduand' %}secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard') }}">Graduands</a>
-            <a class="button tiny{% if postage_type == 'posted' %}secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard') }}">Posted</a>
+            <a class="button tiny{% if postage_type == None %} secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard') }}">All</a>
+            <a class="button tiny{% if postage_type == 'graduand' %} secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard', postage_type='graduand') }}">Graduands</a>
+            <a class="button tiny{% if postage_type == 'posted' %} secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard', postage_type='posted') }}">Posted</a>
         </p>
         <h2>Postage/Graduand Entries</h2>
         <hr />
@@ -18,9 +20,7 @@
             <p><strong>Name</strong>: {{ postage.owner.full_name }}</p>
             {% if postage.address != None %}
                 <p><strong>Address</strong>:</p>
-                <pre>
-                    {{ postage.address }}
-                </pre>
+                <pre>{{ postage.address }}</pre>
             {% endif %}
             <h4>Tickets</h4>
             <table>
@@ -37,14 +37,19 @@
                         <tr>
                             <td>#{{ '%05d' % ticket.object_id }}</td>
                             <td><a href="{{ url_for('admin_users.view_user', user_id=ticket.owner.object_id) }}">{{ ticket.owner.full_name }}</a></td>
-                            <td><a href="{{ url_for('admin_users.view_user', user_id=ticket.holder.object_id) }}">{{ ticket.holder.full_name }}</a></td>
+                            <td>
+                                {% if ticket.holder != None %}
+                                    <a href="{{ url_for('admin_users.view_user', user_id=ticket.holder.object_id) }}">{{ ticket.holder.full_name }}</a></td>
+                                {% else %}
+                                    No ticket holder
+                                {% endif %}
                             <td>
                                 {% if ticket.collected %}
-                                    Ticket collected as {{ ticket.barcode }}.
+                                    Ticket assigned as {{ ticket.barcode }}.
                                 {% elif ticket.can_be_collected() %}
                                     {{ collect_ticket_form(ticket.object_id) }}
                                 {% else %}
-                                    Ticket cannot be collected. ({{ ticket.status }})
+                                    Ticket cannot be assigned. ({{ ticket.status }})
                                 {% endif %}
                             </td>
                         </tr>
@@ -58,4 +63,8 @@
             <hr />
         {% endfor %}
     </section>
+{% endblock %}
+
+{% block javascripts %}
+    {% include 'scripts/collect_ticket.html' %}
 {% endblock %}

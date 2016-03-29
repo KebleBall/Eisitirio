@@ -26,6 +26,8 @@ def postage_dashboard(postage_type=None, page=1):
     """Provide an interface for packing posted tickets."""
     postage_query = models.Postage.query.filter(
         models.Postage.paid == True # pylint: disable=singleton-comparison
+    ).join(
+        models.Postage.owner
     ).filter(
         models.Postage.cancelled == False # pylint: disable=singleton-comparison
     ).filter(
@@ -33,24 +35,24 @@ def postage_dashboard(postage_type=None, page=1):
     ).order_by(
         models.Postage.postage_type
     ).order_by(
-        models.Postage.owner.surname
+        models.User.surname
     ).order_by(
-        models.Postage.owner.forenames
+        models.User.forenames
     )
 
     if postage_type == 'graduand':
         postage_query = postage_query.filter(
             models.Postage.postage_type ==
-            APP.config['GRADUAND_POSTAGE_TYPE'].name
+            APP.config['GRADUAND_POSTAGE_OPTION'].name
         )
     elif postage_type == 'posted':
         postage_query = postage_query.filter(
             models.Postage.postage_type !=
-            APP.config['GRADUAND_POSTAGE_TYPE'].name
+            APP.config['GRADUAND_POSTAGE_OPTION'].name
         )
 
     return flask.render_template(
-        'admin_postage/postage.html',
+        'admin_postage/postage_dashboard.html',
         postage_entries=postage_query.paginate(page=page),
         postage_type=postage_type
     )
@@ -65,14 +67,14 @@ def mark_as_posted(postage_id):
     if not postage:
         flask.flash('Could not load postage entry', 'error')
     elif not all(ticket.collected for ticket in postage.tickets):
-        flask.flash('Not all of the tickets for this entry have been posted.',
+        flask.flash('Not all of the tickets for this entry have been assigned.',
                     'error')
     else:
         postage.posted = True
 
         DB.session.commit()
 
-        flask.flash('Entry marked as posted.', 'success')
+        flask.flash('Entry marked as packed/posted.', 'success')
 
     return flask.redirect(flask.request.referrer or
                           flask.url_for('admin_postage.postage_dashboard'))
