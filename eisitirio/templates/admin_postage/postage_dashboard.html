@@ -14,6 +14,7 @@
             <a class="button tiny{% if postage_type == 'posted' %} secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard', postage_type='posted') }}">Posted</a>
         </p>
         <h2>Postage/Graduand Entries</h2>
+        <p>Page {{ page }} of {{ postage_entries.pages }}.</p>
         <p>
             <a class="button tiny" href="{{ url_for('admin_postage.export_postage', unposted_only='all', postage_type=postage_type) }}">Export All</a>
             <a class="button tiny" href="{{ url_for('admin_postage.export_postage', unposted_only='unposted', postage_type=postage_type) }}">Export Not-posted/packed</a>
@@ -21,7 +22,7 @@
         <hr />
         {% for postage in postage_entries.items %}
             <p><strong>Type</strong>: {{ postage.postage_type }}</p>
-            <p><strong>Name</strong>: {{ postage.owner.full_name }}</p>
+            <p><strong>Name</strong>: <a href="{{ url_for('admin_users.view_user', user_id=postage.owner.object_id) }}">{{ postage.owner.full_name }}</a></p>
             {% if postage.address != None %}
                 <p><strong>Address</strong>:</p>
                 <pre>{{ postage.address }}</pre>
@@ -39,7 +40,7 @@
                 <tbody>
                     {% for ticket in postage.tickets %}
                         <tr>
-                            <td>#{{ '%05d' % ticket.object_id }}</td>
+                            <td><a href="{{ url_for('admin_tickets.view_ticket', ticket_id=ticket.object_id) }}">#{{ '%05d' % ticket.object_id }}</a></td>
                             <td><a href="{{ url_for('admin_users.view_user', user_id=ticket.owner.object_id) }}">{{ ticket.owner.full_name }}</a></td>
                             <td>
                                 {% if ticket.holder != None %}
@@ -62,6 +63,12 @@
             </table>
             <p><a class="button tiny" href="{{ url_for('admin_postage.mark_as_posted', postage_id=postage.object_id) }}">Mark as packed/posted</a></p>
             <hr />
+            {% if postage_entries.has_prev %}
+                <a href="{{ url_for('admin_postage.postage_dashboard', postage_type=postage_type, page=(page-1)) }}" class="button tiny">Previous Page</a>
+            {% endif %}
+            {% if postage_entries.has_next %}
+                <a href="{{ url_for('admin_postage.postage_dashboard', postage_type=postage_type, page=(page+1)) }}" class="button tiny">Next Page</a>
+            {% endif %}
         {% else %}
             <p>No postage/graduand entries awaiting packing.</p>
             <hr />

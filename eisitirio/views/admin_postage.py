@@ -64,7 +64,8 @@ def postage_dashboard(postage_type=None, page=1):
     return flask.render_template(
         'admin_postage/postage_dashboard.html',
         postage_entries=get_postage_query(postage_type).paginate(page=page),
-        postage_type=postage_type
+        postage_type=postage_type,
+        page=page
     )
 
 @ADMIN_POSTAGE.route('/admin/postage/<int:postage_id>/mark_posted')
