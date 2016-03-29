@@ -21,13 +21,15 @@ from eisitirio import system # pylint: disable=unused-import
 
 APP = app.APP
 
-agent.initialize(os.path.join(VENV_DIR, 'newrelic.ini'),
-                 log_level=logging.WARNING)
+agent.initialize(os.path.join(VENV_DIR, 'newrelic.ini'))
 
+# boto and requests are a bit noisy, so we set their level to tone them down
 logging.getLogger('boto').setLevel(logging.WARNING)
-logging.getLogger('newrelic').setLevel(logging.WARNING)
-logging.getLogger('newrelic.config').setLevel(logging.WARNING)
 logging.getLogger('requests').setLevel(logging.WARNING)
+
+# newrelic sets up its own handler to push things to stderr, we want to prevent
+# the messages reaching the root logger and being duplicated
+logging.getLogger('newrelic').propagate = False
 
 @agent.wsgi_application()
 def application(req_environ, start_response):
