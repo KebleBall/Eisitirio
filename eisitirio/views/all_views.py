@@ -12,6 +12,7 @@ from eisitirio.views.admin import ADMIN
 from eisitirio.views.admin_announcements import ADMIN_ANNOUNCEMENTS
 from eisitirio.views.admin_data import ADMIN_DATA
 from eisitirio.views.admin_photos import ADMIN_PHOTOS
+from eisitirio.views.admin_postage import ADMIN_POSTAGE
 from eisitirio.views.admin_tickets import ADMIN_TICKETS
 from eisitirio.views.admin_users import ADMIN_USERS
 from eisitirio.views.admin_vouchers import ADMIN_VOUCHERS

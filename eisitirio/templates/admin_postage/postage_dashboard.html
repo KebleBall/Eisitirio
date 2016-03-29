@@ -1,0 +1,61 @@
+<!-- admin_postage/postage_dashboard.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Postage/Graduand Dashboard{% endblock %}
+
+{% block content %}
+    <section id="postage_dashboard" class="columns">
+        <h3>Postage types to show</h3>
+        <p>
+            <a class="button tiny{% if postage_type == None %}secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard') }}">All</a>
+            <a class="button tiny{% if postage_type == 'graduand' %}secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard') }}">Graduands</a>
+            <a class="button tiny{% if postage_type == 'posted' %}secondary{% endif %}" href="{{ url_for('admin_postage.postage_dashboard') }}">Posted</a>
+        </p>
+        <h2>Postage/Graduand Entries</h2>
+        <hr />
+        {% for postage in postage_entries.items %}
+            <p><strong>Type</strong>: {{ postage.postage_type }}</p>
+            <p><strong>Name</strong>: {{ postage.owner.full_name }}</p>
+            {% if postage.address != None %}
+                <p><strong>Address</strong>:</p>
+                <pre>
+                    {{ postage.address }}
+                </pre>
+            {% endif %}
+            <h4>Tickets</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ticket Number</th>
+                        <th>Ticket Owner</th>
+                        <th>Ticket Holder</th>
+                        <th>Enter Barcode/Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in postage.tickets %}
+                        <tr>
+                            <td>#{{ '%05d' % ticket.object_id }}</td>
+                            <td><a href="{{ url_for('admin_users.view_user', user_id=ticket.owner.object_id) }}">{{ ticket.owner.full_name }}</a></td>
+                            <td><a href="{{ url_for('admin_users.view_user', user_id=ticket.holder.object_id) }}">{{ ticket.holder.full_name }}</a></td>
+                            <td>
+                                {% if ticket.collected %}
+                                    Ticket collected as {{ ticket.barcode }}.
+                                {% elif ticket.can_be_collected() %}
+                                    {{ collect_ticket_form(ticket.object_id) }}
+                                {% else %}
+                                    Ticket cannot be collected. ({{ ticket.status }})
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p><a class="button tiny" href="{{ url_for('admin_postage.mark_as_posted', postage_id=postage.object_id) }}">Mark as packed/posted</a></p>
+            <hr />
+        {% else %}
+            <p>No postage/graduand entries awaiting packing.</p>
+            <hr />
+        {% endfor %}
+    </section>
+{% endblock %}
