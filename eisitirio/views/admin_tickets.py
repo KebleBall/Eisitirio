@@ -195,7 +195,6 @@ def uncollect_ticket(ticket_id):
     ticket = models.Ticket.get_by_id(ticket_id)
 
     if ticket:
-        ticket.collected = False
         ticket.barcode = None
         DB.session.commit()
 

@@ -35,7 +35,6 @@ def collect_ticket(ticket, barcode):
         return 'Barcode has already been used for a ticket.'
 
     ticket.barcode = barcode
-    ticket.collected = True
     DB.session.commit()
 
     APP.log_manager.log_event(

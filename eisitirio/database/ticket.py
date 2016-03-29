@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 import datetime
 import string
 
+from sqlalchemy.ext import hybrid
+
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.helpers import util
@@ -23,11 +25,6 @@ class Ticket(DB.Model):
     )
 
     paid = DB.Column(
-        DB.Boolean(),
-        default=False,
-        nullable=False
-    )
-    collected = DB.Column(
         DB.Boolean(),
         default=False,
         nullable=False
@@ -176,6 +173,11 @@ class Ticket(DB.Model):
 
         if self.price_ == 0:
             self.mark_as_paid()
+
+    @hybrid.hybrid_property
+    def collected(self):
+        """Has this ticket been assigned a barcode."""
+        return self.barcode != None # pylint: disable=singleton-comparison
 
     def mark_as_paid(self):
         """Mark the ticket as paid, and clear any expiry."""
