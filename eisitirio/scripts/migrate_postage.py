@@ -19,7 +19,7 @@ class MigratePostageCommand(script.Command):
         """Run the migration."""
         with app.APP.app_context():
             postage_entries = models.Postage.query.filter(
-                models.Postage.owner != None # pylint: disable=singleton-comparison
+                models.Postage.owner == None # pylint: disable=singleton-comparison
             ).all()
 
             for postage in postage_entries:
@@ -31,4 +31,4 @@ class MigratePostageCommand(script.Command):
 
                 postage.owner = transaction_item.transaction.user
 
-                db.DB.commit()
+                db.DB.session.commit()
