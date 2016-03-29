@@ -16,7 +16,6 @@ from eisitirio.database import db
 from eisitirio.scripts import check_eway
 from eisitirio.scripts import create_claim_codes
 from eisitirio.scripts import cron
-from eisitirio.scripts import migrate_postage
 from eisitirio.scripts import prefill
 from eisitirio.scripts import run_bpython
 from eisitirio.scripts import update_battels
@@ -64,7 +63,6 @@ MANAGER.add_command('create_claim_codes',
                     create_claim_codes.CreateClaimCodesCommand)
 MANAGER.add_command('cron', cron.CronCommand)
 MANAGER.add_command('db', migrate.MigrateCommand)
-MANAGER.add_command('migrate_postage', migrate_postage.MigratePostageCommand)
 MANAGER.add_command('prefill', prefill.PrefillCommand)
 MANAGER.add_command('run', script.Server)
 MANAGER.add_command('update_battels', update_battels.UpdateBattelsCommand)
