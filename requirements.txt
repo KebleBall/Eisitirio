@@ -39,6 +39,6 @@ requests==2.9.1
 six==1.10.0               # via bcrypt, cycler, python-dateutil, validators, wtforms-components
 sqlalchemy==1.0.12        # via alembic, flask-sqlalchemy
 validators==0.10          # via wtforms-components
-werkzeug==0.11.4          # via flask, flask-wtf
+werkzeug==0.11.5          # via flask, flask-wtf
 wtforms-components==0.10.0
 wtforms==2.1              # via flask-wtf, wtforms-components
