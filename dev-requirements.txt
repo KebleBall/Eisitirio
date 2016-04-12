@@ -6,7 +6,7 @@
 #
 astroid==1.4.5            # via pylint
 blessings==1.6            # via curtsies
-bpython==0.14.2
+bpython==0.15
 click==6.2                # via pip-tools
 colorama==0.3.5           # via pylint
 curtsies==0.1.21          # via bpython
