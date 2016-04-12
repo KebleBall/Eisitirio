@@ -9,7 +9,7 @@ blessings==1.6            # via curtsies
 bpython==0.15
 click==6.6                # via pip-tools
 colorama==0.3.7           # via pylint
-curtsies==0.1.21          # via bpython
+curtsies==0.2.6          # via bpython
 first==2.0.1              # via pip-tools
 greenlet==0.4.9           # via bpython
 lazy-object-proxy==1.2.1  # via astroid
