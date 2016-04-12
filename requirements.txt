@@ -28,7 +28,7 @@ markupsafe==0.23          # via jinja2, mako
 matplotlib==1.5.1
 mysql-python==1.2.5
 newrelic==2.60.0.46
-numpy==1.10.4             # via matplotlib
+numpy==1.11.0             # via matplotlib
 pillow==3.1.1
 pycparser==2.14           # via cffi
 pyparsing==2.1.0          # via matplotlib
