@@ -8,7 +8,7 @@ astroid==1.4.5            # via pylint
 blessings==1.6            # via curtsies
 bpython==0.15
 click==6.6                # via pip-tools
-colorama==0.3.5           # via pylint
+colorama==0.3.7           # via pylint
 curtsies==0.1.21          # via bpython
 first==2.0.1              # via pip-tools
 greenlet==0.4.9           # via bpython
