@@ -31,7 +31,7 @@ newrelic==2.60.0.46
 numpy==1.11.0             # via matplotlib
 pillow==3.2.0
 pycparser==2.14           # via cffi
-pyparsing==2.1.0          # via matplotlib
+pyparsing==2.1.1          # via matplotlib
 python-dateutil==2.5.0
 python-editor==0.5        # via alembic
 pytz==2015.7              # via matplotlib
