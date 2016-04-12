@@ -4,7 +4,7 @@
 #
 #    pip-compile dev-requirements.in
 #
-astroid==1.4.3            # via pylint
+astroid==1.4.5            # via pylint
 blessings==1.6            # via curtsies
 bpython==0.14.2
 click==6.2                # via pip-tools
