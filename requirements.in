@@ -1,3 +1,5 @@
+boto
+bpython
 Flask
 Flask-Bcrypt
 Flask-Login
@@ -6,11 +8,10 @@ Flask-Migrate
 Flask-Script
 Flask-SQLAlchemy
 Flask-WTF
+matplotlib
 MySQL-python
 newrelic
+Pillow
 python-dateutil
 requests
-matplotlib
-boto
-Pillow
 WTForms-Components
