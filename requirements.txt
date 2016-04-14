@@ -5,7 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 
-alembic==0.8.5            # via flask-migrate
+alembic==0.8.6            # via flask-migrate
 bcrypt==2.0.0             # via flask-bcrypt
 blessings==1.6            # via curtsies
 boto==2.39.0
