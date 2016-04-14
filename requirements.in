@@ -12,6 +12,7 @@ matplotlib
 MySQL-python
 newrelic
 Pillow
+pip-tools
 python-dateutil
 requests
 WTForms-Components

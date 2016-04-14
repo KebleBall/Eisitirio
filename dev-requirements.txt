@@ -6,11 +6,8 @@
 #
 
 astroid==1.4.5            # via pylint
-click==6.6                # via pip-tools
 colorama==0.3.7           # via pylint
-first==2.0.1              # via pip-tools
 lazy-object-proxy==1.2.2  # via astroid
-pip-tools==1.6.1
 pylint==1.5.5
-six==1.10.0               # via astroid, pip-tools, pylint
+six==1.10.0               # via astroid, pylint
 wrapt==1.10.8             # via astroid
