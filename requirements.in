@@ -15,4 +15,5 @@ Pillow
 pip-tools
 python-dateutil
 requests
+six
 WTForms-Components

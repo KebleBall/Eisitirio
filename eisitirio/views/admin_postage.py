@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-import csv
 import StringIO
 
 from flask.ext import login
@@ -13,6 +12,7 @@ from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.helpers import login_manager
+from eisitirio.helpers import unicode_csv
 
 APP = app.APP
 DB = db.DB
@@ -101,7 +101,7 @@ def export_postage(unposted_only, postage_type=None):
     Exports the statistics used to render the graphs as a CSV file.
     """
     csvdata = StringIO.StringIO()
-    csvwriter = csv.writer(csvdata)
+    csvwriter = unicode_csv.UnicodeWriter(csvdata)
 
     csvwriter.writerow(
         [

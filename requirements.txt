@@ -45,7 +45,7 @@ python-dateutil==2.5.2
 python-editor==1.0        # via alembic
 pytz==2016.3              # via matplotlib
 requests==2.9.1
-six==1.10.0               # via bcrypt, bpython, cycler, pip-tools, python-dateutil, validators, wtforms-components
+six==1.10.0
 SQLAlchemy==1.0.12        # via alembic, flask-sqlalchemy
 validators==0.10          # via wtforms-components
 wcwidth==0.1.6            # via curtsies
