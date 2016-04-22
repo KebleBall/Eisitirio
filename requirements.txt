@@ -10,7 +10,7 @@ bcrypt==2.0.0             # via flask-bcrypt
 blessings==1.6            # via curtsies
 boto==2.39.0
 bpython==0.15.0
-cffi==1.5.2               # via bcrypt
+cffi==1.6.0               # via bcrypt
 click==6.6                # via pip-tools
 curtsies==0.2.6           # via bpython
 cycler==0.10.0            # via matplotlib
