@@ -49,6 +49,6 @@ six==1.10.0
 SQLAlchemy==1.0.12        # via alembic, flask-sqlalchemy
 validators==0.10          # via wtforms-components
 wcwidth==0.1.6            # via curtsies
-Werkzeug==0.11.8          # via flask, flask-wtf
+Werkzeug==0.11.9          # via flask, flask-wtf
 WTForms-Components==0.10.0
 WTForms==2.1              # via flask-wtf, wtforms-components
