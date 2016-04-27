@@ -13,6 +13,7 @@ MySQL-python
 newrelic
 Pillow
 pip-tools
+pylint
 python-dateutil
 requests
 six
