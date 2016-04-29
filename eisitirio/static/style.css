@@ -1960,4 +1960,7 @@ table .button { margin: 0; }
 /* line 120, style.scss */
 .upload_photo .large-9 { padding-top: 2rem; }
 
+/* line 125, style.scss */
+#validate_ticket #holder_photo img { display: block; margin: auto; max-height: 500px; }
+
 /*# sourceMappingURL=style.css.map */

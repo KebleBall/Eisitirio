@@ -230,6 +230,7 @@ def validate_ticket():
     """
     valid = None
     message = None
+    photo = None
 
     if flask.request.method == 'POST':
         ticket = models.Ticket.query.filter(
@@ -248,14 +249,17 @@ def validate_ticket():
                 ticket.holder.full_name,
                 ticket.owner.full_name
             )
+            photo = ticket.holder.photo
         else:
             ticket.entered = True
             DB.session.commit()
             valid = True
             message = 'Permit entry for {0}'.format(ticket.holder.full_name)
+            photo = ticket.holder.photo
 
     return flask.render_template(
         'admin_tickets/validate_ticket.html',
         valid=valid,
-        message=message
+        message=message,
+        photo=photo
     )

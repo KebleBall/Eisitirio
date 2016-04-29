@@ -3,26 +3,49 @@
 
 {% block title %}Validate Ticket{% endblock %}
 
+{% block extra_head %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hide_header_footer.css') }}" />
+{% endblock %}
+
+{% block navigation %}
+<nav class="row">
+    <div class="large-12 columns">
+        <ul id="navigation-main">
+            <li><a href="{{ url_for('dashboard.dashboard_home') }}">Dashboard Home</a></li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
 {% block content %}
     <section id="validate_ticket" class="columns">
-        {% if valid != None %}
-            <div class="message-box {% if valid %}success{% else %}error{% endif %}">
-                <h1>{% if valid %}VALID{% else %}INVALID{% endif %}</h1>
-                <p>{{ message }}</p>
-            </div>
-        {% endif %}
         <form action="{{ url_for('admin_tickets.validate_ticket') }}" method="post">
             <div class="row">
                 <div class="large-8 columns large-centered">
                     <label for="barcode">Ticket Barcode</label>
-                    <input type="text" name="barcode" id="barcode" autofocus="autofocus" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="large-8 columns large-centered">
-                    <input type="submit" class="button expand large" value="Validate Ticket" />
+                    <div class="row collapse">
+                        <div class="small-8 columns">
+                            <input type="text" name="barcode" id="barcode" autofocus="autofocus" />
+                        </div>
+                        <div class="small-4 columns">
+                            <input type="submit" class="button postfix" value="Validate Ticket" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
+        {% if valid != None %}
+            <div class="message-box {% if valid %}success{% else %}error{% endif %}">
+                <h1>{% if valid %}VALID{% else %}INVALID{% endif %}</h1>
+                <p>{{ message }}</p>
+                {% if photo != None %}
+                    <div id="holder_photo">
+                        <a href="{{ photo.full_url }}">
+                            <img src="{{ photo.full_url }}" />
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </section>
 {% endblock %}

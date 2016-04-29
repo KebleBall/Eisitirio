@@ -121,3 +121,9 @@ table .button {
         padding-top: 2rem;
     }
 }
+
+#validate_ticket #holder_photo img {
+    display: block;
+    margin: auto;
+    max-height: 500px;
+}
