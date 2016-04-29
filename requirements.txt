@@ -9,7 +9,7 @@ alembic==0.8.6            # via flask-migrate
 astroid==1.4.5            # via pylint
 bcrypt==2.0.0             # via flask-bcrypt
 blessings==1.6            # via curtsies
-boto==2.39.0
+boto==2.40.0
 bpython==0.15.0
 cffi==1.6.0               # via bcrypt
 click==6.6                # via pip-tools
