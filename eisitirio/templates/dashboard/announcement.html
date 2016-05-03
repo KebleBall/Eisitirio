@@ -18,6 +18,9 @@
                 {% if announcement.has_tickets != None %}
                     , who{% if not announcement.has_tickets %} do not{% endif %} have tickets
                 {% endif %}
+                {% if announcement.holds_ticket != None %}
+                    , who{% if not announcement.holds_ticket %} do not{% endif %} hold a ticket
+                {% endif %}
                 {% if announcement.is_waiting != None %}
                     , who are{% if not announcement.is_waiting %} not{% endif %} waiting for tickets
                 {% endif %}

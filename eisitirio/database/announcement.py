@@ -121,6 +121,10 @@ class Announcement(DB.Model):
         DB.Boolean,
         nullable=True
     )
+    holds_ticket = DB.Column(
+        DB.Boolean,
+        nullable=True
+    )
     has_collected = DB.Column(
         DB.Boolean,
         nullable=True
@@ -150,6 +154,7 @@ class Announcement(DB.Model):
                  college=None,
                  affiliation=None,
                  has_tickets=None,
+                 holds_ticket=None,
                  is_waiting=None,
                  has_collected=None,
                  has_uncollected=None,
@@ -163,6 +168,7 @@ class Announcement(DB.Model):
         self.college = college
         self.affiliation = affiliation
         self.has_tickets = has_tickets
+        self.holds_ticket = holds_ticket
         self.is_waiting = is_waiting
         self.has_collected = has_collected
         self.has_uncollected = has_uncollected
@@ -184,6 +190,10 @@ class Announcement(DB.Model):
                     ( # pylint: disable=too-many-boolean-expressions
                         self.has_tickets is None or
                         recipient.has_tickets() == self.has_tickets
+                    ) and
+                    (
+                        self.holds_ticket is None or
+                        recipient.has_held_ticket() == self.holds_ticket
                     ) and
                     (
                         self.is_waiting is None or

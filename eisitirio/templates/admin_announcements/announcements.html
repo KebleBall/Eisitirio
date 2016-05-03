@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="large-4 columns">
+                    <div class="large-3 columns">
                         <label for="college">College:</label>
                         <select name="college" id="college">
                             <option value="any" {{ form_selected(form, 'college', 'any') }}>Any</option>
@@ -30,7 +30,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="large-4 columns">
+                    <div class="large-3 columns">
                         <label for="affiliation">Affiliation:</label>
                         <select name="affiliation" id="affiliation">
                             <option value="any" {{ form_selected(form, 'affiliation', 'any') }}>Any</option>
@@ -39,12 +39,20 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="large-4 columns">
-                        <label for="tickets">Tickets:</label>
-                        <select name="tickets" id="tickets">
-                            <option value="any" {{ form_selected(form, 'tickets', 'any') }}>Any</option>
-                            <option value="yes" {{ form_selected(form, 'tickets', 'yes') }}>Has Tickets</option>
-                            <option value="no" {{ form_selected(form, 'tickets', 'no') }}>Has No Tickets</option>
+                    <div class="large-3 columns">
+                        <label for="owned_tickets">Owned Tickets:</label>
+                        <select name="owned_tickets" id="owned_tickets">
+                            <option value="any" {{ form_selected(form, 'owned_tickets', 'any') }}>Any</option>
+                            <option value="yes" {{ form_selected(form, 'owned_tickets', 'yes') }}>Owns Tickets</option>
+                            <option value="no" {{ form_selected(form, 'owned_tickets', 'no') }}>Owns No Tickets</option>
+                        </select>
+                    </div>
+                    <div class="large-3 columns">
+                        <label for="held_ticket">Held Ticket:</label>
+                        <select name="held_ticket" id="held_ticket">
+                            <option value="any" {{ form_selected(form, 'held_ticket', 'any') }}>Any</option>
+                            <option value="yes" {{ form_selected(form, 'held_ticket', 'yes') }}>Holds A Ticket</option>
+                            <option value="no" {{ form_selected(form, 'held_ticket', 'no') }}>No Held Ticket</option>
                         </select>
                     </div>
                 </div>
@@ -106,7 +114,8 @@
                         <th>Email Status</th>
                         <th>College</th>
                         <th>Affiliation</th>
-                        <th>Tickets</th>
+                        <th>Owned Tickets</th>
+                        <th>Held Ticket</th>
                         <th>Waiting</th>
                         <th>Collected</th>
                         <th>Uncollected</th>
@@ -149,6 +158,17 @@
                                         Has Tickets
                                     {% else %}
                                         Has No Tickets
+                                    {% endif %}
+                                {% else %}
+                                    Any
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if announcement.holds_ticket != None %}
+                                    {% if announcement.holds_ticket %}
+                                        Held Ticket
+                                    {% else %}
+                                        No Held Ticket
                                     {% endif %}
                                 {% else %}
                                     Any

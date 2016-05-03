@@ -48,11 +48,11 @@ def announcements(page=1):
             )
             success = False
 
-        if 'tickets' in form and form['tickets'] == 'no':
+        if 'owned_tickets' in form and form['owned_tickets'] == 'no':
             if 'collected' in form and form['collected'] == 'yes':
                 flask.flash(
                     (
-                        'A person cannot have no tickets and have collected '
+                        'A person cannot own no tickets and have collected '
                         'tickets'
                     ),
                     'warning'
@@ -61,7 +61,7 @@ def announcements(page=1):
             if 'uncollected' in form and form['uncollected'] == 'yes':
                 flask.flash(
                     (
-                        'A person cannot have no tickets and have uncollected '
+                        'A person cannot own no tickets and have uncollected '
                         'tickets'
                     ),
                     'warning'
@@ -78,11 +78,18 @@ def announcements(page=1):
                 affiliation = models.Affiliation.get_by_id(form['affiliation'])
 
             has_tickets = None
-            if 'tickets' in form:
-                if form['tickets'] == 'yes':
+            if 'owned_tickets' in form:
+                if form['owned_tickets'] == 'yes':
                     has_tickets = True
-                elif form['tickets'] == 'no':
+                elif form['owned_tickets'] == 'no':
                     has_tickets = False
+
+            holds_ticket = None
+            if 'held_ticket' in form:
+                if form['held_ticket'] == 'yes':
+                    holds_ticket = True
+                elif form['held_ticket'] == 'no':
+                    holds_ticket = False
 
             is_waiting = None
             if 'waiting' in form:
@@ -116,6 +123,7 @@ def announcements(page=1):
                 college,
                 affiliation,
                 has_tickets,
+                holds_ticket,
                 is_waiting,
                 has_collected,
                 has_uncollected,
