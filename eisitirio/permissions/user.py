@@ -15,7 +15,13 @@ def tickets(user):
 @models.User.possession()
 def uncollected_tickets(user):
     """Does the user have any uncollected tickets?"""
-    return any(not x.cancelled and not x.collected for x in user.tickets)
+    return (
+        any(not x.cancelled and not x.collected for x in user.tickets) or
+        (
+            user.held_ticket is not None and
+            not user.held_ticket.collected
+        )
+    )
 
 @models.User.possession()
 def collected_tickets(user):
