@@ -81,3 +81,44 @@ def collect_ticket(ticket_id):
             }
 
     return flask.Response(json.dumps(response), mimetype='text/json')
+
+@AJAX.route('/ajax/waiting/<int:entry_id>/reduce', methods=['POST'])
+@login.login_required
+@login_manager.admin_required
+def update_waiting(entry_id):
+    """Change the number of tickets in a waiting list entry.
+
+    Deletes the entry if the number is reduced to 0.
+    """
+    entry = models.Waiting.get_by_id(entry_id)
+
+    if not entry:
+        response = {
+            'success': False,
+            'message': 'Error: could not load entry.'
+        }
+    else:
+        new_waiting_for = int(flask.request.form['waiting_for'])
+
+        if new_waiting_for > entry.waiting_for:
+            response = {
+                'success': False,
+                'message': (
+                    'You cannot increase the quantity you are waiting for. '
+                    'Please create a new waiting list entry if you would like '
+                    'to wait for more tickets.'
+                )
+            }
+        else:
+            if new_waiting_for <= 0:
+                DB.session.delete(entry)
+            else:
+                entry.waiting_for = new_waiting_for
+
+            DB.session.commit()
+
+            response = {
+                'success': True,
+            }
+
+    return flask.Response(json.dumps(response), mimetype='text/json')

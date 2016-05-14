@@ -90,9 +90,38 @@
             <p>You have no tickets. Perhaps you'd like to <a href="{{ url_for('purchase.purchase_home') }}">buy some</a>?</p>
         {% endif %}
 
+        <h3>Waiting List Entries</h3>
         {% if current_user.is_waiting %}
-            <h3>Waiting List</h3>
-            <p>You are currently waiting for {{ current_user.waiting_for }} tickets.</p>
+            <div id="waiting_message_wrapper"></div>
+            <table id="waiting_table">
+                <thead>
+                    <tr>
+                        <th>Waiting for</th>
+                        <th>Waiting since</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for waiting in current_user.waiting %}
+                        <tr id="waiting_entry_{{ waiting.object_id }}">
+                            <td>
+                                <span id="waiting_display_{{ waiting.object_id }}">{{ waiting.waiting_for }}</span>
+                                <span id="waiting_form_{{ waiting.object_id }}" style="display: none;">
+                                    <input id="waiting_input_{{ waiting.object_id }}" type="number" max="{{ waiting.waiting_for }}" min="0" value="{{ waiting.waiting_for }}" />
+                                    <button class="tiny" onclick="submit_waiting_form({{ waiting.object_id }})">Submit</button>
+                                </span>
+                            </td>
+                            <td>{{ waiting.waiting_since.strftime('%c') }}</td>
+                            <td>
+                                <a onclick="show_waiting_form({{ waiting.object_id }})" class="button tiny">Update</a>
+                                <a onclick="update_waiting({{ waiting.object_id }}, 0)" class="button tiny">Remove</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No waiting list entries.</p>
         {% endif %}
 
         <h3>Announcements</h3>
@@ -112,4 +141,58 @@
                 <p>The {{ template_config['BALL_NAME'] }} committee has not posted any announcements yet. Watch this space and check your email for important information about the Ball</p>
             {% endif %}
     </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        var name_change_url = '{{ url_for('ajax.update_waiting', entry_id=123456789, _external=True) }}';
+
+        function show_waiting_form(id) {
+            $('#waiting_display_'+id).hide();
+            $('#waiting_form_'+id).show();
+            $('#waiting_input_'+id).focus();
+        }
+
+        function hide_waiting_form(id) {
+            $('#waiting_display_'+id).show();
+            $('#waiting_form_'+id).hide();
+        }
+
+        function submit_waiting_form(id) {
+            update_waiting(id, $('#waiting_input_'+id).val());
+        }
+
+        function update_waiting(id, value) {
+            jQuery.ajax(
+                name_change_url.replace('123456789',id),
+                {
+                    'data': {
+                        'waiting_for': value
+                    },
+                    'type': 'POST',
+                    'dataType': 'json',
+                    'success': function(data, code, xhr) {
+                        if (data.success) {
+                            if (value > 0) {
+                                $('#waiting_display_'+id).html(value);
+                                $('#waiting_input_'+id).attr('max', value);
+
+                                hide_waiting_form(id);
+                            } else {
+                                $('#waiting_entry_'+id).remove();
+                            }
+
+                            $('#waiting_message_wrapper').html('');
+                        } else {
+                            $('#waiting_message_wrapper').html(
+                                '<div class="message-box error"><p>' +
+                                data.message +
+                                '</p></div>'
+                            );
+                        }
+                    }
+                }
+            );
+        }
+    </script>
 {% endblock %}
