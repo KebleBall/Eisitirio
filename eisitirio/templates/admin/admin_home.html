@@ -123,14 +123,13 @@
                     </div>
                     <div class="row">
                         <div class="columns">
-                            <label for="ticket_method">Payment Method</label>
+                            <label for="ticket_method">Payment Method (implies paid)</label>
                             <select name="ticket_method" id="ticket_method">
                                 <option value="Any"{% if form['ticket_method'] and form['ticket_method'] == 'Any' %} selected="selected"{% endif %}>Any</option>
                                 <option value="Battels"{% if form['ticket_method'] and form['ticket_method'] == 'Battels' %} selected="selected"{% endif %}>Battels</option>
                                 <option value="Card"{% if form['ticket_method'] and form['ticket_method'] == 'Card' %} selected="selected"{% endif %}>Card</option>
-                                <option value="Cash"{% if form['ticket_method'] and form['ticket_method'] == 'Cash' %} selected="selected"{% endif %}>Cash</option>
-                                <option value="Cheque"{% if form['ticket_method'] and form['ticket_method'] == 'Cheque' %} selected="selected"{% endif %}>Cheque</option>
                                 <option value="Free"{% if form['ticket_method'] and form['ticket_method'] == 'Free' %} selected="selected"{% endif %}>Free</option>
+                                <option value="Dummy"{% if form['ticket_method'] and form['ticket_method'] == 'Dummy' %} selected="selected"{% endif %}>Unknown</option>
                             </select>
                         </div>
                     </div>

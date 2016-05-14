@@ -156,9 +156,17 @@ def admin_home(page=1):
             flask.request.form['ticket_method'] != '' and
             flask.request.form['ticket_method'] != 'Any'
     ):
-        ticket_query = ticket_query.filter(
-            models.Ticket.payment_method ==
-            flask.request.form['ticket_method']
+        ticket_query = ticket_query.join(
+            models.TicketTransactionItem.query.join(
+                models.Transaction.query.filter(
+                    models.Transaction.payment_method ==
+                    flask.request.form['ticket_method']
+                ).filter(
+                    models.Transaction.paid == True # pylint: disable=singleton-comparison
+                ).subquery(),
+                models.TicketTransactionItem.transaction
+            ).subquery(reduce_columns=True),
+            models.Ticket.transaction_items
         )
         has_ticket_filter = True
 
