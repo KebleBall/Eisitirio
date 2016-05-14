@@ -16,6 +16,7 @@ from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.database import static
 from eisitirio.helpers import email_manager
+from eisitirio.helpers import statistic_plots
 from eisitirio.helpers import statistics
 from eisitirio.logic import purchase_logic
 
@@ -167,7 +168,7 @@ def delete_old_statistics(now):
     DB.session.commit()
 
 def generate_statistics():
-    """Generate statistics all groups."""
+    """Generate statistics for all groups."""
     for group in static.STATISTIC_GROUPS:
         DB.session.add_all(
             models.Statistic(
@@ -178,6 +179,14 @@ def generate_statistics():
         )
 
         DB.session.commit()
+
+def draw_graphs():
+    """Generate graphs for all statistics groups."""
+    if not os.path.exists(APP.config['GRAPH_STORAGE_FOLDER']):
+        os.makedirs(APP.config['GRAPH_STORAGE_FOLDER'])
+
+    for group in static.STATISTIC_GROUPS:
+        statistic_plots.create_plot(group)
 
 def run_5_minutely(now):
     """Run tasks which need to be run every 5 minutes.
@@ -222,6 +231,8 @@ def run_20_minutely(now):
     delete_old_statistics(now)
 
     generate_statistics()
+
+    draw_graphs()
 
 class CronCommand(script.Command):
     """Flask Script command for running Cron jobs."""

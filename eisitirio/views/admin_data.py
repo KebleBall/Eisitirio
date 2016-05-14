@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 
 import csv
+import os
 import StringIO
 
 from flask.ext import login
@@ -14,7 +15,6 @@ from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.database import static
 from eisitirio.helpers import login_manager
-from eisitirio.helpers import statistic_plots
 from eisitirio.helpers import statistics
 
 APP = app.APP
@@ -50,7 +50,15 @@ def view_statistics():
 @login_manager.admin_required
 def graph(group):
     """Render graph showing statistics for the given statistic group."""
-    return statistic_plots.create_plot(group)
+    image_filename = os.path.join(
+        APP.config['GRAPH_STORAGE_FOLDER'],
+        '{0}.png'.format(group)
+    )
+    return flask.send_file(
+        image_filename,
+        mimetype='image/png',
+        cache_timeout=900
+    )
 
 @ADMIN_DATA.route('/admin/data/<group>')
 @login.login_required

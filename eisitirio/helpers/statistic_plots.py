@@ -4,12 +4,12 @@
 from __future__ import unicode_literals
 
 import collections
-import StringIO
+import os
 
 from matplotlib import dates
 from matplotlib import pyplot
-import flask
 
+from eisitirio import app
 from eisitirio.database import models
 
 COLORS = 'rgbcmyk'
@@ -70,7 +70,11 @@ def create_plot(group):
         plots[statistic.statistic]['datapoints'].append(statistic.value)
         plots[statistic.statistic]['current_value'] = statistic.value
 
-    return render_plot(
+    render_plot(
+        os.path.join(
+            app.APP.config['GRAPH_STORAGE_FOLDER'],
+            '{0}.png'.format(group)
+        ),
         [
             PlotDescriptor(
                 timestamps=plot['timestamps'],
@@ -84,13 +88,14 @@ def create_plot(group):
         statistics[-1].timestamp
     )
 
-def render_plot(plots, x_lim_min, x_lim_max):
+def render_plot(filename, plots, x_lim_min, x_lim_max):
     """Render a graph as a view.
 
     Takes a set of plot descriptors for timeseries, and renders a line graph
     showing the plots.
 
     Args:
+        filename: (str) Location to save the graph to
         plots: (list(PlotDescriptor)) list of plots to render
         x_lim_min: (datetime.datetime) the minimum timestamp to plot on the x
             axis
@@ -122,14 +127,11 @@ def render_plot(plots, x_lim_min, x_lim_max):
     axes.fmt_xdata = dates.DateFormatter('%Y-%m-%d %H:%M:%S')
     fig.autofmt_xdate()
 
-    image = StringIO.StringIO()
     pyplot.savefig(
-        image,
+        filename,
         format='png',
         bbox_extra_artists=(legend,),
         bbox_inches='tight',
         facecolor='white'
     )
 
-    image.seek(0)
-    return flask.send_file(image, mimetype='image/png', cache_timeout=900)
