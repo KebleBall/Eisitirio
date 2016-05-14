@@ -153,6 +153,16 @@
                             </select>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="columns">
+                            <label for="ticket_cancelled">Cancelled</label>
+                            <select name="ticket_cancelled" id="ticket_cancelled">
+                                <option value="Any"{% if form['ticket_cancelled'] and form['ticket_cancelled'] == 'Any' %} selected="selected"{% endif %}>Any</option>
+                                <option value="Is"{% if form['ticket_cancelled'] and form['ticket_cancelled'] == 'Is' %} selected="selected"{% endif %}>Ticket is cancelled</option>
+                                <option value="IsNot"{% if form['ticket_cancelled'] and form['ticket_cancelled'] == 'IsNot' %} selected="selected"{% endif %}>Ticket is not cancelled</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="large-4 columns">
                     <div class="row">

@@ -193,6 +193,17 @@ def admin_home(page=1):
         has_ticket_filter = True
 
     if (
+            'ticket_cancelled' in flask.request.form and
+            flask.request.form['ticket_cancelled'] != '' and
+            flask.request.form['ticket_cancelled'] != 'Any'
+    ):
+        ticket_query = ticket_query.filter(
+            models.Ticket.cancelled ==
+            (flask.request.form['ticket_cancelled'] == 'Is')
+        )
+        has_ticket_filter = True
+
+    if (
             'log_ip' in flask.request.form and
             flask.request.form['log_ip'] != ''
     ):
