@@ -50,7 +50,7 @@ python-editor==1.0        # via alembic
 pytz==2016.4              # via matplotlib
 requests==2.10.0
 six==1.10.0
-sqlalchemy==1.0.12        # via alembic, flask-sqlalchemy
+sqlalchemy==1.0.13        # via alembic, flask-sqlalchemy
 validators==0.10          # via wtforms-components
 wcwidth==0.1.6            # via curtsies
 werkzeug==0.11.9          # via flask, flask-wtf
