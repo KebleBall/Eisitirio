@@ -25,7 +25,7 @@ flask-migrate==1.8.0
 flask-script==2.0.5
 flask-sqlalchemy==2.1
 flask-wtf==0.12
-flask==0.10.1
+flask==0.11
 greenlet==0.4.9           # via bpython
 infinity==1.4             # via intervals
 intervals==0.7.1          # via wtforms-components
