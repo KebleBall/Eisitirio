@@ -14,7 +14,7 @@
 
 @import "scss/vendor/simple-slider";
 
-header, nav, #page-title, #main, footer, #flashes {
+header, nav, #page-title, #main, footer, #flashes, #verify_sms {
     background-color: #fff;
 }
 
@@ -84,7 +84,7 @@ a {
     }
     li {
         @extend .message-box;
-        margin: 0.5em;
+        margin: 0.5em 0;
     }
 }
 

@@ -67,6 +67,10 @@ class CustomModel(flask_sqlalchemy.Model):
     def __repr__(self):
         return '<{0}({1})>'.format(self.__class__.__name__, self.object_id)
 
+    @property
+    def identifier(self):
+        return '{0:05d}'.format(self.object_id)
+
     @classmethod
     def permission(cls, name=None):
         """Define a permission function for this class.

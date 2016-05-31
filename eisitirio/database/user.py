@@ -56,6 +56,15 @@ class User(DB.Model):
         DB.Unicode(20),
         nullable=False
     )
+    phone_verification_code = DB.Column(
+        DB.Unicode(6),
+        nullable=True
+    )
+    phone_verified = DB.Column(
+        DB.Boolean,
+        nullable=False,
+        default=False
+    )
     secret_key = DB.Column(
         DB.Unicode(64),
         nullable=True

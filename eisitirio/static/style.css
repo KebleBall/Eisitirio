@@ -1899,7 +1899,7 @@ th.hide-for-touch { display: table-cell !important; }
 .slider > .highlight-track { background-color: #008CBA; }
 
 /* line 17, style.scss */
-header, nav, #page-title, #main, footer, #flashes { background-color: #fff; }
+header, nav, #page-title, #main, footer, #flashes, #verify_sms { background-color: #fff; }
 
 /* line 21, style.scss */
 a { font-weight: bold; }
@@ -1937,7 +1937,7 @@ a { font-weight: bold; }
 /* line 82, style.scss */
 #flashes ul { margin: 0; }
 /* line 85, style.scss */
-#flashes li { margin: 0.5em; }
+#flashes li { margin: 0.5em 0; }
 
 /* line 91, style.scss */
 p.small, li.small { font-size: 0.75rem; }

@@ -1,0 +1,38 @@
+{% if not current_user.is_anonymous and template_config['REQUIRE_SMS_VERIFICATION'] and not current_user.phone_verified %}
+    <script type="text/javascript">
+        function verify_sms() {
+            jQuery.ajax(
+                "{{ url_for('ajax.verify_phone') }}",
+                {
+                    'data': {
+                        'code': $("#sms_verification_code").val()
+                    },
+                    'type': 'POST',
+                    'dataType': 'json',
+                    'success': function(data, code, xhr) {
+                        if (data.success) {
+                            $("#verify_sms_message").hide();
+                            $("#verify_sms_success").show();
+                            $("#verify_sms_error").hide();
+                        } else {
+                            $("#verify_sms_error").show();
+                        }
+                    }
+                }
+            );
+        }
+
+        function send_verification_code() {
+            jQuery.ajax(
+                "{{ url_for('ajax.verify_phone') }}",
+                {
+                    'type': 'GET',
+                    'success': function(data, code, xhr) {
+                        $("#first_sms_verify_attempt").hide();
+                        $("#verify_sms_form").show();
+                    }
+                }
+            );
+        }
+    </script>
+{% endif %}

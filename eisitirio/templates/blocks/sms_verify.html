@@ -1,0 +1,36 @@
+{% if not current_user.is_anonymous and template_config['REQUIRE_SMS_VERIFICATION'] and not current_user.phone_verified %}
+    <section id="verify_sms" class="row">
+        <div class="columns">
+            <div id="verify_sms_message" class="message-box warning">
+                {% if current_user.phone_verification_code == None %}
+                    <p id="first_sms_verify_attempt">
+                        Please verify your phone number.
+                        <a onclick="send_verification_code()">
+                            Click here to send a verification code to your phone
+                        </a>
+                    </p>
+                    <div id="verify_sms_form" style="display: none">
+                {% else %}
+                    <div id="verify_sms_form">
+                {% endif %}
+                        <p>Please enter the 6 digit verification code you received via SMS.</p>
+                        <div class="row collapse">
+                            <div class="columns small-8">
+                                <input type="text" pattern="\d{6}" id="sms_verification_code" placeholder="Verification Code (xxxxxx)" style="text-align: center" />
+                            </div>
+                            <div class="columns small-4">
+                                <button onclick="verify_sms()" class="postfix">Verify</button>
+                            </div>
+                        </div>
+                        <p>No code? <a onclick="send_verification_code()">Resend</a>.</p>
+                    </div>
+            </div>
+            <p id="verify_sms_success" class="message-box hideable success" style="display: none">
+                Your phone has been verified.
+            </p>
+            <p id="verify_sms_error" class="message-box hideable error" style="display: none">
+                Phone verification failed. Please try again.
+            </p>
+        </div>
+    </section>
+{% endif %}

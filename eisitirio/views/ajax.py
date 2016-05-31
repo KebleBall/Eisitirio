@@ -13,6 +13,7 @@ from eisitirio.database import models
 from eisitirio.helpers import login_manager
 from eisitirio.helpers import validators
 from eisitirio.logic import collection_logic
+from eisitirio.logic import sms_logic
 
 DB = db.DB
 
@@ -84,7 +85,6 @@ def collect_ticket(ticket_id):
 
 @AJAX.route('/ajax/waiting/<int:entry_id>/reduce', methods=['POST'])
 @login.login_required
-@login_manager.admin_required
 def update_waiting(entry_id):
     """Change the number of tickets in a waiting list entry.
 
@@ -122,3 +122,37 @@ def update_waiting(entry_id):
             }
 
     return flask.Response(json.dumps(response), mimetype='text/json')
+
+@AJAX.route('/ajax/user/phone/verify', methods=['GET'])
+@login.login_required
+def send_verify_code():
+    """Send a verification code SMS to the user's phone."""
+
+    return flask.Response(
+        json.dumps(
+            sms_logic.maybe_send_verification_code(login.current_user)
+        ),
+        mimetype='text/json'
+    )
+
+@AJAX.route('/ajax/user/phone/verify', methods=['POST'])
+@login.login_required
+def verify_phone():
+    """Check the code sent via SMS to the user's phone."""
+
+    if flask.request.form['code'] == login.current_user.phone_verification_code:
+        login.current_user.phone_verification_code = None
+        login.current_user.phone_verified = True
+        DB.session.commit()
+
+        response = {
+            'success': True,
+        }
+    else:
+        response = {
+            'success': False,
+            'message': 'Code mismatch.'
+        }
+
+    return flask.Response(json.dumps(response), mimetype='text/json')
+

@@ -60,6 +60,7 @@
                         <h2>{{ self.title() }}</h2>
                     </div>
                 </section>
+                {% include 'blocks/sms_verify.html' %}
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         <section id="flashes" class="row">
@@ -83,6 +84,7 @@
         </div>
         <script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"></script>
         <script src="{{ url_for('static', filename='js/footer.js') }}"></script>
+        {% include 'scripts/sms_verify.html' %}
         {% block javascripts %}{% endblock %}
     </body>
 </html>

@@ -18,6 +18,7 @@ from eisitirio.views import all_views
 from eisitirio.helpers import log_manager
 from eisitirio.helpers import login_manager
 from eisitirio.helpers import email_manager
+from eisitirio.helpers import sms_manager
 from eisitirio.helpers import timed_config
 from eisitirio.helpers import util
 
@@ -51,6 +52,8 @@ log_manager.LogManager(APP)
 email_manager.EmailManager(APP)
 login_manager.LOGIN_MANAGER.init_app(APP)
 markdown.Markdown(APP)
+
+APP.sms_manager = sms_manager.SmsManager()
 
 LOG = APP.log_manager.log_main
 
