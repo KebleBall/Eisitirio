@@ -44,5 +44,6 @@ class UnicodeWriter(object):
         self.buffer.truncate(0)
 
     def writerows(self, rows):
+        """Write multiple rows to the CSV file."""
         for row in rows:
             self.writerow(row)
