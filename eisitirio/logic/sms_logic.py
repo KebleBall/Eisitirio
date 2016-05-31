@@ -15,6 +15,7 @@ DB = db.DB
 LOG = logging.getLogger(__name__)
 
 def maybe_send_verification_code(user):
+    """Send a verification code to the user's phone if necessary."""
     if not APP.config['REQUIRE_SMS_VERIFICATION']:
         return False
 
