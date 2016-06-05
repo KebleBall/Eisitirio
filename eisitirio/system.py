@@ -71,9 +71,6 @@ APP.register_blueprint(all_views.FRONT)
 APP.register_blueprint(all_views.GROUP_PURCHASE)
 APP.register_blueprint(all_views.PURCHASE)
 
-if APP.config['ENABLE_RESALE']:
-    APP.register_blueprint(all_views.RESALE)
-
 @APP.route('/')
 def router():
     """Redirect the user to the appropriate homepage."""
