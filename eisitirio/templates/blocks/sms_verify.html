@@ -3,12 +3,10 @@
         <div class="columns">
             <div id="verify_sms_message" class="message-box warning">
                 {% if current_user.phone_verification_code == None %}
-                    <p id="first_sms_verify_attempt">
-                        Please verify your phone number.
-                        <a onclick="send_verification_code()">
-                            Click here to send a verification code to your phone
-                        </a>
-                    </p>
+                    <div id="first_sms_verify_attempt">
+                        <p>Please verify your phone number {{ current_user.phone }}. <a onclick="send_verification_code()">Click here</a> to send a verification code to your phone.</p>
+                        <p>If your phone number above is not correct, <a href="{{ url_for('dashboard.profile') }}">click here</a> to change it.</p>
+                    </div>
                     <div id="verify_sms_form" style="display: none">
                 {% else %}
                     <div id="verify_sms_form">
