@@ -16,7 +16,7 @@ click==6.6                # via pip-tools
 colorama==0.3.7           # via pylint
 curtsies==0.2.6           # via bpython
 cycler==0.10.0            # via matplotlib
-decorator==4.0.9          # via validators
+decorator==4.0.10          # via validators
 first==2.0.1              # via pip-tools
 flask-bcrypt==0.7.1
 flask-login==0.3.2
