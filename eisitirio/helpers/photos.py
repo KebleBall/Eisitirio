@@ -70,22 +70,39 @@ def save_photo(upload_file):
     im.thumbnail(APP.config['THUMBNAIL_SIZE'])
     im.save(thumb_temp_filename)
 
-    bucket = get_bucket()
-
-    full_key = bucket.new_key("full/" + filename)
-    full_key.set_contents_from_filename(temp_filename)
-    full_key.set_acl('public-read')
-    full_url = full_key.generate_url(expires_in=0, query_auth=False)
-
-    thumb_key = bucket.new_key("thumb/" + filename)
-    thumb_key.set_contents_from_filename(thumb_temp_filename)
-    thumb_key.set_acl('public-read')
-    thumb_url = thumb_key.generate_url(expires_in=0, query_auth=False)
+    full_url, thumb_url = upload_photo(filename, temp_filename,
+                                       thumb_temp_filename)
 
     os.unlink(temp_filename)
     os.unlink(thumb_temp_filename)
 
     return models.Photo(filename, full_url, thumb_url)
+
+def upload_photo(filename, full_location, thumb_location):
+    """Upload a photo and thumbnail to S3.
+
+    Args:
+        filename: (str) filename to store the file as on the server.
+        full_location: (str) path to the full size image on disk.
+        thumbnail_location: (str) path to the thumbnail image on disk.
+
+    Returns:
+        (str, str) the public URL for the full size and thumbnail images
+        respectively.
+    """
+    bucket = get_bucket()
+
+    full_key = bucket.new_key("full/" + filename)
+    full_key.set_contents_from_filename(full_location)
+    full_key.set_acl('public-read')
+    full_url = full_key.generate_url(expires_in=0, query_auth=False)
+
+    thumb_key = bucket.new_key("thumb/" + filename)
+    thumb_key.set_contents_from_filename(thumb_location)
+    thumb_key.set_acl('public-read')
+    thumb_url = thumb_key.generate_url(expires_in=0, query_auth=False)
+
+    return full_url, thumb_url
 
 def delete_photo(photo):
     """Delete a saved photo from S3.
@@ -101,7 +118,6 @@ def rotate_photo(photo, degrees):
     bucket = get_bucket()
 
     full_key = bucket.new_key("full/" + photo.filename)
-    thumb_key = bucket.new_key("thumb/" + photo.filename)
 
     upload_folder = APP.config['TEMP_UPLOAD_FOLDER']
 
@@ -118,13 +134,11 @@ def rotate_photo(photo, degrees):
     im.thumbnail(APP.config['THUMBNAIL_SIZE'])
     im.save(thumb_temp_filename)
 
-    full_key.set_contents_from_filename(temp_filename)
-    full_key.set_acl('public-read')
-    photo.full_url = full_key.generate_url(expires_in=0, query_auth=False)
+    full_url, thumb_url = upload_photo(photo.filename, temp_filename,
+                                       thumb_temp_filename)
 
-    thumb_key.set_contents_from_filename(thumb_temp_filename)
-    thumb_key.set_acl('public-read')
-    photo.thumb_url = thumb_key.generate_url(expires_in=0, query_auth=False)
+    photo.full_url = full_url
+    photo.thumb_url = thumb_url
 
     os.unlink(temp_filename)
     os.unlink(thumb_temp_filename)
