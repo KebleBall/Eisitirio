@@ -14,7 +14,6 @@ from eisitirio import app
 from eisitirio import system # pylint: disable=unused-import
 from eisitirio.database import db
 from eisitirio.scripts import check_eway
-from eisitirio.scripts import create_claim_codes
 from eisitirio.scripts import cron
 from eisitirio.scripts import fix_graduand_postage
 from eisitirio.scripts import prefill
@@ -60,8 +59,6 @@ MANAGER.add_option('config', default=None,
 
 MANAGER.add_command('bpython', run_bpython.BpythonCommand)
 MANAGER.add_command('check_eway', check_eway.CheckEwayCommand)
-MANAGER.add_command('create_claim_codes',
-                    create_claim_codes.CreateClaimCodesCommand)
 MANAGER.add_command('cron', cron.CronCommand)
 MANAGER.add_command('fix_graduand_postage',
                     fix_graduand_postage.FixGraduandPostageCommand)
