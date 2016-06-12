@@ -26,7 +26,7 @@ flask-script==2.0.5
 flask-sqlalchemy==2.1
 flask-wtf==0.12
 flask==0.11
-greenlet==0.4.9           # via bpython
+greenlet==0.4.10           # via bpython
 infinity==1.4             # via intervals
 intervals==0.7.1          # via wtforms-components
 itsdangerous==0.24        # via flask
