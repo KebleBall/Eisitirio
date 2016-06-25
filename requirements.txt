@@ -11,7 +11,7 @@ bcrypt==2.0.0             # via flask-bcrypt
 blessings==1.6            # via curtsies
 boto==2.40.0
 bpython==0.15.0
-cffi==1.6.0               # via bcrypt
+cffi==1.7.0               # via bcrypt
 click==6.6                # via pip-tools
 colorama==0.3.7           # via pylint
 curtsies==0.2.6           # via bpython
