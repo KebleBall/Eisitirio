@@ -21,7 +21,7 @@ first==2.0.1              # via pip-tools
 flask-bcrypt==0.7.1
 flask-login==0.3.2
 flask-markdown==0.3
-flask-migrate==1.8.0
+flask-migrate==1.8.1
 flask-script==2.0.5
 flask-sqlalchemy==2.1
 flask-wtf==0.12
