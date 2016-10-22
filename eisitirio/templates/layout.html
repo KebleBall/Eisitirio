@@ -56,11 +56,6 @@
                         </nav>
                     {% endif %}
                 {% endblock %}
-                <section id="page-title" class="row">
-                    <div class="large-12 columns">
-                        <h2>{{ self.title() }}</h2>
-                    </div>
-                </section>
                 {% include 'blocks/sms_verify.html' %}
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -73,6 +68,11 @@
                         </section>
                     {% endif %}
                 {% endwith %}
+                <section id="page-title" class="row">
+                    <div class="large-12 columns">
+                        <h2>{{ self.title() }}</h2>
+                    </div>
+                </section>
                 <section id="main" class="row">
                     {% block content %}{% endblock %}
                 </section>

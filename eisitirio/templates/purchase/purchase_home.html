@@ -7,6 +7,8 @@
     <section id="purchase" class="columns">
         <form action="{{ url_for('purchase.purchase_home') }}" id="purchase_form" method="post">
             <ol id="purchase_steps">
+              <div class="rows">
+                <div class="small-12 large-5 columns">
                 <li>
                     <h5>Choose Number of Tickets</h5>
                     <table id="ticket_type_table">
@@ -28,6 +30,8 @@
                             <td id="total_tickets">0</td>
                     </table>
                 </li>
+              </div>
+              <div class="small-12 large-7 columns">
                 <li>
                     <h5>Apply voucher code</h5>
                     <p>If you have been given a discount code, please enter it here. If you do not have a code, leave this field blank. Only one discount code may be used per order</p>
@@ -39,14 +43,20 @@
                         </div>
                     </div>
                 </li>
+              </div>
+              <div class="small-12 columns">
                 {% include 'purchase/blocks/choose_postage_method.html' %}
+              </div>
+              <div class="small-12 medium-7 columns">
                 {% include 'purchase/blocks/choose_payment_method.html' %}
-                <li>
-                    <input type="submit" value="Buy Tickets" class="button tiny" />
-                </li>
-            </ol>
+              </div>
+              <div class="small-12 medium-5 columns" style="margin-top: 2rem;">
+                <input type="submit" value="Buy Tickets" class="button large postfix" />
+              </div>
+            </div>
+          </ol>
         </form>
-    </section>
+      </section>
 {% endblock %}
 
 {% block javascripts %}

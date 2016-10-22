@@ -11,21 +11,27 @@
             <p>When the general release starts, the leader of your group will be responsible for visiting the purchase page and reserving the tickets requested by everybody in the group. The tickets will then be allocated to each group member as appropriate for individual payment. Please note that tickets will expire if not paid for within {{ format_timedelta(template_config['TICKET_EXPIRY_TIME']) }}.</p>
             <p>If you are a member of a purchase group, you will be unable to purchase tickets individually.</p>
             <p>There is a limit of {{ template_config['MAX_GROUP_MEMBERS'] }} members in each purchase group.</p>
-            <ul class="pricing-table">
-                <li class="title">Create Group</li>
-                <li class="description">If you will be leading the group, and will purchase the tickets after the general release, you should create the group. You'll then be given a code for you to pass on to your friends so that they can join the group.</li>
-                <li class="cta-button"><a class="button" href="{{ url_for('group_purchase.create') }}">Create Group</a></li>
-            </ul>
-            <form action="{{ url_for('group_purchase.join') }}" method="post">
+            <div class="rows">
+              <div class="small-12 medium-5 columns">
                 <ul class="pricing-table">
+                  <li class="title">Create Group</li>
+                  <li class="description">If you will be leading the group, and will purchase the tickets after the general release, you should create the group. You'll then be given a code for you to pass on to your friends so that they can join the group.</li>
+                  <li class="cta-button"><a class="button large postfix" href="{{ url_for('group_purchase.create') }}">Create Group</a></li>
+                </ul>
+              </div>
+              <div class="small-12 medium-7 columns">
+                <form action="{{ url_for('group_purchase.join') }}" method="post">
+                  <ul class="pricing-table">
                     <li class="title">Join Group</li>
                     <li class="description">If somebody else has already created a group, they'll have a code for you to join. Enter it below.</li>
                     <li class="cta-button">
-                        <input type="text" name="code" placeholder="Group Code" style="text-align: center" />
-                        <button>Join Group</button>
+                      <input type="text" name="code" placeholder="Group Code" style="text-align: center" />
+                      <button class="large postfix" style="padding-bottom: 2rem;">Join Group</button>
                     </li>
-                </ul>
-            </form>
+                  </ul>
+                </form>
+              </div>
+            </div>
         {% elif current_user.purchase_group.purchased %}
             <p>The tickets have been purchased for this purchase group.</p>
             {% if current_user == current_user.purchase_group.leader %}
