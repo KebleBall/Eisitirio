@@ -281,6 +281,8 @@ def check_payment_method(flashes):
 
     return payment_method, payment_term
 
+# TODO: Add check_roundup_donation here
+
 def check_postage(flashes):
     """Validate the postage method selected in the purchase form.
 

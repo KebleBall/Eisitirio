@@ -26,7 +26,7 @@
         <div id="wrapper" class="row">
             <div class="columns">
                 <header class="row">
-                    <section id="user" class="large-3 columns right">
+                    <section id="user" class="small-12 large-6 columns right">
                         {% if current_user.is_anonymous %}
                             <p>You are not currently logged in. <a href="{{ url_for('front.home') }}#log-in-form">Log in.</a></p>
                         {% else %}

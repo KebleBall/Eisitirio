@@ -14,7 +14,7 @@
             The {{ template_config['TITLE'] }} will take place on the night of {{ template_config['START_TIME'].strftime('%A %B') }} {{ template_config['START_TIME'].day }}{{ get_ord(template_config['START_TIME']) }}. Tickets are available in advance only, there will be no tickets for sale on the door. To purchase a ticket, please register or log in
         </p>
         <div class="row">
-            <section id="homepage-login" class="large-6 columns">
+            <section id="homepage-login" class="large-5 columns">
                 <a id="log-in-form"></a>
                 <h2>Log In</h2>
                 <form action="{{ url_for('front.do_login') }}" method="post">
@@ -40,8 +40,8 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="large-12 columns">
-                            <input type="submit" value="Log In" class="button small" />
+                        <div class="large-12 columns center">
+                            <input type="submit" value="Log In" class="button postfix large" />
                         </div>
                     </div>
                 </form>
@@ -52,7 +52,7 @@
                     <li><a href="{{ url_for('front.email_confirm') }}">Confirm your email</a></li>
                 </ul>
             </section>
-            <section id="homepage-register" class="large-6 columns">
+            <section id="homepage-register" class="large-7 columns">
                 <h2>Register</h2>
                 <p>If you are a {{ template_config['COLLEGE'] }} student, you must use your university email address in order to be able to pay by battels.</p>
                 <form action="{{ url_for('front.register') }}" enctype="multipart/form-data" method="post">
@@ -135,9 +135,6 @@
                             <div class="large-12 columns">
                                 <label for="photo">Upload Photo</label>
                                 <div class="row upload_photo">
-                                    <div class="large-3 columns right">
-                                        <img src="{{ url_for('static', filename='images/passport_outline.png') }}" />
-                                    </div>
                                     <div class="large-9 columns">
                                         <input type="file" name="photo" accept="{{ template_config['IMAGE_ACCEPT_STRING'] }}" required="required" />
                                         <p class="small">Please upload a passport style photograph of yourself.</p>
@@ -156,7 +153,7 @@
                     </div>
                     <div class="row">
                         <div class="large-12 columns">
-                            <input type="submit" value="Register" class="button small" />
+                            <input type="submit" value="Register" class="button postfix large" />
                         </div>
                     </div>
                 </form>
