@@ -66,6 +66,11 @@ class Ticket(DB.Model):
         nullable=False,
         default=0
     )
+    # is_queue_jump = DB.Column(
+    #     DB.Boolean(),
+    #     default = False,
+    #     nullable = False
+    # )
 
     owner_id = DB.Column(
         DB.Integer,

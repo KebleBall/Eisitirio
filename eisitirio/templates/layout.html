@@ -41,17 +41,18 @@
                         </a>
                     </section>
                 </header>
+
                 {% block navigation %}
                     {% if not current_user.is_anonymous %}
                         <nav class="row">
-                            <div class="large-12 columns">
-                                <ul id="navigation-main">
-                                    {% include 'blocks/dashboard-navigation.html' %}
-                                    {% if current_user.is_admin %}
-                                        {% include 'blocks/admin-navigation.html' %}
-                                    {% endif %}
-                                </ul>
-                            </div>
+                          <div class="large-12 columns centered" id="navigation-main">
+                            {% include 'blocks/dashboard-navigation.html' %}
+                          </div>
+                          <div class="large-12 columns" id="navigation-main">
+                            {% if current_user.is_admin %}
+                            {% include 'blocks/admin-navigation.html' %}
+                            {% endif %}
+                          </div>
                         </nav>
                     {% endif %}
                 {% endblock %}

@@ -1,14 +1,16 @@
-<li><a href="{{ url_for('dashboard.dashboard_home') }}">Dashboard Home</a></li>
-<li><a href="{{ url_for('dashboard.profile') }}">Update your Details</a></li>
-<li><a href="{{ url_for('purchase.purchase_home') }}">Buy Tickets</a></li>
+<!-- <div class="small-6 medium-4 large-3 text-center columns dash-column"columns dash-column dash-columniv> -->
+
+<a class="small button" href="{{ url_for('dashboard.dashboard_home') }}">Dashboard Home</a>
+<a class="small button" href="{{ url_for('dashboard.profile') }}">Update your Details</a>
+<a class="small button" href="{{ url_for('purchase.purchase_home') }}">Buy Tickets</a>
 {% if current_user.has_unpaid_tickets() %}
-<li><a href="{{ url_for('purchase.complete_payment') }}">Complete Ticket Payment</a></li>
+<a class="small button" href="{{ url_for('purchase.complete_payment') }}">Complete Ticket Payment</a>
 {% endif %}
 {% if template_config['ENABLE_POSTAGE'] %}
-<li><a href="{{ url_for('purchase.buy_postage') }}">Buy Postage</a></li>
+<a class="small button" href="{{ url_for('purchase.buy_postage') }}">Buy Postage</a>
 {% endif %}
 {% if template_config['ENABLE_GROUP_PURCHASE'] %}
-<li><a href="{{ url_for('group_purchase.dashboard') }}">Group Purchase</a></li>
+<a class="small button" href="{{ url_for('group_purchase.dashboard') }}">Group Purchase</a>
 {% endif %}
-<li><a href="{{ url_for('front.terms') }}">Terms and Conditions</a></li>
-<li><a href="{{ url_for('front.faqs') }}">Frequently Asked Questions</a></li>
+<a class="small button" href="{{ url_for('front.terms') }}">T &amp Cs</a>
+<a class="small button" href="{{ url_for('front.faqs') }}">FAQs</a>
