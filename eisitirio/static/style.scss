@@ -1,18 +1,18 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic,700italic);
 
-@import "scss/vendor/normalize";
-
 @import "scss/variables";
+@import "scss/vendor/global";
+@import "scss/vendor/foundation";
+@include foundation-everything;
 
-@import "scss/vendor/foundation/components/buttons";
-@import "scss/vendor/foundation/components/forms";
-@import "scss/vendor/foundation/components/grid";
-@import "scss/vendor/foundation/components/pricing-tables";
-@import "scss/vendor/foundation/components/tables";
-@import "scss/vendor/foundation/components/type";
-@import "scss/vendor/foundation/components/visibility";
-
-@import "scss/vendor/simple-slider";
+//@import "scss/old_vendor/foundation/components/buttons";
+//@import "scss/old_vendor/foundation/components/forms";
+//@import "scss/old_vendor/foundation/components/grid";
+//@import "scss/old_vendor/foundation/components/pricing-tables";
+//@import "scss/old_vendor/foundation/components/tables";
+//@import "scss/old_vendor/foundation/components/type";
+//@import "scss/old_vendor/foundation/components/visibility";
+//@import "scss/old_vendor/simple-slider";
 
 header, nav, #page-title, #main, footer, #flashes, #verify_sms {
     background-color: #fff;

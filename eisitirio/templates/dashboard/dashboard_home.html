@@ -33,7 +33,7 @@
             <p>Please note that once you have claimed a ticket, you will not be able to change your personal details or photo. Please ensure that your details and photo are correct before claiming a ticket.</p>
             <form action="{{ url_for('dashboard.claim_ticket') }}" method="post">
                 <input type="text" name="claim_code" placeholder="Ticket Claim Code (xxxxx-xxxxx-xxxxx)" style="text-align: center" pattern="\d{5}-\d{5}-\d{5}" />
-                <input type="submit" value="Claim Ticket" class="button postfix" />
+                <input type="submit" value="Claim Ticket" class="button" />
             </form>
         {% endif %}
         <h3>Tickets You Own <a href="{{ url_for('purchase.purchase_home') }}" class="button">Buy Tickets</a></h3>

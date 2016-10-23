@@ -3,7 +3,7 @@
     <head>
         <title>{% block title %}{% endblock %} - {{ template_config['TITLE'] }}</title>
         <meta name="description" content="{{ template_config['TITLE'] }} - Buy Tickets">
-        <meta name="author" content="Samuel Littley">
+        <meta name="author" content="Samuel Littley and Timothy Zakian">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width" />
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
@@ -26,7 +26,7 @@
         <div id="wrapper" class="row">
             <div class="columns">
                 <header class="row">
-                    <section id="user" class="small-12 large-6 columns right">
+                    <section id="user" class="small-12 large-offset-6 large-6 columns">
                         {% if current_user.is_anonymous %}
                             <p>You are not currently logged in. <a href="{{ url_for('front.home') }}#log-in-form">Log in.</a></p>
                         {% else %}
@@ -83,7 +83,8 @@
                 </footer>
             </div>
         </div>
-        <script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/vendor/jquery-3.1.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/vendor/foundation.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/footer.js') }}"></script>
         {% include 'scripts/sms_verify.html' %}
         {% block javascripts %}{% endblock %}
