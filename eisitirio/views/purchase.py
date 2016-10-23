@@ -131,8 +131,7 @@ def purchase_home():
                 ticket_info=ticket_info
             )
 
-        # TODO: Add checking for if they selected to roundup their purchase
-        # here with purchase_logic.check_roundup_donation
+        roundup_price = purchase_logic.check_roundup_donation(flashes)
 
         tickets = purchase_logic.create_tickets(
             login.current_user,
@@ -146,6 +145,9 @@ def purchase_home():
             if not success:
                 flask.flash('Could not use voucher - ' + error, 'error')
 
+
+        # if roundup_price is not 0:
+            # (success, tickets, error) =
         # TODO: Add the roundups here for the tickets here. Similar to what's
         # done for vouchers
 
@@ -158,13 +160,18 @@ def purchase_home():
             user=login.current_user
         )
 
-        return payment_logic.do_payment(
-            tickets,
-            postage,
-            payment_method,
-            payment_term,
-            address
+        return flask.render_template(
+            'purchase/purchase_home.html',
+            num_tickets=num_tickets,
+            ticket_info=ticket_info
         )
+        # return payment_logic.do_payment(
+        #     tickets,
+        #     postage,
+        #     payment_method,
+        #     payment_term,
+        #     address
+        # )
     else:
         return flask.render_template(
             'purchase/purchase_home.html',

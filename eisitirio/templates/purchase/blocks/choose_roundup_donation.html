@@ -1,0 +1,23 @@
+{% if template_config['ENABLE_ROUNDUP_DONATION'] %}
+<li>
+    <h5>Roundup Donation</h5>
+
+    <p>
+        This year, we are allowing people to roundup the price of their ticket
+        to the nearest pound, and have the proceeds from this donated to Keble
+        Ball's charity for this year: <strong>{{ template_config['BALL_CHARITY'] }}</strong>
+    </p>
+    <div class="row">
+      <div class="columns">
+        <label for="roundup_donation">
+          <input type="radio" name="roundup_donation" id="make_roundup_donation" value="make_roundup_donation" class="roundup_donation_option" required="required"/>
+          Yes, I would like to contribute &pound;{{ template_config['ROUNDUP_DONATION_AMT'] }} per ticket to {{ template_config['BALL_CHARITY'] }}
+        </label>
+        <label for="roundup_donation">
+          <input type="radio" name="roundup_donation" id="no_roundup_donation" value="no_roundup_donation" class="roundup_donation_option" required="required"/>
+          No, I would not like to contribute &pound;{{ template_config['ROUNDUP_DONATION_AMT'] }} per ticket to {{ template_config['BALL_CHARITY'] }}
+        </label>
+      </div>
+    </div>
+  </li>
+  {% endif %}

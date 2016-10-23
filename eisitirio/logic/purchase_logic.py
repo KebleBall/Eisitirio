@@ -282,6 +282,18 @@ def check_payment_method(flashes):
     return payment_method, payment_term
 
 # TODO: Add check_roundup_donation here
+def check_roundup_donation(flashes):
+    if not APP.config['ENABLE_ROUNDUP_DONATION']:
+        return 0
+
+    if 'roundup_donation' not in flask.request.form:
+        flashes.append('You must select a roundup donation option')
+    elif flask.request.form['roundup_donation'] == 'make_roundup_donation':
+        return APP.config['ROUNDUP_DONATION_AMT']
+    else:
+        return 0
+
+
 
 def check_postage(flashes):
     """Validate the postage method selected in the purchase form.
