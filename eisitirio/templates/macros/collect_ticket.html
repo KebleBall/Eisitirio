@@ -5,7 +5,7 @@
             <input type="text" name="ticket-barcode-{{ ticket_id }}" id="ticket-barcode-{{ ticket_id }}" onkeypress="collect_ticket_keypress('{{ ticket_id }}')" />
         </div>
         <div class="small-3 columns">
-            <button class="expanded" onclick="collect_ticket('{{ ticket_id }}')">Go</button>
+            <button class="button expanded" onclick="collect_ticket('{{ ticket_id }}')">Go</button>
         </div>
     </div>
     <p id="collect-ticket-{{ ticket_id }}-message" class="message-box error" style="display: none"></p>

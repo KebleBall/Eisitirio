@@ -22,7 +22,7 @@
                         <td>{{ current_user.held_ticket.status }}</td>
                         <td>
                             {% if current_user.held_ticket.can_be_reclaimed() %}
-                                <a href="{{ url_for('dashboard.relinquish_ticket') }}" class="button tiny">Relinquish</a>
+                                <a href="{{ url_for('dashboard.relinquish_ticket') }}" class="button">Relinquish</a>
                             {% endif %}
                         </td>
                     </tr>
@@ -36,7 +36,7 @@
                 <input type="submit" value="Claim Ticket" class="button" />
             </form>
         {% endif %}
-        <h3>Tickets You Own <a href="{{ url_for('purchase.purchase_home') }}" class="button">Buy Tickets</a></h3>
+        <h3>Tickets You Own</h3>
         {% if current_user.tickets.count() > 0 %}
             <table id="tickets_table">
                 <thead>
@@ -108,7 +108,7 @@
                                 <span id="waiting_display_{{ waiting.object_id }}">{{ waiting.waiting_for }}</span>
                                 <span id="waiting_form_{{ waiting.object_id }}" style="display: none;">
                                     <input id="waiting_input_{{ waiting.object_id }}" type="number" max="{{ waiting.waiting_for }}" min="0" value="{{ waiting.waiting_for }}" />
-                                    <button class="tiny" onclick="submit_waiting_form({{ waiting.object_id }})">Submit</button>
+                                    <button class="button tiny" onclick="submit_waiting_form({{ waiting.object_id }})">Submit</button>
                                 </span>
                             </td>
                             <td>{{ waiting.waiting_since.strftime('%c') }}</td>
