@@ -228,10 +228,12 @@
                             </select>
                         </div>
                         <div class="large-4 columns">
-                            <input type="submit" action="{{ url_for('admin.admin_home') }}" name="action" value="Search" class="button postfix"/>
+                            <input type="submit" action="{{
+                            url_for('admin.admin_home') }}" name="action" value="Search" class="button expanded"/>
                         </div>
                         <div class="large-4 columns">
-                            <input type="submit" action="{{ url_for('admin.admin_home') }}" name="action" value="Export" class="button postfix secondary"/>
+                            <input type="submit" action="{{
+                            url_for('admin.admin_home') }}" name="action" value="Export" class="button expanded secondary"/>
                         </div>
                     </div>
                 </div>

@@ -3,7 +3,7 @@
 $rem-base: 16px !default;
 
 $body-font-family: "Open Sans", Helvetica, sans-serif !default;
-$body-font-weight: lighter !default;
+//$body-font-weight: lighter !default;
 
 $h1-font-size: 3rem !default;
 $h2-font-size: 2.6rem !default;
@@ -26,3 +26,12 @@ $paragraph-margin-bottom: rem-calc(5) !default;
 $include-open-sans: false !default;
 
 $blockquote-font-color: #000 !default;
+
+$header-bg: #950219;
+$subnav-link-padding: 0.9rem;
+$subnav-font-size: 0.75rem;
+$subnav-link-opacity: 0.15;
+$header-height: 0.5rem;
+$transition: all .35s ease-in-out;
+
+$primary-color: $header-bg;

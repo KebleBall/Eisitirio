@@ -1,25 +1,75 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic,700italic);
 
-@import "scss/variables";
+@import "scss/variables"; // TODO/XXX: When we use this, the row max-width gets all screwed up
 @import "scss/vendor/global";
 @import "scss/vendor/foundation";
 @include foundation-everything;
 
-//@import "scss/old_vendor/foundation/components/buttons";
-//@import "scss/old_vendor/foundation/components/forms";
-//@import "scss/old_vendor/foundation/components/grid";
-//@import "scss/old_vendor/foundation/components/pricing-tables";
-//@import "scss/old_vendor/foundation/components/tables";
-//@import "scss/old_vendor/foundation/components/type";
-//@import "scss/old_vendor/foundation/components/visibility";
-//@import "scss/old_vendor/simple-slider";
-
-header, nav, #page-title, #main, footer, #flashes, #verify_sms {
+nav, #page-title, #main, footer, #flashes, #verify_sms {
     background-color: #fff;
 }
 
 a {
     font-weight: bold;
+}
+
+.header {
+  text-align: center;
+  background: $header-bg;
+  background-size: cover;
+  background-attachment: fixed;
+  position: relative;
+  overflow: visible;
+  padding-top: $header-height;
+  padding-bottom: $header-height + ($subnav-link-padding * 2 + $subnav-font-size - 0.15rem);
+  margin-bottom: 0.5rem;
+
+  .header-text {
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+  }
+
+  .headline {
+    color: #ffe;
+  }
+
+  a {
+    color: #ffe;
+  }
+}
+
+.header-subnav {
+  float: none;
+  position:relative;
+  text-align: center;
+  margin: 0 auto;
+  bottom: 0;
+  width: 100%;
+
+  li {
+    float: none;
+    display: inline-block;
+
+    a {
+      padding: $subnav-link-padding 1rem;
+      font-size: $subnav-font-size;
+      color: #ffe;
+      text-transform: uppercase;
+      display: block;
+      font-weight: bold;
+      letter-spacing: 1px;
+      transition: $transition;
+
+      &.is-active {
+        background: rgba(250,250,250,$subnav-link-opacity);
+      }
+
+      &:hover {
+        background: rgba(250,250,250,$subnav-link-opacity);
+        transition: $transition;
+      }
+    }
+  }
 }
 
 #logo {
@@ -55,16 +105,16 @@ a {
     background-color: #fff;
     color: #000;
     &.error {
-        background-color: #f3afbf;
-        border: 3px solid #f31323;
+        background-color: map-get($foundation-palette, alert);
+        border: 3px solid darken(map-get($foundation-palette, alert), 20);
     }
     &.warning {
-        background-color: #f3cf9f;
-        border: 3px solid #f38323;
+        background-color: map-get($foundation-palette, warning);
+        border: 3px solid darken(map-get($foundation-palette, warning), 20);
     }
     &.success {
-        background-color: #83ef9f;
-        border: 3px solid #338323;
+        background-color: map-get($foundation-palette, success);
+        border: 3px solid darken(map-get($foundation-palette, success), 20);
     }
     &.info {
         background-color: #b3dfef;

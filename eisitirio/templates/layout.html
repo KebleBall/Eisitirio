@@ -23,39 +23,43 @@
         {% block extra_head %}{% endblock %}
     </head>
     <body>
+
+      <header class="header">
+        <section id="user" class="small-12 large-offset-6 large-6 columns">
+          {% if current_user.is_anonymous %}
+          <p>You are not currently logged in. <a href="{{ url_for('front.home') }}#log-in-form">Log in.</a></p>
+          {% else %}
+          <p>You are currently logged in as {{ current_user.full_name }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
+          {% endif %}
+        </section>
+        <div class="header-text">
+          <a href="/">
+            <h2>{{ template_config['TITLE'] }}</h2>
+            <h1 class="headline">{{ template_config['THEME'] }}</h1>
+            <h3>{{ template_config['START_TIME'].strftime(template_config['DATE_FORMAT']) }}</h3>
+          </a>
+        </div>
+        <ul class="header-subnav">
+          {% block navigation %}
+            {% if not current_user.is_anonymous %}
+            <div class="row">
+              <div class="large-12 columns centered" id="navigation-main">
+                {% include 'blocks/dashboard-navigation.html' %}
+              </div>
+              <div class="large-12 columns" id="navigation-main">
+                {% if current_user.is_admin %}
+                  {% include 'blocks/admin-navigation.html' %}
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+          {% endblock %}
+        </ul>
+      </header>
+
         <div id="wrapper" class="row">
             <div class="columns">
-                <header class="row">
-                    <section id="user" class="small-12 large-offset-6 large-6 columns">
-                        {% if current_user.is_anonymous %}
-                            <p>You are not currently logged in. <a href="{{ url_for('front.home') }}#log-in-form">Log in.</a></p>
-                        {% else %}
-                            <p>You are currently logged in as {{ current_user.full_name }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
-                        {% endif %}
-                    </section>
-                    <section id="logo" class="large-12 columns">
-                        <a href="/">
-                            <h1>{{ template_config['TITLE'] }}</h1>
-                            <h2>{{ template_config['THEME'] }}</h2>
-                            <h3>{{ template_config['START_TIME'].strftime(template_config['DATE_FORMAT']) }}</h3>
-                        </a>
-                    </section>
-                </header>
 
-                {% block navigation %}
-                    {% if not current_user.is_anonymous %}
-                        <nav class="row">
-                          <div class="large-12 columns centered" id="navigation-main">
-                            {% include 'blocks/dashboard-navigation.html' %}
-                          </div>
-                          <div class="large-12 columns" id="navigation-main">
-                            {% if current_user.is_admin %}
-                            {% include 'blocks/admin-navigation.html' %}
-                            {% endif %}
-                          </div>
-                        </nav>
-                    {% endif %}
-                {% endblock %}
                 {% include 'blocks/sms_verify.html' %}
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
