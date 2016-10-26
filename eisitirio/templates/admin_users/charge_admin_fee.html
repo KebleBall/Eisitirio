@@ -18,7 +18,7 @@
                         {% endfor %}
                         {{ form.reason() }}
                     </div>
-                    <div class="columns large-6">
+                    <div class="columns large-12">
                         {{ form.amount.label }}
                         {% for error in form.amount.pounds.errors %}
                             <p class="message-box hideable error">{{ error }}</p>
@@ -27,22 +27,22 @@
                             <p class="message-box hideable error">{{ error }}</p>
                         {% endfor %}
                         <div class="row collapse">
-                            <div class="columns small-2">
+                            <div class="columns small-1">
                                 <span class="prefix">&pound;</span>
                             </div>
-                            <div class="columns small-4">
+                            <div class="columns small-3">
                                 {{ form.amount.pounds() }}
                             </div>
-                            <div class="columns small-2">
-                                <span class="prefix postfix">.</span>
+                            <div class="columns small-1">
+                                <span class="prefix postfix" style="padding-left: 10px;">.</span>
                             </div>
-                            <div class="columns small-4">
+                            <div class="columns small-3">
                                 {{ form.amount.pence() }}
                             </div>
+                            <div class="columns small-4">
+                              <input type="submit" class="button expanded" value="Charge Admin Fee" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="columns large-6">
-                        <input type="submit" class="button small expand" value="Charge Admin Fee" />
                     </div>
                 </div>
             </fieldset>

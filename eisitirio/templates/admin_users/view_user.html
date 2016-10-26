@@ -59,43 +59,41 @@
                 <input type="submit" class="large button expanded" value="Update" />
             </form>
             <h4>Actions</h4>
-            <ul>
-                <li><a href="{{ url_for('admin_users.impersonate_user', user_id=user.object_id) }}" class="button large">Impersonate User</a></li>
+            <div class="stack-for-small button-group even-5">
+                <a href="{{ url_for('admin_users.impersonate_user', user_id=user.object_id) }}" class="button large">Impersonate User</a>
                 {% if not user.verified %}
-                    <li><a href="{{ url_for('admin_users.verify_user', user_id=user.object_id) }}" class="button large">Verify User</a></li>
+                    <a href="{{ url_for('admin_users.verify_user', user_id=user.object_id) }}" class="button large">Verify User</a>
                 {% endif %}
                 {% if user.is_admin %}
-                    <li><a href="{{ url_for('admin_users.demote_user', user_id=user.object_id) }}" class="button large">Demote User</a></li>
+                    <a href="{{ url_for('admin_users.demote_user', user_id=user.object_id) }}" class="button large">Demote User</a>
                 {% else %}
-                    <li><a href="{{ url_for('admin_users.promote_user', user_id=user.object_id) }}" class="button large">Promote User</a></li>
+                    <a href="{{ url_for('admin_users.promote_user', user_id=user.object_id) }}" class="button large">Promote User</a>
                 {% endif %}
                 {% if user.has_uncollected_tickets() %}
-                    <li><a href="{{ url_for('admin_users.collect_tickets', user_id=user.object_id) }}" class="button large">Collect Tickets</a></li>
+                    <a href="{{ url_for('admin_users.collect_tickets', user_id=user.object_id) }}" class="button large">Collect Tickets</a>
                 {% endif %}
                 {% if user.battels == None %}
-                    <li><a href="{{ url_for('admin_users.add_manual_battels', user_id=user.object_id) }}" class="button large">Manually setup battelling</a></li>
+                    <a href="{{ url_for('admin_users.add_manual_battels', user_id=user.object_id) }}" class="button large">Manually setup battelling</a>
                 {% endif %}
-                <li><a href="{{ url_for('admin_users.charge_admin_fee', user_id=user.object_id) }}" class="button large">Charge admin fee</a></li>
-                <li>
-                    <form action="{{ url_for('admin_users.give_user', user_id=user.object_id) }}" method="post" id="give_tickets">
-                        Give user
-                        <input type="number" name="give_num_tickets" min="1" value="1" step="1" />
-                        <select name="give_ticket_type">
-                            {% for ticket_type in template_config['TICKET_TYPES'] %}
-                                <option value="{{ ticket_type.slug }}">{{ ticket_type.name }} (&pound;{{ ticket_type.price_pounds }})</option>
-                            {% endfor %}
-                        </select>
-                        tickets at &pound;
-                        <input type="number" name="give_price_pounds" min="0" step="1" />
-                        .
-                        <input type="number" name="give_price_pence" min="0" step="1" max="99" />
-                        each (leave blank to use default price) with reason
-                        <input type="text" name="give_reason" />
-                        .
-                        <input type="submit" class="button large expanded" />
-                    </form>
-                </li>
-            </ul>
+                <a href="{{ url_for('admin_users.charge_admin_fee', user_id=user.object_id) }}" class="button large">Charge admin fee</a>
+              </div>
+              <form action="{{ url_for('admin_users.give_user', user_id=user.object_id) }}" method="post" id="give_tickets">
+                Give user
+                <input type="number" name="give_num_tickets" min="1" value="1" step="1" />
+                <select name="give_ticket_type">
+                  {% for ticket_type in template_config['TICKET_TYPES'] %}
+                    <option value="{{ ticket_type.slug }}">{{ ticket_type.name }} (&pound;{{ ticket_type.price_pounds }})</option>
+                  {% endfor %}
+                </select>
+                tickets at &pound;
+                <input type="number" name="give_price_pounds" min="0" step="1" />
+                .
+                <input type="number" name="give_price_pence" min="0" step="1" max="99" />
+                each (leave blank to use default price) with reason
+                <input type="text" name="give_reason" />
+                .
+                <input type="submit" class="button large expanded" />
+              </form>
             <h4>User's Tickets</h4>
             {% if user.tickets.count() > 0 %}
                 <table id="tickets_table">
