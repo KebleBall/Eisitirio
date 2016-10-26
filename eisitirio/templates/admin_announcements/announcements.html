@@ -90,7 +90,7 @@
                         <label for="use_noreply"><input type="checkbox" id="use_noreply" name="use_noreply" value="yes" {{ form_checked(form, 'use_noreply', 'yes') }}/> Use noreply@ email as sender</label>
                     </div>
                     <div class="large-4 columns">
-                        <input type="submit" class="button small right">
+                        <input type="submit" class="button right expanded">
                     </div>
                 </div>
             </fieldset>
@@ -99,10 +99,10 @@
         <a id="announcements"></a>
         <p>
             {% if announcements.has_prev %}
-                <a href="{{ url_for('admin_announcements.announcements', page=announcements.prev_num) }}#announcements" class="button small left" />Previous Page</a>
+                <a href="{{ url_for('admin_announcements.announcements', page=announcements.prev_num) }}#announcements" class="button left expanded" />Previous Page</a>
             {% endif %}
             {% if announcements.has_next %}
-                <a href="{{ url_for('admin_announcements.announcements', page=announcements.next_num) }}#announcements" class="button small right" />Next Page</a>
+                <a href="{{ url_for('admin_announcements.announcements', page=announcements.next_num) }}#announcements" class="button right expanded" />Next Page</a>
             {% endif %}
         </p>
         {% if announcements.items %}
@@ -208,10 +208,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('dashboard.display_announcement', announcement_id=announcement.object_id) }}" class="button tiny">View</a>
-                                <a href="{{ url_for('admin_announcements.delete_announcement', announcement_id=announcement.object_id) }}" class="button tiny">Delete</a>
+                                <a href="{{ url_for('dashboard.display_announcement', announcement_id=announcement.object_id) }}" class="button">View</a>
+                                <a href="{{ url_for('admin_announcements.delete_announcement', announcement_id=announcement.object_id) }}" class="button">Delete</a>
                                 {% if announcement.send_email and not announcement.email_sent %}
-                                    <a href="{{ url_for('admin_announcements.cancel_announcement_emails', announcement_id=announcement.object_id) }}" class="button tiny">Cancel Emails</a>
+                                    <a href="{{ url_for('admin_announcements.cancel_announcement_emails', announcement_id=announcement.object_id) }}" class="button">Cancel Emails</a>
                                 {% endif %}
                             </td>
                         </tr>

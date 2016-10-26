@@ -56,26 +56,26 @@
             <h4>User Notes</h4>
             <form action="{{ url_for('admin_users.note_user', user_id=user.object_id) }}" method="post">
                 <textarea name="notes">{% if user.note %}{{ user.note }}{% endif %}</textarea>
-                <input type="submit" class="button tiny" value="Update" />
+                <input type="submit" class="large button expanded" value="Update" />
             </form>
             <h4>Actions</h4>
             <ul>
-                <li><a href="{{ url_for('admin_users.impersonate_user', user_id=user.object_id) }}" class="button tiny">Impersonate User</a></li>
+                <li><a href="{{ url_for('admin_users.impersonate_user', user_id=user.object_id) }}" class="button large">Impersonate User</a></li>
                 {% if not user.verified %}
-                    <li><a href="{{ url_for('admin_users.verify_user', user_id=user.object_id) }}" class="button tiny">Verify User</a></li>
+                    <li><a href="{{ url_for('admin_users.verify_user', user_id=user.object_id) }}" class="button large">Verify User</a></li>
                 {% endif %}
                 {% if user.is_admin %}
-                    <li><a href="{{ url_for('admin_users.demote_user', user_id=user.object_id) }}" class="button tiny">Demote User</a></li>
+                    <li><a href="{{ url_for('admin_users.demote_user', user_id=user.object_id) }}" class="button large">Demote User</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('admin_users.promote_user', user_id=user.object_id) }}" class="button tiny">Promote User</a></li>
+                    <li><a href="{{ url_for('admin_users.promote_user', user_id=user.object_id) }}" class="button large">Promote User</a></li>
                 {% endif %}
                 {% if user.has_uncollected_tickets() %}
-                    <li><a href="{{ url_for('admin_users.collect_tickets', user_id=user.object_id) }}" class="button tiny">Collect Tickets</a></li>
+                    <li><a href="{{ url_for('admin_users.collect_tickets', user_id=user.object_id) }}" class="button large">Collect Tickets</a></li>
                 {% endif %}
                 {% if user.battels == None %}
-                    <li><a href="{{ url_for('admin_users.add_manual_battels', user_id=user.object_id) }}" class="button tiny">Manually setup battelling</a></li>
+                    <li><a href="{{ url_for('admin_users.add_manual_battels', user_id=user.object_id) }}" class="button large">Manually setup battelling</a></li>
                 {% endif %}
-                <li><a href="{{ url_for('admin_users.charge_admin_fee', user_id=user.object_id) }}" class="button tiny">Charge admin fee</a></li>
+                <li><a href="{{ url_for('admin_users.charge_admin_fee', user_id=user.object_id) }}" class="button large">Charge admin fee</a></li>
                 <li>
                     <form action="{{ url_for('admin_users.give_user', user_id=user.object_id) }}" method="post" id="give_tickets">
                         Give user
@@ -92,7 +92,7 @@
                         each (leave blank to use default price) with reason
                         <input type="text" name="give_reason" />
                         .
-                        <input type="submit" class="button tiny" />
+                        <input type="submit" class="button large expanded" />
                     </form>
                 </li>
             </ul>
@@ -193,10 +193,10 @@
                     </tbody>
                 </table>
                 {% if self_actions.has_prev %}
-                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, self_actions_page=(self_actions_page-1)) }}#self_actions" class="button tiny">Previous Page</a>
+                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, self_actions_page=(self_actions_page-1)) }}#self_actions" class="button large">Previous Page</a>
                 {% endif %}
                 {% if self_actions.has_next %}
-                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, self_actions_page=(self_actions_page+1)) }}#self_actions" class="button tiny">Next Page</a>
+                    <a href="{{ url_for('admin_users.view_user', user_id=user.object_id, self_actions_page=(self_actions_page+1)) }}#self_actions" class="button large">Next Page</a>
                 {% endif %}
             {% else %}
                 <p>No events performed by user on self.</p>
