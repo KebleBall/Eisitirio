@@ -167,7 +167,7 @@ def update_request():
         for ticket_type, _ in ticket_info.ticket_types
     }
 
-    flashes = purchase_logic.validate_tickets(ticket_info, num_tickets, [])
+    flashes = purchase_logic.validate_tickets(ticket_info, num_tickets)
 
     if flashes:
         for flash in flashes:

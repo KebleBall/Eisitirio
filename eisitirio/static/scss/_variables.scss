@@ -27,11 +27,9 @@ $include-open-sans: false !default;
 
 $blockquote-font-color: #000 !default;
 
-$header-bg: #950219;
+$header-bg: #333; //#950219;
 $subnav-link-padding: 0.9rem;
 $subnav-font-size: 0.75rem;
 $subnav-link-opacity: 0.15;
 $header-height: 0.5rem;
 $transition: all .35s ease-in-out;
-
-$primary-color: $header-bg;

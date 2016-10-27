@@ -13,22 +13,23 @@
             <p>There is a limit of {{ template_config['MAX_GROUP_MEMBERS'] }} members in each purchase group.</p>
             <div class="rows">
               <div class="small-12 medium-5 columns">
-                <ul class="pricing-table">
-                  <li class="title">Create Group</li>
-                  <li class="description">If you will be leading the group, and will purchase the tickets after the general release, you should create the group. You'll then be given a code for you to pass on to your friends so that they can join the group.</li>
-                  <li class="cta-button"><a class="button large expanded" href="{{ url_for('group_purchase.create') }}">Create Group</a></li>
-                </ul>
+                <h5>Create Group</h5>
+                <div class="callout">
+                  <p>
+                    If you will be leading the group, and will purchase the tickets after the general release, you should create the group. You'll then be given a code for you to pass on to your friends so that they can join the group.
+                  </p>
+                  <a class="button large expanded" href="{{ url_for('group_purchase.create') }}">Create Group</a>
+                </div>
               </div>
               <div class="small-12 medium-7 columns">
                 <form action="{{ url_for('group_purchase.join') }}" method="post">
-                  <ul class="pricing-table">
-                    <li class="title">Join Group</li>
-                    <li class="description">If somebody else has already created a group, they'll have a code for you to join. Enter it below.</li>
-                    <li class="cta-button">
-                      <input type="text" name="code" placeholder="Group Code" style="text-align: center" />
-                      <button class="large expanded button">Join Group</button>
-                    </li>
-                  </ul>
+
+                  <h5>Join Group</h5>
+                  <div class="callout">
+                    <p>If somebody else has already created a group, they'll have a code for you to join. Enter it below.</p>
+                    <input type="text" name="code" placeholder="Group Code" style="text-align: center" />
+                    <button class="large expanded button">Join Group</button>
+                  </div>
                 </form>
               </div>
             </div>

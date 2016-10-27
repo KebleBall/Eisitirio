@@ -58,7 +58,7 @@
       </header>
 
         <div id="wrapper" class="row">
-            <div class="columns">
+            <div class="columns" style="padding-top: 0.5rem;">
 
                 {% include 'blocks/sms_verify.html' %}
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -80,7 +80,7 @@
                 <section id="main" class="row">
                     {% block content %}{% endblock %}
                 </section>
-                <footer class="row">
+                <footer class="row" style="padding-top: 5rem;">
                     <section id="copyright" class="large-8 large-centered columns">
                         <p>&copy; {{ current_year }} {{ template_config['BALL_NAME'] }}. All rights reserved. <a href="{{ template_config['WEBSITE_EMAIL_LINK'] }}" target="_blank">Webmaster</a></p>
                     </section>

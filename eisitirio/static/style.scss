@@ -22,11 +22,11 @@ a {
   overflow: visible;
   padding-top: $header-height;
   padding-bottom: $header-height + ($subnav-link-padding * 2 + $subnav-font-size - 0.15rem);
-  margin-bottom: 0.5rem;
+  //margin-bottom: 0.5rem;
 
   .header-text {
-    padding-top: 10vh;
-    padding-bottom: 10vh;
+    padding-top: 5vh;
+    padding-bottom: 5vh;
     h1 { font-size: 2 * $h1-font-size; }
     h2 { font-size: 2 * $h2-font-size; }
     h3 { font-size: 2 * $h3-font-size; }
@@ -103,7 +103,7 @@ a {
 
 .message-box {
     display: block;
-    border: 3px solid;
+    border: 0px solid;
     padding: 0.5em;
     margin-bottom: 0.5em;
     background-color: #fff;
