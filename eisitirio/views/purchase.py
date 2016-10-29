@@ -131,7 +131,6 @@ def purchase_home():
                 ticket_info=ticket_info
             )
 
-        roundup_price = purchase_logic.check_roundup_donation(flashes)
 
         tickets = purchase_logic.create_tickets(
             login.current_user,
@@ -146,10 +145,21 @@ def purchase_home():
                 flask.flash('Could not use voucher - ' + error, 'error')
 
 
-        # if roundup_price is not 0:
-            # (success, tickets, error) =
-        # TODO: Add the roundups here for the tickets here. Similar to what's
-        # done for vouchers
+        roundup_price = purchase_logic.check_roundup_donation(flashes)
+
+        if roundup_price is not 0:
+            roundup_donation = None
+
+            roundup_donation = models.RoundupDonation(
+                    roundup_price,
+                    login.current_user,
+            )
+
+            if roundup_donation is not None:
+                # Tack on the roundup donation fee to their ticket
+                tickets = roundup_donation.apply(tickets)
+                DB.session.add(roundup_donation);
+
 
         DB.session.add_all(tickets)
         DB.session.commit()

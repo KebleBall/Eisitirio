@@ -43,3 +43,4 @@ from eisitirio.database.transaction_item import TransactionItem
 from eisitirio.database.user import User
 from eisitirio.database.voucher import Voucher
 from eisitirio.database.waiting import Waiting
+from eisitirio.database.roundup_donation import RoundupDonation

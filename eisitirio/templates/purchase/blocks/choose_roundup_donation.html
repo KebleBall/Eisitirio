@@ -11,7 +11,9 @@
       <div class="columns">
         <label for="roundup_donation">
           <input type="radio" name="roundup_donation" id="make_roundup_donation" value="make_roundup_donation" class="roundup_donation_option" required="required"/>
-          Yes, I would like to contribute &pound;{{ template_config['ROUNDUP_DONATION_AMT'] }} per ticket to {{ template_config['BALL_CHARITY'] }}
+          Yes, I would like to contribute
+          <!--&pound;<span id="roundup_donation_amt">{{ template_config['ROUNDUP_DONATION_AMT'] }}</span>-->
+          &pound;{{ template_config['ROUNDUP_DONATION_AMT'] }} per ticket to {{ template_config['BALL_CHARITY'] }}
         </label>
         <label for="roundup_donation">
           <input type="radio" name="roundup_donation" id="no_roundup_donation" value="no_roundup_donation" class="roundup_donation_option" required="required"/>

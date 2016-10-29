@@ -101,6 +101,7 @@
 
             $("#total_value").html("&pound;" + price_str.slice(0, -2) + "." + price_str.slice(-2));
             $("#total_tickets").html(total_tickets_ordered);
+            //$("#roundup_donation_amt").html(total_tickets_ordered);
 
             var guest_tickets_available = ticket_info.guest_tickets_available - guest_tickets_ordered;
             var total_tickets_available = ticket_info.total_tickets_available - total_tickets_ordered;
