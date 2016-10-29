@@ -57,9 +57,9 @@ class RoundupDonation(DB.Model):
         return [self.apply_to_ticket(t) for t in tickets]
 
     def apply_to_ticket(self, ticket):
-        print 'Ticket price before/roundup donation amt: {0}/{1}'.format(ticket.price, self.base_donation_amt)
+        # TODO: Make sure that this is correct (it looks like the prices
+        # are being represented by an int that is multiplied by 10???)
         ticket.price = ticket.price + self.base_donation_amt
         self.total_amount = self.total_amount + self.base_donation_amt
-        print 'Ticket price after/roundup donation amt: {0}/{1}'.format(ticket.price, self.base_donation_amt)
         ticket.add_note('Roundup donation amt {0}'.format(self.base_donation_amt))
         return ticket
