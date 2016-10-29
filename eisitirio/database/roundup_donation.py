@@ -12,12 +12,12 @@ class RoundupDonation(DB.Model):
     __tablename__ = 'roundup_donation'
 
     base_donation_amt = DB.Column(
-        DB.Float(),
+        DB.Integer(),
         nullable = False
     )
 
     total_amount = DB.Column(
-        DB.Float(),
+        DB.Integer(),
         nullable = False
     )
 
@@ -37,7 +37,9 @@ class RoundupDonation(DB.Model):
     )
 
     def __init__(self, amount, charged_to):
-        self.base_donation_amt = amount
+        # Internal representaion of amt is integer. So need to multiply by
+        # 100
+        self.base_donation_amt = int(amount * 100)
         self.charged_to = charged_to
         self.total_amount = 0
 
