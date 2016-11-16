@@ -27,9 +27,9 @@
       <header class="header">
         <section id="user" class="small-12 large-offset-6 large-6 columns">
           {% if current_user.is_anonymous %}
-          <p>You are not currently logged in. <a href="{{ url_for('front.home') }}#log-in-form">Log in.</a></p>
+          <p style="color: white;">You are not currently logged in. <a href="{{ url_for('front.home') }}#log-in-form">Log in.</a></p>
           {% else %}
-          <p>You are currently logged in as {{ current_user.full_name }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
+          <p style="color: white;">You are currently logged in as {{ current_user.full_name }}. <a href="{{ url_for('front.logout') }}">Log out.</a></p>
           {% endif %}
         </section>
         <div class="header-text">

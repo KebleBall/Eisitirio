@@ -832,9 +832,9 @@ h6 { font-size: 1rem; }
   /* line 313, scss/vendor/typography/_base.scss */
   h6 { font-size: 1rem; } }
 /* line 321, scss/vendor/typography/_base.scss */
-a { color: blue; text-decoration: none; line-height: inherit; cursor: pointer; }
+a { color: midnightblue; text-decoration: none; line-height: inherit; cursor: pointer; }
 /* line 327, scss/vendor/typography/_base.scss */
-a:hover, a:focus { color: #0000db; }
+a:hover, a:focus { color: #161660; }
 /* line 335, scss/vendor/typography/_base.scss */
 a img { border: 0; }
 
@@ -1071,11 +1071,11 @@ select[multiple] { height: auto; background-image: none; }
 .form-error.is-visible { display: block; }
 
 /* line 209, scss/vendor/components/_button.scss */
-.button { display: inline-block; text-align: center; line-height: 1; cursor: pointer; -webkit-appearance: none; transition: background-color 0.25s ease-out, color 0.25s ease-out; vertical-align: middle; border: 1px solid transparent; border-radius: 0; padding: 0.85em 1em; margin: 0 0 1rem 0; font-size: 0.9rem; background-color: blue; color: #fefefe; }
+.button { display: inline-block; text-align: center; line-height: 1; cursor: pointer; -webkit-appearance: none; transition: background-color 0.25s ease-out, color 0.25s ease-out; vertical-align: middle; border: 1px solid transparent; border-radius: 0; padding: 0.85em 1em; margin: 0 0 1rem 0; font-size: 0.9rem; background-color: midnightblue; color: #fefefe; }
 /* line 173, scss/vendor/util/_mixins.scss */
 [data-whatinput='mouse'] .button { outline: 0; }
 /* line 121, scss/vendor/components/_button.scss */
-.button:hover, .button:focus { background-color: #0000d9; color: #fefefe; }
+.button:hover, .button:focus { background-color: #15155f; color: #fefefe; }
 /* line 214, scss/vendor/components/_button.scss */
 .button.tiny { font-size: 0.6rem; }
 /* line 214, scss/vendor/components/_button.scss */
@@ -1085,9 +1085,9 @@ select[multiple] { height: auto; background-image: none; }
 /* line 219, scss/vendor/components/_button.scss */
 .button.expanded { display: block; width: 100%; margin-left: 0; margin-right: 0; }
 /* line 224, scss/vendor/components/_button.scss */
-.button.primary { background-color: blue; color: #fefefe; }
+.button.primary { background-color: midnightblue; color: #fefefe; }
 /* line 121, scss/vendor/components/_button.scss */
-.button.primary:hover, .button.primary:focus { background-color: #0000cc; color: #fefefe; }
+.button.primary:hover, .button.primary:focus { background-color: #14145a; color: #fefefe; }
 /* line 224, scss/vendor/components/_button.scss */
 .button.secondary { background-color: #777; color: #fefefe; }
 /* line 121, scss/vendor/components/_button.scss */
@@ -1105,15 +1105,15 @@ select[multiple] { height: auto; background-image: none; }
 /* line 121, scss/vendor/components/_button.scss */
 .button.alert:hover, .button.alert:focus { background-color: #da3116; color: #fefefe; }
 /* line 241, scss/vendor/components/_button.scss */
-.button.hollow { border: 1px solid blue; color: blue; }
+.button.hollow { border: 1px solid midnightblue; color: midnightblue; }
 /* line 129, scss/vendor/components/_button.scss */
 .button.hollow, .button.hollow:hover, .button.hollow:focus { background-color: transparent; }
 /* line 144, scss/vendor/components/_button.scss */
-.button.hollow:hover, .button.hollow:focus { border-color: navy; color: navy; }
+.button.hollow:hover, .button.hollow:focus { border-color: #0d0d38; color: #0d0d38; }
 /* line 246, scss/vendor/components/_button.scss */
-.button.hollow.primary { border: 1px solid blue; color: blue; }
+.button.hollow.primary { border: 1px solid midnightblue; color: midnightblue; }
 /* line 144, scss/vendor/components/_button.scss */
-.button.hollow.primary:hover, .button.hollow.primary:focus { border-color: navy; color: navy; }
+.button.hollow.primary:hover, .button.hollow.primary:focus { border-color: #0d0d38; color: #0d0d38; }
 /* line 246, scss/vendor/components/_button.scss */
 .button.hollow.secondary { border: 1px solid #777; color: #777; }
 /* line 144, scss/vendor/components/_button.scss */
@@ -1133,11 +1133,11 @@ select[multiple] { height: auto; background-image: none; }
 /* line 254, scss/vendor/components/_button.scss */
 .button.disabled, .button[disabled] { opacity: 0.25; cursor: not-allowed; }
 /* line 155, scss/vendor/components/_button.scss */
-.button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus { background-color: blue; color: #fefefe; }
+.button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus { background-color: midnightblue; color: #fefefe; }
 /* line 259, scss/vendor/components/_button.scss */
 .button.disabled.primary, .button[disabled].primary { opacity: 0.25; cursor: not-allowed; }
 /* line 155, scss/vendor/components/_button.scss */
-.button.disabled.primary:hover, .button.disabled.primary:focus, .button[disabled].primary:hover, .button[disabled].primary:focus { background-color: blue; color: #fefefe; }
+.button.disabled.primary:hover, .button.disabled.primary:focus, .button[disabled].primary:hover, .button[disabled].primary:focus { background-color: midnightblue; color: #fefefe; }
 /* line 259, scss/vendor/components/_button.scss */
 .button.disabled.secondary, .button[disabled].secondary { opacity: 0.25; cursor: not-allowed; }
 /* line 155, scss/vendor/components/_button.scss */
@@ -1168,7 +1168,7 @@ select[multiple] { height: auto; background-image: none; }
 .accordion-item:last-child > :last-child { border-radius: 0 0 0 0; }
 
 /* line 126, scss/vendor/components/_accordion.scss */
-.accordion-title { display: block; padding: 1.25rem 1rem; line-height: 1; font-size: 0.75rem; color: blue; position: relative; border: 1px solid #e6e6e6; border-bottom: 0; }
+.accordion-title { display: block; padding: 1.25rem 1rem; line-height: 1; font-size: 0.75rem; color: midnightblue; position: relative; border: 1px solid #e6e6e6; border-bottom: 0; }
 /* line 78, scss/vendor/components/_accordion.scss */
 :last-child:not(.is-active) > .accordion-title { border-radius: 0 0 0 0; border-bottom: 1px solid #e6e6e6; }
 /* line 83, scss/vendor/components/_accordion.scss */
@@ -1186,13 +1186,13 @@ select[multiple] { height: auto; background-image: none; }
 /* line 15, scss/vendor/components/_accordion-menu.scss */
 .is-accordion-submenu-parent > a { position: relative; }
 /* line 18, scss/vendor/components/_accordion-menu.scss */
-.is-accordion-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 6px; border-color: blue transparent transparent; border-top-style: solid; border-bottom-width: 0; position: absolute; top: 50%; margin-top: -4px; right: 1rem; }
+.is-accordion-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 6px; border-color: midnightblue transparent transparent; border-top-style: solid; border-bottom-width: 0; position: absolute; top: 50%; margin-top: -4px; right: 1rem; }
 
 /* line 27, scss/vendor/components/_accordion-menu.scss */
 .is-accordion-submenu-parent[aria-expanded='true'] > a::after { transform-origin: 50% 50%; transform: scaleY(-1); }
 
 /* line 40, scss/vendor/components/_badge.scss */
-.badge { display: inline-block; padding: 0.3em; min-width: 2.1em; font-size: 0.6rem; text-align: center; border-radius: 50%; background: blue; color: #fefefe; }
+.badge { display: inline-block; padding: 0.3em; min-width: 2.1em; font-size: 0.6rem; text-align: center; border-radius: 50%; background: midnightblue; color: #fefefe; }
 /* line 48, scss/vendor/components/_badge.scss */
 .badge.secondary { background: #777; color: #fefefe; }
 /* line 48, scss/vendor/components/_badge.scss */
@@ -1213,7 +1213,7 @@ select[multiple] { height: auto; background-image: none; }
 /* line 62, scss/vendor/components/_breadcrumbs.scss */
 .breadcrumbs li:not(:last-child)::after { color: #cacaca; content: "/"; margin: 0 0.75rem; position: relative; top: 1px; opacity: 1; }
 /* line 77, scss/vendor/components/_breadcrumbs.scss */
-.breadcrumbs a { color: blue; }
+.breadcrumbs a { color: midnightblue; }
 /* line 80, scss/vendor/components/_breadcrumbs.scss */
 .breadcrumbs a:hover { text-decoration: underline; }
 /* line 90, scss/vendor/components/_breadcrumbs.scss */
@@ -1262,9 +1262,9 @@ select[multiple] { height: auto; background-image: none; }
 /* line 94, scss/vendor/components/_button-group.scss */
 .button-group.expanded .button:first-child:nth-last-child(6):last-child, .button-group.expanded .button:first-child:nth-last-child(6):first-child:nth-last-child(6) ~ .button:last-child { margin-right: -6px; }
 /* line 182, scss/vendor/components/_button-group.scss */
-.button-group.primary .button { background-color: blue; color: #fefefe; }
+.button-group.primary .button { background-color: midnightblue; color: #fefefe; }
 /* line 121, scss/vendor/components/_button.scss */
-.button-group.primary .button:hover, .button-group.primary .button:focus { background-color: #0000cc; color: #fefefe; }
+.button-group.primary .button:hover, .button-group.primary .button:focus { background-color: #14145a; color: #fefefe; }
 /* line 182, scss/vendor/components/_button-group.scss */
 .button-group.secondary .button { background-color: #777; color: #fefefe; }
 /* line 121, scss/vendor/components/_button.scss */
@@ -1311,7 +1311,7 @@ select[multiple] { height: auto; background-image: none; }
 /* line 59, scss/vendor/components/_callout.scss */
 .callout > :last-child { margin-bottom: 0; }
 /* line 92, scss/vendor/components/_callout.scss */
-.callout.primary { background-color: #d9d9ff; }
+.callout.primary { background-color: #d1d1f5; }
 /* line 92, scss/vendor/components/_callout.scss */
 .callout.secondary { background-color: #ebebeb; }
 /* line 92, scss/vendor/components/_callout.scss */
@@ -1387,7 +1387,7 @@ select[multiple] { height: auto; background-image: none; }
 /* line 300, scss/vendor/components/_menu.scss */
 .menu.nested { margin-left: 1rem; }
 /* line 305, scss/vendor/components/_menu.scss */
-.menu .active > a { color: #fefefe; background: blue; }
+.menu .active > a { color: #fefefe; background: midnightblue; }
 /* line 312, scss/vendor/components/_menu.scss */
 .menu.menu-bordered li { border: 1px solid #e6e6e6; }
 /* line 314, scss/vendor/components/_menu.scss */
@@ -1437,10 +1437,10 @@ select[multiple] { height: auto; background-image: none; }
 /* line 63, scss/vendor/components/_drilldown.scss */
 .is-drilldown-submenu-parent > a { position: relative; }
 /* line 66, scss/vendor/components/_drilldown.scss */
-.is-drilldown-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 6px; border-color: transparent transparent transparent blue; border-left-style: solid; border-right-width: 0; position: absolute; top: 50%; margin-top: -6px; right: 1rem; }
+.is-drilldown-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 6px; border-color: transparent transparent transparent midnightblue; border-left-style: solid; border-right-width: 0; position: absolute; top: 50%; margin-top: -6px; right: 1rem; }
 
 /* line 75, scss/vendor/components/_drilldown.scss */
-.js-drilldown-back > a::before { content: ''; display: block; width: 0; height: 0; border: inset 6px; border-color: transparent blue transparent transparent; border-right-style: solid; border-left-width: 0; border-left-width: 0; display: inline-block; vertical-align: middle; margin-right: 0.75rem; }
+.js-drilldown-back > a::before { content: ''; display: block; width: 0; height: 0; border: inset 6px; border-color: transparent midnightblue transparent transparent; border-right-style: solid; border-left-width: 0; border-left-width: 0; display: inline-block; vertical-align: middle; margin-right: 0.75rem; }
 
 /* line 60, scss/vendor/components/_dropdown.scss */
 .dropdown-pane { background-color: #e6e6e6; border: 1px solid #cacaca; border-radius: 0; display: block; font-size: 1rem; padding: 1rem; position: absolute; visibility: hidden; width: 300px; z-index: 10; }
@@ -1463,7 +1463,7 @@ select[multiple] { height: auto; background-image: none; }
 /* line 68, scss/vendor/components/_dropdown-menu.scss */
 .dropdown.menu > li.is-dropdown-submenu-parent > a { padding-right: 1.5rem; position: relative; }
 /* line 73, scss/vendor/components/_dropdown-menu.scss */
-.dropdown.menu > li.is-dropdown-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: blue transparent transparent; border-top-style: solid; border-bottom-width: 0; right: 5px; margin-top: -2px; }
+.dropdown.menu > li.is-dropdown-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: midnightblue transparent transparent; border-top-style: solid; border-bottom-width: 0; right: 5px; margin-top: -2px; }
 /* line 173, scss/vendor/util/_mixins.scss */
 [data-whatinput='mouse'] .dropdown.menu a { outline: 0; }
 /* line 118, scss/vendor/components/_dropdown-menu.scss */
@@ -1477,9 +1477,9 @@ select[multiple] { height: auto; background-image: none; }
 /* line 35, scss/vendor/components/_dropdown-menu.scss */
 .dropdown.menu.vertical > li > a::after { right: 14px; margin-top: -3px; }
 /* line 40, scss/vendor/components/_dropdown-menu.scss */
-.dropdown.menu.vertical > li.opens-left > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent blue transparent transparent; border-right-style: solid; border-left-width: 0; }
+.dropdown.menu.vertical > li.opens-left > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent midnightblue transparent transparent; border-right-style: solid; border-left-width: 0; }
 /* line 44, scss/vendor/components/_dropdown-menu.scss */
-.dropdown.menu.vertical > li.opens-right > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent transparent transparent blue; border-left-style: solid; border-right-width: 0; }
+.dropdown.menu.vertical > li.opens-right > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent transparent transparent midnightblue; border-left-style: solid; border-right-width: 0; }
 @media screen and (min-width: 40em) { /* line 52, scss/vendor/components/_dropdown-menu.scss */
   .dropdown.menu.medium-horizontal > li.opens-left > .is-dropdown-submenu { left: auto; right: 0; top: 100%; }
   /* line 60, scss/vendor/components/_dropdown-menu.scss */
@@ -1487,7 +1487,7 @@ select[multiple] { height: auto; background-image: none; }
   /* line 68, scss/vendor/components/_dropdown-menu.scss */
   .dropdown.menu.medium-horizontal > li.is-dropdown-submenu-parent > a { padding-right: 1.5rem; position: relative; }
   /* line 73, scss/vendor/components/_dropdown-menu.scss */
-  .dropdown.menu.medium-horizontal > li.is-dropdown-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: blue transparent transparent; border-top-style: solid; border-bottom-width: 0; right: 5px; margin-top: -2px; }
+  .dropdown.menu.medium-horizontal > li.is-dropdown-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: midnightblue transparent transparent; border-top-style: solid; border-bottom-width: 0; right: 5px; margin-top: -2px; }
   /* line 82, scss/vendor/components/_dropdown-menu.scss */
   .dropdown.menu.medium-vertical > li .is-dropdown-submenu { top: 0; }
   /* line 87, scss/vendor/components/_dropdown-menu.scss */
@@ -1497,9 +1497,9 @@ select[multiple] { height: auto; background-image: none; }
   /* line 35, scss/vendor/components/_dropdown-menu.scss */
   .dropdown.menu.medium-vertical > li > a::after { right: 14px; margin-top: -3px; }
   /* line 40, scss/vendor/components/_dropdown-menu.scss */
-  .dropdown.menu.medium-vertical > li.opens-left > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent blue transparent transparent; border-right-style: solid; border-left-width: 0; }
+  .dropdown.menu.medium-vertical > li.opens-left > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent midnightblue transparent transparent; border-right-style: solid; border-left-width: 0; }
   /* line 44, scss/vendor/components/_dropdown-menu.scss */
-  .dropdown.menu.medium-vertical > li.opens-right > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent transparent transparent blue; border-left-style: solid; border-right-width: 0; } }
+  .dropdown.menu.medium-vertical > li.opens-right > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent transparent transparent midnightblue; border-left-style: solid; border-right-width: 0; } }
 @media screen and (min-width: 64em) { /* line 52, scss/vendor/components/_dropdown-menu.scss */
   .dropdown.menu.large-horizontal > li.opens-left > .is-dropdown-submenu { left: auto; right: 0; top: 100%; }
   /* line 60, scss/vendor/components/_dropdown-menu.scss */
@@ -1507,7 +1507,7 @@ select[multiple] { height: auto; background-image: none; }
   /* line 68, scss/vendor/components/_dropdown-menu.scss */
   .dropdown.menu.large-horizontal > li.is-dropdown-submenu-parent > a { padding-right: 1.5rem; position: relative; }
   /* line 73, scss/vendor/components/_dropdown-menu.scss */
-  .dropdown.menu.large-horizontal > li.is-dropdown-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: blue transparent transparent; border-top-style: solid; border-bottom-width: 0; right: 5px; margin-top: -2px; }
+  .dropdown.menu.large-horizontal > li.is-dropdown-submenu-parent > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: midnightblue transparent transparent; border-top-style: solid; border-bottom-width: 0; right: 5px; margin-top: -2px; }
   /* line 82, scss/vendor/components/_dropdown-menu.scss */
   .dropdown.menu.large-vertical > li .is-dropdown-submenu { top: 0; }
   /* line 87, scss/vendor/components/_dropdown-menu.scss */
@@ -1517,9 +1517,9 @@ select[multiple] { height: auto; background-image: none; }
   /* line 35, scss/vendor/components/_dropdown-menu.scss */
   .dropdown.menu.large-vertical > li > a::after { right: 14px; margin-top: -3px; }
   /* line 40, scss/vendor/components/_dropdown-menu.scss */
-  .dropdown.menu.large-vertical > li.opens-left > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent blue transparent transparent; border-right-style: solid; border-left-width: 0; }
+  .dropdown.menu.large-vertical > li.opens-left > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent midnightblue transparent transparent; border-right-style: solid; border-left-width: 0; }
   /* line 44, scss/vendor/components/_dropdown-menu.scss */
-  .dropdown.menu.large-vertical > li.opens-right > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent transparent transparent blue; border-left-style: solid; border-right-width: 0; } }
+  .dropdown.menu.large-vertical > li.opens-right > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent transparent transparent midnightblue; border-left-style: solid; border-right-width: 0; } }
 /* line 141, scss/vendor/components/_dropdown-menu.scss */
 .dropdown.menu.align-right .is-dropdown-submenu.first-sub { top: 100%; left: auto; right: 0; }
 
@@ -1544,9 +1544,9 @@ select[multiple] { height: auto; background-image: none; }
 /* line 35, scss/vendor/components/_dropdown-menu.scss */
 .is-dropdown-submenu .is-dropdown-submenu-parent > a::after { right: 14px; margin-top: -3px; }
 /* line 40, scss/vendor/components/_dropdown-menu.scss */
-.is-dropdown-submenu .is-dropdown-submenu-parent.opens-left > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent blue transparent transparent; border-right-style: solid; border-left-width: 0; }
+.is-dropdown-submenu .is-dropdown-submenu-parent.opens-left > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent midnightblue transparent transparent; border-right-style: solid; border-left-width: 0; }
 /* line 44, scss/vendor/components/_dropdown-menu.scss */
-.is-dropdown-submenu .is-dropdown-submenu-parent.opens-right > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent transparent transparent blue; border-left-style: solid; border-right-width: 0; }
+.is-dropdown-submenu .is-dropdown-submenu-parent.opens-right > a::after { content: ''; display: block; width: 0; height: 0; border: inset 5px; border-color: transparent transparent transparent midnightblue; border-left-style: solid; border-right-width: 0; }
 /* line 205, scss/vendor/components/_dropdown-menu.scss */
 .is-dropdown-submenu .is-dropdown-submenu { margin-top: -1px; }
 /* line 210, scss/vendor/components/_dropdown-menu.scss */
@@ -1562,7 +1562,7 @@ select[multiple] { height: auto; background-image: none; }
 .responsive-embed.widescreen, .flex-video.widescreen { padding-bottom: 56.25%; }
 
 /* line 41, scss/vendor/components/_label.scss */
-.label { display: inline-block; padding: 0.33333rem 0.5rem; font-size: 0.8rem; line-height: 1; white-space: nowrap; cursor: default; border-radius: 0; background: blue; color: #fefefe; }
+.label { display: inline-block; padding: 0.33333rem 0.5rem; font-size: 0.8rem; line-height: 1; white-space: nowrap; cursor: default; border-radius: 0; background: midnightblue; color: #fefefe; }
 /* line 49, scss/vendor/components/_label.scss */
 .label.secondary { background: #777; color: #fefefe; }
 /* line 49, scss/vendor/components/_label.scss */
@@ -1715,7 +1715,7 @@ html, body { height: 100%; }
 /* line 109, scss/vendor/components/_pagination.scss */
 .pagination a:hover, .pagination button:hover { background: #e6e6e6; }
 /* line 145, scss/vendor/components/_pagination.scss */
-.pagination .current { padding: 0.1875rem 0.625rem; background: blue; color: #fefefe; cursor: default; }
+.pagination .current { padding: 0.1875rem 0.625rem; background: midnightblue; color: #fefefe; cursor: default; }
 /* line 149, scss/vendor/components/_pagination.scss */
 .pagination .disabled { padding: 0.1875rem 0.625rem; color: #cacaca; cursor: not-allowed; }
 /* line 129, scss/vendor/components/_pagination.scss */
@@ -1732,7 +1732,7 @@ html, body { height: 100%; }
 /* line 43, scss/vendor/components/_progress-bar.scss */
 .progress { background-color: #cacaca; height: 1rem; margin-bottom: 1rem; border-radius: 0; }
 /* line 48, scss/vendor/components/_progress-bar.scss */
-.progress.primary .progress-meter { background-color: blue; }
+.progress.primary .progress-meter { background-color: midnightblue; }
 /* line 48, scss/vendor/components/_progress-bar.scss */
 .progress.secondary .progress-meter { background-color: #777; }
 /* line 48, scss/vendor/components/_progress-bar.scss */
@@ -1743,7 +1743,7 @@ html, body { height: 100%; }
 .progress.alert .progress-meter { background-color: #ec5840; }
 
 /* line 56, scss/vendor/components/_progress-bar.scss */
-.progress-meter { position: relative; display: block; width: 0%; height: 100%; background-color: blue; }
+.progress-meter { position: relative; display: block; width: 0%; height: 100%; background-color: midnightblue; }
 
 /* line 61, scss/vendor/components/_progress-bar.scss */
 .progress-meter-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); position: absolute; margin: 0; font-size: 0.75rem; font-weight: bold; color: #fefefe; white-space: nowrap; }
@@ -1757,11 +1757,11 @@ html, body { height: 100%; }
 .slider-fill.is-dragging { transition: all 0s linear; }
 
 /* line 112, scss/vendor/components/_slider.scss */
-.slider-handle { position: absolute; top: 50%; transform: translateY(-50%); position: absolute; left: 0; z-index: 1; display: inline-block; width: 1.4rem; height: 1.4rem; background-color: blue; transition: all 0.2s ease-in-out; touch-action: manipulation; border-radius: 0; }
+.slider-handle { position: absolute; top: 50%; transform: translateY(-50%); position: absolute; left: 0; z-index: 1; display: inline-block; width: 1.4rem; height: 1.4rem; background-color: midnightblue; transition: all 0.2s ease-in-out; touch-action: manipulation; border-radius: 0; }
 /* line 173, scss/vendor/util/_mixins.scss */
 [data-whatinput='mouse'] .slider-handle { outline: 0; }
 /* line 63, scss/vendor/components/_slider.scss */
-.slider-handle:hover { background-color: #0000d9; }
+.slider-handle:hover { background-color: #15155f; }
 /* line 67, scss/vendor/components/_slider.scss */
 .slider-handle.is-dragging { transition: all 0s linear; }
 
@@ -1844,7 +1844,7 @@ input + .switch-paddle { margin: 0; }
 /* line 102, scss/vendor/components/_switch.scss */
 .switch-paddle::after { background: #fefefe; content: ''; display: block; position: absolute; height: 1.5rem; left: 0.25rem; top: 0.25rem; width: 1.5rem; transition: all 0.25s ease-out; transform: translate3d(0, 0, 0); border-radius: 0; }
 /* line 117, scss/vendor/components/_switch.scss */
-input:checked ~ .switch-paddle { background: blue; }
+input:checked ~ .switch-paddle { background: midnightblue; }
 /* line 120, scss/vendor/components/_switch.scss */
 input:checked ~ .switch-paddle::after { left: 2.25rem; }
 /* line 173, scss/vendor/util/_mixins.scss */
@@ -1962,11 +1962,11 @@ table.hover:not(.unstriped) tr:nth-of-type(even):hover { background-color: #ecec
 .tabs.simple > li > a:hover { background: transparent; }
 
 /* line 137, scss/vendor/components/_tabs.scss */
-.tabs.primary { background: blue; }
+.tabs.primary { background: midnightblue; }
 /* line 140, scss/vendor/components/_tabs.scss */
 .tabs.primary > li > a { color: #fefefe; }
 /* line 143, scss/vendor/components/_tabs.scss */
-.tabs.primary > li > a:hover, .tabs.primary > li > a:focus { background: #0000f2; }
+.tabs.primary > li > a:hover, .tabs.primary > li > a:focus { background: #1c1c7f; }
 
 /* line 150, scss/vendor/components/_tabs.scss */
 .tabs-title { float: left; }
@@ -1994,7 +1994,7 @@ table.hover:not(.unstriped) tr:nth-of-type(even):hover { background-color: #ecec
 /* line 59, scss/vendor/components/_thumbnail.scss */
 a.thumbnail { transition: box-shadow 200ms ease-out; }
 /* line 46, scss/vendor/components/_thumbnail.scss */
-a.thumbnail:hover, a.thumbnail:focus { box-shadow: 0 0 6px 1px rgba(0, 0, 255, 0.5); }
+a.thumbnail:hover, a.thumbnail:focus { box-shadow: 0 0 6px 1px rgba(25, 25, 112, 0.5); }
 /* line 50, scss/vendor/components/_thumbnail.scss */
 a.thumbnail image { box-shadow: none; }
 
@@ -2141,86 +2141,86 @@ a { font-weight: bold; }
 /* line 16, style.scss */
 .header { text-align: center; background-image: url(./images/headerbg.jpg); background-size: cover; background-attachment: fixed; position: relative; overflow: visible; padding-top: 0.5rem; padding-bottom: 2.9rem; }
 /* line 27, style.scss */
-.header .header-text { padding-top: 5vh; padding-bottom: 5vh; }
-/* line 30, style.scss */
-.header .header-text h1 { font-size: 4.5rem; }
+.header .header-text { text-transform: uppercase; padding-top: 5vh; padding-bottom: 5vh; }
 /* line 31, style.scss */
-.header .header-text h2 { font-size: 3.9rem; }
+.header .header-text h1 { font-size: 4.5rem; }
 /* line 32, style.scss */
+.header .header-text h2 { font-size: 3.9rem; }
+/* line 33, style.scss */
 .header .header-text h3 { font-size: 3.3rem; }
-/* line 36, style.scss */
+/* line 37, style.scss */
 .header .headline { color: #ffe; }
-/* line 40, style.scss */
+/* line 41, style.scss */
 .header a { color: #ffe; }
 
-/* line 45, style.scss */
+/* line 46, style.scss */
 .header-subnav { float: none; position: relative; text-align: center; margin: 0 auto; bottom: 0; width: 100%; }
-/* line 53, style.scss */
+/* line 54, style.scss */
 .header-subnav li { float: none; display: inline-block; }
-/* line 57, style.scss */
+/* line 58, style.scss */
 .header-subnav li a { padding: 0.9rem 1rem; font-size: 0.75rem; color: #ffe; text-transform: uppercase; display: block; font-weight: bold; letter-spacing: 1px; transition: all 0.35s ease-in-out; }
-/* line 67, style.scss */
+/* line 68, style.scss */
 .header-subnav li a.is-active { background: rgba(250, 250, 250, 0.15); }
-/* line 71, style.scss */
+/* line 72, style.scss */
 .header-subnav li a:hover { background: rgba(250, 250, 250, 0.15); transition: all 0.35s ease-in-out; }
 
-/* line 79, style.scss */
+/* line 80, style.scss */
 #logo { padding-bottom: 2em; text-align: center; }
-/* line 82, style.scss */
+/* line 83, style.scss */
 #logo h1 { font-size: 3rem; margin: 2rem 0 0; }
-/* line 86, style.scss */
+/* line 87, style.scss */
 #logo h2 { font-size: 5rem; margin: 0; }
-/* line 90, style.scss */
+/* line 91, style.scss */
 #logo h3 { font-size: 2rem; margin: 0 0 2rem; }
 
-/* line 96, style.scss */
+/* line 97, style.scss */
 #user { text-align: right; }
 
-/* line 100, style.scss */
+/* line 101, style.scss */
 #copyright { text-align: center; }
 
-/* line 104, style.scss */
+/* line 105, style.scss */
 .message-box, #flashes li { display: block; border: 0px solid; padding: 0.5em; margin-bottom: 0.5em; background-color: #fff; color: #000; }
-/* line 111, style.scss */
+/* line 112, style.scss */
 .message-box.error, #flashes li.error { background-color: #ec5840; border: 3px solid #b42912; }
-/* line 115, style.scss */
+/* line 116, style.scss */
 .message-box.warning, #flashes li.warning { background-color: #ffae00; border: 3px solid #996800; }
-/* line 119, style.scss */
+/* line 120, style.scss */
 .message-box.success, #flashes li.success { background-color: #3adb76; border: 3px solid #1b9448; }
-/* line 123, style.scss */
+/* line 124, style.scss */
 .message-box.info, #flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
-/* line 127, style.scss */
+/* line 128, style.scss */
 .message-box p:last-child, #flashes li p:last-child { margin-bottom: 0; }
-/* line 130, style.scss */
+/* line 131, style.scss */
 .message-box h1, #flashes li h1, .message-box h2, #flashes li h2, .message-box h3, #flashes li h3, .message-box h4, #flashes li h4, .message-box h5, #flashes li h5, .message-box h6, #flashes li h6 { font-family: "Open Sans", Helvetica, sans-serif; }
 
-/* line 136, style.scss */
+/* line 137, style.scss */
 #flashes ul { margin: 0; }
-/* line 139, style.scss */
+/* line 140, style.scss */
 #flashes li { margin: 0.5em 0; }
 
-/* line 145, style.scss */
+/* line 146, style.scss */
 p.small, li.small { font-size: 0.75rem; }
 
-/* line 149, style.scss */
+/* line 150, style.scss */
 table .button { margin: 0; }
 
-/* line 155, style.scss */
+/* line 156, style.scss */
 #give_tickets input, #refund_transaction input { display: inline; }
-/* line 157, style.scss */
+/* line 158, style.scss */
 #give_tickets input[type="number"], #refund_transaction input[type="number"] { width: 5rem; }
-/* line 160, style.scss */
+/* line 161, style.scss */
 #give_tickets input[type="text"], #refund_transaction input[type="text"] { width: auto; }
 
-/* line 166, style.scss */
+/* line 167, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
 
-/* line 172, style.scss */
+/* line 173, style.scss */
 .upload_photo { margin-bottom: 1rem; }
-/* line 174, style.scss */
+/* line 175, style.scss */
 .upload_photo .large-9 { padding-top: 2rem; }
 
-/* line 179, style.scss */
+/* line 180, style.scss */
 #validate_ticket #holder_photo img { display: block; margin: auto; max-height: 500px; }
 
 /*# sourceMappingURL=style.css.map */
