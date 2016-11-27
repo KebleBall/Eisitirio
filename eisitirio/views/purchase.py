@@ -170,18 +170,18 @@ def purchase_home():
             user=login.current_user
         )
 
-        return flask.render_template(
-            'purchase/purchase_home.html',
-            num_tickets=num_tickets,
-            ticket_info=ticket_info
-        )
-        # return payment_logic.do_payment(
-        #     tickets,
-        #     postage,
-        #     payment_method,
-        #     payment_term,
-        #     address
+        # return flask.render_template(
+        #    'purchase/purchase_home.html',
+        #    num_tickets=num_tickets,
+        #    ticket_info=ticket_info
         # )
+        return payment_logic.do_payment(
+         tickets,
+         postage,
+         payment_method,
+         payment_term,
+         address
+        )
     else:
         return flask.render_template(
             'purchase/purchase_home.html',
