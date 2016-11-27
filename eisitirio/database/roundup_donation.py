@@ -39,7 +39,7 @@ class RoundupDonation(DB.Model):
     def __init__(self, amount, charged_to):
         # Internal representaion of amt is integer. So need to multiply by
         # 100
-        self.base_donation_amt = int(amount * 100)
+        self.base_donation_amt = amount
         self.charged_to = charged_to
         self.total_amount = 0
 
