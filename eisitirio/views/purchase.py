@@ -156,7 +156,7 @@ def purchase_home():
             )
 
             if roundup_donation is not None:
-                # Tack on the roundup donation fee to their ticket
+                # Tack on the roundup donation fee to their ticket(s)
                 tickets = roundup_donation.apply(tickets)
                 DB.session.add(roundup_donation);
 
