@@ -567,12 +567,10 @@ def pay_admin_fee(admin_fee_id):
                           flask.url_for('dashboard.dashboard_home'))
 
 @PURCHASE.route('/purchase/test-transaction', methods=['GET', 'POST'])
-@login.login_required
 def test_transaction():
     return flask.render_template('purchase/test_transaction_page.html')
 
-@PURCHASE.route('/purchase/payment-processed', methods=['POST'])
-@login.login_required
+@PURCHASE.route('/purchase/payment-processed', methods=['GET','POST'])
 def payment_processed():
     print request.form
     return "Looks good"
