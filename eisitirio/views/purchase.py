@@ -572,5 +572,8 @@ def test_transaction():
 
 @PURCHASE.route('/purchase/payment-processed', methods=['GET','POST'])
 def payment_processed():
-    print request.form
-    return "Looks good"
+    if request.method == 'POST':
+        print request.form
+        return "Looks good: POST request"
+    else
+        return "Looks good: GET request"
