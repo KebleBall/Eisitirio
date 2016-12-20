@@ -575,5 +575,5 @@ def payment_processed():
     if request.method == 'POST':
         print request.form
         return "Looks good: POST request"
-    else
+    else:
         return "Looks good: GET request"
