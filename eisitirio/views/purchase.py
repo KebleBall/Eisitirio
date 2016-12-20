@@ -572,8 +572,8 @@ def test_transaction():
 
 @PURCHASE.route('/purchase/payment-processed', methods=['GET','POST'])
 def payment_processed():
-    if request.method == 'POST':
-        print request.form
+    if flask.request.method == 'POST':
+        print flask.request.form
         return "Looks good: POST request"
     else:
         return "Looks good: GET request"
