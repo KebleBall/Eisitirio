@@ -553,8 +553,13 @@ def test_transaction():
 @PURCHASE.route('/purchase/payment-processed', methods=['GET','POST'])
 def payment_processed():
     if flask.request.method == 'POST':
-        #return "Looks good: POST request. FORM: {0}\n HEADERS: {1}\n ARGS: {2}".format(flask.request.form, flask.request.headers, flask.request.args)
-        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+        realex_logic.process_payment(flask.request)
+        return "Looks good: POST request.\n RESULT CODE: {0}\n PASREF: {1}\n ORDER ID: {2}\n".format(
+            flask.request.form['RESULT'],
+            flask.request.form['PASREF'],
+            flask.request.form['ORDER_ID']
+        )
+        # return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
         return "Looks good: GET request. CHANGE ID: 1"
 
