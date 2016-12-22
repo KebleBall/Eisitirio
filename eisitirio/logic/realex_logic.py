@@ -195,7 +195,11 @@ def get_transaction_id(str):
 
 def process_payment(request):
 
-    form = RealexForm(data=request.form)
+    transaction = models.transaction.get_by_id(
+        get_transaction_id(request['ORDER_ID'])
+    )
+
+    form = RealexForm(transaction=transaction, data=request.form)
 
     # Path 1: SHA1HASH check does not match
     try:
@@ -217,10 +221,6 @@ def process_payment(request):
             'warning'
         )
         return None
-
-    transaction = models.transaction.get_by_id(
-        get_transaction_id(request['ORDER_ID'])
-    )
 
     realex_transaction = transaction.eway_transaction
     realex_transaction.completed = datetime.datetime.utcnow()
