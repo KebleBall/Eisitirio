@@ -553,9 +553,8 @@ def test_transaction():
 @PURCHASE.route('/purchase/payment-processed', methods=['GET','POST'])
 def payment_processed():
     if flask.request.method == 'POST':
-        print flask.request.form
-        return "Looks good: POST request. FORM: {0}\n HEADERS: {1}\n ARGS: {2}".format(flask.request.form, flask.request.headers, flask.request.args)
-
+        #return "Looks good: POST request. FORM: {0}\n HEADERS: {1}\n ARGS: {2}".format(flask.request.form, flask.request.headers, flask.request.args)
+        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
         return "Looks good: GET request. CHANGE ID: 1"
 
