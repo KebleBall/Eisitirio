@@ -554,7 +554,8 @@ def test_transaction():
 def payment_processed():
     if flask.request.method == 'POST':
         print flask.request.form
-        return "Looks good: POST request"
+        return "Looks good: POST request. FORM: {0}\n HEADERS: {1}\n ARGS: {2}".format(request.form, request.headers, request.args)
+        
     else:
         return "Looks good: GET request"
 
