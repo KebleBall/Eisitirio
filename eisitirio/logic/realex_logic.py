@@ -196,7 +196,7 @@ def get_transaction_id(str):
 def process_payment(request):
 
     transaction = models.Transaction.get_by_id(
-        get_transaction_id(request.form['ORDER_ID'])
+        get_transaction_id(request['ORDER_ID'])
     )
 
     form = RealexForm(transaction=transaction, data=request.form)
@@ -224,9 +224,9 @@ def process_payment(request):
 
     realex_transaction = transaction.eway_transaction
     realex_transaction.completed = datetime.datetime.utcnow()
-    realex_transaction.result_code = request.form.['RESULT']
-    realex_transaction.charged = int(request.form['AMOUNT'])
-    realex_transaction.eway_id = int(request.form['PASREF'])
+    realex_transaction.result_code = request['RESULT']
+    realex_transaction.charged = int(request['AMOUNT'])
+    realex_transaction.eway_id = int(request['PASREF'])
 
     DB.session.commit()
 
