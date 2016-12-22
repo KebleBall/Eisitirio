@@ -10,6 +10,7 @@ from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.logic import eway_logic
+from eisitirio.logic import realex_logic
 
 def get_transaction(payment_method, tickets=None, postage_option=None,
                     admin_fee=None):
@@ -63,10 +64,7 @@ def complete_payment(transaction, payment_term):
 
         flask.flash('Battels payment completed.', 'success')
     elif transaction.payment_method == 'Card':
-        payment_url = eway_logic.get_payment_url(transaction)
-
-        if payment_url:
-            return flask.redirect(payment_url)
+            return flask.redirect(flask.url_for('purchase.payment_interstitial', transaction_id=transaction.object_id))
 
     return flask.redirect(flask.url_for('dashboard.dashboard_home'))
 
