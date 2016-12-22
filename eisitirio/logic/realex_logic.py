@@ -195,7 +195,7 @@ def get_transaction_id(str):
 
 def process_payment(request):
 
-    transaction = models.transaction.get_by_id(
+    transaction = models.Transaction.get_by_id(
         get_transaction_id(request['ORDER_ID'])
     )
 
