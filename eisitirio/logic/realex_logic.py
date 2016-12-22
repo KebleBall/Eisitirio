@@ -190,6 +190,64 @@ def generate_payment_form(transaction):
 
     return form_str
 
+def get_transaction_id(str):
+    return int(str.split('-')[0])
+
+def process_payment(request):
+
+    form = RealexForm(data=request.form)
+
+    # Path 1: SHA1HASH check does not match
+    try:
+        form.is_valid()
+    except SHA1CheckError as exc:
+        APP.log_manager.log_event(
+            'Suspicious Response from Realex: SHA1HASH does not match.',
+            transaction=transaction
+        )
+
+        flash(
+            (
+                'There is a problem with our payment provider, '
+                'please contact <a href="{0}">the treasurer</a> '
+                'to confirm that payment has not been taken before trying again'
+            ).format(
+                APP.config['TREASURER_EMAIL_LINK'],
+            ),
+            'warning'
+        )
+        return None
+
+    transaction = models.transaction.get_by_id(
+        get_transaction_id(request['ORDER_ID'])
+    )
+
+    realex_transaction = transaction.eway_transaction
+    realex_transaction.completed = datetime.datetime.utcnow()
+    realex_transaction.result_code = request['RESULT']
+    realex_transaction.charged = int(request['AMOUNT'])
+    realex_transaction.eway_id = int(request['PASREF'])
+
+    DB.session.commit()
+
+    # Good payment
+    if realex_transaction.status[0]:
+
+        transaction.mark_as_paid()
+
+        APP.log_manager.log_event(
+            'Completed Card Payment',
+            tickets=transaction.tickets,
+            user=transaction.user,
+            transaction=transaction,
+            in_app=True
+        )
+    else: # Invalid Realex payment
+        flash(
+            'The card payment failed. You have not been charged.',
+            'error'
+        )
+
 ## def _send_request(endpoint, data, transaction):
 ##     """Helper to send requests to the eWay API.
 ##
