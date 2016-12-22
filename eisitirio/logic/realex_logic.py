@@ -224,9 +224,9 @@ def process_payment(request):
 
     realex_transaction = transaction.eway_transaction
     realex_transaction.completed = datetime.datetime.utcnow()
-    #realex_transaction.result_code = request.form.['RESULT']
-    #realex_transaction.charged = int(request.form['AMOUNT'])
-    #realex_transaction.eway_id = int(request.form['PASREF'])
+    realex_transaction.result_code = request.form['RESULT']
+    realex_transaction.charged = int(request.form['AMOUNT'])
+    realex_transaction.eway_id = int(request.form['PASREF'])
 
     DB.session.commit()
 
