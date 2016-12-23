@@ -546,23 +546,21 @@ def payment_interstitial(transaction_id):
     form = realex_logic.generate_payment_form(transaction)
     return flask.render_template('purchase/payment_interstitial.html', form=form)
 
-@PURCHASE.route('/purchase/test-transaction', methods=['GET', 'POST'])
-def test_transaction():
-    return flask.render_template('purchase/test_transaction_page.html')
-
 @PURCHASE.route('/purchase/payment-processed', methods=['GET','POST'])
 def payment_processed():
     if flask.request.method == 'POST':
-        realex_logic.process_payment(flask.request)
-        return "Looks good: POST request.\n RESULT CODE: {0}\n PASREF: {1}\n ORDER ID: {2}\n".format(
-            flask.request.form['RESULT'],
-            flask.request.form['PASREF'],
-            flask.request.form['ORDER_ID']
-        )
+        response = realex_logic.process_payment(flask.request)
+        return flask.render_template('purchase/payment_processed.html')
+        #return "Looks good: POST request.\n RESULT CODE: {0}\n PASREF: {1}\n ORDER ID: {2}\n ORDER WENT THROUGH: {3}".format(
+        #    flask.request.form['RESULT'],
+        #    flask.request.form['PASREF'],
+        #    flask.request.form['ORDER_ID'],
+        #    response
+        # )
         # return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
-        return "Looks good: GET request. CHANGE ID: 1"
-
+        # return "Looks good: GET request. CHANGE ID: 1"
+        return flask.render_template('purchase/payment_processed.html')
 
 ## This is for eWay
 @PURCHASE.route('/purchase/eway-success/<int:object_id>')

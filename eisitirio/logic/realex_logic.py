@@ -210,9 +210,9 @@ def process_payment(request):
             transaction=transaction
         )
 
-        flash(
+        flask.flash(
             (
-                'There is a problem with our payment provider, '
+                'There is a possible problem with our payment provider, '
                 'please contact <a href="{0}">the treasurer</a> '
                 'to confirm that payment has not been taken before trying again'
             ).format(
@@ -242,11 +242,16 @@ def process_payment(request):
             transaction=transaction,
             in_app=True
         )
+        return realex_transaction
     else: # Invalid Realex payment
-        flash(
-            'The card payment failed. You have not been charged.',
+        flask.flash(
+            (
+                'The card payment failed. You have not been charged. Please make '
+                'sure you have enough money in your account, or try a different card.'
+            ),
             'error'
         )
+        return None
 
 ## def _send_request(endpoint, data, transaction):
 ##     """Helper to send requests to the eWay API.
