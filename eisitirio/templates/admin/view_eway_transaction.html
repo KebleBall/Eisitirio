@@ -24,12 +24,6 @@
                     <li>Transaction <strong>is{% if not eway_transaction.refunded >= eway_transaction.charged %} not{% endif %}</strong> fully refunded.</li>
                     <li>Transaction <strong>was{% if not eway_transaction.result_code == 'CX' %} not{% endif %}</strong> cancelled.</li>
                 </ul>
-                {% if eway_transaction.status[0] %}
-                    <h4>Actions</h4>
-                    <ul>
-                        <li><form action="{{ url_for('admin.refund_transaction', eway_transaction_id=eway_transaction.object_id) }}" method="post" id="refund_transaction">Refund &pound;<input type="number" name="refund_amount_pounds" min="0" step="1" />.<input type="number" name="refund_amount_pence" min="0" step="1" max="99" /> to card. <input type="submit" class="button tiny" /></form></li>
-                    </ul>
-                {% endif %}
             {% else %}
                 <p>Transaction <strong>is not</strong> completed.</p>
             {% endif %}

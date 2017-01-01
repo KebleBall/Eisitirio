@@ -15,7 +15,6 @@ from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.helpers import login_manager
 from eisitirio.helpers import util
-from eisitirio.logic import eway_logic
 
 APP = app.APP
 DB = db.DB
@@ -395,94 +394,6 @@ def view_eway_transaction(eway_transaction_id):
         'admin/view_eway_transaction.html',
         eway_transaction=eway_transaction,
     )
-
-@ADMIN.route('/admin/eway_transaction/<int:eway_transaction_id>/refund',
-             methods=['GET', 'POST'])
-@login.login_required
-@login_manager.admin_required
-def refund_transaction(eway_transaction_id):
-    """Refund a transaction.
-
-    Allows part or full refunds for whatever reason, sends a request to eWay to
-    refund money back to the user's card.
-    """
-    if flask.request.method != 'POST':
-        return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.admin_home'))
-
-    eway = models.EwayTransaction.get_by_id(eway_transaction_id)
-
-    if eway:
-        amount = util.parse_pounds_pence(flask.request.form,
-                                         'refund_amount_pounds',
-                                         'refund_amount_pence')
-
-        if amount == 0:
-            flask.flash(
-                'Cannot refund nothing.',
-                'warning'
-            )
-            return flask.redirect(
-                flask.request.referrer or
-                flask.url_for('admin.view_transaction',
-                              transaction_id=eway_transaction_id)
-            )
-
-        if amount > (eway.charged - eway.refunded):
-            flask.flash(
-                'Cannot refund more than has been charged.',
-                'warning'
-            )
-            return flask.redirect(
-                flask.request.referrer or
-                flask.url_for('admin.view_eway_transaction',
-                              eway_transaction_id=eway_transaction_id)
-            )
-
-        transaction = models.CardTransaction(eway.transactions[0].user, eway)
-
-        DB.session.add(transaction)
-
-        DB.session.add(models.GenericTransactionItem(
-            transaction,
-            0 - amount,
-            'Manual Refund'
-        ))
-
-        DB.session.commit()
-
-        if eway_logic.process_refund(transaction, amount):
-            flask.flash(
-                'Refund processed successfully.',
-                'success'
-            )
-
-            transaction.paid = True
-            DB.session.commit()
-
-            APP.log_manager.log_event(
-                "Manual refund",
-                user=transaction.user,
-                transaction=transaction
-            )
-        else:
-            flask.flash(
-                'Could not process refund.',
-                'warning'
-            )
-
-        return flask.redirect(
-            flask.request.referrer or
-            flask.url_for('admin.view_transaction',
-                          transaction_id=transaction.transaction_id)
-        )
-    else:
-        flask.flash(
-            'Could not find transaction, could not refund.',
-            'warning'
-        )
-        return flask.redirect(flask.request.referrer or
-                              flask.url_for('admin.admin_home'))
 
 @ADMIN.route('/admin/waiting/<int:entry_id>/delete')
 @login.login_required

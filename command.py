@@ -13,7 +13,6 @@ from flask.ext import migrate
 from eisitirio import app
 from eisitirio import system # pylint: disable=unused-import
 from eisitirio.database import db
-from eisitirio.scripts import check_eway
 from eisitirio.scripts import cron
 from eisitirio.scripts import fix_graduand_postage
 from eisitirio.scripts import prefill
@@ -58,7 +57,6 @@ MANAGER.add_option('config', default=None,
                    help="Configuration file to load before running commands")
 
 MANAGER.add_command('bpython', run_bpython.BpythonCommand)
-MANAGER.add_command('check_eway', check_eway.CheckEwayCommand)
 MANAGER.add_command('cron', cron.CronCommand)
 MANAGER.add_command('fix_graduand_postage',
                     fix_graduand_postage.FixGraduandPostageCommand)

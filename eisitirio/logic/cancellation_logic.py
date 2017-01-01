@@ -11,7 +11,6 @@ import flask
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
-from eisitirio.logic import eway_logic
 
 APP = app.APP
 DB = db.DB
@@ -39,21 +38,16 @@ def cancel_tickets(tickets, quiet=False):
         if not ticket.paid or ticket.payment_method == 'Free':
             ticket.cancelled = True
             cancelled.append(ticket)
-        elif ticket.payment_method in ['Card', 'Battels']:
+        # no longer allow refunds for card transactions
+        elif ticket.payment_method in ['Battels']:
             transactions[ticket.transaction].append(ticket)
 
     DB.session.commit()
 
     for transaction, tickets in transactions.iteritems():
-        if transaction.payment_method == 'Card':
-            refund_transaction = models.CardTransaction(
-                transaction.user,
-                transaction.eway_transaction
-            )
-        else:
-            refund_transaction = models.BattelsTransaction(
-                transaction.user
-            )
+        refund_transaction = models.BattelsTransaction(
+            transaction.user
+        )
 
         DB.session.add(refund_transaction)
 
@@ -85,17 +79,13 @@ def cancel_tickets(tickets, quiet=False):
 
         DB.session.commit()
 
-        if transaction.payment_method == 'Card':
-            success = eway_logic.process_refund(refund_transaction,
-                                                0 - refund_transaction.value)
+        if (
+            transaction.battels_term == 'MTHT' and
+            app.APP.config['CURRENT_TERM']
+        ):
+            refund_transaction.charge('MTHT')
         else:
-            if (
-                    transaction.battels_term == 'MTHT' and
-                    app.APP.config['CURRENT_TERM']
-            ):
-                refund_transaction.charge('MTHT')
-            else:
-                refund_transaction.charge(app.APP.config['CURRENT_TERM'])
+            refund_transaction.charge(app.APP.config['CURRENT_TERM'])
 
             success = True
 

@@ -12,7 +12,6 @@ from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.helpers import validators
 from eisitirio.logic import cancellation_logic
-from eisitirio.logic import eway_logic
 from eisitirio.logic import realex_logic
 from eisitirio.logic import purchase_logic
 from eisitirio.logic import payment_logic
@@ -542,51 +541,23 @@ def pay_admin_fee(admin_fee_id):
 @PURCHASE.route('/purchase/payment-interstitial/<int:transaction_id>', methods=['GET'])
 @login.login_required
 def payment_interstitial(transaction_id):
-    transaction = models.Transaction.get_by_id(transaction_id)
-    form = realex_logic.generate_payment_form(transaction)
+    form = realex_logic.generate_payment_form(
+        models.Transaction.get_by_id(transaction_id)
+    )
     return flask.render_template('purchase/payment_interstitial.html', form=form)
 
 @PURCHASE.route('/purchase/payment-processed', methods=['GET','POST'])
 def payment_processed():
+    """Callback from realex. Data received in a POST request, see the
+    Realex website for details on how the data is structured. This records
+    the end result of the transaction in the database (using
+    'process_payment') and then redirects the user to their dashboard.
+    Errors and warnings are recorded using flask.flash inside of
+    process_payment."""
     if flask.request.method == 'POST':
         response = realex_logic.process_payment(flask.request)
         return flask.render_template('purchase/payment_processed.html')
-        #return "Looks good: POST request.\n RESULT CODE: {0}\n PASREF: {1}\n ORDER ID: {2}\n ORDER WENT THROUGH: {3}".format(
-        #    flask.request.form['RESULT'],
-        #    flask.request.form['PASREF'],
-        #    flask.request.form['ORDER_ID'],
-        #    response
-        # )
         # return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
-        # return "Looks good: GET request. CHANGE ID: 1"
         return flask.render_template('purchase/payment_processed.html')
-
-## This is for eWay
-@PURCHASE.route('/purchase/eway-success/<int:object_id>')
-def eway_success(object_id):
-    """Callback from a successful eWay transaction.
-
-    The user is redirected back to this page from the payment gateway once the
-    transaction has been completed successfully (not necessarily implying that
-    the payment was completed successfully).
-
-    Has the transaction object process the result of the transaction, and
-    redirects to the dashboard.
-    """
-    eway_logic.process_payment(models.CardTransaction.get_by_id(object_id))
-
-    return flask.redirect(flask.url_for('dashboard.dashboard_home'))
-
-@PURCHASE.route('/purchase/eway-cancel/<int:object_id>')
-def eway_cancel(object_id):
-    """Callback from a cancelled eWay transaction.
-
-    The user is redirected back to this page from the payment gateway if they
-    cancel the transaction.
-
-    Marks the transaction as cancelled and redirects to the dashboard.
-    """
-    eway_logic.cancel_payment(models.CardTransaction.get_by_id(object_id))
-
-    return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+        # return flask.redirect(flask.url_for('dashboard.dashboard_home'))

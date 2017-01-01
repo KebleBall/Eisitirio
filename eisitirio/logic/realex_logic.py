@@ -87,10 +87,6 @@ class RealexForm(object):
         uid = "%i" % (transaction.user_id)
         self.fields['order_id'] = "%i-%s-%s" % (transaction.object_id, self.fields['timestamp'], uid)
         # hash fields
-        print "first hash:"
-        print ".".join([self.fields['timestamp'], APP.config['REALEX_MERCHANT_ID'],
-          self.fields['order_id'], self.fields['currency']])
-
         self.sha1hash = hashlib.sha1(".".join([self.fields['timestamp'],
                                                APP.config['REALEX_MERCHANT_ID'],
                                                self.fields['order_id'],

@@ -9,7 +9,6 @@ import flask
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
-from eisitirio.logic import eway_logic
 from eisitirio.logic import realex_logic
 
 def get_transaction(payment_method, tickets=None, postage_option=None,
