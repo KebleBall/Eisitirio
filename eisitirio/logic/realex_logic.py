@@ -191,9 +191,47 @@ def get_transaction_id(str):
 
 def process_payment(request):
 
+    if 'ORDER_ID' not in request.form:
+        flask.flash(
+            (
+                'There is a problem with our payment provider, '
+                'please contact <a href="{0}">the treasurer</a> '
+                'to confirm that payment has not been taken before trying again'
+            ).format(
+                APP.config['TREASURER_EMAIL_LINK'],
+            ),
+            'warning'
+        )
+        APP.log_manager.log_event(
+            'Error processing payment: ORDER_ID not in POST request.'
+        )
+        return None
+
     transaction = models.Transaction.get_by_id(
         get_transaction_id(request.form['ORDER_ID'])
     )
+
+    if transaction is None:
+        flask.flash(
+            (
+                'There is a problem with our payment provider, '
+                'please contact <a href="{0}">the treasurer</a> '
+                'to confirm that payment has not been taken before trying again'
+            ).format(
+                APP.config['TREASURER_EMAIL_LINK'],
+            ),
+            'warning'
+        )
+        APP.log_manager.log_event(
+            (
+                'Error processing payment: unable to find transaction in database.'
+                ' ORDER_ID was {0}'
+            ).format(
+                request.form['ORDER_ID']
+            )
+        )
+
+        return None
 
     form = RealexForm(transaction=transaction, data=request.form)
 
@@ -241,6 +279,14 @@ def process_payment(request):
         )
         return realex_transaction
     else: # Invalid Realex payment
+        APP.log_manager.log_event(
+            'Failed Card Payment',
+            tickets=transaction.tickets,
+            user=transaction.user,
+            transaction=transaction,
+            in_app=True
+        )
+
         flask.flash(
             (
                 'The card payment failed. You have not been charged. Please make '
