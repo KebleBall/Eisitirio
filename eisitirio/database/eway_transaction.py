@@ -41,7 +41,7 @@ class EwayTransaction(DB.Model):
     )
     # This holds the PASREF field for realex
     eway_id = DB.Column(
-        DB.Integer(),
+        DB.String(50),
         nullable=True
     )
     refunded = DB.Column(

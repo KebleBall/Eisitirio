@@ -194,7 +194,7 @@ def process_payment(request):
     if 'ORDER_ID' not in request.form:
         flask.flash(
             (
-                'There is a problem with our payment provider, '
+                'There was a problem with our payment provider, '
                 'please contact <a href="{0}">the treasurer</a> '
                 'to confirm that payment has not been taken before trying again'
             ).format(
@@ -214,7 +214,7 @@ def process_payment(request):
     if transaction is None:
         flask.flash(
             (
-                'There is a problem with our payment provider, '
+                'There was a problem with our payment provider, '
                 'please contact <a href="{0}">the treasurer</a> '
                 'to confirm that payment has not been taken before trying again'
             ).format(
@@ -261,7 +261,7 @@ def process_payment(request):
     # Stored result codes are only of length two
     realex_transaction.result_code = request.form['RESULT'][:2]
     realex_transaction.charged = int(request.form['AMOUNT'])
-    realex_transaction.eway_id = int(request.form['PASREF'])
+    realex_transaction.eway_id = request.form['PASREF']
 
     DB.session.commit()
 
