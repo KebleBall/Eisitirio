@@ -556,8 +556,4 @@ def payment_processed():
     process_payment."""
     if flask.request.method == 'POST':
         response = realex_logic.process_payment(flask.request)
-        return flask.render_template('purchase/payment_processed.html')
-        # return flask.redirect(flask.url_for('dashboard.dashboard_home'))
-    else:
-        return flask.render_template('purchase/payment_processed.html')
-        # return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+    return flask.redirect(flask.url_for('dashboard.dashboard_home'))
