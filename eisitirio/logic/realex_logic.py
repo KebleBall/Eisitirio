@@ -192,6 +192,8 @@ def get_transaction_id(str):
 
 def process_payment(request):
 
+    APP.log_manager.log_event('Received callback from Realex')
+
     if 'ORDER_ID' not in request.form:
         flask.flash(
             (
