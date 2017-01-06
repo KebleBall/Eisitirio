@@ -83,7 +83,7 @@ class RealexForm(object):
         self.fields = dict()
         self.fields['currency'] = currency
         self.fields['amount'] = amount
-        self.fields['account'] = 'internet'
+        #self.fields['account'] = 'internet'
         self.fields['timestamp'] = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         uid = "%i" % (transaction.user_id)
         self.fields['order_id'] = "%i-%s-%s" % (transaction.object_id, self.fields['timestamp'], uid)
@@ -122,7 +122,7 @@ class RealexForm(object):
         all_fields = {
             'merchant_id': APP.config['REALEX_MERCHANT_ID']
         }
-        #all_fields['merchant_response_url'] = APP.config['REALEX_RESPONSE_URL']
+        all_fields['merchant_response_url'] = APP.config['REALEX_RESPONSE_URL']
         all_fields.update(self.fields)
         for k, v in all_fields.items():
             field_init = {"name": k.upper(), "value": v, "type": "hidden"}
