@@ -122,7 +122,7 @@ class RealexForm(object):
         all_fields = {
             'merchant_id': APP.config['REALEX_MERCHANT_ID']
         }
-        all_fields['merchant_response_url'] = APP.config['REALEX_RESPONSE_URL']
+        #all_fields['merchant_response_url'] = APP.config['REALEX_RESPONSE_URL']
         all_fields.update(self.fields)
         for k, v in all_fields.items():
             field_init = {"name": k.upper(), "value": v, "type": "hidden"}
