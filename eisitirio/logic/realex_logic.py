@@ -285,7 +285,8 @@ def process_payment(request):
         return realex_transaction
     else: # Invalid Realex payment
         APP.log_manager.log_event(
-            'Failed Card Payment',
+            'Failed Card Payment. Error is {0}.'.format(realex_transaction.status[0]
+            ),
             tickets=transaction.tickets,
             user=transaction.user,
             transaction=transaction,
