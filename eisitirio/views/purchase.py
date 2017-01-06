@@ -556,9 +556,7 @@ def payment_processed():
     Errors and warnings are recorded using flask.flash inside of
     process_payment."""
     if flask.request.method == 'POST':
-        # XXX
-        #response = realex_logic.process_payment(flask.request)
-        flask.flash('We got a post request', 'error')
+        response = realex_logic.process_payment(flask.request)
         return flask.render_template('purchase/payment_processed.html')
         # return flask.redirect(flask.url_for('dashboard.dashboard_home'))
     else:
