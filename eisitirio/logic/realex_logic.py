@@ -83,6 +83,7 @@ class RealexForm(object):
         self.fields = dict()
         self.fields['currency'] = currency
         self.fields['amount'] = amount
+        self.fields['account'] = 'internet'
         self.fields['timestamp'] = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         uid = "%i" % (transaction.user_id)
         self.fields['order_id'] = "%i-%s-%s" % (transaction.object_id, self.fields['timestamp'], uid)
