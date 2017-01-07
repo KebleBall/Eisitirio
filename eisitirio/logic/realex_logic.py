@@ -259,8 +259,6 @@ def process_payment(request):
         )
         return None
 
-    print transaction.payment_method
-
     realex_transaction = transaction.eway_transaction
     realex_transaction.completed = datetime.datetime.utcnow()
     # Stored result codes are only of length two
