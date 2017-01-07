@@ -22,7 +22,10 @@ class UpdateBattelsCommand(script.Command):
         """Perform the matching."""
         with APP.app_context():
             for user in models.User.query.all():
-                if user.battels is not None:
+                if user.battels is not None and user.affiliation_verified is None:
+                    print user.full_name
+                    user.affiliation_verified = True
+                    DB.session.commit()
                     continue
 
                 battels = models.Battels.query.filter(
