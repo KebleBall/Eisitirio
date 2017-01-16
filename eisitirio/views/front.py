@@ -282,14 +282,14 @@ def confirm_email(user_id, secret_key):
             )
         else:
             flask.flash('Your email address has been verified.', 'info')
-    else:
-        flask.flash(
-            (
-                'Could not confirm email address. Check that you have used '
-                'the correct link'
-            ),
-            'warning'
-        )
+    #else: ## XXX/FIXME
+    #    flask.flash(
+    #        (
+    #            'Could not confirm email address. Check that you have used '
+    #            'the correct link'
+    #        ),
+    #        'warning'
+    #    )
 
     return flask.redirect(flask.url_for('router'))
 
