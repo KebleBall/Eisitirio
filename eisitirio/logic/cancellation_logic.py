@@ -79,14 +79,16 @@ def cancel_tickets(tickets, quiet=False):
 
         DB.session.commit()
 
+        success = False
+
         if (
             transaction.battels_term == 'MTHT' and
             app.APP.config['CURRENT_TERM']
         ):
             refund_transaction.charge('MTHT')
+            success = True
         else:
             refund_transaction.charge(app.APP.config['CURRENT_TERM'])
-
             success = True
 
         if success:
