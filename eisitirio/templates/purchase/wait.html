@@ -24,16 +24,11 @@
                             {% else -%}
                                 1
                             {% endif %}"
-                            data-slider="true"
-                            data-slider-range="1,{{ wait_available }}"
-                            data-slider-snap="true"
-                            data-slider-step="1"
-                            data-slider-highlight="true"
                         />
                     </label>
                 </li>
                 <li>
-                    <input type="submit" value="Join Waiting List" class="button tiny" />
+                    <input type="submit" value="Join Waiting List" class="button" />
                 </li>
             </ol>
         </form>
@@ -41,11 +36,9 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{ url_for('static', filename='js/vendor/simple-slider.js') }}"></script>
-
     <script type="text/javascript">
-        $("#num_tickets").bind("slider:changed", function (event, data) {
-            $('#num_tickets_display').html(data.value);
+        $("#num_tickets").on("change",  function (event) {
+            $('#num_tickets_display').html($(this).val());
         });
     </script>
 {% endblock %}
