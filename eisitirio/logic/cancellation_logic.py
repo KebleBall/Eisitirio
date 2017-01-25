@@ -118,7 +118,8 @@ def cancel_tickets(tickets, quiet=False):
             flash(
                 (
                     'Some of your tickets could not be automatically '
-                    'refunded, and so were not cancelled. You can try again '
+                    'refunded, and so were not cancelled. This might be due to '
+                    'them having been payed for by card. If they have not been purchased by card you can try again '
                     'later, but if this problem continues to occur, you '
                     'should contact <a href="{0}">the ticketing officer</a>'
                 ).format(
@@ -130,9 +131,10 @@ def cancel_tickets(tickets, quiet=False):
         flash(
             (
                 'None of your tickets could be automatically refunded, and so '
-                'none were cancelled. You can try again later, but if this '
-                'problem continues to occur, you should contact <a href="{0}">'
-                'the ticketing officer</a>'
+                'none were cancelled.  This might be due to '
+                'them having been payed for by card. If they have not been purchased by card you can try again '
+                'later, but if this problem continues to occur, you '
+                'should contact <a href="{0}">the ticketing officer</a>'
             ).format(
                 APP.config['TICKETS_EMAIL_LINK']
             ),
