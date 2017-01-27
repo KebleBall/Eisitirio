@@ -258,11 +258,6 @@ def confirm_email(user_id, secret_key):
     """
     user = models.User.get_by_id(user_id)
 
-    APP.log_manager.log_event(
-        'Confirm email: User {0} secret_key: {1}'.format(user is not None, user.secret_key),
-        user=user
-    )
-
     if user is not None and user.secret_key == secret_key:
         user.secret_key = None
         user.verified = True
