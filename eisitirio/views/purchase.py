@@ -199,86 +199,44 @@ def upgrade_ticket():
     Checks if the user can purchase tickets, and processes the purchase form.
     """
 
-    ticket_info = purchase_logic.get_ticket_info_for_upgrade(
-        login.current_user
-    )
+    if flask.request.method == 'POST':
+        selected_tickets = flask.request.form.getlist('tickets[]')
+        if not selected_tickets:
+            flask.flash(
+                'Please select the tickets you want to upgrade.',
+                'info'
+            )
+            return flask.redirect(flask.url_for('purchase.upgrade_tickets'))
 
-    if not ticket_info.ticket_types or not ticket_logic.can_buy_upgrade(login.current_user):
+        total_amt = 0
+        for obj_id in selected_tickets:
+            ticket = models.Ticket.get_by_id(obj_id)
+            ticket.add_note('Upgrade')
+            # 30 pounds each ticket
+            total_amt = total_amt + 3000
+
+        admin_fee = models.AdminFee(
+            total_amt,
+            "Ticket Upgrade(s)",
+            login.current_user,
+            login.current_user
+        )
+
+        DB.session.add(admin_fee)
+        DB.session.commit()
+
+        return payment_logic.pay_admin_fee(admin_fee, 'Card', 'HT')
+
+    number_upgrade = purchase_logic.get_ticket_info_for_upgrade(login.current_user)
+
+    if number_upgrade <= 0 or not ticket_logic.can_buy_upgrade(login.current_user):
         flask.flash(
-            'You are not able to purchase upgrade tickets at this time.',
+            'You are not able to upgrade tickets at this time.',
             'info'
         )
         return flask.redirect(flask.url_for('dashboard.dashboard_home'))
-
-    num_tickets = {
-        ticket_type.slug: 0
-        for ticket_type, _ in ticket_info.ticket_types
-    }
-
-    if flask.request.method == 'POST':
-        for ticket_type, _ in ticket_info.ticket_types:
-            num_tickets[ticket_type.slug] = int(
-                flask.request.form['num_tickets_{0}'.format(ticket_type.slug)]
-            )
-
-        flashes = purchase_logic.validate_tickets(
-            ticket_info,
-            num_tickets
-        )
-
-        payment_method, payment_term = purchase_logic.check_payment_method(
-            flashes
-        )
-
-        if flashes:
-            flask.flash(
-                (
-                    'There were errors in your order. Please fix '
-                    'these and try again'
-                ),
-                'error'
-            )
-            for msg in flashes:
-                flask.flash(msg, 'warning')
-
-            return flask.render_template(
-                'purchase/purchase_home.html',
-                form=flask.request.form,
-                num_tickets=num_tickets,
-                ticket_info=ticket_info
-            )
-
-
-        tickets = purchase_logic.create_tickets(
-            login.current_user,
-            ticket_info,
-            num_tickets
-        )
-
-        DB.session.add_all(tickets)
-        DB.session.commit()
-
-        APP.log_manager.log_event(
-            'Purchased Upgrade Tickets',
-            tickets=tickets,
-            user=login.current_user
-        )
-        postage, address = APP.config['POSTAGE_OPTIONS']['collection'], None
-
-        return payment_logic.do_payment(
-         tickets,
-         postage,
-         payment_method,
-         payment_term,
-         address
-        )
     else:
-        return flask.render_template(
-            'purchase/upgrade.html',
-            num_tickets=num_tickets,
-            ticket_info=ticket_info
-        )
-
+        return flask.render_template('purchase/upgrade.html')
 
 @PURCHASE.route('/purchase/wait', methods=['GET', 'POST'])
 @login.login_required

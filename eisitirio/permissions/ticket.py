@@ -57,6 +57,13 @@ def be_resold(ticket):
         return True
 
 @models.Ticket.permission()
+def be_upgraded(ticket):
+    return (
+        ticket.paid and
+        "Upgrade" not in ticket.note
+    )
+
+@models.Ticket.permission()
 def be_collected(ticket):
     """Check whether a ticket can be collected."""
     return (

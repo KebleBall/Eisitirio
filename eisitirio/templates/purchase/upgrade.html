@@ -1,146 +1,35 @@
 <!-- purchase/upgrade.html -->
+
 {% extends 'layout.html' %}
 
 {% block title %}Upgrade Tickets{% endblock %}
 
 {% block content %}
-    <section id="purchase" class="columns">
-        <form action="{{ url_for('purchase.upgrade_ticket') }}" id="purchase_form" method="post">
-            <ol id="purchase_steps">
-              <div class="rows">
-                <div class="small-12 large-5 columns">
-                <li>
-                    <h5>Choose Number of Tickets to Upgrade</h5>
-                    <table id="ticket_type_table">
-                        <thead>
-                            <th>Ticket type</th>
-                            <th>Price</th>
-                            <th>Number</th>
-                        </thead>
-                        {% for ticket_type, limit in ticket_info.ticket_types %}
-                            <tr>
-                                <td>{{ ticket_type.name }}</td>
-                                <td>&pound;{{ ticket_type.price_pounds }}</td>
-                                <td><input type="number" name="num_tickets_{{ ticket_type.slug }}" id="num_tickets_{{ ticket_type.slug }}" class="num_ticket_input" min="0" max="{{ limit }}" value="{{ num_tickets[ticket_type.slug] }}" /></td>
+    <section id="cancel" class="columns">
+        <p>If you wish to upgrade tickets, you must first own them:</p>
+        <h3>Select Tickets to Upgrade:</h3>
+        <form action="{{ url_for('purchase.upgrade_ticket') }}" method="post">
+            <table id="tickets_table">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Ticket Number</th>
+                        <th>Ticket Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in current_user.tickets %}
+                        {% if ticket.can_be_upgraded() %}
+                            <tr id="ticket-{{ ticket.object_id }}">
+                                <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
+                                <td><label for="ticket_select-{{ ticket.object_id }}">#{{ '%05d' % ticket.object_id }}</label></td>
+                                <td><label for="ticket_select-{{ ticket.object_id }}">{{ ticket.status }}</label></td>
                             </tr>
-                        {% endfor %}
-                        <tr>
-                            <td>Total:</td>
-                            <td id="total_value">&pound;0.00</td>
-                            <td id="total_tickets">0</td>
-                    </table>
-                </li>
-              </div>
-              <div class="small-12 medium-7 columns">
-                {% include 'purchase/blocks/choose_payment_method.html' %}
-              </div>
-              <div class="small-12 medium-5 columns" style="margin-top: 2rem;">
-                <input type="submit" value="Buy Tickets" class="button large expanded" />
-              </div>
-            </div>
-          </ol>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="submit" value="Upgrade Tickets" class="button" />
         </form>
-      </section>
-        <p>
-          Please note that even though this will show up as a separate ticket
-          on your dashboard, it <b>does not</b> count as an extra ticket,
-         and it can only be held in conjunction with a normal ticket.
-        </p>
-
-{% endblock %}
-
-{% block javascripts %}
-    <script type="text/javascript">
-        String.prototype.toInt = function(){
-            return parseInt(this, 10);
-        }
-
-        var ticket_info = {{ ticket_info.to_json()|safe }};
-
-        var num_ticket_inputs = $(".num_ticket_input")
-
-        num_ticket_inputs.on("change", function () {
-            var guest_tickets_ordered = 0;
-            var total_tickets_ordered = 0;
-            var total_value = 0;
-
-            $(ticket_info.ticket_types).each(function(_, ticket_type) {
-                var input = $("#num_tickets_" + ticket_type.slug);
-
-                var ordered = input.val().toInt();
-                var max = input.attr("max").toInt();
-
-                if (ordered > max) {
-                    ordered = max;
-                    input.val(max);
-                }
-
-                if (ticket_type.counts_towards_guest_limit)
-                    guest_tickets_ordered = guest_tickets_ordered + ordered;
-
-                total_tickets_ordered = total_tickets_ordered + ordered;
-
-                total_value = total_value + ordered * ticket_type.price;
-            });
-
-            var price_str = total_value + "";
-            while (price_str.length < 3) price_str = "0" + price_str;
-
-            $("#total_value").html("&pound;" + price_str.slice(0, -2) + "." + price_str.slice(-2));
-            $("#total_tickets").html(total_tickets_ordered);
-            //$("#roundup_donation_amt").html(total_tickets_ordered);
-
-            var guest_tickets_available = ticket_info.guest_tickets_available - guest_tickets_ordered;
-            var total_tickets_available = ticket_info.total_tickets_available - total_tickets_ordered;
-
-            $(ticket_info.ticket_types).each(function(_, ticket_type) {
-                var input = $("#num_tickets_" + ticket_type.slug);
-
-                var ordered = input.val().toInt();
-                var limit = Math.min(
-                    ticket_type.purchase_limit,
-                    ordered + total_tickets_available
-                );
-
-                if (ticket_type.counts_towards_guest_limit)
-                    limit = Math.min(limit, ordered + guest_tickets_available)
-
-                input.attr("max", Math.max(0, limit));
-            });
-        });
-    </script>
-    <script type="text/javascript">
-        var voucher_code = $("#voucher_code");
-        var voucher_message = $("#voucher_message");
-
-        voucher_code.on("blur", function() {
-            if (voucher_code.val() != '') {
-                jQuery.ajax(
-                    '{{ url_for('ajax.validate_voucher', _external=True) }}',
-                    {
-                        'data': {
-                            'code': voucher_code.val()
-                        },
-                        'type': 'POST',
-                        'dataType': 'json',
-                        'success': function(data, code, xhr) {
-                            voucher_message.attr(
-                                "class",
-                                data.class
-                            );
-                            voucher_message.html(data.message);
-                            voucher_message.show(0);
-                        }
-                    }
-                );
-            } else {
-                voucher_message.hide(0);
-            }
-        });
-
-        voucher_code.on("change", function() {
-            voucher_message.hide(0);
-        });
-    </script>
-    {% include 'purchase/blocks/script_show_postage_address.html' %}
+    </section>
 {% endblock %}
