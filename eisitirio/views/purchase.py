@@ -208,16 +208,11 @@ def upgrade_ticket():
             )
             return flask.redirect(flask.url_for('purchase.upgrade_tickets'))
 
-        total_amt = 0
-        for obj_id in selected_tickets:
-            ticket = models.Ticket.get_by_id(obj_id)
-            ticket.add_note('Upgrade')
-            # 30 pounds each ticket
-            total_amt = total_amt + 3000
+        total_amt = 3000 * len(selected_tickets)
 
         admin_fee = models.AdminFee(
             total_amt,
-            "Ticket Upgrade(s)",
+            "Ticket Upgrade: {0}".format(','.join(selected_tickets)),
             login.current_user,
             login.current_user
         )

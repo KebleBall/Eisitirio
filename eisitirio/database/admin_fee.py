@@ -74,9 +74,15 @@ class AdminFee(DB.Model):
         """Email the creator of this fee when it has been paid."""
         self.paid = True
 
-        APP.email_manager.send_template(
-            self.charged_by.email,
-            'Administration fee paid.',
-            'admin_fee_paid.email',
-            fee=self
-        )
+        if "Ticket Upgrade:" in self.reason:
+            possible_tickets = [int(x) for x in self.reason[16:].split(',')]
+            for ticket in self.charged_to.active_tickets:
+                if ticket.object_id in possible_tickets:
+                    ticket.add_note('Upgrade')
+        else:
+            APP.email_manager.send_template(
+                self.charged_by.email,
+                'Administration fee paid.',
+                'admin_fee_paid.email',
+                fee=self
+            )
