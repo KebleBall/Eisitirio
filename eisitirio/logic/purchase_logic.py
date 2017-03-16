@@ -11,11 +11,12 @@ import flask
 from flask.ext import login
 
 from eisitirio import app
-from eisitirio.database import models
+from eisitirio.database import models, db
 from eisitirio.helpers import postage_option
 
 LARGE_NUMBER = 999999
 APP = app.APP
+DB = db.DB
 
 _TicketInfo = collections.namedtuple(
     "TicketInfo",
@@ -137,6 +138,26 @@ def get_ticket_info(user):
 
     return ticket_info
 
+## XXX/HACK! Committee wanted to be able to do some shit quickly,
+## so this is what happens when you don't give your IT guy time to work...
+def get_ticket_info_for_upgrade(user):
+    """Get information about what tickets |user| can purchase online."""
+
+    ticket_info = TicketInfo(
+        guest_tickets_available(),
+        4,
+        []
+    )
+
+    for ticket_type in app.APP.config['TICKET_TYPES']:
+        if ticket_type.can_buy(user) and ticket_type.name == 'Upgrade':
+            ticket_limit = _get_ticket_limit(user, ticket_type, ticket_info)
+
+            if ticket_limit > 0:
+                ticket_info.ticket_types.append((ticket_type, ticket_limit))
+
+    return ticket_info
+
 def _get_group_ticket_limit(user, ticket_type, ticket_info):
     """Get how many |ticket_type| tickets |user| can purchase in a group.
 
@@ -238,6 +259,13 @@ def create_tickets(user, ticket_info, num_tickets):
 
     return tickets
 
+#def upgrade_ticket(ticket, ticket_slug, amt):
+#    ticket.ticket_type = ticket_slug
+#    ticket.add_note("Upgrade ticket to queue jump")
+#    ticket.price = ticket.price + amt
+#    DB.session.commit()
+
+
 def check_payment_method(flashes):
     """Validate the payment method selected in the purchase form.
 
@@ -291,7 +319,6 @@ def check_roundup_donation(flashes):
         return APP.config['ROUNDUP_DONATION_AMT']
 
     return 0
-
 
 
 def check_postage(flashes):

@@ -21,3 +21,4 @@ from eisitirio.views.dashboard import DASHBOARD
 from eisitirio.views.front import FRONT
 from eisitirio.views.group_purchase import GROUP_PURCHASE
 from eisitirio.views.purchase import PURCHASE
+from eisitirio.views.api import API

@@ -19,7 +19,7 @@ def _ticket_is_cancellable(ticket):
     elif not ticket.paid:
         return True
     elif ticket.payment_method == 'Card':
-        return True
+        return False
     elif ticket.payment_method == 'Battels':
         return app.APP.config['CURRENT_TERM'] != 'TT'
     elif ticket.payment_method == 'Free':

@@ -15,6 +15,7 @@ from eisitirio.logic import cancellation_logic
 from eisitirio.logic import realex_logic
 from eisitirio.logic import purchase_logic
 from eisitirio.logic import payment_logic
+from eisitirio.logic.custom_logic import ticket_logic
 
 APP = app.APP
 DB = db.DB
@@ -189,6 +190,95 @@ def purchase_home():
             num_tickets=num_tickets,
             ticket_info=ticket_info
         )
+
+@PURCHASE.route('/upgrade', methods=['GET', 'POST'])
+@login.login_required
+def upgrade_ticket():
+    """Buy an upgrade ticket
+
+    Checks if the user can purchase tickets, and processes the purchase form.
+    """
+
+    ticket_info = purchase_logic.get_ticket_info_for_upgrade(
+        login.current_user
+    )
+
+    if not ticket_info.ticket_types or not ticket_logic.can_buy_upgrade(login.current_user):
+        flask.flash(
+            'You are not able to purchase upgrade tickets at this time.',
+            'info'
+        )
+        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+
+    num_tickets = {
+        ticket_type.slug: 0
+        for ticket_type, _ in ticket_info.ticket_types
+    }
+
+    if flask.request.method == 'POST':
+        for ticket_type, _ in ticket_info.ticket_types:
+            num_tickets[ticket_type.slug] = int(
+                flask.request.form['num_tickets_{0}'.format(ticket_type.slug)]
+            )
+
+        flashes = purchase_logic.validate_tickets(
+            ticket_info,
+            num_tickets
+        )
+
+        payment_method, payment_term = purchase_logic.check_payment_method(
+            flashes
+        )
+
+        if flashes:
+            flask.flash(
+                (
+                    'There were errors in your order. Please fix '
+                    'these and try again'
+                ),
+                'error'
+            )
+            for msg in flashes:
+                flask.flash(msg, 'warning')
+
+            return flask.render_template(
+                'purchase/purchase_home.html',
+                form=flask.request.form,
+                num_tickets=num_tickets,
+                ticket_info=ticket_info
+            )
+
+
+        tickets = purchase_logic.create_tickets(
+            login.current_user,
+            ticket_info,
+            num_tickets
+        )
+
+        DB.session.add_all(tickets)
+        DB.session.commit()
+
+        APP.log_manager.log_event(
+            'Purchased Upgrade Tickets',
+            tickets=tickets,
+            user=login.current_user
+        )
+        postage, address = APP.config['POSTAGE_OPTIONS']['collection'], None
+
+        return payment_logic.do_payment(
+         tickets,
+         postage,
+         payment_method,
+         payment_term,
+         address
+        )
+    else:
+        return flask.render_template(
+            'purchase/upgrade.html',
+            num_tickets=num_tickets,
+            ticket_info=ticket_info
+        )
+
 
 @PURCHASE.route('/purchase/wait', methods=['GET', 'POST'])
 @login.login_required
@@ -562,3 +652,14 @@ def payment_processed():
     else:
         return flask.render_template('purchase/payment_processed.html')
         # return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+
+@PURCHASE.route('/purchase/verify-ticket/<int:ticket_id>')
+def api_verify_ticket(ticket_id):
+    ticket = models.Ticket.get_by_id(ticket_id)
+
+    print ticket
+
+    if ticket is not None:
+        return "true"
+    else:
+        return "false"

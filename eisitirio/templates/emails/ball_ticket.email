@@ -1,0 +1,10 @@
+Dear {{ user.fornames }},
+
+Here is your ticket for entering Keble Ball 2017. This email or a printout of it
+must be shown at the door in order to gain admittance on the night of the ball.
+
+<img src="data:image/svg+xml;base64, {{ user.held_ticket.barcode }}"/>
+
+Best Wishes,
+
+{{ template_config['EMAIL_SIGNOFF'] }}
