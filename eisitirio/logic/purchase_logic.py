@@ -244,13 +244,6 @@ def create_tickets(user, ticket_info, num_tickets):
 
     return tickets
 
-#def upgrade_ticket(ticket, ticket_slug, amt):
-#    ticket.ticket_type = ticket_slug
-#    ticket.add_note("Upgrade ticket to queue jump")
-#    ticket.price = ticket.price + amt
-#    DB.session.commit()
-
-
 def check_payment_method(flashes):
     """Validate the payment method selected in the purchase form.
 
