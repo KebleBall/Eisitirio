@@ -199,6 +199,16 @@ def upgrade_ticket():
     Checks if the user can purchase tickets, and processes the purchase form.
     """
 
+    price_per_ticket, number_upgrade = purchase_logic.get_ticket_info_for_upgrade(login.current_user)
+
+    if number_upgrade <= 0 or not ticket_logic.can_buy_upgrade(login.current_user):
+        flask.flash(
+            'You are not able to upgrade tickets at this time.',
+            'info'
+        )
+        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
+
+
     if flask.request.method == 'POST':
         selected_tickets = flask.request.form.getlist('tickets[]')
         if not selected_tickets:
@@ -208,7 +218,7 @@ def upgrade_ticket():
             )
             return flask.redirect(flask.url_for('purchase.upgrade_tickets'))
 
-        total_amt = 3000 * len(selected_tickets)
+        total_amt = price_per_ticket * len(selected_tickets)
 
         admin_fee = models.AdminFee(
             total_amt,
@@ -222,16 +232,7 @@ def upgrade_ticket():
 
         return payment_logic.pay_admin_fee(admin_fee, 'Card', 'HT')
 
-    number_upgrade = purchase_logic.get_ticket_info_for_upgrade(login.current_user)
-
-    if number_upgrade <= 0 or not ticket_logic.can_buy_upgrade(login.current_user):
-        flask.flash(
-            'You are not able to upgrade tickets at this time.',
-            'info'
-        )
-        return flask.redirect(flask.url_for('dashboard.dashboard_home'))
-    else:
-        return flask.render_template('purchase/upgrade.html')
+    return flask.render_template('purchase/upgrade.html')
 
 @PURCHASE.route('/purchase/wait', methods=['GET', 'POST'])
 @login.login_required

@@ -140,8 +140,21 @@ def get_ticket_info(user):
 
 def get_ticket_info_for_upgrade(user):
     """Get information about what tickets |user| can purchase online."""
+
+    # Get the total number of upgrade tickets that we've sold so far
     upgraded_tickets = models.Ticket.query.filter(models.Ticket.note.like("%Upgrade%")).count()
-    return max(0, 100 -  upgraded_tickets)
+    # Start out at zero -- if there isn't an upgrade option, there are none available
+    total_number_allowed = 0
+    price_per_ticket = 0
+
+    # Now see if we have an upgrade option ticket type in our available ticket types
+    for ticket_type in app.APP.config['TICKET_TYPES']:
+        if ticket_type.name == 'Upgrade':
+            total_number_allowed = ticket_type.total_limit
+            price_per_ticket = ticket_type.price
+            break
+
+    return price_per_ticket, max(0, total_number_allowed -  upgraded_tickets)
 
 def _get_group_ticket_limit(user, ticket_type, ticket_info):
     """Get how many |ticket_type| tickets |user| can purchase in a group.
