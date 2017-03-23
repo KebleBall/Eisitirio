@@ -194,7 +194,6 @@ def purchase_home():
 
 @PURCHASE.route('/purchase/upgrade', methods=['GET', 'POST'])
 @login.login_required
-@login_manager.admin_required
 def upgrade_ticket():
     """Buy an upgrade ticket
 
