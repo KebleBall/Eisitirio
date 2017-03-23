@@ -50,7 +50,10 @@
                 <tbody>
                     {% for ticket in current_user.tickets %}
                         <tr id="ticket-{{ ticket.object_id }}">
-                            <td>#{{ '%05d' % ticket.object_id }}</td>
+                            <td>#{{ '%05d' % ticket.object_id }}
+                              {% if ticket.note != None and 'Upgrade' in ticket.note %}
+                              , Upgraded
+                              {% endif %}</td>
                             <td>{{ ticket.status }}</td>
                             <td>
                                 {% if not ticket.cancelled %}
