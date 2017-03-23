@@ -61,7 +61,7 @@ def be_upgraded(ticket):
     return (
         ticket and
         ticket.paid and
-        "Upgrade" not in ticket.note
+        (ticket.note is None or "Upgrade" not in ticket.note)
     )
 
 @models.Ticket.permission()
