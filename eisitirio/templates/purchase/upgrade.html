@@ -18,7 +18,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for ticket in current_user.tickets %}
+                    {% for ticket in current_user.active_tickets %}
                         {% if ticket.can_be_upgraded() %}
                             <tr id="ticket-{{ ticket.object_id }}">
                                 <td><input type="checkbox" name="tickets[]" id="ticket_select-{{ ticket.object_id }}" value="{{ ticket.object_id }}" {% if tickets and ticket.object_id in tickets %}checked="checked" {% endif %}/></td>
