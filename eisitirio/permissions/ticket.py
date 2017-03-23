@@ -61,6 +61,7 @@ def be_upgraded(ticket):
     return (
         ticket and
         ticket.paid and
+        not ticket.cancelled and 
         (ticket.note is None or "Upgrade" not in ticket.note)
     )
 
