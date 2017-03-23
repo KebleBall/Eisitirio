@@ -59,6 +59,7 @@ def be_resold(ticket):
 @models.Ticket.permission()
 def be_upgraded(ticket):
     return (
+        ticket and
         ticket.paid and
         "Upgrade" not in ticket.note
     )
