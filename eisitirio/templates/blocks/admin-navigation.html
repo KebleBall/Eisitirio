@@ -8,6 +8,9 @@
 <li><a href="{{ url_for('admin_users.verify_affiliations') }}">Verify Affiliations</a>
 <li><a href="{{ url_for('admin_photos.verify_photos') }}">Verify Photos</a>
 <li><a href="{{ url_for('admin_postage.postage_dashboard') }}">Postage Dashboard</a>
+{% if current_user.tickets.count() > 0 %}
+<li><a href="{{ url_for('purchase.upgrade_ticket') }}">Upgrade Tickets</a>
+{% endif %}
 
 <!--
 <div class="small-6 medium-4 large-3 text-center columns dash-column"><div class="admin-dashboard-item"><li><ahref="{{ url_for('admin.admin_home') }}">Search Database</div></div>

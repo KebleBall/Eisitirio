@@ -11,6 +11,7 @@ from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.helpers import validators
+from eisitirio.helpers import login_manager
 from eisitirio.logic import cancellation_logic
 from eisitirio.logic import realex_logic
 from eisitirio.logic import purchase_logic
@@ -191,8 +192,9 @@ def purchase_home():
             ticket_info=ticket_info
         )
 
-@PURCHASE.route('/upgrade', methods=['GET', 'POST'])
+@PURCHASE.route('/purchase/upgrade', methods=['GET', 'POST'])
 @login.login_required
+@login_manager.admin_required
 def upgrade_ticket():
     """Buy an upgrade ticket
 
@@ -225,6 +227,12 @@ def upgrade_ticket():
             "Ticket Upgrade: {0}".format(','.join(selected_tickets)),
             login.current_user,
             login.current_user
+        )
+
+        APP.log_manager.log_event(
+            'Upgraded Tickets: {0}'.format(', '.join(selected_tickets)),
+            admin_fee=admin_fee,
+            user=login.current_user
         )
 
         DB.session.add(admin_fee)
