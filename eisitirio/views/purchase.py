@@ -192,6 +192,10 @@ def purchase_home():
             ticket_info=ticket_info
         )
 
+@PURCHASE.route('/upgrade', methods=['GET', 'POST'])
+def upgrade_ticket_redirect():
+    return flask.redirect(flask.url_for('purchase.upgrade_ticket'))
+
 @PURCHASE.route('/purchase/upgrade', methods=['GET', 'POST'])
 @login.login_required
 def upgrade_ticket():
