@@ -217,7 +217,7 @@ def upgrade_ticket():
                 'Please select the tickets you want to upgrade.',
                 'info'
             )
-            return flask.redirect(flask.url_for('purchase.upgrade_tickets'))
+            return flask.redirect(flask.url_for('purchase.upgrade_ticket'))
 
         total_amt = price_per_ticket * len(selected_tickets)
 
