@@ -4,6 +4,9 @@
 from __future__ import unicode_literals
 
 from email.mime import text
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
 import atexit
 import smtplib
 import socket
@@ -153,6 +156,39 @@ class EmailManager(object):
             )
 
         return self.jinjaenv.get_template(template)
+
+    def send_qr_code(self, recipient, subject, template, image_route, **kwargs):
+        """Send an email based on an html template and allow embedded images.
+        Args:
+            recipient: (str) the email address of the recipient
+            subject: (str) the subject line of the email to be sent
+            template: (str) the filename of a template located in the
+                templates/emails folder, to be rendered as the email body
+            kwargs: if this contains an element under the |email_from| key, this
+                is used as the sender of the email. Otherwise, all elements are
+                passed to the template rendering as template parameters.
+        """
+
+        # Set up the MIME stuff so that we can send the images
+        message = MIMEMultipart('related')
+        # Get the template
+        template = self.get_template(template)
+        msg_content = template.render(**kwargs)
+        message.attach(MIMEText((msg_content), 'html'))
+
+        # TODO: Make this pull from a database instead of storing it as files
+        with open(image_route, 'rb') as image_file:
+            image = MIMEImage(image_file.read())
+        image.add_header('Content-ID', '<ticket>')
+        image.add_header('Content-Disposition', 'inline', filename='ticket.png')
+        message.attach(image)
+
+        message['From'] = self.app.config['EMAIL_FROM']
+        message['To'] = recipient
+        message['Subject'] = '[{0}] {1}'.format(self.app.config['BALL_NAME'],
+                                                subject)
+
+        return self.send_message(message)
 
     def send_template(self, recipient, subject, template, **kwargs):
         """Send an email based on a template.
