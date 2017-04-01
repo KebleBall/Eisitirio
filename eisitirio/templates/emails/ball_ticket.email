@@ -1,7 +1,8 @@
-Dear {{ user.fornames }},
+Dear {{ user.forenames }},
 
 <p>Here is your ticket for entering Keble Ball 2017. This email or a printout of it
-must be shown at the door in order to gain admittance on the night of the ball.</p>
+containg the QR code below must be shown at the door in order to gain admittance
+on the night of the ball.</p>
 
 <img src="cid:ticket" width="500" height="500">
 

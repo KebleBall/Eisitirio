@@ -157,11 +157,12 @@ class EmailManager(object):
 
         return self.jinjaenv.get_template(template)
 
-    def send_qr_code(self, recipient, subject, template, image_route, **kwargs):
+    def send_image_html(self, recipient, subject, template, image_bytes, **kwargs):
         """Send an email based on an html template and allow embedded images.
         Args:
             recipient: (str) the email address of the recipient
             subject: (str) the subject line of the email to be sent
+            image_bytes: (bytes) the png image to be embedded in the email
             template: (str) the filename of a template located in the
                 templates/emails folder, to be rendered as the email body
             kwargs: if this contains an element under the |email_from| key, this
@@ -176,9 +177,7 @@ class EmailManager(object):
         msg_content = template.render(**kwargs)
         message.attach(MIMEText((msg_content), 'html'))
 
-        # TODO: Make this pull from a database instead of storing it as files
-        with open(image_route, 'rb') as image_file:
-            image = MIMEImage(image_file.read())
+        image = MIMEImage(image_bytes)
         image.add_header('Content-ID', '<ticket>')
         image.add_header('Content-Disposition', 'inline', filename='ticket.png')
         message.attach(image)
