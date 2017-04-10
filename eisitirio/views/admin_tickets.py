@@ -263,3 +263,38 @@ def validate_ticket():
         message=message,
         photo=photo
     )
+
+@ADMIN_TICKETS.route('/admin/ticket/validate-ticket/<int:ticket_id>/<string:barcode>', methods=['POST', 'GET'])
+#@login.login_required
+#@login_manager.admin_required
+def check_ticket(ticket_id, barcode):
+    ticket = models.Ticket.get_by_id(ticket_id)
+
+    valid = None
+    message = None
+    photo = None
+
+    if not ticket:
+        valid = False
+        message = 'No such ticket with barcode {0}'.format(barcode)
+
+    elif ticket.entered:
+        valid = False
+        message = (
+            'Ticket has already been used for '
+            'entry. Check ID against {0} (owned by {1})'
+        ).format(
+            ticket.holder.full_name,
+            ticket.owner.full_name
+        )
+        photo = ticket.holder.photo.thumb_url
+    else:
+        ticket.entered = True
+        DB.session.commit()
+        valid = True
+        message = 'Permit entry for {0}'.format(ticket.holder.full_name)
+        photo = ticket.holder.photo.thumb_url
+
+    return "ticket_valid: {0}, message: {1}, photo_url: {2}".format(
+            valid, message, photo
+        )
