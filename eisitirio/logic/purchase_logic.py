@@ -324,7 +324,7 @@ def check_postage(flashes):
         method and address to post to.
     """
     if not APP.config['ENABLE_POSTAGE']:
-        return None, None
+        return APP.config['NO_POSTAGE_OPTION'], None
 
     postage = None
     address = None
