@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block title %}Validate Ticket{% endblock %}
+
+{% block extra_head %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hide_header_footer.css') }}" />
+{% endblock %}
+
+{% block navigation %}
+<nav class="row">
+    <div class="large-12 columns">
+        <ul id="navigation-main">
+            <li><a href="{{ url_for('dashboard.dashboard_home') }}">Dashboard Home</a></li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <section id="validate_ticket" class="columns">
+      <div class="row">
+        <div class="small-12 columns large-centered">
+          <form action="{{ url_for('admin_tickets.check_ticket_qr') }}" method="post">
+            <input type="hidden" name="current_ticket_index" value="{{ idx }}">
+            <input type="image" src="data:image/png;base64, {{ barcode }}" value="Next QR Code" />
+          </form>
+        </div>
+      </div>
+  </section>
+{% endblock %}

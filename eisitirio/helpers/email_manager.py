@@ -178,8 +178,8 @@ class EmailManager(object):
         message.attach(MIMEText((msg_content), 'html'))
 
         image = MIMEImage(image_bytes)
-        image.add_header('Content-ID', '<ticket>')
-        image.add_header('Content-Disposition', 'inline', filename='ticket.png')
+        image.add_header('Content-ID', '<image>')
+        image.add_header('Content-Disposition', 'inline', filename='image.png')
         message.attach(image)
 
         message['From'] = self.app.config['EMAIL_FROM']

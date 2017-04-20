@@ -18,6 +18,7 @@ from eisitirio.scripts import fix_graduand_postage
 from eisitirio.scripts import prefill
 from eisitirio.scripts import run_bpython
 from eisitirio.scripts import update_battels
+from eisitirio.scripts import create_qr_codes
 
 EISITIRIO_DIR = os.path.realpath(__file__).replace('command.py',
                                                    'eisitirio')
@@ -64,6 +65,7 @@ MANAGER.add_command('db', migrate.MigrateCommand)
 MANAGER.add_command('prefill', prefill.PrefillCommand)
 MANAGER.add_command('run', script.Server)
 MANAGER.add_command('update_battels', update_battels.UpdateBattelsCommand)
+MANAGER.add_command('send_qr_tickets', create_qr_codes.CreateQRCodes)
 
 if __name__ == '__main__':
     MANAGER.run()

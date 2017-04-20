@@ -16,6 +16,15 @@ APP = app.APP
 DB = db.DB
 LOG = logging.getLogger(__name__)
 
+class CreateQRCodes(script.Command):
+    help = 'Create and send QR codes for ball entrence'
+
+    @staticmethod
+    def run():
+        with app.APP.app_context():
+            send_claim_codes(send_only_new=False)
+
+
 # The flow goes:
 # 1. generate_barcodes()
 # 2.
