@@ -156,6 +156,8 @@ class Ticket(DB.Model):
             )
         elif self.entered:
             return 'Used for entry.'
+        elif self.collected and self.holder:
+            return 'Ticket Sent to {0}.'.format(self.holder.full_name)
         elif self.collected:
             return 'Collected as {0}.'.format(self.barcode)
         elif self.holder is None:

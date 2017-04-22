@@ -16,22 +16,19 @@ APP = app.APP
 DB = db.DB
 LOG = logging.getLogger(__name__)
 
+
 class CreateQRCodes(script.Command):
+    """Generates ticket QR codes for tickets, and sends them out to ball goers"""
     help = 'Create and send QR codes for ball entrence'
 
     @staticmethod
     def run():
         with app.APP.app_context():
-            send_claim_codes(send_only_new=False)
-
-
-# The flow goes:
-# 1. generate_barcodes()
-# 2.
+            send_claim_codes(send_only_new=True)
 
 def generate_barcodes():
     """Given a ticket, generate a 20 character long unique ID for each ticket.
-    This will then be used in the QR code that we """
+    This will then be used in the QR code that we generate."""
     # Get all the tickets that need to have barcodes added to them
     tickets = models.Ticket.query.filter(
         models.Ticket.barcode == None
@@ -45,35 +42,6 @@ def generate_barcodes():
         DB.session.commit()
     # Return the number of tickets that we generated barcodes for.
     return tickets
-
-def create_qr_for(user):
-    """Given a user, this generates a qrcode for the ticket that they hold for
-    entrance into the ball.
-
-    The QR code is generated on the barcode for the ticket. So we have a
-    precondition that 'generate_barcodes' has been run before any calls to
-    this function are made.
-    """
-
-    qrcode_img = None
-
-    if user.held_ticket is not None and user.held_ticket.barcode is None:
-        qrcode_img = generate_ticket_qr(user.held_ticket)
-        if qrcode_img is None:
-            LOG.warning(
-            "Failed to generate QR code for ticket {0} for user id {1}".format(
-                user.held_ticket.object_id,
-                user.object_id
-                )
-            )
-            return None
-        else:
-            return user.held_ticket.barcode
-    elif user.held_ticket is None:
-        # If the user doesn't hold a ticket, then we don't need to do anything
-        return None
-    else:
-        return user.held_ticket.barcode
 
 def generate_ticket_qr(ticket):
     """
@@ -99,14 +67,20 @@ def send_claim_code(user):
         LOG.warning("User {0} has a held ticket, but unable to send it to them since there is no barcode for ticket {1}".format(user, user.held_ticket.object_id))
         return False
     else:
-        APP.email_manager.send_image_html(
-            user.email,
-            'Your Ball Entrance Ticket',
-            'ball_ticket.email',
-            generate_ticket_qr(user.held_ticket),
-            user=user
-        )
-        LOG.info("Sent ticket to {0} holding ticket {1}----{2}".format(user, user.held_ticket.object_id, user.held_ticket.barcode))
+        qr_code = generate_ticket_qr(user.held_ticket)
+        if qr_code is None:
+            LOG.warning("User {0} has a held ticket, but QR generation failed for {1}".format(
+                user, user.held_ticket.object_id ))
+            return False
+        else:
+            APP.email_manager.send_image_html(
+                user.email,
+                'Your Ball Entrance Ticket',
+                'ball_ticket.email',
+                qr_code,
+                user=user
+            )
+            LOG.info("Sent ticket to {0} holding ticket {1}----{2}".format(user, user.held_ticket.object_id, user.held_ticket.barcode))
         return True
 
 def send_claim_codes(send_only_new=True):

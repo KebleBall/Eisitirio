@@ -5,12 +5,14 @@ from __future__ import unicode_literals
 
 from flask.ext import login
 import flask
+import base64
 
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.helpers import login_manager
 from eisitirio.logic import cancellation_logic
+from eisitirio.scripts import create_qr_codes
 
 APP = app.APP
 DB = db.DB
@@ -265,8 +267,8 @@ def validate_ticket():
     )
 
 @ADMIN_TICKETS.route('/admin/ticket/validate-ticket/<int:ticket_id>/<string:barcode>', methods=['POST', 'GET'])
-@login.login_required
-@login_manager.admin_required
+#@login.login_required
+#@login_manager.admin_required
 def check_ticket(ticket_id, barcode):
     ticket = models.Ticket.get_by_id(ticket_id)
 
@@ -288,6 +290,12 @@ def check_ticket(ticket_id, barcode):
             ticket.owner.full_name
         )
         photo = ticket.holder.photo.thumb_url
+    elif not ticket.holder:
+        valid = False
+        message = (
+            'Ticket has not been claimed. Owner is {0}'
+            ).format(ticket.owner.full_name)
+        photo = ticket.owner.photo.thumb_url
     else:
         ticket.entered = True
         DB.session.commit()
@@ -297,4 +305,29 @@ def check_ticket(ticket_id, barcode):
 
     return "ticket_valid: {0}, message: {1}, photo_url: {2}".format(
             valid, message, photo
+        )
+
+@ADMIN_TICKETS.route('/admin/ticket/check-ticket-qrs', methods=['POST', 'GET'])
+@login.login_required
+@login_manager.admin_required
+def check_ticket_qr():
+    """A simple little view to make sure all the qrs are working correctly"""
+
+    tickets = models.Ticket.query.filter(
+        models.Ticket.barcode != None,
+        models.Ticket.holder_id != None
+    ).all()
+
+    index = -1
+
+    if flask.request.method == 'POST':
+        index = int(flask.request.form['current_ticket_index'])
+        if len(tickets) <= index + 1:
+            return "Done"
+
+    ticket = tickets[index + 1]
+    return flask.render_template(
+            'admin_tickets/check_ticket_qrs.html',
+            idx=index + 1,
+            barcode=base64.b64encode(create_qr_codes.generate_ticket_qr(ticket))
         )
