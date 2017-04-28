@@ -7,7 +7,8 @@ import datetime
 import json
 import hashlib
 
-from flask.ext import login
+import flask_login as login
+# from flask.ext import login
 import flask
 import requests
 

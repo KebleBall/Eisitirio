@@ -7,8 +7,10 @@ from __future__ import unicode_literals
 import os
 import sys
 
-from flask.ext import script
-from flask.ext import migrate
+import flask_script as script
+# from flask.ext import script
+import flask_migrate as migrate
+# from flask.ext import migrate
 
 from eisitirio import app
 from eisitirio import system # pylint: disable=unused-import

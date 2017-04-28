@@ -3,7 +3,8 @@
 
 from __future__ import unicode_literals
 
-from flask.ext import sqlalchemy as flask_sqlalchemy
+import flask_sqlalchemy
+#from flask.ext import sqlalchemy as flask_sqlalchemy
 from sqlalchemy.dialects import mysql
 from sqlalchemy.ext import declarative
 import sqlalchemy

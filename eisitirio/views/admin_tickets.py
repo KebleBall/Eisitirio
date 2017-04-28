@@ -3,7 +3,8 @@
 
 from __future__ import unicode_literals
 
-from flask.ext import login
+import flask_login as login
+# from flask.ext import login
 import flask
 import base64
 

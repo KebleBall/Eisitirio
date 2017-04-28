@@ -3,7 +3,8 @@
 
 from __future__ import unicode_literals
 
-from flask.ext import bcrypt
+import flask_bcrypt as bcrypt
+# from flask.ext import bcrypt
 import flask
 
 from eisitirio import app

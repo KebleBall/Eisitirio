@@ -8,7 +8,8 @@ import datetime
 import json
 
 import flask
-from flask.ext import login
+import flask_login as login
+# from flask.ext import login
 
 from eisitirio import app
 from eisitirio.database import models, db

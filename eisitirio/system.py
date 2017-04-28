@@ -6,8 +6,10 @@ from __future__ import unicode_literals
 import datetime
 import os
 
-from flask.ext import login
-from flask.ext import markdown
+import flask_login as login
+# from flask.ext import login
+import flask_misaka as misaka
+# from flask.ext import markdown
 from werkzeug import exceptions
 import flask
 import jinja2
@@ -51,7 +53,8 @@ def check_for_maintenance():
 log_manager.LogManager(APP)
 email_manager.EmailManager(APP)
 login_manager.LOGIN_MANAGER.init_app(APP)
-markdown.Markdown(APP)
+misaka.Misaka(APP)
+# markdown.Markdown(APP)
 
 APP.sms_manager = sms_manager.SmsManager()
 

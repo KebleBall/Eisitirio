@@ -9,7 +9,8 @@ from __future__ import unicode_literals
 
 import functools
 
-from flask.ext import sqlalchemy as flask_sqlalchemy
+import flask_sqlalchemy
+# from flask.ext import sqlalchemy as flask_sqlalchemy
 import sqlalchemy
 
 from eisitirio.helpers import permissions

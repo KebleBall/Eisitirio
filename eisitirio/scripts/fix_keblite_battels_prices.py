@@ -3,7 +3,8 @@
 
 from __future__ import unicode_literals
 
-from flask.ext import script
+import flask_script as script
+# from flask.ext import script
 from eisitirio import app
 from eisitirio.database import db
 from eisitirio.database import models

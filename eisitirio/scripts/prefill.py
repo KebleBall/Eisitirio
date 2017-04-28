@@ -6,7 +6,8 @@ from __future__ import unicode_literals
 import os
 import uuid
 
-from flask.ext import script
+import flask_script as script
+# from flask.ext import script
 
 from eisitirio import app
 from eisitirio.database import db

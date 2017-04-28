@@ -8,7 +8,9 @@ import datetime
 import os
 import sys
 
-from flask.ext import script
+
+import flask_script as script
+# from flask.ext import script
 
 from eisitirio import app
 from eisitirio import system # pylint: disable=unused-import

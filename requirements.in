@@ -4,6 +4,7 @@ Flask
 Flask-Bcrypt
 Flask-Login
 Flask-Markdown
+Flask-Misaka
 Flask-Migrate
 Flask-Script
 Flask-SQLAlchemy

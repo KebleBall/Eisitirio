@@ -4,16 +4,16 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-
 alembic==0.8.6            # via flask-migrate
 astroid==1.4.7            # via pylint
+backports.functools-lru-cache==1.3  # via pylint
 bcrypt==3.1.0             # via flask-bcrypt
 blessings==1.6            # via curtsies
 boto==2.42.0
 bpython==0.15.0
-cffi==1.7.0               # via bcrypt
+cffi==1.7.0               # via bcrypt, misaka
 click==6.6                # via flask, pip-tools
-colorama==0.3.7           # via pylint
+configparser==3.5.0       # via pylint
 curtsies==0.2.6           # via bpython
 cycler==0.10.0            # via matplotlib
 decorator==4.0.10         # via validators
@@ -22,6 +22,7 @@ flask-bcrypt==0.7.1
 flask-login==0.3.2
 flask-markdown==0.3
 flask-migrate==1.8.1
+Flask-Misaka==0.4.1
 flask-script==2.0.5
 flask-sqlalchemy==2.1
 Flask-Uploads==0.2.0
@@ -30,6 +31,7 @@ flask==0.11
 greenlet==0.4.10          # via bpython
 infinity==1.4             # via intervals
 intervals==0.8.0          # via wtforms-components
+isort==4.2.5              # via pylint
 itsdangerous==0.24        # via flask
 jinja2==2.8               # via flask
 lazy-object-proxy==1.2.2  # via astroid
@@ -37,6 +39,8 @@ mako==1.0.4               # via alembic
 markdown==2.6.6           # via flask-markdown
 markupsafe==0.23          # via jinja2, mako
 matplotlib==1.5.1
+mccabe==0.6.1             # via pylint
+misaka==2.1.0             # via flask-misaka
 mysql-python==1.2.5
 newrelic==2.64.0.48
 numpy==1.11.1             # via matplotlib
@@ -46,6 +50,7 @@ pycparser==2.14           # via cffi
 pygments==2.1.3           # via bpython
 pylint==1.6.4
 pyparsing==2.1.5          # via matplotlib
+pyqrcode==1.2.1
 python-dateutil==2.5.3
 python-editor==1.0        # via alembic
 pytz==2016.6              # via matplotlib
@@ -54,8 +59,7 @@ six==1.10.0
 sqlalchemy==1.0.14        # via alembic, flask-sqlalchemy
 validators==0.10          # via wtforms-components
 wcwidth==0.1.7            # via curtsies
-werkzeug==0.11.10          # via flask, flask-wtf
+werkzeug==0.11.10         # via flask, flask-wtf
 wrapt==1.10.8             # via astroid
 wtforms-components==0.10.0
 wtforms==2.1              # via flask-wtf, wtforms-components
-pyqrcode==1.2.1

@@ -3,7 +3,8 @@
 
 from __future__ import unicode_literals
 
-from flask.ext import script
+import flask_script as script
+# from flask.ext import script
 from bpython import curtsies
 
 from eisitirio import app

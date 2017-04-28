@@ -7,7 +7,8 @@ import datetime
 import re
 
 from dateutil import parser
-from flask.ext import login
+import flask_login as login
+# from flask.ext import login
 import flask
 
 from eisitirio import app
