@@ -19,3 +19,4 @@ python-dateutil
 requests
 six
 WTForms-Components
+PyQRCode
