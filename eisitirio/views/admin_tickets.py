@@ -268,8 +268,8 @@ def validate_ticket():
     )
 
 @ADMIN_TICKETS.route('/admin/ticket/validate-ticket/<int:ticket_id>/<string:barcode>', methods=['POST', 'GET'])
-# @login.login_required
-# @login_manager.admin_required
+@login.login_required
+@login_manager.admin_required
 def check_ticket(ticket_id, barcode):
     ticket = models.Ticket.get_by_id(ticket_id)
 
@@ -307,6 +307,8 @@ def check_ticket(ticket_id, barcode):
     return flask.jsonify(ticketvalid=valid, message=message,
             photourl=photo)
 
+###########################################################################
+
 @ADMIN_TICKETS.route('/admin/ticket/check-ticket-qrs', methods=['POST', 'GET'])
 @login.login_required
 @login_manager.admin_required
@@ -331,3 +333,30 @@ def check_ticket_qr():
             idx=index + 1,
             barcode=base64.b64encode(create_qr_codes.generate_ticket_qr(ticket))
         )
+
+
+@ADMIN_TICKETS.route('/admin/ticket/test-validate-ticket/<int:ticket_id>/<string:barcode>', methods=['POST', 'GET'])
+# @login.login_required
+# @login_manager.admin_required
+def test_check_ticket(ticket_id, barcode):
+
+    user = models.User.get_by_id(1)
+
+    valid = False
+    message = None
+    photo = None
+
+    if ticket_id == 1:
+        valid = True
+        message = 'Permit entry for {0}'.format(user.full_name)
+        photo = user.photo.thumb_url
+    else:
+        valid = False
+        message = (
+            'Ticket has not been claimed. Owner is {0}'
+            ).format(user.full_name)
+        photo = user.photo.thumb_url
+
+    return flask.jsonify(ticketvalid=valid, message=message,
+            photourl=photo)
+
