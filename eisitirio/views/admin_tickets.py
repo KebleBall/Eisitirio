@@ -304,8 +304,8 @@ def check_ticket(ticket_id, barcode):
         message = 'Permit entry for {0}'.format(ticket.holder.full_name)
         photo = ticket.holder.photo.thumb_url
 
-    return flask.jsonify(ticket_valid=valid, message=message,
-            photo_url=photo)
+    return flask.jsonify(ticketvalid=valid, message=message,
+            photourl=photo)
 
 @ADMIN_TICKETS.route('/admin/ticket/check-ticket-qrs', methods=['POST', 'GET'])
 @login.login_required
