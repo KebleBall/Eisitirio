@@ -86,9 +86,12 @@ def send_claim_code(user):
 
 def send_claim_codes(send_only_new=True):
     """Generate barcodes, and send claim codes to all users.
+    NOTE: We keep track of the tickets that we have sent out already via
+        barcode generation. Thus, if we generate barcodes and don't send then
+        we won't send those we generated barcodes for.
     NOTE: if send_only_new is False, then we will send an email with a claim
-    code to _all_ users that hold a ticket, whether or not they have previously
-    been sent one. Be careful!!
+        code to _all_ users that hold a ticket, whether or not they have previously
+        been sent one. Be careful!!
     """
     tickets = generate_barcodes()
     successes = 0
