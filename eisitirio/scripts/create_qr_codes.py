@@ -27,21 +27,44 @@ class CreateQRCodes(script.Command):
         with app.APP.app_context():
             send_claim_codes(send_only_new=True)
 
-def generate_barcodes():
+def generate_barcodes(send_only_new):
     """Given a ticket, generate a 20 character long unique ID for each ticket.
-    This will then be used in the QR code that we generate."""
+    This will then be used in the QR code that we generate.
+
+    This returns the tickets that will then be used by 'send_claim_codes'.
+
+    """
     # Get all the tickets that need to have barcodes added to them
-    tickets = models.Ticket.query.filter(
-        models.Ticket.barcode == None
-    ).all()
+    tickets = []
+    if send_only_new:
+        tickets = models.Ticket.query.filter(
+            # We have not sent them an email yet (it has not been "claimed")
+            models.Ticket.barcode == None,
+            # Ticket has a holder
+            models.Ticket.holder_id != None,
+            # The ticket is paid for.
+            models.Ticket.paid,
+            # The ticket has not been cancelled.
+            models.Ticket.cancelled == False
+        ).all()
+    else:
+        tickets = models.Ticket.query.filter(
+            # Ticket has a holder
+            models.Ticket.holder_id != None,
+            # The ticket is paid for.
+            models.Ticket.paid,
+            # The ticket has not been cancelled.
+            models.Ticket.cancelled == False
+        ).all()
 
     for ticket in tickets:
-        # Generate a unique key for this ticket.
-        key = util.generate_key(20).decode('utf-8')
-        # and add it
-        ticket.barcode = key
-        DB.session.commit()
-    # Return the number of tickets that we generated barcodes for.
+        if not ticket.barcode: # Need to generate a bar code
+            # Generate a unique key for this ticket.
+            key = util.generate_key(20).decode('utf-8')
+            # and add it
+            ticket.barcode = key
+            DB.session.commit()
+    # Return the tickets
     return tickets
 
 def generate_ticket_qr(ticket):
@@ -93,15 +116,9 @@ def send_claim_codes(send_only_new=True):
         code to _all_ users that hold a ticket, whether or not they have previously
         been sent one. Be careful!!
     """
-    tickets = generate_barcodes()
+    tickets = generate_barcodes(send_only_new)
     successes = 0
     failures = 0
-
-
-    if not send_only_new:
-        tickets = models.Ticket.query.filter(
-            models.Ticket.holder_id != None
-        ).all()
 
     for ticket in tickets:
         if send_claim_code(ticket.holder):

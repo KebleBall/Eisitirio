@@ -237,5 +237,5 @@ class Ticket(DB.Model):
             ) if self.expires is not None else 'N/A',
             self.barcode if self.barcode is not None else 'N/A',
             self.owner_id,
-            self.owner.full_name,
+            self.owner.full_name.encode('utf-8'),
         ])
