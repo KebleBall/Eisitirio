@@ -230,7 +230,7 @@ class Ticket(DB.Model):
             'Yes' if self.entered else 'No',
             'Yes' if self.cancelled else 'No',
             self.price_pounds,
-            self.holder.full_name if self.holder is not None else 'N/A',
+            self.holder.full_name.encode('utf-8') if self.holder is not None else 'N/A',
             self.note,
             self.expires.strftime(
                 '%Y-%m-%d %H:%M:%S'
