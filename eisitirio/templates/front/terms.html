@@ -5,7 +5,7 @@
 
 {% block content %}
     <section id="terms" class="columns">
-        <p>Last Updated 15th February 2016</p>
+        <p>Last Updated May 2nd 2017</p>
 
         {% if template_config['REQUIRE_USER_PHOTOS'] %}
             <h3>Use of Images</h3>
@@ -18,6 +18,7 @@
         <p>Tickets for {{ template_config['BALL_NAME'] }} are subject to the following terms and conditions. By confirming, reserving, booking, or purchasing tickets for the ball, you agree to the following:</p>
 
         <ol>
+            <li>No ticket refunds will be processed after 23:59:59 Tuesday May 2nd 2017</li>
             <li>You and any guests you invite are over 18 years of age on or before {{ template_config['START_TIME'].strftime('%-d') }}{{ get_ord(template_config['START_TIME']) }} {{ template_config['START_TIME'].strftime('%B %Y') }}.</li>
             <li>Ball tickets must not be sold or transferred. Any ticket found to have been resold will be deemed void, and no refund will be given.</li>
             <li>It is forbidden for any user to register multiple accounts for the purposes of evading limits on the number of tickets per person. Any person found to be doing so will have all their tickets deemed void, and no refund will be given.</li>
