@@ -336,8 +336,8 @@ def check_ticket_qr():
 
 
 @ADMIN_TICKETS.route('/admin/ticket/test-validate-ticket/<int:ticket_id>/<string:barcode>', methods=['POST', 'GET'])
-# @login.login_required
-# @login_manager.admin_required
+@login.login_required
+@login_manager.admin_required
 def test_check_ticket(ticket_id, barcode):
     ticket = models.Ticket.get_by_id(ticket_id)
 
