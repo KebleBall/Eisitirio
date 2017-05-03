@@ -207,9 +207,7 @@ def run_5_minutely(now):
 
     send_announcements()
 
-    # XXX/REMOVE ME: Just a way to turn off waiting list allocation for now
-    # right before the ball.
-    # allocate_waiting()
+    allocate_waiting()
 
     cancel_expired_tickets(now)
 
