@@ -25,7 +25,7 @@ class CreateQRCodes(script.Command):
     @staticmethod
     def run():
         with app.APP.app_context():
-            send_claim_codes(send_only_new=True)
+            send_claim_codes(send_only_new=False)
 
 def generate_barcodes(send_only_new):
     """Given a ticket, generate a 20 character long unique ID for each ticket.
