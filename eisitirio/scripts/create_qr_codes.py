@@ -85,16 +85,16 @@ def generate_ticket_qr(ticket):
 def send_claim_code(user):
     """Send qr code to user that holds ticket"""
     if not user.held_ticket:
-        LOG.info("Not generating for user {0} since they don't hold a ticket".format(user))
+        LOG.info("Not generating for user {0} since they don't hold a ticket".format(user.full_name.encode('utf-8')))
         return False
     elif user.held_ticket.barcode is None:
-        LOG.warning("User {0} has a held ticket, but unable to send it to them since there is no barcode for ticket {1}".format(user, user.held_ticket.object_id))
+        LOG.error("User {0} has a held ticket, but unable to send it to them since there is no barcode for ticket {1}".format(user.full_name.encode('utf-8'), user.held_ticket.object_id))
         return False
     else:
         qr_code = generate_ticket_qr(user.held_ticket)
         if qr_code is None:
-            LOG.warning("User {0} has a held ticket, but QR generation failed for {1}".format(
-                user, user.held_ticket.object_id ))
+            LOG.error("User {0} has a held ticket, but QR generation failed for {1}".format(
+                user.full_name.encode('utf-8'), user.held_ticket.object_id ))
             return False
         else:
             APP.email_manager.send_image_html(
@@ -104,7 +104,7 @@ def send_claim_code(user):
                 qr_code,
                 user=user
             )
-            LOG.info("Sent ticket to {0} holding ticket {1}----{2}".format(user, user.held_ticket.object_id, user.held_ticket.barcode))
+            LOG.info("Sent ticket to {0} holding ticket {1}----{2}".format(user.full_name.encode('utf-8'), user.held_ticket.object_id, user.held_ticket.barcode))
         return True
 
 def send_claim_codes(send_only_new=True):
@@ -121,10 +121,23 @@ def send_claim_codes(send_only_new=True):
     failures = 0
 
     for ticket in tickets:
-        if send_claim_code(ticket.holder):
-            successes = successes + 1
-        else:
+        try:
+            if send_claim_code(ticket.holder):
+                successes = successes + 1
+                print '[Sent: {0}]'.format(ticket.object_id)
+                LOG.info('[{0}] sent QR code to: {1}'.format(ticket.object_id, ticket.holder.full_name.encode('utf-8')))
+            else:
+                ticket.barcode = None
+                DB.session.commit()
+                LOG.error("Failed to send ticket to {0}".format(ticket.holder.full_name.encode('utf-8')))
+                print '[Failed to Send: {0}]'.format(ticket.object_id)
+                failures = failures + 1
+        except:
+            # We've failed to send this one out, so mark it for review
+            ticket.barcode = None
+            DB.session.commit()
             failures = failures + 1
+            LOG.error("[EXCEPTION] Possibly failed to send ticket to: {0}".format(ticket.holder.full_name.encode('utf-8')))
 
     print "All done sending claim codes. Total #codes that we should have sent: {0}".format(len(tickets))
     print "Total that were sent successfully: {0}".format(successes)
