@@ -12,6 +12,7 @@ from eisitirio.database import db
 from eisitirio.database import models
 from eisitirio.logic.custom_logic import ticket_logic
 from eisitirio.helpers import util
+from time import sleep
 
 APP = app.APP
 DB = db.DB
@@ -107,16 +108,7 @@ def send_claim_code(user):
             LOG.info("Sent ticket to {0} holding ticket {1}----{2}".format(user.full_name.encode('utf-8'), user.held_ticket.object_id, user.held_ticket.barcode))
         return True
 
-def send_claim_codes(send_only_new=True):
-    """Generate barcodes, and send claim codes to all users.
-    NOTE: We keep track of the tickets that we have sent out already via
-        barcode generation. Thus, if we generate barcodes and don't send then
-        we won't send those we generated barcodes for.
-    NOTE: if send_only_new is False, then we will send an email with a claim
-        code to _all_ users that hold a ticket, whether or not they have previously
-        been sent one. Be careful!!
-    """
-    tickets = generate_barcodes(send_only_new)
+def send_chunk(tickets):
     successes = 0
     failures = 0
 
@@ -138,7 +130,21 @@ def send_claim_codes(send_only_new=True):
             DB.session.commit()
             failures = failures + 1
             LOG.error("[EXCEPTION] Possibly failed to send ticket to: {0}".format(ticket.holder.full_name.encode('utf-8')))
+        sleep(0.5)
 
     print "All done sending claim codes. Total #codes that we should have sent: {0}".format(len(tickets))
     print "Total that were sent successfully: {0}".format(successes)
     print "Total that we failed to send successfully: {0}".format(failures)
+
+def send_claim_codes(send_only_new=True):
+    """Generate barcodes, and send claim codes to all users.
+    NOTE: We keep track of the tickets that we have sent out already via
+        barcode generation. Thus, if we generate barcodes and don't send then
+        we won't send those we generated barcodes for.
+    NOTE: if send_only_new is False, then we will send an email with a claim
+        code to _all_ users that hold a ticket, whether or not they have previously
+        been sent one. Be careful!!
+    """
+    tickets = generate_barcodes(send_only_new)
+
+    send_chunk(tickets)
