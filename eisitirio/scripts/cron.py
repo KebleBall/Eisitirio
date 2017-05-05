@@ -207,7 +207,8 @@ def run_5_minutely(now):
 
     send_announcements()
 
-    allocate_waiting()
+    # Don't repopulate the waiting list
+    # allocate_waiting()
 
     cancel_expired_tickets(now)
 
