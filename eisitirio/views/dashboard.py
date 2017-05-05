@@ -8,6 +8,7 @@ import datetime
 import flask_login as login
 # from flask.ext import login
 import flask
+import base64
 
 from eisitirio import app
 from eisitirio.database import db
@@ -15,6 +16,7 @@ from eisitirio.database import models
 from eisitirio.helpers import photos
 from eisitirio.helpers import util
 from eisitirio.logic import affiliation_logic
+from eisitirio.scripts import create_qr_codes
 
 APP = app.APP
 DB = db.DB
@@ -28,7 +30,13 @@ def dashboard_home():
 
     Does nothing special.
     """
-    return flask.render_template('dashboard/dashboard_home.html')
+    # Hacky I know...
+    if login.current_user.held_ticket and login.current_user.held_ticket.barcode:
+        ticket = login.current_user.held_ticket
+        return flask.render_template('dashboard/dashboard_home.html',
+            barcode=base64.b64encode(create_qr_codes.generate_ticket_qr(ticket)))
+    else:
+        return flask.render_template('dashboard/dashboard_home.html')
 
 @DASHBOARD.route('/dashboard/profile', methods=['GET', 'POST'])
 @login.login_required

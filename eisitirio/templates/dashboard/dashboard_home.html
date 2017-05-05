@@ -36,6 +36,12 @@
                 <input type="submit" value="Claim Ticket" class="button" />
             </form>
         {% endif %}
+
+        {% if (current_user.held_ticket != None) and (current_user.held_ticket.barcode != None) and (barcode is defined) %}
+          <h3>Your Entry Ticket</h3>
+            <img src="data:image/png;base64, {{ barcode }}" value="Your Ticket" />
+        {% endif %}
+
         <h3>Tickets You Own</h3>
         {% if current_user.tickets.count() > 0 %}
             <table id="tickets_table">
