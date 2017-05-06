@@ -302,8 +302,8 @@ def check_ticket(ticket_id, barcode):
         message = 'Found ticket, barcode doesnt match {0}'.format(barcode)
         photo = ticket.holder.photo.thumb_url
     else:
-        #ticket.entered = True
-        #DB.session.commit()
+        ticket.entered = True
+        DB.session.commit()
 
         valid = True
         message = 'Permit entry for {0}'.format(ticket.holder.full_name.encode('utf-8'))
