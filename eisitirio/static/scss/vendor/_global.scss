@@ -23,8 +23,8 @@ $global-lineheight: 1.5 !default;
 /// Colors used for buttons, callouts, links, etc. There must always be a color called `primary`.
 /// @type Map
 $foundation-palette: (
-  primary: midnightblue,
-  secondary: #777,
+  primary: blue,
+  secondary: red,
   success: #3adb76,
   warning: #ffae00,
   alert: #ec5840,
@@ -60,7 +60,7 @@ $body-font-color: $black !default;
 
 /// Font stack of the body.
 /// @type List
-$body-font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif !default;
+$body-font-family: 'Open Sans', sans-serif !default;
 
 /// Set to `true` to enable antialiased type, using the `-webkit-font-smoothing` and `-moz-osx-font-smoothing` CSS properties.
 /// @type Boolean
