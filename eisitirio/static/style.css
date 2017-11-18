@@ -797,87 +797,87 @@ strong, b { font-weight: bold; line-height: inherit; }
 small { font-size: 80%; line-height: inherit; }
 
 /* line 288, scss/vendor/typography/_base.scss */
-h1, h2, h3, h4, h5, h6 { font-family: "Open Sans", Helvetica, sans-serif; font-weight: normal; font-style: normal; color: inherit; text-rendering: optimizeLegibility; margin-top: 0; margin-bottom: 0.5rem; line-height: 1.4; }
-/* line 303, scss/vendor/typography/_base.scss */
+h1, h2, h3, h4, h5, h6 { font-family: "Open Sans", Helvetica, sans-serif; font-weight: normal; font-style: normal; color: inherit; text-rendering: optimizeLegibility; text-transform: uppercase; margin-top: 0; margin-bottom: 0.5rem; line-height: 1.4; }
+/* line 304, scss/vendor/typography/_base.scss */
 h1 small, h2 small, h3 small, h4 small, h5 small, h6 small { color: #cacaca; line-height: 0; }
 
-/* line 313, scss/vendor/typography/_base.scss */
+/* line 314, scss/vendor/typography/_base.scss */
 h1 { font-size: 1.5rem; }
 
-/* line 313, scss/vendor/typography/_base.scss */
+/* line 314, scss/vendor/typography/_base.scss */
 h2 { font-size: 1.25rem; }
 
-/* line 313, scss/vendor/typography/_base.scss */
+/* line 314, scss/vendor/typography/_base.scss */
 h3 { font-size: 1.1875rem; }
 
-/* line 313, scss/vendor/typography/_base.scss */
+/* line 314, scss/vendor/typography/_base.scss */
 h4 { font-size: 1.125rem; }
 
-/* line 313, scss/vendor/typography/_base.scss */
+/* line 314, scss/vendor/typography/_base.scss */
 h5 { font-size: 1.0625rem; }
 
-/* line 313, scss/vendor/typography/_base.scss */
+/* line 314, scss/vendor/typography/_base.scss */
 h6 { font-size: 1rem; }
 
-@media screen and (min-width: 40em) { /* line 313, scss/vendor/typography/_base.scss */
+@media screen and (min-width: 40em) { /* line 314, scss/vendor/typography/_base.scss */
   h1 { font-size: 3rem; }
-  /* line 313, scss/vendor/typography/_base.scss */
+  /* line 314, scss/vendor/typography/_base.scss */
   h2 { font-size: 2.5rem; }
-  /* line 313, scss/vendor/typography/_base.scss */
+  /* line 314, scss/vendor/typography/_base.scss */
   h3 { font-size: 1.9375rem; }
-  /* line 313, scss/vendor/typography/_base.scss */
+  /* line 314, scss/vendor/typography/_base.scss */
   h4 { font-size: 1.5625rem; }
-  /* line 313, scss/vendor/typography/_base.scss */
+  /* line 314, scss/vendor/typography/_base.scss */
   h5 { font-size: 1.25rem; }
-  /* line 313, scss/vendor/typography/_base.scss */
+  /* line 314, scss/vendor/typography/_base.scss */
   h6 { font-size: 1rem; } }
-/* line 321, scss/vendor/typography/_base.scss */
+/* line 322, scss/vendor/typography/_base.scss */
 a { color: blue; text-decoration: none; line-height: inherit; cursor: pointer; }
-/* line 327, scss/vendor/typography/_base.scss */
+/* line 328, scss/vendor/typography/_base.scss */
 a:hover, a:focus { color: #0000db; }
-/* line 335, scss/vendor/typography/_base.scss */
+/* line 336, scss/vendor/typography/_base.scss */
 a img { border: 0; }
 
-/* line 341, scss/vendor/typography/_base.scss */
+/* line 342, scss/vendor/typography/_base.scss */
 hr { max-width: 75rem; height: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #cacaca; border-left: 0; margin: 1.25rem auto; clear: both; }
 
-/* line 353, scss/vendor/typography/_base.scss */
+/* line 354, scss/vendor/typography/_base.scss */
 ul, ol, dl { line-height: 1.6; margin-bottom: 0.3125rem; list-style-position: outside; }
 
-/* line 362, scss/vendor/typography/_base.scss */
+/* line 363, scss/vendor/typography/_base.scss */
 li { font-size: inherit; }
 
-/* line 367, scss/vendor/typography/_base.scss */
+/* line 368, scss/vendor/typography/_base.scss */
 ul { list-style-type: disc; margin-left: 1.25rem; }
 
-/* line 373, scss/vendor/typography/_base.scss */
+/* line 374, scss/vendor/typography/_base.scss */
 ol { margin-left: 1.25rem; }
 
-/* line 379, scss/vendor/typography/_base.scss */
+/* line 380, scss/vendor/typography/_base.scss */
 ul ul, ol ul, ul ol, ol ol { margin-left: 1.25rem; margin-bottom: 0; }
 
-/* line 386, scss/vendor/typography/_base.scss */
+/* line 387, scss/vendor/typography/_base.scss */
 dl { margin-bottom: 1rem; }
-/* line 389, scss/vendor/typography/_base.scss */
+/* line 390, scss/vendor/typography/_base.scss */
 dl dt { margin-bottom: 0.3rem; font-weight: bold; }
 
-/* line 396, scss/vendor/typography/_base.scss */
+/* line 397, scss/vendor/typography/_base.scss */
 blockquote { margin: 0 0 0.3125rem; padding: 0.5625rem 1.25rem 0 1.1875rem; border-left: 1px solid #cacaca; }
-/* line 401, scss/vendor/typography/_base.scss */
+/* line 402, scss/vendor/typography/_base.scss */
 blockquote, blockquote p { line-height: 1.6; color: #8a8a8a; }
 
-/* line 408, scss/vendor/typography/_base.scss */
+/* line 409, scss/vendor/typography/_base.scss */
 cite { display: block; font-size: 0.8125rem; color: #8a8a8a; }
-/* line 413, scss/vendor/typography/_base.scss */
+/* line 414, scss/vendor/typography/_base.scss */
 cite:before { content: "— "; }
 
-/* line 419, scss/vendor/typography/_base.scss */
+/* line 420, scss/vendor/typography/_base.scss */
 abbr { color: #fefefe; cursor: help; border-bottom: 1px dotted #0a0a0a; }
 
-/* line 426, scss/vendor/typography/_base.scss */
+/* line 427, scss/vendor/typography/_base.scss */
 code { font-family: Consolas, "Liberation Mono", Courier, monospace; font-weight: normal; color: #0a0a0a; background-color: #e6e6e6; border: 1px solid #cacaca; padding: 0.125rem 0.3125rem 0.0625rem; }
 
-/* line 436, scss/vendor/typography/_base.scss */
+/* line 437, scss/vendor/typography/_base.scss */
 kbd { padding: 0.125rem 0.25rem 0; margin: 0; background-color: #e6e6e6; color: #0a0a0a; font-family: Consolas, "Liberation Mono", Courier, monospace; }
 
 /* line 48, scss/vendor/typography/_helpers.scss */

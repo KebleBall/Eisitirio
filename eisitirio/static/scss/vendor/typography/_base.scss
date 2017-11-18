@@ -296,6 +296,7 @@ $abbr-underline: 1px dotted $black !default;
     font-style: $header-font-style;
     color: $header-color;
     text-rendering: $header-text-rendering;
+    text-transform: uppercase;
     margin-top: 0;
     margin-bottom: $header-margin-bottom;
     line-height: $header-lineheight;
