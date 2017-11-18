@@ -6,7 +6,7 @@
 @include foundation-everything;
 
 nav, #page-title, #main, footer, #flashes, #verify_sms {
-    background-color: #fff;
+    background-color: #000;
 }
 
 a {
@@ -26,8 +26,8 @@ a {
 
   .header-text {
     text-transform: uppercase;;
-    padding-top: 10vh;
-    padding-bottom: 10vh;
+    padding-top: 5vh;
+    padding-bottom: 5vh;
     h1 { font-size: 1 * $h1-font-size; }
     h2 { font-size: 1 * $h2-font-size; }
     h3 { font-size: 1 * $h3-font-size; }

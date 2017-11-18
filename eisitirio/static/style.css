@@ -1000,7 +1000,7 @@ label > [type='checkbox'], label > [type='radio'] { margin-right: 0.5rem; }
 [type='file'] { width: 100%; }
 
 /* line 41, scss/vendor/forms/_label.scss */
-label { display: block; margin: 0; font-size: 1rem; font-weight: normal; line-height: 1.8; color: #0a0a0a; }
+label { display: block; margin: 0; font-size: 1rem; font-weight: normal; line-height: 1.8; color: #fefefe; }
 /* line 44, scss/vendor/forms/_label.scss */
 label.middle { margin: 0 0 1rem; padding: 0.5625rem 0; }
 
@@ -1893,16 +1893,16 @@ input:checked + label > .switch-inactive { display: none; }
 /* line 302, scss/vendor/components/_table.scss */
 table { width: 100%; margin-bottom: 1rem; border-radius: 0; }
 /* line 107, scss/vendor/components/_table.scss */
-thead, tbody, tfoot { border: 1px solid #f1f1f1; background-color: #fefefe; }
+thead, tbody, tfoot { border: 1px solid #3d3d3d; background-color: #333333; }
 
 /* line 115, scss/vendor/components/_table.scss */
 caption { font-weight: bold; padding: 0.5rem 0.625rem 0.625rem; }
 
 /* line 121, scss/vendor/components/_table.scss */
-thead { background: #f8f8f8; color: #fefefe; }
+thead { background: #383838; color: #fefefe; }
 
 /* line 127, scss/vendor/components/_table.scss */
-tfoot { background: #f1f1f1; color: #fefefe; }
+tfoot { background: #3d3d3d; color: #fefefe; }
 
 /* line 136, scss/vendor/components/_table.scss */
 thead tr, tfoot tr { background: transparent; }
@@ -1913,12 +1913,12 @@ thead th, thead td, tfoot th, tfoot td { padding: 0.5rem 0.625rem 0.625rem; font
 tbody th, tbody td { padding: 0.5rem 0.625rem 0.625rem; }
 
 /* line 83, scss/vendor/components/_table.scss */
-tbody tr:nth-child(even) { background-color: #f1f1f1; border-bottom: 0; }
+tbody tr:nth-child(even) { background-color: #3d3d3d; border-bottom: 0; }
 
 /* line 163, scss/vendor/components/_table.scss */
-table.unstriped tbody { background-color: #fefefe; }
+table.unstriped tbody { background-color: #333333; }
 /* line 99, scss/vendor/components/_table.scss */
-table.unstriped tbody tr { background-color: #fefefe; border-bottom: 0; border-bottom: 1px solid #f1f1f1; }
+table.unstriped tbody tr { background-color: #333333; border-bottom: 0; border-bottom: 1px solid #3d3d3d; }
 
 @media screen and (max-width: 63.9375em) { /* line 281, scss/vendor/components/_table.scss */
   table.stack thead { display: none; }
@@ -1933,13 +1933,13 @@ table.unstriped tbody tr { background-color: #fefefe; border-bottom: 0; border-b
 table.scroll { display: block; width: 100%; overflow-x: auto; }
 
 /* line 214, scss/vendor/components/_table.scss */
-table.hover thead tr:hover { background-color: #f3f3f3; }
+table.hover thead tr:hover { background-color: #333333; }
 /* line 221, scss/vendor/components/_table.scss */
-table.hover tfoot tr:hover { background-color: #ececec; }
+table.hover tfoot tr:hover { background-color: #383838; }
 /* line 228, scss/vendor/components/_table.scss */
-table.hover tbody tr:hover { background-color: #f9f9f9; }
+table.hover tbody tr:hover { background-color: #2e2e2e; }
 /* line 236, scss/vendor/components/_table.scss */
-table.hover:not(.unstriped) tr:nth-of-type(even):hover { background-color: #ececec; }
+table.hover:not(.unstriped) tr:nth-of-type(even):hover { background-color: #212121; }
 
 /* line 320, scss/vendor/components/_table.scss */
 .table-scroll { overflow-x: auto; }
@@ -2133,7 +2133,7 @@ a.thumbnail image { box-shadow: none; }
 .clearfix::after { clear: both; }
 
 /* line 8, style.scss */
-nav, #page-title, #main, footer, #flashes, #verify_sms { background-color: #fff; }
+nav, #page-title, #main, footer, #flashes, #verify_sms { background-color: #000; }
 
 /* line 12, style.scss */
 a { font-weight: bold; }
@@ -2141,7 +2141,7 @@ a { font-weight: bold; }
 /* line 16, style.scss */
 .header { text-align: center; background-image: url(./images/headerbg.jpg); background-size: cover; background-attachment: fixed; position: relative; overflow: visible; padding-top: 0.5rem; padding-bottom: 2.9rem; }
 /* line 27, style.scss */
-.header .header-text { text-transform: uppercase; padding-top: 10vh; padding-bottom: 10vh; }
+.header .header-text { text-transform: uppercase; padding-top: 5vh; padding-bottom: 5vh; }
 /* line 31, style.scss */
 .header .header-text h1 { font-size: 3rem; }
 /* line 32, style.scss */
