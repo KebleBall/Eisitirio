@@ -1305,7 +1305,7 @@ select[multiple] { height: auto; background-image: none; }
   .button-group.stacked-for-small.expanded .button { display: block; margin-right: 0; } }
 
 /* line 88, scss/vendor/components/_callout.scss */
-.callout { margin: 0 0 1rem 0; padding: 1rem; border: 1px solid rgba(10, 10, 10, 0.25); border-radius: 0; position: relative; color: #fefefe; background-color: #e6e6e6; }
+.callout { margin: 0 0 1rem 0; padding: 1rem; border: 1px solid rgba(10, 10, 10, 0.25); border-radius: 0; position: relative; color: #fefefe; background-color: #e3e3e3; }
 /* line 55, scss/vendor/components/_callout.scss */
 .callout > :first-child { margin-top: 0; }
 /* line 59, scss/vendor/components/_callout.scss */
