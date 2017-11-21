@@ -1,5 +1,6 @@
 @charset "UTF-8";
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic,700italic);
+@import url("https://fonts.googleapis.com/css?family=Rubik:400,700,900");
 /* line 224, scss/vendor/_global.scss */
 html { font-family: sans-serif; line-height: 1.15; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -2141,86 +2142,86 @@ a { font-weight: bold; }
 /* line 16, style.scss */
 .header { text-align: center; background-image: url(./images/headerbg.png); background-size: contain; background-attachment: fixed; background-position: center; position: relative; overflow: visible; padding-top: 0.5rem; padding-bottom: 2.9rem; }
 /* line 28, style.scss */
-.header .header-text { text-transform: uppercase; padding-top: 5vh; padding-bottom: 5vh; }
-/* line 32, style.scss */
-.header .header-text h1 { font-size: 4.5rem; }
+.header .header-text { font-family: "Rubik", sans-serif; text-transform: uppercase; padding-top: 5vh; padding-bottom: 5vh; font-weight: bold; }
 /* line 33, style.scss */
-.header .header-text h2 { font-size: 3.9rem; }
+.header .header-text h1 { font-size: 4.5rem; }
 /* line 34, style.scss */
+.header .header-text h2 { font-size: 3.9rem; }
+/* line 35, style.scss */
 .header .header-text h3 { font-size: 3.3rem; }
-/* line 38, style.scss */
+/* line 39, style.scss */
 .header .headline { color: #ffe; }
-/* line 42, style.scss */
+/* line 43, style.scss */
 .header a { color: #ffe; }
 
-/* line 47, style.scss */
+/* line 48, style.scss */
 .header-subnav { float: none; position: relative; text-align: center; margin: 0 auto; bottom: 0; width: 100%; }
-/* line 55, style.scss */
+/* line 56, style.scss */
 .header-subnav li { float: none; display: inline-block; }
-/* line 59, style.scss */
+/* line 60, style.scss */
 .header-subnav li a { padding: 0.9rem 1rem; font-size: 0.75rem; color: #ffe; text-transform: uppercase; display: block; font-weight: bold; letter-spacing: 1px; transition: all 0.35s ease-in-out; }
-/* line 69, style.scss */
+/* line 70, style.scss */
 .header-subnav li a.is-active { background: rgba(250, 250, 250, 0.15); }
-/* line 73, style.scss */
+/* line 74, style.scss */
 .header-subnav li a:hover { background: rgba(250, 250, 250, 0.15); transition: all 0.35s ease-in-out; }
 
-/* line 81, style.scss */
+/* line 82, style.scss */
 #logo { padding-bottom: 2em; text-align: center; }
-/* line 84, style.scss */
+/* line 85, style.scss */
 #logo h1 { font-size: 3rem; margin: 2rem 0 0; }
-/* line 88, style.scss */
+/* line 89, style.scss */
 #logo h2 { font-size: 5rem; margin: 0; }
-/* line 92, style.scss */
+/* line 93, style.scss */
 #logo h3 { font-size: 2rem; margin: 0 0 2rem; }
 
-/* line 98, style.scss */
+/* line 99, style.scss */
 #user { text-align: right; }
 
-/* line 102, style.scss */
+/* line 103, style.scss */
 #copyright { text-align: center; }
 
-/* line 106, style.scss */
+/* line 107, style.scss */
 .message-box, #flashes li { display: block; border: 0px solid; padding: 0.5em; margin-bottom: 0.5em; background-color: #fff; color: #000; }
-/* line 113, style.scss */
+/* line 114, style.scss */
 .message-box.error, #flashes li.error { background-color: #ec5840; border: 3px solid #b42912; }
-/* line 117, style.scss */
+/* line 118, style.scss */
 .message-box.warning, #flashes li.warning { background-color: #ffae00; border: 3px solid #996800; }
-/* line 121, style.scss */
+/* line 122, style.scss */
 .message-box.success, #flashes li.success { background-color: #3adb76; border: 3px solid #1b9448; }
-/* line 125, style.scss */
+/* line 126, style.scss */
 .message-box.info, #flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
-/* line 129, style.scss */
+/* line 130, style.scss */
 .message-box p:last-child, #flashes li p:last-child { margin-bottom: 0; }
-/* line 132, style.scss */
+/* line 133, style.scss */
 .message-box h1, #flashes li h1, .message-box h2, #flashes li h2, .message-box h3, #flashes li h3, .message-box h4, #flashes li h4, .message-box h5, #flashes li h5, .message-box h6, #flashes li h6 { font-family: "Open Sans", Helvetica, sans-serif; }
 
-/* line 138, style.scss */
+/* line 139, style.scss */
 #flashes ul { margin: 0; }
-/* line 141, style.scss */
+/* line 142, style.scss */
 #flashes li { margin: 0.5em 0; }
 
-/* line 147, style.scss */
+/* line 148, style.scss */
 p.small, li.small { font-size: 0.75rem; }
 
-/* line 151, style.scss */
+/* line 152, style.scss */
 table .button { margin: 0; }
 
-/* line 157, style.scss */
+/* line 158, style.scss */
 #give_tickets input, #refund_transaction input { display: inline; }
-/* line 159, style.scss */
+/* line 160, style.scss */
 #give_tickets input[type="number"], #refund_transaction input[type="number"] { width: 5rem; }
-/* line 162, style.scss */
+/* line 163, style.scss */
 #give_tickets input[type="text"], #refund_transaction input[type="text"] { width: auto; }
 
-/* line 168, style.scss */
+/* line 169, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
 
-/* line 174, style.scss */
+/* line 175, style.scss */
 .upload_photo { margin-bottom: 1rem; }
-/* line 176, style.scss */
+/* line 177, style.scss */
 .upload_photo .large-9 { padding-top: 2rem; }
 
-/* line 181, style.scss */
+/* line 182, style.scss */
 #validate_ticket #holder_photo img { display: block; margin: auto; max-height: 500px; }
 
 /*# sourceMappingURL=style.css.map */

@@ -1,5 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic,700italic);
-
+@import url('https://fonts.googleapis.com/css?family=Rubik:400,700,900');
 @import "scss/variables"; // TODO/XXX: When we use this, the row max-width gets all screwed up
 @import "scss/vendor/global";
 @import "scss/vendor/foundation";
@@ -26,13 +26,14 @@ a {
   //margin-bottom: 0.5rem;
 
   .header-text {
+    font-family: "Rubik", sans-serif;
     text-transform: uppercase;;
     padding-top: 5vh;
     padding-bottom: 5vh;
     h1 { font-size: 1.5 * $h1-font-size; }
     h2 { font-size: 1.5 * $h2-font-size; }
     h3 { font-size: 1.5 * $h3-font-size; }
-
+    font-weight: bold;
   }
 
   .headline {
