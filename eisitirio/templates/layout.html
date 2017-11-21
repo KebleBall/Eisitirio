@@ -89,7 +89,14 @@
         </div>
         <script src="{{ url_for('static', filename='js/vendor/jquery-3.1.1.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/vendor/foundation.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/footer.js') }}"></script>
+        <script>
+		$(window).scroll(function() {
+  var scrolledY = $(window).scrollTop();
+  $('.header').css('background-position', 'left ' + ((scrolledY)) + 'px');
+});
+
+	</script>
+	<script src="{{ url_for('static', filename='js/footer.js') }}"></script>
         {% include 'scripts/sms_verify.html' %}
         {% block javascripts %}{% endblock %}
     </body>
