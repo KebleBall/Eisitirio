@@ -2140,88 +2140,88 @@ nav, #page-title, #main, footer, #flashes, #verify_sms { background-color: #000;
 a { font-weight: bold; }
 
 /* line 16, style.scss */
-.header { text-align: center; background-image: url(./images/headerbg.png); background-size: contain; background-attachment: fixed; background-position: center; position: relative; overflow: visible; padding-top: 0.5rem; padding-bottom: 2.9rem; }
-/* line 28, style.scss */
+.header { text-align: center; background-image: url(./images/headerbg.png); background-size: contain; background-attachment: fixed; background-position: center; background-repeat: no-repeat; position: relative; overflow: visible; padding-top: 0.5rem; padding-bottom: 2.9rem; }
+/* line 29, style.scss */
 .header .header-text { font-family: "Rubik", sans-serif; text-transform: uppercase; padding-top: 5vh; padding-bottom: 5vh; font-weight: bold; }
-/* line 33, style.scss */
-.header .header-text h1 { font-size: 4.5rem; }
 /* line 34, style.scss */
-.header .header-text h2 { font-size: 3.9rem; }
+.header .header-text h1 { font-size: 4.5rem; }
 /* line 35, style.scss */
+.header .header-text h2 { font-size: 3.9rem; }
+/* line 36, style.scss */
 .header .header-text h3 { font-size: 3.3rem; }
-/* line 39, style.scss */
+/* line 40, style.scss */
 .header .headline { color: #ffe; }
-/* line 43, style.scss */
+/* line 44, style.scss */
 .header a { color: #ffe; }
 
-/* line 48, style.scss */
+/* line 49, style.scss */
 .header-subnav { float: none; position: relative; text-align: center; margin: 0 auto; bottom: 0; width: 100%; }
-/* line 56, style.scss */
+/* line 57, style.scss */
 .header-subnav li { float: none; display: inline-block; }
-/* line 60, style.scss */
+/* line 61, style.scss */
 .header-subnav li a { padding: 0.9rem 1rem; font-size: 0.75rem; color: #ffe; text-transform: uppercase; display: block; font-weight: bold; letter-spacing: 1px; transition: all 0.35s ease-in-out; }
-/* line 70, style.scss */
+/* line 71, style.scss */
 .header-subnav li a.is-active { background: rgba(250, 250, 250, 0.15); }
-/* line 74, style.scss */
+/* line 75, style.scss */
 .header-subnav li a:hover { background: rgba(250, 250, 250, 0.15); transition: all 0.35s ease-in-out; }
 
-/* line 82, style.scss */
+/* line 83, style.scss */
 #logo { padding-bottom: 2em; text-align: center; }
-/* line 85, style.scss */
+/* line 86, style.scss */
 #logo h1 { font-size: 3rem; margin: 2rem 0 0; }
-/* line 89, style.scss */
+/* line 90, style.scss */
 #logo h2 { font-size: 5rem; margin: 0; }
-/* line 93, style.scss */
+/* line 94, style.scss */
 #logo h3 { font-size: 2rem; margin: 0 0 2rem; }
 
-/* line 99, style.scss */
+/* line 100, style.scss */
 #user { text-align: right; }
 
-/* line 103, style.scss */
+/* line 104, style.scss */
 #copyright { text-align: center; }
 
-/* line 107, style.scss */
+/* line 108, style.scss */
 .message-box, #flashes li { display: block; border: 0px solid; padding: 0.5em; margin-bottom: 0.5em; background-color: #fff; color: #000; }
-/* line 114, style.scss */
+/* line 115, style.scss */
 .message-box.error, #flashes li.error { background-color: #ec5840; border: 3px solid #b42912; }
-/* line 118, style.scss */
+/* line 119, style.scss */
 .message-box.warning, #flashes li.warning { background-color: #ffae00; border: 3px solid #996800; }
-/* line 122, style.scss */
+/* line 123, style.scss */
 .message-box.success, #flashes li.success { background-color: #3adb76; border: 3px solid #1b9448; }
-/* line 126, style.scss */
+/* line 127, style.scss */
 .message-box.info, #flashes li.info { background-color: #b3dfef; border: 3px solid #1313f3; }
-/* line 130, style.scss */
+/* line 131, style.scss */
 .message-box p:last-child, #flashes li p:last-child { margin-bottom: 0; }
-/* line 133, style.scss */
+/* line 134, style.scss */
 .message-box h1, #flashes li h1, .message-box h2, #flashes li h2, .message-box h3, #flashes li h3, .message-box h4, #flashes li h4, .message-box h5, #flashes li h5, .message-box h6, #flashes li h6 { font-family: "Open Sans", Helvetica, sans-serif; }
 
-/* line 139, style.scss */
+/* line 140, style.scss */
 #flashes ul { margin: 0; }
-/* line 142, style.scss */
+/* line 143, style.scss */
 #flashes li { margin: 0.5em 0; }
 
-/* line 148, style.scss */
+/* line 149, style.scss */
 p.small, li.small { font-size: 0.75rem; }
 
-/* line 152, style.scss */
+/* line 153, style.scss */
 table .button { margin: 0; }
 
-/* line 158, style.scss */
+/* line 159, style.scss */
 #give_tickets input, #refund_transaction input { display: inline; }
-/* line 160, style.scss */
+/* line 161, style.scss */
 #give_tickets input[type="number"], #refund_transaction input[type="number"] { width: 5rem; }
-/* line 163, style.scss */
+/* line 164, style.scss */
 #give_tickets input[type="text"], #refund_transaction input[type="text"] { width: auto; }
 
-/* line 169, style.scss */
+/* line 170, style.scss */
 #dashboard h3 .button { margin: 0; position: relative; top: -0.25rem; }
 
-/* line 175, style.scss */
+/* line 176, style.scss */
 .upload_photo { margin-bottom: 1rem; }
-/* line 177, style.scss */
+/* line 178, style.scss */
 .upload_photo .large-9 { padding-top: 2rem; }
 
-/* line 182, style.scss */
+/* line 183, style.scss */
 #validate_ticket #holder_photo img { display: block; margin: auto; max-height: 500px; }
 
 /*# sourceMappingURL=style.css.map */
