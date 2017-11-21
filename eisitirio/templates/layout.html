@@ -3,11 +3,11 @@
     <head>
         <title>{% block title %}{% endblock %} - {{ template_config['TITLE'] }}</title>
         <meta name="description" content="{{ template_config['TITLE'] }} - Buy Tickets">
-        <meta name="author" content="Samuel Littley and Timothy Zakian">
+        <meta name="author" content="Samuel Littley, Timothy Zakian and Jack Arthur">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
-        <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+        <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}?v=2" />
         {% if template_config['ENABLE_ANALYTICS'] %}
             <script>
               (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
