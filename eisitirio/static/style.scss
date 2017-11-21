@@ -15,8 +15,8 @@ a {
 
 .header {
   text-align: center;
-  background-image: url(./images/headerbg.jpg);
-  background-size: cover;
+  background-image: url(./images/headerbg.png);
+  background-size: contain;
   background-attachment: fixed;
   background-position: center;
   position: relative;
@@ -29,9 +29,9 @@ a {
     text-transform: uppercase;;
     padding-top: 5vh;
     padding-bottom: 5vh;
-    h1 { font-size: 1 * $h1-font-size; }
-    h2 { font-size: 1 * $h2-font-size; }
-    h3 { font-size: 1 * $h3-font-size; }
+    h1 { font-size: 1.5 * $h1-font-size; }
+    h2 { font-size: 1.5 * $h2-font-size; }
+    h3 { font-size: 1.5 * $h3-font-size; }
 
   }
 

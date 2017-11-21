@@ -1305,21 +1305,21 @@ select[multiple] { height: auto; background-image: none; }
   .button-group.stacked-for-small.expanded .button { display: block; margin-right: 0; } }
 
 /* line 88, scss/vendor/components/_callout.scss */
-.callout { margin: 0 0 1rem 0; padding: 1rem; border: 1px solid rgba(10, 10, 10, 0.25); border-radius: 0; position: relative; color: #fefefe; background-color: #e3e3e3; }
+.callout { margin: 0 0 1rem 0; padding: 1rem; border: 1px solid rgba(10, 10, 10, 0.25); border-radius: 0; position: relative; color: #fefefe; background-color: #595959; }
 /* line 55, scss/vendor/components/_callout.scss */
 .callout > :first-child { margin-top: 0; }
 /* line 59, scss/vendor/components/_callout.scss */
 .callout > :last-child { margin-bottom: 0; }
 /* line 92, scss/vendor/components/_callout.scss */
-.callout.primary { background-color: #d9d9ff; }
+.callout.primary { background-color: #1a1aff; }
 /* line 92, scss/vendor/components/_callout.scss */
-.callout.secondary { background-color: #ffd9d9; }
+.callout.secondary { background-color: #ff1a1a; }
 /* line 92, scss/vendor/components/_callout.scss */
-.callout.success { background-color: #e1faea; }
+.callout.success { background-color: #4edf84; }
 /* line 92, scss/vendor/components/_callout.scss */
-.callout.warning { background-color: #fff3d9; }
+.callout.warning { background-color: #ffb61a; }
 /* line 92, scss/vendor/components/_callout.scss */
-.callout.alert { background-color: #fce6e2; }
+.callout.alert { background-color: #ee6953; }
 /* line 97, scss/vendor/components/_callout.scss */
 .callout.small { padding-top: 0.5rem; padding-right: 0.5rem; padding-bottom: 0.5rem; padding-left: 0.5rem; }
 /* line 101, scss/vendor/components/_callout.scss */
@@ -2139,15 +2139,15 @@ nav, #page-title, #main, footer, #flashes, #verify_sms { background-color: #000;
 a { font-weight: bold; }
 
 /* line 16, style.scss */
-.header { text-align: center; background-image: url(./images/headerbg.jpg); background-size: cover; background-attachment: fixed; background-position: center; position: relative; overflow: visible; padding-top: 0.5rem; padding-bottom: 2.9rem; }
+.header { text-align: center; background-image: url(./images/headerbg.png); background-size: contain; background-attachment: fixed; background-position: center; position: relative; overflow: visible; padding-top: 0.5rem; padding-bottom: 2.9rem; }
 /* line 28, style.scss */
 .header .header-text { text-transform: uppercase; padding-top: 5vh; padding-bottom: 5vh; }
 /* line 32, style.scss */
-.header .header-text h1 { font-size: 3rem; }
+.header .header-text h1 { font-size: 4.5rem; }
 /* line 33, style.scss */
-.header .header-text h2 { font-size: 2.6rem; }
+.header .header-text h2 { font-size: 3.9rem; }
 /* line 34, style.scss */
-.header .header-text h3 { font-size: 2.2rem; }
+.header .header-text h3 { font-size: 3.3rem; }
 /* line 38, style.scss */
 .header .headline { color: #ffe; }
 /* line 42, style.scss */
