@@ -2140,7 +2140,7 @@ nav, #page-title, #main, footer, #flashes, #verify_sms { background-color: #000;
 a { font-weight: bold; }
 
 /* line 16, style.scss */
-.header { text-align: center; background-image: url(./images/headerbg.png); background-size: contain; background-attachment: fixed; background-position: center; background-repeat: no-repeat; position: relative; overflow: visible; padding-top: 0.5rem; padding-bottom: 2.9rem; }
+.header { text-align: center; background-image: url(./images/headerbg.png); background-size: contain; background-attachment: scroll; background-position: center; background-repeat: no-repeat; position: relative; overflow: visible; padding-top: 0.5rem; padding-bottom: 2.9rem; }
 /* line 29, style.scss */
 .header .header-text { font-family: "Rubik", sans-serif; text-transform: uppercase; padding-top: 5vh; padding-bottom: 5vh; font-weight: bold; }
 /* line 34, style.scss */
